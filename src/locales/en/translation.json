@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "brand": "MARXIST.THEORY",
+    "theory": "Revolutionary Theory",
+    "analysis": "Analysis",
+    "library": "Digital Library",
+    "submit": "Submit"
+  },
+  "hero": {
+    "title": "革命 REVOLUTIONARY THEORY",
+    "subtitle": "A collective of writers, artists, and researchers contributing to the renaissance of Marxist analysis",
+    "buttons": {
+      "explore": "Explore Theory",
+      "submit": "Submit Work"
+    }
+  },
+  "featured": {
+    "title": "Featured Analysis",
+    "cards": {
+      "dialectics": {
+        "title": "Dialectical Materialism in the Digital Age",
+        "excerpt": "Examining the contradictions of modern technology",
+        "category": "Theory"
+      },
+      "labor": {
+        "title": "Labor Movement Resurgence",
+        "excerpt": "Analysis of contemporary worker organization",
+        "category": "Analysis"
+      },
+      "ai": {
+        "title": "Socialist Planning & AI",
+        "excerpt": "Technical possibilities for economic coordination",
+        "category": "Technology"
+      }
+    }
+  },
+  "library": {
+    "title": "Digital Library",
+    "classicalTexts": {
+      "title": "Classical Texts",
+      "description": "Access foundational works of Marxist theory"
+    }
+  },
+  "common": {
+    "readMore": "Read More →"
+  }
+}

@@ -1,0 +1,14 @@
+# Create and open .gitignore
+echo "node_modules/
+.env
+.env.local
+.DS_Store
+build/
+.next/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*" > .gitignore
+# Cache files
+node_modules/.cache
+.eslintcache
