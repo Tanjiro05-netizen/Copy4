@@ -1,24 +1,12 @@
 import React, { useState } from 'react';
-import { ChevronRight, Globe, ArrowLeft, RotateCw, X, LogOut } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import Header from '../components/Header';
 
 const TheoryPage = () => {
     const [activeCategory, setActiveCategory] = useState('philosophy');
-    const { logout } = useAuth();
-    const navigate = useNavigate();
-    const { t, i18n } = useTranslation();
-
-    const toggleLanguage = () => {
-        const newLang = i18n.language === 'en' ? 'kr' : 'en';
-        i18n.changeLanguage(newLang);
-    };
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    const { t } = useTranslation();
 
     const categories = [
         { id: 'dialectics', name: t('辯證法'), enName: t('Dialectics') },
@@ -47,159 +35,105 @@ const TheoryPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-black text-white">
-            {/* Top Menu Bar */}
-            <div className="fixed top-0 left-0 right-0 z-50 bg-neutral-900 border-b border-neutral-800">
-                <div className="flex items-center h-12">
-                    {/* Back Button and Title */}
-                    <div className="flex items-center px-4 border-r border-neutral-800 h-full">
-                        <button className="flex items-center text-neutral-400 hover:text-white transition-colors">
-                            <ArrowLeft className="w-4 h-4 mr-2" />
-                            <span className="text-sm">{t('Revolutionary Theory Page')}</span>
-                        </button>
+        <div className="min-h-screen bg-[#12131A] text-white">
+            <Header />
+
+            <main className="pt-24 pb-16 max-w-7xl mx-auto px-4">
+                <h1 className="text-4xl font-bold mb-8">{t('Revolutionary Theory')}</h1>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Left Sidebar */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-black/30 rounded-lg p-4 sticky top-24">
+                            <h2 className="text-xl font-semibold mb-4">{t('Categories')}</h2>
+                            <div className="space-y-2">
+                                {categories.map(category => (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => setActiveCategory(category.id)}
+                                        className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                                            activeCategory === category.id
+                                                ? 'bg-red-600/20 text-white'
+                                                : 'text-gray-400 hover:bg-black/50'
+                                        }`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <div className="text-sm font-medium">{category.enName}</div>
+                                                <div className="text-xs opacity-70">{category.name}</div>
+                                            </div>
+                                            {activeCategory === category.id && (
+                                                <ChevronRight className="w-4 h-4 text-red-400" />
+                                            )}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Center Buttons */}
-                    <div className="flex items-center mx-auto space-x-2 px-4">
-                        <button className="px-3 py-1 text-sm text-white bg-neutral-800 rounded">
-                            {t('Preview')}
-                        </button>
-                        <button className="px-3 py-1 text-sm text-neutral-400 hover:text-white transition-colors">
-                            {t('Code')}
-                        </button>
-                    </div>
-
-                    {/* Right Actions */}
-                    <div className="flex items-center px-4 border-l border-neutral-800 h-full">
-                        <button className="flex items-center text-neutral-400 hover:text-white transition-colors">
-                            <RotateCw className="w-4 h-4 mr-2" />
-                        </button>
-                        <button className="flex items-center text-neutral-400 hover:text-white transition-colors ml-2">
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-black">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex items-center justify-between h-16">
-                        <Link to="/" className="text-white font-medium">
-                            {t('MARXIST.THEORY')}
-                        </Link>
-
-                        <div className="flex items-center space-x-4">
-                            <Link
-                                to="/"
-                                className="px-4 py-1 text-sm text-gray-400 hover:bg-neutral-800 rounded"
-                            >
-                                {t('Home')}
-                            </Link>
-                            <button className="px-4 py-1 text-sm text-white hover:bg-neutral-800 rounded">
-                                {t('Revolutionary Theory')}
-                            </button>
-                            <button className="px-4 py-1 text-sm text-gray-400 hover:bg-neutral-800 rounded">
-                                {t('Analysis')}
-                            </button>
-                            <Link
-                                to="/digital-library"
-                                className="px-4 py-1 text-sm text-gray-400 hover:bg-neutral-800 rounded"
-                            >
-                                {t('Digital Library')}
-                            </Link>
-                            <button className="px-4 py-1 text-sm text-gray-400 hover:bg-neutral-800 rounded">
-                                {t('Submit')}
-                            </button>
-                            <button
-                                onClick={toggleLanguage}
-                                className="flex items-center space-x-2 hover:text-red-400 transition-colors"
-                            >
-                                <Globe className="h-5 w-5"/>
-                                <span className="text-sm">{i18n.language.toUpperCase()}</span>
-                            </button>
-                            <button
-                                onClick={handleLogout}
-                                className="p-2 hover:bg-neutral-800 rounded-full transition-colors text-red-500"
-                            >
-                                <LogOut className="w-5 h-5"/>
-                            </button>
+                    {/* Main Content */}
+                    <div className="lg:col-span-3 space-y-6">
+                        {/* Featured Section */}
+                        <div className="bg-gradient-to-r from-red-900/30 to-black/30 rounded-lg overflow-hidden">
+                            <div className="p-6">
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                                    <h2 className="text-2xl font-bold">{t('Featured Materials')}</h2>
+                                    <Link to="/digital-library" className="text-red-400 text-sm hover:underline mt-2 md:mt-0">
+                                        {t('View All')}
+                                    </Link>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {articles.map(article => (
+                                        <div key={article.id} className="bg-black/40 rounded-lg p-4">
+                                            <div className="mb-2">
+                                                <span className="text-xs text-red-400 uppercase">
+                                                    {categories.find(c => c.id === article.category)?.enName}
+                                                </span>
+                                            </div>
+                                            <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
+                                            <p className="text-gray-400 text-sm mb-4">{article.excerpt}</p>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xs text-gray-400">{article.readTime}</span>
+                                                <div className="relative w-24 h-1 bg-gray-700 rounded-full overflow-hidden">
+                                                    <div 
+                                                        className="absolute top-0 left-0 h-full bg-red-500 rounded-full"
+                                                        style={{ width: `${article.progress}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Additional Theory Sections */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-black/30 rounded-lg p-6">
+                                <h3 className="text-xl font-semibold mb-4">{t('Marxist Classics')}</h3>
+                                <p className="text-gray-400">
+                                    {t('Essential readings from Marx, Engels, Lenin, and other foundational theorists.')}
+                                </p>
+                                <Link to="/digital-library?category=classics" className="mt-4 inline-block text-red-400 hover:underline">
+                                    {t('Explore Classics')}
+                                </Link>
+                            </div>
+                            
+                            <div className="bg-black/30 rounded-lg p-6">
+                                <h3 className="text-xl font-semibold mb-4">{t('Contemporary Theory')}</h3>
+                                <p className="text-gray-400">
+                                    {t('Modern applications and developments of Marxist analysis in the 21st century.')}
+                                </p>
+                                <Link to="/digital-library?category=contemporary" className="mt-4 inline-block text-red-400 hover:underline">
+                                    {t('Explore Contemporary Works')}
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </nav>
-
-            {/* Hero Section */}
-            <div className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-28">
-                <div className="absolute inset-0 flex items-center justify-center opacity-5">
-                    <span className="text-9xl text-red-500">{t('革命')}</span>
-                </div>
-                <h1 className="text-5xl md:text-7xl font-bold mb-6 text-center">{t('革命 REVOLUTIONARY THEORY')}</h1>
-                <p className="text-gray-400 text-xl max-w-3xl text-center">
-                    {t('"Without revolutionary theory there can be no revolutionary movement."')}
-                </p>
-            </div>
-
-            {/* Category Navigation */}
-            <div className="max-w-6xl mx-auto px-6">
-                <div className="flex space-x-12 mb-16">
-                    {categories.map(category => (
-                        <button
-                            key={category.id}
-                            onClick={() => setActiveCategory(category.id)}
-                            className="flex flex-col space-y-2 group"
-                        >
-                            <span className={`text-2xl transition-colors ${
-                                activeCategory === category.id ? 'text-red-500' : 'text-gray-400 group-hover:text-white'
-                            }`}>
-                                {category.name}
-                            </span>
-                            <span className={`text-sm transition-colors ${
-                                activeCategory === category.id ? 'text-gray-200' : 'text-gray-600 group-hover:text-gray-400'
-                            }`}>
-                                {category.enName}
-                            </span>
-                        </button>
-                    ))}
-                </div>
-
-                {/* Articles */}
-                <div className="space-y-4">
-                    {articles.map(article => (
-                        <div
-                            key={article.id}
-                            className="group relative bg-black border border-red-900/20 hover:border-red-500/30 rounded p-6 cursor-pointer"
-                        >
-                            <div className="flex justify-between items-start mb-3">
-                                <h3 className="text-xl font-medium group-hover:text-red-500 transition-colors">
-                                    {article.title}
-                                </h3>
-                                <span className="text-sm text-gray-500">{article.readTime}</span>
-                            </div>
-
-                            <p className="text-gray-400 mb-6 pr-8">{article.excerpt}</p>
-
-                            {/* Progress Bar */}
-                            <div className="h-1 bg-red-900/20 rounded-full overflow-hidden mb-3">
-                                <div
-                                    className="h-full bg-red-600 transition-all duration-500"
-                                    style={{ width: `${article.progress}%` }}
-                                />
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500">{t('Complete', { progress: article.progress })}</span>
-                                <ChevronRight
-                                    className="w-5 h-5 text-red-500 transform group-hover:translate-x-1 transition-transform duration-300"
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Bottom Spacing */}
-            <div className="h-32" />
+            </main>
         </div>
     );
 };

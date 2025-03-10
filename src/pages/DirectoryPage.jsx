@@ -17,33 +17,33 @@ const DirectoryPage = () => {
     const tools = [
         {
             id: 'concepts',
-            name: 'Concept Mapping',
+            name: t('directory.conceptMapping'),
             icon: Network,
-            description: 'Dialectical analysis and concept relationships'
+            description: t('directory.conceptMappingDesc')
         },
         {
             id: 'bibliography',
-            name: 'Bibliography',
+            name: t('directory.bibliography'),
             icon: BookCopy,
-            description: 'Manage and organize references'
+            description: t('directory.bibliographyDesc')
         },
         {
             id: 'references',
-            name: 'Cross References',
+            name: t('directory.crossReferences'),
             icon: GitFork,
-            description: 'Navigate connections between texts'
+            description: t('directory.crossReferencesDesc')
         },
         {
             id: 'glossary',
-            name: 'Marxist Glossary',
+            name: t('directory.marxistGlossary'),
             icon: Book,
-            description: 'Comprehensive dictionary of terms and concepts'
+            description: t('directory.marxistGlossaryDesc')
         },
         {
             id: 'timeline',
-            name: 'Historical Timeline',
+            name: t('directory.historicalTimeline'),
             icon: Clock,
-            description: 'Explore historical events and theoretical developments'
+            description: t('directory.historicalTimelineDesc')
         }
     ];
 
@@ -55,8 +55,8 @@ const DirectoryPage = () => {
         <div className="min-h-screen bg-[#12131A]">
             <Header />
             
-            <main className="container mx-auto px-4 py-16">
-                <h1 className="text-4xl font-bold text-white mb-8">Research Directory</h1>
+            <main className="container mx-auto px-4 pt-24 pb-16">
+                <h1 className="text-4xl font-bold text-white mb-8">{t('directory.researchDirectory')}</h1>
                 
                 <div className="flex gap-8">
                     {/* Left Side Navigation Tiles */}
@@ -120,7 +120,7 @@ const DirectoryPage = () => {
                                             : 'text-gray-400'
                                     }`} />
                                     <span className={activeTab === 'timeline' ? 'text-white' : 'text-gray-300'}>
-                                        {activeTab === 'timeline' ? 'Close Timeline' : 'Historical Timeline'}
+                                        {activeTab === 'timeline' ? t('directory.closeTimeline') : t('directory.historicalTimeline')}
                                     </span>
                                 </div>
                             </button>
@@ -151,8 +151,8 @@ const DirectoryPage = () => {
                                 relative overflow-hidden transition-all duration-300">
                                 <div className="absolute inset-0 bg-[radial-gradient(#ff000022_1px,transparent_1px)] [background-size:16px_16px] opacity-10"></div>
                                 <div className="relative z-10">
-                                    <h2 className="text-2xl font-bold text-white mb-4">Select a Tool</h2>
-                                    <p className="text-gray-400">Choose a research tool from the left sidebar to begin.</p>
+                                    <h2 className="text-2xl font-bold text-white mb-4">{t('directory.selectTool')}</h2>
+                                    <p className="text-gray-400">{t('directory.selectToolDesc')}</p>
                                 </div>
                             </div>
                         )}

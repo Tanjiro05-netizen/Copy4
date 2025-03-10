@@ -12,3 +12,4 @@ yarn-error.log*" > .gitignore
 # Cache files
 node_modules/.cache
 .eslintcache
+node_modules

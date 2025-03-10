@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
-import { Search, Clock, Share2, BookmarkPlus, Download, BookOpen, Quote, FileText, MessageSquare, Tags, Filter, Network, X, Check } from 'lucide-react';
+import { Search, Clock, Share2, BookmarkPlus, Download, BookOpen, Quote, FileText, MessageSquare, Tags, Filter, Network, X, Check, GitFork } from 'lucide-react';
 
 const AnalysisPage = () => {
     const { t } = useTranslation();
@@ -17,12 +17,12 @@ const AnalysisPage = () => {
     const [showFilters, setShowFilters] = useState(false);
 
     const categories = [
-        { id: 'all', name: 'All' },
-        { id: 'economic', name: 'Economic Analysis' },
-        { id: 'labor', name: 'Labor Theory' },
-        { id: 'political', name: 'Political Economy' },
-        { id: 'dialectical', name: 'Dialectical Analysis' },
-        { id: 'historical', name: 'Historical Materialism' }
+        { id: 'all', name: t('analysis.all') },
+        { id: 'economic', name: t('analysis.economicAnalysis') },
+        { id: 'labor', name: t('analysis.laborTheory') },
+        { id: 'political', name: t('analysis.politicalEconomy') },
+        { id: 'dialectical', name: t('analysis.dialecticalAnalysis') },
+        { id: 'historical', name: t('analysis.historicalMaterialism') }
     ];
 
     // Import article data
@@ -65,18 +65,18 @@ const AnalysisPage = () => {
             
                 <Header />
             
-                <div className="relative pt-20 pb-12 px-4">
+                <div className="relative pt-24 pb-12 px-4">
                     <div className="max-w-7xl mx-auto">
                         <div className="flex flex-col md:flex-row items-center justify-between mb-6">
                             <div className="text-center md:text-left mb-4 md:mb-0">
-                                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Analysis Archive</h1>
+                                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{t('analysis.title')}</h1>
                                 <p className="text-base text-gray-300 max-w-2xl">
-                                    {analyses.length} Papers Available
+                                    {analyses.length} {t('analysis.papersAvailable')}
                                 </p>
                             </div>
                             
                             <button className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                                Submit Analysis
+                                {t('analysis.submitAnalysis')}
                             </button>
                         </div>
                         
@@ -85,7 +85,7 @@ const AnalysisPage = () => {
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
                                     type="text"
-                                    placeholder="Search analyses..."
+                                    placeholder={t('analysis.searchAnalyses')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full bg-black/50 border border-red-900/30 text-white rounded-lg pl-10 pr-4 py-3 focus:border-red-500 transition-colors"
@@ -97,9 +97,9 @@ const AnalysisPage = () => {
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value)}
                                 >
-                                    <option value="latest">Latest</option>
-                                    <option value="popular">Most Read</option>
-                                    <option value="trending">Trending</option>
+                                    <option value="latest">{t('analysis.latest')}</option>
+                                    <option value="popular">{t('analysis.mostRead')}</option>
+                                    <option value="trending">{t('analysis.trending')}</option>
                                 </select>
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
@@ -135,7 +135,7 @@ const AnalysisPage = () => {
                 {showFilters && (
                     <div className="bg-black/30 backdrop-blur-sm p-6 rounded-lg mb-8 border border-red-900/20">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-white font-semibold">Advanced Filters</h3>
+                            <h3 className="text-white font-semibold">{t('analysis.advancedFilters')}</h3>
                             <button
                                 onClick={() => setShowFilters(false)}
                                 className="text-gray-400 hover:text-white transition-colors"
@@ -152,7 +152,7 @@ const AnalysisPage = () => {
                                         : 'bg-black/50 text-gray-400 hover:bg-black/40'
                                 }`}
                             >
-                                <span>Peer Reviewed</span>
+                                <span>{t('analysis.peerReviewed')}</span>
                                 {activeFilters.peerReviewed && <Check className="w-5 h-5" />}
                             </button>
                             <button
@@ -163,7 +163,7 @@ const AnalysisPage = () => {
                                         : 'bg-black/50 text-gray-400 hover:bg-black/40'
                                 }`}
                             >
-                                <span>With Citations</span>
+                                <span>{t('analysis.withCitations')}</span>
                                 {activeFilters.withCitations && <Check className="w-5 h-5" />}
                             </button>
                             <button
@@ -174,7 +174,7 @@ const AnalysisPage = () => {
                                         : 'bg-black/50 text-gray-400 hover:bg-black/40'
                                 }`}
                             >
-                                <span>With Methodology</span>
+                                <span>{t('analysis.withMethodology')}</span>
                                 {activeFilters.withMethodology && <Check className="w-5 h-5" />}
                             </button>
                         </div>
@@ -223,7 +223,7 @@ const AnalysisPage = () => {
                             
                             {analysis.methodology && (
                                 <div className="text-xs text-gray-400 mb-3">
-                                    <span className="text-red-500">Methodology:</span> {analysis.methodology}
+                                    <span className="text-red-500">{t('analysis.methodology')}:</span> {analysis.methodology}
                                 </div>
                             )}
                             

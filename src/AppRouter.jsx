@@ -13,6 +13,7 @@ import SubmitPage from './pages/SubmitPage';
 import DirectoryPage from './pages/DirectoryPage';
 import DataVisualizationPage from './pages/DataVisualizationPage';
 import ArticleReaderPage from './pages/ArticleReaderPage';
+import BookReaderPage from './pages/BookReaderPage';
 
 const AppRouter = () => {
     return (
@@ -45,8 +46,17 @@ const AppRouter = () => {
                     } />
                     <Route path="/analysis" element={<AnalysisPage />} />
                     <Route path="/submit" element={<SubmitPage />} />
-                    <Route path="/visualizations" element={<DataVisualizationPage />} />
+                    <Route path="/visualizations" element={
+                        <ProtectedRoute>
+                            <DataVisualizationPage />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/article/:articleId" element={<ArticleReaderPage />} />
+                    <Route path="/book/:bookId" element={
+                        <ProtectedRoute>
+                            <BookReaderPage />
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </Router>
         </AuthProvider>
