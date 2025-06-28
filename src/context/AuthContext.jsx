@@ -1,25 +1,44 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const login = (username, password) => {
-        // Dummy authentication
-        if (username === "Admin" && password === "Admin") {
-            setIsAuthenticated(true);
-            return true;
-        }
-        return false;
-    };
+    useEffect(() => {
+        const getSession = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                setUser(session?.user ?? null);
+            } catch (error) {
+                console.error('Error getting session:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const logout = () => {
-        setIsAuthenticated(false);
+        getSession();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => {
+            subscription?.unsubscribe();
+        };
+    }, []);
+
+    const value = {
+        signUp: (data) => supabase.auth.signUp(data),
+        login: (data) => supabase.auth.signInWithPassword(data),
+        logout: () => supabase.auth.signOut(),
+        user,
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
@@ -27,7 +46,7 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if (!context) {
+    if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;

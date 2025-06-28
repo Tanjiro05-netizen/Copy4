@@ -1,4 +1,4 @@
-// src/App.jsx
+
 import React, { useState } from 'react';
 import { Menu, Book, Globe, LogOut, FileText, BookOpen, BarChart, Sun, Moon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';

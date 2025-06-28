@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Info, AlertCircle, X } from 'lucide-react';
-import Header from '../components/Header';
-import SubmissionGuidelines from '../components/SubmissionGuidelines';
-import ResearchValidation from '../components/ResearchValidation';
+
+import { FileIcon, UploadIcon, Info } from "lucide-react";
+import SubmissionGuidelines from "../components/SubmissionGuidelines";
 
 const SubmitPage = () => {
     const { t } = useTranslation();
-    const [showGuidelines, setShowGuidelines] = useState(false);
-    const [showValidation, setShowValidation] = useState(false);
+    const [fileName, setFileName] = useState("");
+    const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
 
     return (
         <div className="min-h-screen bg-[#12131A]">
@@ -26,7 +25,7 @@ const SubmitPage = () => {
                     ></div>
                 </div>
 
-                <Header />
+                
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                     <div className="text-center space-y-8 max-w-4xl px-4 mb-16">
@@ -51,17 +50,10 @@ const SubmitPage = () => {
             {/* Submission Form Section */}
             <section className="container mx-auto px-4 py-16">
                 <div className="max-w-3xl mx-auto bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-red-900/20">
-                    {/* Guidelines and Validation Buttons */}
+                    {/* Guidelines Button */}
                     <div className="flex justify-end space-x-4 mb-6">
                         <button
-                            onClick={() => setShowValidation(true)}
-                            className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"
-                        >
-                            <AlertCircle className="w-5 h-5" />
-                            <span>Research Validation Requirements</span>
-                        </button>
-                        <button
-                            onClick={() => setShowGuidelines(true)}
+                            onClick={() => setShowGuidelinesModal(true)}
                             className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"
                         >
                             <Info className="w-5 h-5" />
@@ -139,27 +131,9 @@ const SubmitPage = () => {
             </section>
 
             {/* Guidelines Modal */}
-            <SubmissionGuidelines 
-                isOpen={showGuidelines} 
-                onClose={() => setShowGuidelines(false)} 
-            />
+            <SubmissionGuidelines isOpen={showGuidelinesModal} onClose={() => setShowGuidelinesModal(false)} />
 
-            {/* Research Validation Modal */}
-            {showValidation && (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-end mb-4">
-                            <button
-                                onClick={() => setShowValidation(false)}
-                                className="p-2 hover:bg-red-900/20 rounded-full transition-colors"
-                            >
-                                <X className="w-6 h-6 text-red-500" />
-                            </button>
-                        </div>
-                        <ResearchValidation />
-                    </div>
-                </div>
-            )}
+            
 
             <style jsx>{`
                 .input-div {

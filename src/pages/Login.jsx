@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const Login = () => {
-    const [credentials, setCredentials] = useState({ username: '', password: '' });
+const LoginPage = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const { login } = useAuth();
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        if (login(credentials.username, credentials.password)) {
-            navigate('/');
+        setError('');
+        setLoading(true);
+        const { error } = await login({ email, password });
+        if (error) {
+            setError(error.message);
         } else {
-            setError('Invalid credentials');
+            navigate('/');
         }
+        setLoading(false);
     };
 
     return (
-        <div className="min-h-screen bg-black text-white">
-            <nav className="p-5 flex justify-between bg-transparent">
-                <div className="font-bold text-2xl">MARXIST.THEORY</div>
-            </nav>
-
-            {/* Background Image Container */}
+        <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center relative overflow-hidden">
+            {/* Background elements from the original design */}
             <div className="fixed inset-0 z-0">
                 <div
                     className="w-full h-full opacity-20"
@@ -35,54 +37,48 @@ const Login = () => {
                     }}
                 />
             </div>
+            <div className="fixed inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
 
             {/* Login Form Container */}
-            <div className="relative z-10 h-[calc(100vh-64px)] flex justify-center items-center">
-                <div className="bg-black/30 backdrop-blur-sm p-10 rounded-lg w-[90%] max-w-[400px] border border-red-900/30">
-                    <h1 className="text-3xl font-bold mb-8 text-center">Login</h1>
-
+            <div className="relative z-10 max-w-md w-full p-8 space-y-8 bg-black/50 backdrop-blur-sm border border-red-900/40 rounded-lg shadow-lg">
+                <h2 className="text-3xl font-bold text-center text-red-500">Login</h2>
+                <form onSubmit={handleLogin} className="space-y-6">
+                    <div>
+                        <label className="block mb-2 text-sm font-medium">Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-2 text-sm font-medium">Password</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-3 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition"
+                            required
+                        />
+                    </div>
                     {error && (
-                        <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded mb-4">
+                        <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-lg text-center">
                             {error}
                         </div>
                     )}
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-5">
-                            <label className="block mb-1">Username</label>
-                            <input
-                                type="text"
-                                value={credentials.username}
-                                onChange={(e) => setCredentials({...credentials, username: e.target.value})}
-                                required
-                                className="w-full p-2 bg-black/50 border border-red-500/30 text-white rounded focus:outline-none focus:border-red-500/60"
-                            />
-                        </div>
-
-                        <div className="mb-5">
-                            <label className="block mb-1">Password</label>
-                            <input
-                                type="password"
-                                value={credentials.password}
-                                onChange={(e) => setCredentials({...credentials, password: e.target.value})}
-                                required
-                                className="w-full p-2 bg-black/50 border border-red-500/30 text-white rounded focus:outline-none focus:border-red-500/60"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="w-full py-2 bg-red-600 text-white rounded cursor-pointer hover:bg-red-700 transition-colors mt-5"
-                        >
-                            Sign In
-                        </button>
-                    </form>
-                </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full p-3 bg-red-600 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
+                </form>
             </div>
-
-            <div className="fixed inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
         </div>
     );
 };
 
-export default Login;
+export default LoginPage;
