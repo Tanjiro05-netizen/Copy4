@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
+import { supabase } from '../supabaseClient';
+
 import { 
     Search, Filter, BookOpen, Clock, Download, 
     BookmarkPlus, List, Grid, SortAsc, Calendar,
@@ -15,29 +16,56 @@ const DigitalLibraryPage = () => {
         language: 'all',
         type: 'all'
     });
+    const [books, setBooks] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const books = [
-        {
-            id: 1,
-            title: "Capital, Volume I",
-            author: "Karl Marx",
-            year: 1867,
-            language: "English",
-            type: "Book",
-            era: "19th Century",
-            pages: 1152,
-            downloads: 15234,
-            coverImage: "/images/books/2018062917173050984.jpg",
-            description: "A critical analysis of political economy...",
-            relatedAnalyses: 45,
-            tags: ["Political Economy", "Labor Theory", "Capitalism"]
-        },
-        // ... more books
-    ];
+    useEffect(() => {
+        const fetchBooks = async () => {
+            setIsLoading(true);
+            setError(null);
+            console.log("Fetching books from Supabase...");
+            try {
+                const { data, error } = await supabase.storage.from('library').list();
+
+                console.log("Supabase storage response:", { data, error });
+
+                if (error) {
+                    console.error("Error fetching books from Supabase:", error);
+                    throw error;
+                }
+
+                if (data) {
+                    console.log("Books data received:", data);
+                    const formattedBooks = data.map(file => ({
+                        id: file.id,
+                        name: file.name, // Keep original name for linking
+                        title: file.name.replace(/\.pdf$/i, '').replace(/_/g, ' '),
+                        author: 'Unknown',
+                        year: 'N/A',
+                        coverImage: '/images/books/default-cover.jpg', // A default cover
+                        downloads: 0,
+                        pages: 0,
+                    }));
+                    setBooks(formattedBooks);
+                } else {
+                    console.log("No book data received.");
+                    setBooks([]);
+                }
+            } catch (error) {
+                console.error("Caught an error during fetchBooks:", error);
+                setError('Error fetching books: ' + error.message);
+            } finally {
+                setIsLoading(false);
+                console.log("Finished book fetching process.");
+            }
+        };
+
+        fetchBooks();
+    }, []);
 
     return (
         <div className="min-h-screen bg-[#12131A]">
-            <Header />
             
             {/* Hero Section */}
             <div className="relative bg-black/40 py-24">
@@ -114,62 +142,65 @@ const DigitalLibraryPage = () => {
 
                 {/* Book Grid */}
                 <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
-                    {books.map(book => (
-                        <div key={book.id} className={`
-                            ${viewMode === 'grid' 
-                                ? 'bg-black/30 rounded-lg p-4 border border-red-900/20 hover:border-red-900/40 transition-colors'
-                                : 'flex items-start space-x-4 bg-black/30 rounded-lg p-4 border border-red-900/20'}
-                        `}>
-                            <div className={viewMode === 'grid' ? 'aspect-[3/4] mb-4' : 'w-32'}>
-                                <img
-                                    src={book.coverImage}
-                                    alt={book.title}
-                                    className="w-full h-full object-cover rounded"
-                                />
-                            </div>
-                            
-                            <div className="flex-1">
-                                <h3 className="text-xl font-semibold text-white mb-2">{book.title}</h3>
-                                <p className="text-gray-400 text-sm mb-2">{book.author} • {book.year}</p>
-                                
-                                {viewMode === 'list' && (
-                                    <p className="text-gray-300 text-sm mb-4">{book.description}</p>
-                                )}
-                                
-                                <div className="flex items-center space-x-4 text-sm text-gray-400">
-                                    <span className="flex items-center">
-                                        <FileText size={16} className="mr-1" />
-                                        {book.pages} pages
-                                    </span>
-                                    <span className="flex items-center">
-                                        <Download size={16} className="mr-1" />
-                                        {book.downloads}
-                                    </span>
-                                    <Link 
-                                        to={`/analysis?book=${book.id}`}
-                                        className="text-red-400 hover:text-red-500"
-                                    >
-                                        {book.relatedAnalyses} Analyses
-                                    </Link>
+                    {isLoading ? (
+                        <div className="text-white col-span-full text-center p-8">Loading books...</div>
+                    ) : error ? (
+                        <div className="text-red-500 col-span-full text-center p-8">{error}</div>
+                    ) : (
+                        books.map(book => (
+                            <div key={book.id} className={`
+                                ${viewMode === 'grid' 
+                                    ? 'bg-black/30 rounded-lg p-4 border border-red-900/20 hover:border-red-900/40 transition-colors flex flex-col'
+                                    : 'flex items-start space-x-4 bg-black/30 rounded-lg p-4 border border-red-900/20'}
+                            `}>
+                                <div className={viewMode === 'grid' ? 'aspect-[3/4] mb-4' : 'w-32 flex-shrink-0'}>
+                                    <img
+                                        src={book.coverImage}
+                                        alt={book.title}
+                                        className="w-full h-full object-cover rounded"
+                                    />
                                 </div>
                                 
-                                <div className="flex items-center space-x-2 mt-4">
-                                    <button className="p-2 bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">
-                                        <Download size={16} />
-                                    </button>
-                                    <button className="p-2 bg-black/50 text-gray-400 rounded hover:text-white">
-                                        <BookmarkPlus size={16} />
-                                    </button>
-                                                                  <Link 
-                                        to={`/book/${book.id}`}
-                                        className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700"
-                                    >
-                                        Read Now
-                                    </Link>
+                                <div className="flex-1 flex flex-col">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-white mb-2 hover:text-red-400 transition-colors">
+                                            <Link to={`/book/${book.name}`}>{book.title}</Link>
+                                        </h3>
+                                        <p className="text-gray-400 text-sm mb-2">{book.author} • {book.year}</p>
+                                        
+                                        {viewMode === 'list' && (
+                                            <p className="text-gray-300 text-sm mb-4">Description placeholder for the book will go here.</p>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="flex-grow"></div>
+
+                                    <div className="flex items-center space-x-4 text-sm text-gray-400 mt-2">
+                                        <span className="flex items-center">
+                                            <FileText size={16} className="mr-1" />
+                                            {book.pages} pages
+                                        </span>
+                                        <span className="flex items-center">
+                                            <Download size={16} className="mr-1" />
+                                            {book.downloads}
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="flex items-center space-x-2 mt-4">
+                                         <Link 
+                                            to={`/book/${book.name}`}
+                                            className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors text-sm font-bold"
+                                        >
+                                            Read Now
+                                        </Link>
+                                        <button className="p-2 bg-black/50 text-gray-400 rounded hover:text-white">
+                                            <BookmarkPlus size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>

@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './i18n';
 import './index.css';
+import './styles/theme.css';
 import AppRouter from './AppRouter';
 
 // Add error logging to help debug initialization issues

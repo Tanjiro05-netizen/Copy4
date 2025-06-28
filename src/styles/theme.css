@@ -1,0 +1,106 @@
+/* Theme variables */
+:root {
+  /* Dark theme (default) */
+  --bg-primary: #12131A;
+  --bg-secondary: rgba(0, 0, 0, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db; /* gray-300 */
+  --text-tertiary: #9ca3af; /* gray-400 */
+  --accent-primary: #dc2626; /* red-600 */
+  --accent-secondary: rgba(220, 38, 38, 0.2); /* red-600 with opacity */
+  --border-color: rgba(185, 28, 28, 0.3); /* red-900 with opacity */
+}
+
+/* Light theme */
+[data-theme='light'] {
+  --bg-primary: #ffffff;
+  --bg-secondary: rgba(255, 255, 255, 0.9);
+  --text-primary: #111827; /* gray-900 */
+  --text-secondary: #374151; /* gray-700 */
+  --text-tertiary: #6b7280; /* gray-500 */
+  --accent-primary: #eab308; /* yellow-500 */
+  --accent-secondary: rgba(234, 179, 8, 0.2); /* yellow-500 with opacity */
+  --border-color: rgba(234, 179, 8, 0.3); /* yellow-500 with opacity */
+}
+
+/* Apply theme to common elements */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Additional utility classes */
+.bg-theme-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-theme-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.text-theme-primary {
+  color: var(--text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.text-theme-tertiary {
+  color: var(--text-tertiary);
+}
+
+.accent-theme-primary {
+  color: var(--accent-primary);
+}
+
+.border-theme {
+  border-color: var(--border-color);
+}
+
+/* Override specific elements */
+.light-theme .bg-\[\#12131A\] {
+  background-color: var(--bg-primary);
+}
+
+.light-theme .bg-black\/30 {
+  background-color: rgba(234, 179, 8, 0.05);
+}
+
+.light-theme .text-white {
+  color: var(--text-primary);
+}
+
+.light-theme .text-gray-300 {
+  color: var(--text-secondary);
+}
+
+.light-theme .text-gray-400 {
+  color: var(--text-tertiary);
+}
+
+.light-theme .text-red-500 {
+  color: var(--accent-primary);
+}
+
+.light-theme .hover\:text-red-400:hover {
+  color: var(--accent-primary);
+}
+
+.light-theme .bg-red-600 {
+  background-color: var(--accent-primary);
+}
+
+.light-theme .hover\:bg-red-700:hover {
+  background-color: var(--accent-primary);
+  filter: brightness(0.9);
+}
+
+.light-theme .border-red-900\/30 {
+  border-color: var(--border-color);
+}
+
+.light-theme .bg-red-600\/20 {
+  background-color: var(--accent-secondary);
+}

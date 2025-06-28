@@ -1,6 +1,8 @@
 // src/i18n.js
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import enTranslation from './locales/en/translation.json';
+import krTranslation from './locales/kr/translation.json';
 
 // Create this file directly in the src folder
 i18n
@@ -13,10 +15,10 @@ i18n
         },
         resources: {
             en: {
-                translation: require('./locales/en/translation.json')
+                translation: enTranslation
             },
             kr: {
-                translation: require('./locales/kr/translation.json')
+                translation: krTranslation
             }
         }
     });

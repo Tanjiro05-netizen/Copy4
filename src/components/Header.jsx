@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Menu, Globe, LogOut, BarChart, BookOpen, FileText, Home } from 'lucide-react';
+import { Menu, Globe, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Header = () => {
     const { t, i18n } = useTranslation();
     const { logout } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -27,37 +29,47 @@ const Header = () => {
     
     const navItems = [
         { path: '/', label: t('nav.home', 'Home'), icon: Home },
-        { path: '/theory', label: t('nav.theory', 'Theory'), icon: BookOpen },
+        { path: '/theory', label: t('nav.theory', 'Revolutionary Theory'), icon: BookMarked },
         { path: '/analysis', label: t('nav.analysis', 'Analysis'), icon: FileText },
-        { path: '/digital-library', label: t('nav.library', 'Library'), icon: BookOpen },
-        { path: '/visualizations', label: t('nav.data', 'Data'), icon: BarChart }
+        { path: '/digital-library', label: t('nav.library', 'Digital Library'), icon: BookOpen },
+        { path: '/study', label: t('nav.study', 'Study Center'), icon: BarChart },
+        { path: '/science-tech', label: t('nav.scienceTech', 'Science & Tech'), icon: FileText },
+        { path: '/visualizations', label: t('nav.data', 'Data'), icon: LineChart },
+        { path: '/directory', label: t('nav.directory', 'Directory'), icon: Users }
     ];
     
     return (
-        <header className="fixed top-0 w-full bg-black/50 backdrop-blur-sm text-white p-4 z-50 border-b border-gray-800">
-            <div className="container mx-auto flex justify-between items-center">
-                <Link to="/" className="text-2xl font-bold tracking-wider">
+        <header className="fixed top-0 w-full bg-black text-white py-3 z-50 border-b border-gray-800">
+            <div className="container mx-auto flex justify-between items-center px-4">
+                <Link to="/" className="text-xl font-bold tracking-wider">
                     {t('MARXIST.THEORY', 'Marxist Theory')}
                 </Link>
                 
                 {/* Desktop Navigation */}
-                <div className="hidden md:flex items-center space-x-6">
-                    <nav className="flex items-center space-x-6">
+                <div className="hidden md:flex items-center">
+                    <nav className="flex items-center">
                         {navItems.map((item) => (
                             <Link 
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center space-x-1 text-sm font-medium hover:text-red-400 transition-colors ${
+                                className={`flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors ${
                                     isActive(item.path) ? 'text-red-500' : 'text-gray-300'
                                 }`}
                             >
-                                <item.icon className="w-4 h-4" />
                                 <span>{item.label}</span>
                             </Link>
                         ))}
                     </nav>
                     
                     <div className="flex items-center space-x-3">
+                        <button
+                            onClick={toggleTheme}
+                            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                            title={t('nav.toggleTheme', 'Toggle Theme')}
+                        >
+                            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                        </button>
+                        
                         <button
                             onClick={toggleLanguage}
                             className="p-2 hover:bg-gray-800 rounded-full transition-colors"
@@ -87,7 +99,7 @@ const Header = () => {
             
             {/* Mobile Menu */}
             {mobileMenuOpen && (
-                <div className="md:hidden fixed inset-0 z-50 bg-black/95 pt-16">
+                <div className="md:hidden fixed inset-0 z-50 bg-black pt-16">
                     <div className="container mx-auto px-4 py-8 flex flex-col">
                         <div className="flex justify-end mb-4">
                             <button 
@@ -102,17 +114,26 @@ const Header = () => {
                                 <Link 
                                     key={item.path}
                                     to={item.path}
-                                    className={`flex items-center space-x-3 text-lg font-medium hover:text-red-400 transition-colors ${
+                                    className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
                                         isActive(item.path) ? 'text-red-500' : 'text-white'
                                     }`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
-                                    <item.icon className="w-5 h-5" />
                                     <span>{item.label}</span>
                                 </Link>
                             ))}
                         </nav>
                         <div className="mt-8 flex justify-center space-x-6">
+                            <button
+                                onClick={() => {
+                                    toggleTheme();
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="flex items-center space-x-2 text-white hover:text-red-400 transition-colors"
+                            >
+                                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                <span>{theme === 'dark' ? t('nav.lightMode', 'Light Mode') : t('nav.darkMode', 'Dark Mode')}</span>
+                            </button>
                             <button
                                 onClick={() => {
                                     toggleLanguage();
