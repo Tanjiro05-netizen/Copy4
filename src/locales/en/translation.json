@@ -1,10 +1,19 @@
 {
+  "MARXIST.THEORY": "Marxist Theory",
   "nav": {
     "brand": "MARXIST.THEORY",
     "theory": "Revolutionary Theory",
     "analysis": "Analysis",
     "library": "Digital Library",
-    "submit": "Submit"
+    "submit": "Submit",
+    "home": "Home",
+    "study": "Study Center",
+    "scienceTech": "Science & Tech",
+    "data": "Data",
+    "directory": "Directory",
+    "toggleTheme": "Toggle Theme",
+    "switchLanguage": "Switch Language",
+    "logout": "Logout"
   },
   "hero": {
     "title": "革命 REVOLUTIONARY THEORY",

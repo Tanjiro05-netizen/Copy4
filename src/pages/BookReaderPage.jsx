@@ -1,54 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader, AlertCircle } from 'lucide-react';
+import { Loader, AlertCircle, Download } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { supabase } from '../supabaseClient';
-import { Download } from 'lucide-react';
 
 const BookReaderPage = () => {
     const { bookId } = useParams();
-    console.log('Book ID from URL params:', bookId);
     const { theme } = useTheme();
     const [pdfUrl, setPdfUrl] = useState(null);
+    const [bookTitle, setBookTitle] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!bookId) {
-            setIsLoading(false);
-            setError("No book specified.");
-            return;
-        };
-
-        setIsLoading(true);
-        try {
-            const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-            if (!supabaseUrl) {
-                throw new Error("Supabase URL is not configured. Please check your .env file.");
+        const fetchBook = async () => {
+            if (!bookId) {
+                setError("No book ID provided.");
+                setIsLoading(false);
+                return;
             }
 
-            // Manually construct the public URL, ensuring bookId is encoded
-            const publicUrl = `${supabaseUrl}/storage/v1/object/public/library/${encodeURIComponent(bookId)}`;
+            setIsLoading(true);
+            try {
+                // 1. Fetch book details from the database
+                const { data: bookData, error: dbError } = await supabase
+                    .from('digital_library_books')
+                    .select('title, pdf_filename')
+                    .eq('id', bookId)
+                    .single();
 
-            console.log('Manually constructed PDF URL:', publicUrl);
-            setPdfUrl(publicUrl);
-            setError(null);
-        } catch (error) {
-            console.error('Error constructing PDF URL:', error);
-            setError(`Failed to load book: ${error.message}`);
-        } finally {
-            setIsLoading(false);
-        }
+                if (dbError) {
+                    throw new Error(dbError.message || "Book not found in the database.");
+                }
+                if (!bookData) {
+                    throw new Error("Book not found in the database.");
+                }
+
+                setBookTitle(bookData.title);
+
+                // 2. Get the public URL for the PDF file
+                const { data: urlData } = supabase
+                    .storage
+                    .from('library')
+                    .getPublicUrl(bookData.pdf_filename);
+
+                if (!urlData || !urlData.publicUrl) {
+                    throw new Error("Could not retrieve PDF URL.");
+                }
+                
+                setPdfUrl(urlData.publicUrl);
+                setError(null);
+
+            } catch (err) {
+                console.error("Error fetching book:", err);
+                setError(err.message);
+                setPdfUrl(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBook();
     }, [bookId]);
 
     return (
         <div className={`h-screen flex flex-col ${theme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
             <div className="flex justify-between items-center p-4 bg-gray-800 text-white shadow-md">
-                <h1 className="text-xl font-bold truncate">{bookId}</h1>
+                <h1 className="text-xl font-bold truncate">{bookTitle || 'Loading...'}</h1>
                 {pdfUrl && (
                     <a
                         href={pdfUrl}
-                        download={bookId}
+                        download={bookTitle ? `${bookTitle}.pdf` : 'download.pdf'}
                         className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md transition-colors"
                     >
                         <Download className="w-5 h-5 mr-2" />
@@ -69,7 +91,7 @@ const BookReaderPage = () => {
                         </div>
                     </div>
                 ) : pdfUrl ? (
-                    <iframe src={pdfUrl} className="w-full h-full" title={`Book ${bookId}`}></iframe>
+                    <iframe src={pdfUrl} className="w-full h-full" title={bookTitle || 'Book'}></iframe>
                 ) : (
                     <div className="flex-grow flex items-center justify-center bg-[#12131A]">
                         <div className="flex items-center space-x-2 bg-yellow-900/20 text-yellow-400 p-4 rounded-lg">

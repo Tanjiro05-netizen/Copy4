@@ -1,181 +1,482 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
-import { Clock, BookOpen, Quote, MessageSquare, Share2, Download, ChevronLeft, ChevronRight, Bookmark, FileText, ExternalLink, Copy } from 'lucide-react';
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
+import ReactMarkdown from 'react-markdown';
+import Mark from 'mark.js';
+import remarkGfm from 'remark-gfm';
+import remarkSlug from 'remark-slug';
+import rehypeRaw from 'rehype-raw';
+import ArticleComments from '../components/ArticleComments';
+import HighlightHandler from '../components/HighlightHandler';
+import TableOfContents from '../components/TableOfContents';
+import HighlightsSidebar from '../components/HighlightsSidebar';
+import { Loader, ArrowLeft, Bookmark, MessageSquare, List, Check, Share2, Search, X, ChevronUp, ChevronDown, Quote, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const ArticleReaderPage = () => {
-    const { articleId } = useParams();
+    const { slug } = useParams();
+    const { user } = useAuth();
+    
     const [article, setArticle] = useState(null);
-    const [activeSection, setActiveSection] = useState(0);
+    const [highlights, setHighlights] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const contentRef = useRef(null);
+    const progressToSave = useRef(0);
+
+    // UI State
+    const [isTocOpen, setIsTocOpen] = useState(true);
+    const [isHighlightsOpen, setIsHighlightsOpen] = useState(true);
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [currentResultIndex, setCurrentResultIndex] = useState(-1);
+    const [showCopied, setShowCopied] = useState(false);
+    const markInstance = useRef(null);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+    // Quote state
+    const [showQuotePopup, setShowQuotePopup] = useState(false);
+    const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+    const [selectedText, setSelectedText] = useState('');
+
+    const handleScroll = () => {
+        if (!contentRef.current) return;
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        const windowHeight = scrollHeight - clientHeight;
+        const currentProgress = windowHeight > 0 ? (scrollTop / windowHeight) * 100 : 0;
+        setScrollProgress(currentProgress);
+        progressToSave.current = Math.round(currentProgress);
+    };
 
     useEffect(() => {
-        const loadArticle = async () => {
-            try {
-                const articleData = await import(`../data/articles/${articleId}-full.json`);
-                setArticle(articleData.default);
-            } catch (error) {
-                console.error('Error loading article:', error);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const fetchArticleAndHighlights = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data: articleData, error: articleError } = await supabase
+                .from('theory_articles')
+                .select('*')
+                .eq('slug', slug)
+                .single();
+
+            if (articleError) throw articleError;
+            if (!articleData) throw new Error('Article not found.');
+            
+            setArticle(articleData);
+
+            if (user && articleData) {
+                // Fetch highlights
+                const { data: highlightsData, error: highlightsError } = await supabase
+                    .from('user_article_highlights')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('article_id', articleData.id)
+                    .order('created_at', { ascending: true });
+
+                if (highlightsError) throw highlightsError;
+                setHighlights(highlightsData || []);
+
+                // Fetch progress
+                const { data: progressData } = await supabase
+                    .from('user_article_progress')
+                    .select('progress_percentage')
+                    .eq('user_id', user.id)
+                    .eq('article_id', articleData.id)
+                    .single();
+                if (progressData) {
+                    const initialScroll = (document.documentElement.scrollHeight - document.documentElement.clientHeight) * (progressData.progress_percentage / 100);
+                    window.scrollTo(0, initialScroll);
+                }
+            }
+        } catch (err) {
+            setError(err.message);
+            console.error('Error fetching data:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, [slug, user]);
+
+    useEffect(() => {
+        fetchArticleAndHighlights();
+    }, [fetchArticleAndHighlights]);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            markInstance.current = new Mark(contentRef.current);
+        }
+    }, [article]); // Re-init if article changes
+
+    const performSearch = useCallback(() => {
+        if (!markInstance.current) return;
+        if (!searchQuery || searchQuery.length < 2) {
+            markInstance.current.unmark();
+            setSearchResults([]);
+            setCurrentResultIndex(-1);
+            return;
+        }
+
+        markInstance.current.unmark({
+            done: () => {
+                markInstance.current.mark(searchQuery, {
+                    className: 'search-highlight',
+                    done: (count) => {
+                        const highlightedElements = contentRef.current.querySelectorAll('.search-highlight');
+                        setSearchResults(Array.from(highlightedElements));
+                        setCurrentResultIndex(count > 0 ? 0 : -1);
+                    }
+                });
+            }
+        });
+    }, [searchQuery]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            performSearch();
+        }, 300); // Debounce search
+        return () => clearTimeout(handler);
+    }, [searchQuery, performSearch]);
+
+    useEffect(() => {
+        searchResults.forEach((el, index) => {
+            el.classList.remove('current-search-highlight');
+            if (index === currentResultIndex) {
+                el.classList.add('current-search-highlight');
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    }, [currentResultIndex, searchResults]);
+
+    const handleNextResult = () => {
+        if (searchResults.length > 0) {
+            setCurrentResultIndex((prevIndex) => (prevIndex + 1) % searchResults.length);
+        }
+    };
+
+    const handlePrevResult = () => {
+        if (searchResults.length > 0) {
+            setCurrentResultIndex((prevIndex) => (prevIndex - 1 + searchResults.length) % searchResults.length);
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (user && article && progressToSave.current > 0) {
+                const saveProgress = async () => {
+                    await supabase.from('user_article_progress').upsert({
+                        user_id: user.id,
+                        article_id: article.id,
+                        progress_percentage: Math.min(100, progressToSave.current)
+                    }, { onConflict: 'user_id, article_id' });
+                };
+                saveProgress();
             }
         };
+    }, [user, article]);
 
-        loadArticle();
-    }, [articleId]);
+    const handleShare = async () => {
+        const shareData = {
+            title: article.title,
+            text: article.excerpt || '',
+            url: window.location.href
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                throw new Error('Web Share API not supported');
+            }
+        } catch (err) {
+            // Fallback to copy to clipboard
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                setShowCopied(true);
+                setTimeout(() => setShowCopied(false), 2000);
+            });
+        }
+    };
 
-    if (!article) {
+    const handleDownloadPdf = async () => {
+        if (!contentRef.current || isGeneratingPdf) return;
+
+        setIsGeneratingPdf(true);
+        try {
+            const canvas = await html2canvas(contentRef.current, {
+                scale: 2, // Higher scale for better quality
+                backgroundColor: '#12131A', // Match the page background
+                useCORS: true,
+                onclone: (document) => {
+                    // Hide elements that shouldn't be in the PDF
+                    document.querySelectorAll('.no-pdf').forEach(el => el.style.display = 'none');
+                }
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'p',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const ratio = canvasWidth / canvasHeight;
+            const imgHeight = pdfWidth / ratio;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+
+            pdf.save(`${article.slug}.pdf`);
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+        } finally {
+            setIsGeneratingPdf(false);
+        }
+    };
+
+    const handleAddHighlight = async (newHighlight) => {
+        if (!user || !article) return;
+        try {
+            const { data, error } = await supabase
+                .from('user_article_highlights')
+                .insert({
+                    ...newHighlight,
+                    user_id: user.id,
+                    article_id: article.id,
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+            setHighlights(prev => [...prev, data]);
+        } catch (err) {
+            console.error('Error saving highlight:', err);
+        }
+    };
+
+    const handleMouseUp = () => {
+        if (!contentRef.current) return;
+        const selection = window.getSelection();
+        const text = selection.toString().trim();
+
+        if (text.length > 0 && contentRef.current.contains(selection.anchorNode)) {
+            setSelectedText(text);
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            setPopupPosition({
+                top: rect.top + window.scrollY - 40, // Position above selection
+                left: rect.left + window.scrollX + (rect.width / 2) - 30, // Center horizontally
+            });
+            setShowQuotePopup(true);
+        } else {
+            setShowQuotePopup(false);
+        }
+    };
+
+    const handleSaveQuote = async () => {
+        if (!user || !article || !selectedText) return;
+
+        try {
+            const { error } = await supabase
+                .from('user_quotes')
+                .insert({ 
+                    user_id: user.id, 
+                    article_id: article.id, 
+                    quote_text: selectedText 
+                });
+            if (error) throw error;
+            alert('Quote saved!'); // Replace with a better notification later
+        } catch (error) {
+            console.error('Error saving quote:', error);
+            alert('Failed to save quote.');
+        } finally {
+            setShowQuotePopup(false);
+            setSelectedText('');
+            window.getSelection().removeAllRanges();
+        }
+    };
+
+    const handleDeleteHighlight = async (highlightId) => {
+        try {
+            const { error } = await supabase
+                .from('user_article_highlights')
+                .delete()
+                .eq('id', highlightId);
+
+            if (error) throw error;
+            setHighlights(prev => prev.filter(h => h.id !== highlightId));
+        } catch (err) {
+            console.error('Error deleting highlight:', err);
+        }
+    };
+
+    if (loading) {
         return (
             <div className="min-h-screen bg-[#12131A] flex items-center justify-center">
-                <div className="text-white">Loading...</div>
+                <div className="text-white">Loading article...</div>
+            </div>
+        );
+    }
+
+    if (error || !article) {
+        return (
+            <div className="min-h-screen bg-[#12131A] flex items-center justify-center">
+                <p className="text-red-500">Error: {error || 'Article not found.'}</p>
             </div>
         );
     }
 
     return (
         <div className="min-h-screen bg-[#12131A]">
+            {showCopied && (
+                <div className="fixed bottom-10 right-10 bg-gray-800 border border-green-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">
+                    <div className="flex items-center">
+                        <Check size={20} className="text-green-500 mr-2" />
+                        <span>Link copied to clipboard!</span>
+                    </div>
+                </div>
+            )}
+            {showQuotePopup && (
+                <div
+                    style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }}
+                    className="absolute z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-lg"
+                >
+                    <button 
+                        onClick={handleSaveQuote}
+                        className="flex items-center space-x-2 px-3 py-1 text-white hover:bg-red-600/50 rounded-lg"
+                    >
+                        <Quote size={16} />
+                        <span>Save Quote</span>
+                    </button>
+                </div>
+            )}
+
             <Header />
+            <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30">
+                <div 
+                    className="h-full bg-red-600 transition-all duration-150 ease-linear"
+                    style={{ width: `${scrollProgress}%` }}
+                ></div>
+            </div>
             
-            <main className="container mx-auto px-4 py-16">
-                {/* Article Header */}
-                <div className="max-w-4xl mx-auto mb-12">
-                    <div className="text-red-500 text-sm mb-2">{article.category}</div>
-                    <h1 className="text-4xl font-bold text-white mb-4">{article.title}</h1>
-                    
-                    <div className="flex items-center space-x-4 text-gray-400 text-sm mb-6">
-                        <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            <span>{article.readTime}</span>
+            <main className="container mx-auto px-4 py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                    <div className="lg:col-span-8">
+                        {/* Article Action Bar */}
+                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+                            <div className="flex items-center space-x-2">
+                                <button onClick={() => setIsTocOpen(!isTocOpen)} className={`p-2 rounded-full hover:bg-gray-700 ${isTocOpen ? 'bg-gray-700' : ''}`} title="Table of Contents">
+                                    <List size={20} />
+                                </button>
+                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className={`p-2 rounded-full hover:bg-gray-700 ${isHighlightsOpen ? 'bg-gray-700' : ''}`} title="My Highlights">
+                                    <Bookmark size={20} />
+                                </button>
+                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className={`p-2 rounded-full hover:bg-gray-700 ${isSearchVisible ? 'bg-gray-700' : ''}`} title="Search in article">
+                                    <Search size={20} />
+                                </button>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                 <button className="p-2 rounded-full hover:bg-gray-700" title="Comments">
+                                    <MessageSquare size={20} />
+                                </button>
+                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-700" title="Share">
+                                    <Share2 size={20} />
+                                </button>
+                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" title="Download as PDF" disabled={isGeneratingPdf}>
+                                    {isGeneratingPdf ? <Loader size={20} className="animate-spin" /> : <Download size={20} />}
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex items-center">
-                            <Quote className="w-4 h-4 mr-1" />
-                            <span>{article.citations} citations</span>
-                        </div>
-                        <div className="flex items-center">
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            <span>{article.comments} comments</span>
-                        </div>
-                    </div>
 
-                    <div className="flex items-center space-x-2 mb-6">
-                        {article.keywords.map((keyword, index) => (
-                            <span key={index} className="text-xs bg-red-900/20 text-red-400 px-2 py-1 rounded">
-                                {keyword}
-                            </span>
-                        ))}
-                    </div>
+                        {/* Search Input Bar */}
+                        {isSearchVisible && (
+                            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.shiftKey ? handlePrevResult() : handleNextResult();
+                                        }
+                                    }}
+                                    className="bg-gray-900 text-white placeholder-gray-500 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-500 w-full"
+                                />
+                                <span className="text-sm text-gray-400 whitespace-nowrap">
+                                    {searchResults.length > 0 ? `${currentResultIndex + 1} of ${searchResults.length}` : 'No results'}
+                                </span>
+                                <button onClick={handlePrevResult} className="p-1 hover:bg-gray-700 rounded" title="Previous result" disabled={searchResults.length === 0}>
+                                    <ChevronUp size={16} />
+                                </button>
+                                <button onClick={handleNextResult} className="p-1 hover:bg-gray-700 rounded" title="Next result" disabled={searchResults.length === 0}>
+                                    <ChevronDown size={16} />
+                                </button>
+                                <button onClick={() => setIsSearchVisible(false)} className="p-1 hover:bg-gray-700 rounded" title="Close search">
+                                    <X size={16} />
+                                </button>
+                            </div>
+                        )}
 
-                    <div className="text-gray-400 mb-8">
-                        <p className="text-sm">By {article.author} • {article.date}</p>
-                    </div>
-
-                    <div className="prose prose-invert max-w-none">
-                        <p className="text-gray-300">{article.content.abstract}</p>
-                    </div>
-                </div>
-
-                {/* Article Navigation */}
-                <div className="flex gap-8 max-w-6xl mx-auto">
-                    {/* Table of Contents */}
-                    <div className="w-64 hidden lg:block">
-                        <div className="sticky top-8">
-                            <h3 className="text-white font-semibold mb-4">Table of Contents</h3>
-                            <nav className="space-y-2">
-                                {article.content.sections.map((section, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveSection(index)}
-                                        className={`block text-sm w-full text-left px-3 py-2 rounded transition-colors ${
-                                            activeSection === index
-                                                ? 'bg-red-900/20 text-red-400'
-                                                : 'text-gray-400 hover:text-white'
-                                        }`}
-                                    >
-                                        {section.title}
-                                    </button>
-                                ))}
-                            </nav>
-                        </div>
-                    </div>
-
-                    {/* Main Content */}
-                    <div className="flex-1 max-w-4xl">
+                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{article.title}</h1>
                         
-                        <div className="fixed left-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-                            <button className="p-3 bg-black/50 text-white rounded-lg hover:bg-red-600/20 hover:text-red-400 transition-colors group">
-                                <Bookmark className="w-5 h-5" />
-                                <span className="absolute left-full ml-2 bg-black/80 text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100">
-                                    Save Article
-                                </span>
-                            </button>
-                            <button className="p-3 bg-black/50 text-white rounded-lg hover:bg-red-600/20 hover:text-red-400 transition-colors group">
-                                <Quote className="w-5 h-5" />
-                                <span className="absolute left-full ml-2 bg-black/80 text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100">
-                                    Cite Article
-                                </span>
-                            </button>
-                            <button className="p-3 bg-black/50 text-white rounded-lg hover:bg-red-600/20 hover:text-red-400 transition-colors group">
-                                <FileText className="w-5 h-5" />
-                                <span className="absolute left-full ml-2 bg-black/80 text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100">
-                                    Export PDF
-                                </span>
-                            </button>
-                        </div>
-                    
-                        <div className="fixed top-0 left-0 w-full h-1 bg-black/30">
-                            <div 
-                                className="h-full bg-red-600 transition-all duration-300"
-                                style={{ width: `${(activeSection / (article.content.sections.length - 1)) * 100}%` }}
-                            ></div>
-                        </div>
-                        <div className="prose prose-invert max-w-none">
-                            {article.content.sections.map((section, index) => (
-                                <section key={index} className="mb-12">
-                                    <h2 className="text-2xl font-bold text-white mb-4">{section.title}</h2>
-                                    <p className="text-gray-300">{section.content}</p>
-                                </section>
-                            ))}
+                        <HighlightHandler 
+                            highlights={highlights}
+                            onAddHighlight={handleAddHighlight}
+                        >
+                                                        <div 
+                                ref={contentRef}
+                                onMouseUp={handleMouseUp}
+                                className="prose prose-lg prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white prose-strong:text-white prose-a:text-red-400 hover:prose-a:text-red-500 prose-h1:text-4xl prose-h1:font-bold prose-h2:text-3xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-700 prose-h2:pb-2"
+                            >
+                                <ReactMarkdown 
+                                    remarkPlugins={[remarkGfm, remarkSlug]}
+                                    rehypePlugins={[rehypeRaw]}
+                                >
+                                    {article.content}
+                                </ReactMarkdown>
+                            </div>
+                        </HighlightHandler>
 
-                            {/* References */}
-                          
-                            <section className="mt-16 bg-black/30 border border-red-900/20 rounded-lg p-6">
-                                <h2 className="text-2xl font-bold text-white mb-6">References</h2>
-                                <div className="space-y-4">
-                                    {article.content.references.map((reference, index) => (
-                                        <div key={index} className="flex items-start space-x-4 text-gray-300 p-4 hover:bg-black/30 rounded-lg group">
-                                            <div className="text-gray-500">[{index + 1}]</div>
-                                            <div className="flex-1">
-                                                <div>{reference.author} ({reference.year}). <span className="italic">{reference.title}</span>. {reference.publisher}.</div>
-                                                <div className="mt-2 flex items-center space-x-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button className="text-sm text-red-400 hover:text-red-500 flex items-center">
-                                                        <ExternalLink className="w-4 h-4 mr-1" /> View Source
-                                                    </button>
-                                                    <button className="text-sm text-red-400 hover:text-red-500 flex items-center">
-                                                        <Copy className="w-4 h-4 mr-1" /> Copy Citation
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
+                        <div className="mt-12">
+                            <ArticleComments articleId={article.id} />
                         </div>
                     </div>
-                </div>
 
-                {/* Navigation Controls */}
-                <div className="fixed bottom-8 right-8 flex space-x-4">
-                    <button
-                        onClick={() => setActiveSection(Math.max(0, activeSection - 1))}
-                        className="p-3 bg-black/50 text-white rounded-full hover:bg-red-600 transition-colors"
-                        disabled={activeSection === 0}
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-                    <button
-                        onClick={() => setActiveSection(Math.min(article.content.sections.length - 1, activeSection + 1))}
-                        className="p-3 bg-black/50 text-white rounded-full hover:bg-red-600 transition-colors"
-                        disabled={activeSection === article.content.sections.length - 1}
-                    >
-                        <ChevronRight className="w-6 h-6" />
-                    </button>
+                    <aside className="lg:col-span-4 lg:block space-y-8">
+                        {isTocOpen && <TableOfContents contentRef={contentRef} />}
+                        {user && isHighlightsOpen &&
+                            <HighlightsSidebar 
+                                highlights={highlights} 
+                                onDelete={handleDeleteHighlight} 
+                            />
+                        }
+                    </aside>
                 </div>
             </main>
         </div>

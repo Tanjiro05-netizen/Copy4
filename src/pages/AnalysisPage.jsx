@@ -1,250 +1,300 @@
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
 import Header from '../components/Header';
-import { Search, Clock, Share2, BookmarkPlus, Download, BookOpen, Quote, FileText, MessageSquare, Tags, Filter, Network, X, Check, GitFork } from 'lucide-react';
+import ArticleComments from '../components/ArticleComments';
+import PrivateNotes from '../components/PrivateNotes';
+import ArticleAnalysis from '../components/ArticleAnalysis';
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
+import { BookText, Loader, Search, List, Grid, BookOpen } from 'lucide-react';
 
 const AnalysisPage = () => {
-    const { t } = useTranslation();
-    const [activeCategory, setActiveCategory] = useState('all');
+    const { user } = useAuth();
+    const [userRole, setUserRole] = useState(null);
+    const [articles, setArticles] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [sortBy, setSortBy] = useState('latest');
-    const [activeFilters, setActiveFilters] = useState({
-        peerReviewed: false,
-        withCitations: false,
-        withMethodology: false
-    });
-    const [showFilters, setShowFilters] = useState(false);
-
-    const categories = [
-        { id: 'all', name: t('analysis.all') },
-        { id: 'economic', name: t('analysis.economicAnalysis') },
-        { id: 'labor', name: t('analysis.laborTheory') },
-        { id: 'political', name: t('analysis.politicalEconomy') },
-        { id: 'dialectical', name: t('analysis.dialecticalAnalysis') },
-        { id: 'historical', name: t('analysis.historicalMaterialism') }
-    ];
-
-    // Import article data
-    const [analyses, setAnalyses] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [viewMode, setViewMode] = useState('grid');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedArticle, setSelectedArticle] = useState(null);
+    const [activeTab, setActiveTab] = useState('Content');
+    const TABS = ['Content', 'Comments', 'Notes', 'Analysis'];
 
     useEffect(() => {
-        // Function to load article data
-        const loadArticles = async () => {
+        const fetchUserRole = async () => {
+            if (!user) return;
             try {
-                const articles = [
-                    await import('../data/articles/contemporary-crisis.json'),
-                    await import('../data/articles/digital-labor.json'),
-                    await import('../data/articles/modern-imperialism.json'),
-                    await import('../data/articles/class-consciousness.json')
-                ];
-                setAnalyses(articles.map(article => article.default));
-            } catch (error) {
-                console.error('Error loading articles:', error);
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+                if (error && error.code !== 'PGRST116') throw error;
+                setUserRole(data?.role || 'user');
+            } catch (err) {
+                console.error('Error fetching user role:', err);
+                setError('Could not verify user role.');
+            }
+        };
+        fetchUserRole();
+    }, [user]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!user) {
+                setLoading(false);
+                return;
+            }
+            setLoading(true);
+            try {
+                const categoriesResult = await supabase.from('theory_categories').select('id, name');
+                if (categoriesResult.error) throw new Error(`Categories fetch failed: ${categoriesResult.error.message}`);
+                
+                const articlesResult = await supabase.from('theory_articles').select('id, title, slug, category_id, description');
+                if (articlesResult.error) throw new Error(`Articles fetch failed: ${articlesResult.error.message}`);
+
+                const categoriesData = categoriesResult.data || [];
+                const articlesData = articlesResult.data || [];
+
+                const articlesWithCategories = articlesData.map(article => {
+                    const category = categoriesData.find(cat => cat.id === article.category_id);
+                    return {
+                        ...article,
+                        theory_categories: category ? { id: category.id, name: category.name } : null,
+                    };
+                });
+                
+                setArticles(articlesWithCategories);
+                setCategories(categoriesData);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching analysis data:', err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
         };
 
-        loadArticles();
-    }, []);
+        if (userRole) {
+            fetchData();
+        }
+    }, [userRole, user]);
+
+    const filteredArticles = useMemo(() => {
+        let filtered = [...articles];
+        
+        if (selectedCategory && selectedCategory !== 'all') {
+            filtered = filtered.filter(article => 
+                article.theory_categories?.name === selectedCategory
+            );
+        }
+        
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(article => 
+                article.title.toLowerCase().includes(query) ||
+                (article.description && article.description.toLowerCase().includes(query))
+            );
+        }
+        
+        return filtered;
+    }, [articles, selectedCategory, searchQuery]);
+
+
+    const handleSelectArticle = async (article) => {
+        setSelectedArticle({ ...article, loadingContent: true });
+        setError(null);
+        try {
+            const { data, error } = await supabase
+                .from('theory_articles')
+                .select('content')
+                .eq('id', article.id)
+                .single();
+
+            if (error) throw error;
+
+            setSelectedArticle({ ...article, content: data.content, loadingContent: false });
+            setActiveTab('Content');
+        } catch (err) {
+            console.error('Error fetching article content:', err);
+            setError('Failed to load article content.');
+            setSelectedArticle(null);
+        } 
+    };
+
+    const renderArticleCard = (article) => (
+        <div key={article.id} className={
+            viewMode === 'grid'
+                ? 'bg-black/30 rounded-lg border border-red-900/20 hover:border-red-900/40 transition-colors flex flex-col'
+                : 'flex bg-black/30 rounded-lg border border-red-900/20 hover:border-red-900/40 transition-colors'
+        }>
+            <div className={viewMode === 'grid' ? 'p-4 flex-1 flex flex-col' : 'p-4 flex-1'}>
+                <div className="mb-4">
+                    <div className="flex items-start justify-between mb-2">
+                        <div className="text-sm text-red-400 mb-1">
+                            {article.theory_categories?.name || 'Uncategorized'}
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">{article.title}</h3>
+                    {article.description && (
+                        <p className="text-gray-300 text-sm mb-3 line-clamp-3">{article.description}</p>
+                    )}
+                </div>
+            </div>
+            <div className="p-4 border-t border-gray-800/50 mt-auto">
+                <button
+                    onClick={() => handleSelectArticle(article)}
+                    disabled={selectedArticle?.loadingContent && selectedArticle?.id === article.id}
+                    className="w-full text-center bg-red-600/20 hover:bg-red-600/40 text-red-300 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {selectedArticle?.loadingContent && selectedArticle?.id === article.id ? (
+                        <><Loader size={16} className="animate-spin mr-2" /> Loading...</>
+                    ) : (
+                        <><BookOpen size={16} className="mr-2" /> Analyze</>
+                    )}
+                </button>
+            </div>
+        </div>
+    );
+
+    if (loading && !articles.length) {
+        return <div className="min-h-screen bg-[#12131A] flex items-center justify-center text-white"><Loader className="animate-spin mr-2"/>Loading Analysis Page...</div>;
+    }
 
     return (
-        <div className="min-h-screen bg-[#12131A] overflow-y-auto">
-            <div className="relative bg-[#12131A] min-h-[40vh] mb-8">
-                <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-                <div className="absolute inset-0">
-                    <div
-                        className="absolute inset-0 opacity-20"
-                        style={{
-                            background: `url('/images/marx-bg.jpg') no-repeat center center`,
-                            backgroundSize: 'cover',
-                            filter: 'brightness(0.7) contrast(1.2)',
-                            mixBlendMode: 'soft-light'
-                        }}
-                    ></div>
-                </div>
-            
-                <Header />
-            
-                <div className="relative pt-24 pb-12 px-4">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="flex flex-col md:flex-row items-center justify-between mb-6">
-                            <div className="text-center md:text-left mb-4 md:mb-0">
-                                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{t('analysis.title')}</h1>
-                                <p className="text-base text-gray-300 max-w-2xl">
-                                    {analyses.length} {t('analysis.papersAvailable')}
-                                </p>
-                            </div>
-                            
-                            <button className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                                {t('analysis.submitAnalysis')}
-                            </button>
-                        </div>
-                        
-                        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-                            <div className="w-full md:w-2/3 relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                                <input
-                                    type="text"
-                                    placeholder={t('analysis.searchAnalyses')}
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-black/50 border border-red-900/30 text-white rounded-lg pl-10 pr-4 py-3 focus:border-red-500 transition-colors"
-                                />
-                            </div>
-                            <div className="flex items-center space-x-4 w-full md:w-1/3">
-                                <select 
-                                    className="flex-1 bg-black/50 border border-red-900/30 text-white rounded-lg px-4 py-3 focus:border-red-500 transition-colors"
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                >
-                                    <option value="latest">{t('analysis.latest')}</option>
-                                    <option value="popular">{t('analysis.mostRead')}</option>
-                                    <option value="trending">{t('analysis.trending')}</option>
-                                </select>
-                                <button
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className={`p-3 rounded-lg border transition-colors ${showFilters ? 'bg-red-600 border-red-500 text-white' : 'bg-black/50 border-red-900/30 text-gray-400 hover:border-red-500'}`}
-                                >
-                                    <Filter className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-4 pb-12">
-                {/* Category Filters */}
-                <div className="flex flex-wrap gap-4 mb-8 sticky top-16 z-10 bg-[#12131A] py-4">
-                    {categories.map(category => (
+        <div className="min-h-screen bg-[#12131A]">
+            <Header />
+            <main className="container mx-auto px-4 py-24">
+                {selectedArticle && !selectedArticle.loadingContent ? (
+                    <div>
                         <button
-                            key={category.id}
-                            onClick={() => setActiveCategory(category.id)}
-                            className={`px-4 py-2 rounded-lg transition-colors ${
-                                activeCategory === category.id
-                                    ? 'bg-red-600 text-white'
-                                    : 'bg-black/30 text-gray-400 hover:bg-black/50'
-                            }`}
+                            onClick={() => setSelectedArticle(null)}
+                            className="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                         >
-                            {category.name}
+                            &larr; Back to Laboratory
                         </button>
-                    ))}
-                </div>
+                        <div className="bg-black/30 rounded-lg border border-red-900/20 p-6">
+                            <h1 className="text-3xl font-bold text-white mb-2">{selectedArticle.title}</h1>
+                            <p className="text-red-400 mb-6">{selectedArticle.theory_categories?.name || 'Uncategorized'}</p>
 
-                {/* Filters Panel */}
-                {showFilters && (
-                    <div className="bg-black/30 backdrop-blur-sm p-6 rounded-lg mb-8 border border-red-900/20">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-white font-semibold">{t('analysis.advancedFilters')}</h3>
-                            <button
-                                onClick={() => setShowFilters(false)}
-                                className="text-gray-400 hover:text-white transition-colors"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button
-                                onClick={() => setActiveFilters(prev => ({...prev, peerReviewed: !prev.peerReviewed}))}
-                                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                                    activeFilters.peerReviewed 
-                                        ? 'bg-red-600 text-white' 
-                                        : 'bg-black/50 text-gray-400 hover:bg-black/40'
-                                }`}
-                            >
-                                <span>{t('analysis.peerReviewed')}</span>
-                                {activeFilters.peerReviewed && <Check className="w-5 h-5" />}
-                            </button>
-                            <button
-                                onClick={() => setActiveFilters(prev => ({...prev, withCitations: !prev.withCitations}))}
-                                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                                    activeFilters.withCitations 
-                                        ? 'bg-red-600 text-white' 
-                                        : 'bg-black/50 text-gray-400 hover:bg-black/40'
-                                }`}
-                            >
-                                <span>{t('analysis.withCitations')}</span>
-                                {activeFilters.withCitations && <Check className="w-5 h-5" />}
-                            </button>
-                            <button
-                                onClick={() => setActiveFilters(prev => ({...prev, withMethodology: !prev.withMethodology}))}
-                                className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                                    activeFilters.withMethodology 
-                                        ? 'bg-red-600 text-white' 
-                                        : 'bg-black/50 text-gray-400 hover:bg-black/40'
-                                }`}
-                            >
-                                <span>{t('analysis.withMethodology')}</span>
-                                {activeFilters.withMethodology && <Check className="w-5 h-5" />}
-                            </button>
+                            <div className="border-b border-gray-700 mb-6">
+                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                                    {TABS.map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab)}
+                                            className={`
+                                                ${activeTab === tab
+                                                    ? 'border-red-500 text-red-400'
+                                                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
+                                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div>
+                                {activeTab === 'Content' && (
+                                    <div className="prose prose-invert max-w-none text-gray-300 bg-black/20 p-4 rounded-lg" dangerouslySetInnerHTML={{ __html: selectedArticle.content || '<p>Content not available.</p>' }}></div>
+                                )}
+                                {activeTab === 'Comments' && <ArticleComments articleId={selectedArticle.id} userRole={userRole} />}
+                                {activeTab === 'Notes' && <PrivateNotes articleId={selectedArticle.id} />}
+                                {activeTab === 'Analysis' && <ArticleAnalysis articleId={selectedArticle.id} />}
+                            </div>
                         </div>
                     </div>
-                )}
-
-                {/* Analysis Cards */}
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {analyses.map((analysis, index) => (
-                        <div key={index} className="bg-black/30 backdrop-blur-sm p-5 rounded-lg border border-red-900/20 hover:border-red-900/40 transition-colors">
-                            <div className="flex justify-between items-start mb-3">
-                                <div className="text-red-500 text-sm">{analysis.category}</div>
-                                <button className="text-gray-400 hover:text-red-500 transition-colors">
-                                    <BookmarkPlus className="w-5 h-5" />
-                                </button>
-                            </div>
-                            <Link to={`/article/${analysis.title.toLowerCase().replace(/ /g, '-')}`} className="block hover:opacity-80 transition-opacity">
-                                    <h3 className="text-white text-lg font-semibold mb-2">{analysis.title}</h3>
-                                </Link>
-                            <p className="text-gray-400 text-sm mb-3">{analysis.excerpt}</p>
-                            
-                            <div className="flex items-center space-x-3 mb-3 text-xs text-gray-400">
-                                <div className="flex items-center">
-                                    <Quote className="w-3 h-3 mr-1" />
-                                    <span>{analysis.citations}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <FileText className="w-3 h-3 mr-1" />
-                                    <span>{analysis.references}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <MessageSquare className="w-3 h-3 mr-1" />
-                                    <span>{analysis.comments}</span>
-                                </div>
-                            </div>
-                            
-                            <div className="mb-3">
-                                <div className="flex flex-wrap gap-2">
-                                    {analysis.keywords && analysis.keywords.map((keyword, idx) => (
-                                        <span key={idx} className="text-xs bg-red-900/20 text-red-400 px-2 py-1 rounded">
-                                            {keyword}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            {analysis.methodology && (
-                                <div className="text-xs text-gray-400 mb-3">
-                                    <span className="text-red-500">{t('analysis.methodology')}:</span> {analysis.methodology}
-                                </div>
-                            )}
-                            
-                            <div className="flex justify-between items-center pt-2 border-t border-red-900/10">
-                                <div className="flex items-center space-x-2">
-                                    <button className="text-gray-400 hover:text-red-500 transition-colors">
-                                        <Share2 className="w-4 h-4" />
-                                    </button>
-                                    <button className="text-gray-400 hover:text-red-500 transition-colors">
-                                        <Download className="w-4 h-4" />
-                                    </button>
-                                </div>
-                                <div className="flex items-center text-gray-500 text-xs">
-                                    <Clock className="w-4 h-4 mr-1" />
-                                    <span>15 min read</span>
+                ) : (
+                    <>
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-4">
+                                <h1 className="text-4xl font-bold text-white flex items-center">
+                                    <BookText size={36} className="mr-3 text-red-500"/> 
+                                    Analysis Laboratory
+                                </h1>
+                                <div className="text-gray-400">
+                                    {filteredArticles.length} papers available
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
+
+                        <div className="mb-8 space-y-4">
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="flex-1 relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search articles and analyses..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full bg-black/30 border border-gray-800 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <select
+                                        value={selectedCategory}
+                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                        className="bg-black/30 border border-gray-800 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
+                                    >
+                                        <option value="all">All Categories</option>
+                                        {categories.map(category => (
+                                            <option key={category.id} value={category.name}>
+                                                {category.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+                                        className="bg-black/30 border border-gray-800 rounded-lg px-4 py-3 text-white hover:bg-black/50 transition-colors"
+                                    >
+                                        {viewMode === 'grid' ? <List size={20} /> : <Grid size={20} />}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-8">
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => setSelectedCategory('all')}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                        selectedCategory === 'all'
+                                            ? 'bg-red-600 text-white'
+                                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                                    }`}
+                                >
+                                    All
+                                </button>
+                                {categories.map(category => (
+                                    <button
+                                        key={category.id}
+                                        onClick={() => setSelectedCategory(category.name)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                            selectedCategory === category.name
+                                                ? 'bg-red-600 text-white'
+                                                : 'bg-black/30 text-gray-300 hover:bg-black/50'
+                                        }`}
+                                    >
+                                        {category.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {error && <p className="text-red-500 bg-red-900/20 p-3 rounded-lg mb-6">{error}</p>}
+
+                        <div className={
+                            viewMode === 'grid' 
+                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                                : 'space-y-6'
+                        }>
+                            {filteredArticles.map(article => renderArticleCard(article))}
+                        </div>
+                    </>
+                )}
+            </main>
         </div>
     );
 };

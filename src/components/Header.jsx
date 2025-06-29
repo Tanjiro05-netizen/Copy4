@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import { Menu, Globe, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, Globe, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users, Shield } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { supabase } from '../supabaseClient';
 
 const Header = () => {
     const { t, i18n } = useTranslation();
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [userRole, setUserRole] = useState(null);
 
     const isActive = (path) => {
         return location.pathname === path;
@@ -26,6 +28,30 @@ const Header = () => {
         logout();
         navigate('/login');
     };
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            if (!user) {
+                setUserRole(null);
+                return;
+            }
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') throw error;
+                if (data) setUserRole(data.role);
+
+            } catch (error) {
+                console.error('Error fetching user role in header:', error);
+            }
+        };
+
+        fetchUserRole();
+    }, [user]);
     
     const navItems = [
         { path: '/', label: t('nav.home', 'Home'), icon: Home },
@@ -59,6 +85,39 @@ const Header = () => {
                                 <span>{item.label}</span>
                             </Link>
                         ))}
+                        {userRole === 'admin' && (
+                            <div className="relative group">
+                                <div className="flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors cursor-pointer">
+                                    <Shield size={16} className="mr-2" />
+                                    <span>Admin</span>
+                                </div>
+                                <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-black border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <div className="py-1">
+                                        <Link 
+                                            to="/admin/tags"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/tags') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Category & Tag Management
+                                        </Link>
+                                        <Link 
+                                            to="/admin/submissions"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/submissions') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Review Submissions
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {user && (
+                            <Link to="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                                My Profile
+                            </Link>
+                        )}
                     </nav>
                     
                     <div className="flex items-center space-x-3">
@@ -122,6 +181,28 @@ const Header = () => {
                                     <span>{item.label}</span>
                                 </Link>
                             ))}
+                            {userRole === 'admin' && (
+                                <Link 
+                                    to="/admin/tags"
+                                    className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
+                                        isActive('/admin/tags') ? 'text-red-500' : 'text-white'
+                                    }`}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    <Shield size={20} className="mr-2" />
+                                    <span>Admin</span>
+                                </Link>
+                            )}
+                            {user && (
+                                <Link 
+                                    to="/profile"
+                                    className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors text-white`}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    <span>My Profile</span>
+                                </Link>
+                            )}
+
                         </nav>
                         <div className="mt-8 flex justify-center space-x-6">
                             <button
