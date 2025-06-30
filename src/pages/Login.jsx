@@ -345,8 +345,8 @@ const LoginPage = () => {
                                 utility for revolutionary study and practice.
                             </p>
                             <p className="text-gray-200 mb-3">
-                                My development process involves extensive research into both Marxist literature and modern 
-                                technological tools that can serve my theoretical and practical needs. I'm creating a 
+                                The development process involves extensive research into both Marxist literature and modern 
+                                technological tools that can serve theoretical and practical needs. I'm creating a 
                                 platform that respects the rich history of Marxism while embracing the technology Capitalism gave us. Its grave will be dug by itself.
                             </p>
                             <div className="border-l-4 border-red-500 pl-4 py-2 mb-6">
