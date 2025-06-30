@@ -65,7 +65,7 @@ const Header = () => {
         <header className="fixed top-0 w-full bg-black text-white py-3 z-50 border-b border-gray-800">
             <div className="container mx-auto flex justify-between items-center px-4">
                 <Link to="/" className="text-xl font-bold tracking-wider">
-                    Marxist Theory
+                    Marxist.info
                 </Link>
                 
                 {/* Desktop Navigation */}

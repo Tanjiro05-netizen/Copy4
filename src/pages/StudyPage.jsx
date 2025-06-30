@@ -137,7 +137,7 @@ const StudyPage = () => (
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-white mb-2">Marxist Theory Lecture {item}</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">Marxist.info Lecture {item}</h3>
                 <p className="text-sm text-gray-400">Understanding the fundamental concepts of Marxist theory and their application in modern society.</p>
               </div>
             </div>

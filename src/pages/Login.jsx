@@ -233,7 +233,7 @@ const LoginPage = () => {
                                 <div className="max-w-7xl mx-auto">
                     {/* Header Section */}
                     <div className="mb-8">
-                        <h1 className="text-4xl md:text-6xl font-bold text-red-500 mb-6">Scientific Marxism</h1>
+                        <h1 className="text-4xl md:text-6xl font-bold text-red-500 mb-6">Marxist Theory: Marxist.info</h1>
                         <p className="text-xl md:text-2xl text-gray-300 mb-2">
                             A Renaissance of Revolutionary Theory and Practice
                         </p>
