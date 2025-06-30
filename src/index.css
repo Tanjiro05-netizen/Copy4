@@ -28,7 +28,7 @@ code {
 }
 
 .login-background {
-  background-image: url('/images/marx-outline.png');
+  background-image: url('%PUBLIC_URL%/images/marx-outline.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
