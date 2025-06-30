@@ -23,8 +23,8 @@ const ComingSoonPage = () => {
                     <div className="bg-black/30 p-8 rounded-lg border border-red-900/20 mb-12">
                         <h2 className="text-2xl font-semibold mb-4">What to expect</h2>
                         <p className="text-gray-400 mb-4">
-                            We're working on a revolutionary platform for Marxist theory, education, and analysis. 
-                            Our team is building a comprehensive library of resources, interactive study tools, 
+                            I'm working on a revolutionary platform for Marxist theory, education, and analysis. 
+                            I am building a comprehensive library of resources, interactive study tools, 
                             and collaborative research features.
                         </p>
                         <p className="text-gray-400">
