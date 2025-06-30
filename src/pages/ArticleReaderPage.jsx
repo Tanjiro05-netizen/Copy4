@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-
 import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
@@ -14,7 +13,7 @@ import HighlightHandler from '../components/HighlightHandler';
 import TableOfContents from '../components/TableOfContents';
 import HighlightsSidebar from '../components/HighlightsSidebar';
 import NerRenderer from '../components/NerRenderer';
-import { Loader, ArrowLeft, Bookmark, MessageSquare, List, Check, Share2, Search, X, ChevronUp, ChevronDown, Quote, Download } from 'lucide-react';
+import { Loader, Bookmark, MessageSquare, List, Check, Share2, Search, X, ChevronUp, ChevronDown, Quote, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -49,7 +48,6 @@ const ArticleReaderPage = () => {
     const [selectedText, setSelectedText] = useState('');
 
     const handleScroll = () => {
-        if (!contentRef.current) return;
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
         const windowHeight = scrollHeight - clientHeight;
         const currentProgress = windowHeight > 0 ? (scrollTop / windowHeight) * 100 : 0;
@@ -78,48 +76,35 @@ const ArticleReaderPage = () => {
 
             setArticle(articleData);
 
-            // Fetch entities for NER
             if (articleData.content) {
                 supabase.functions.invoke('ner', {
                     body: { text: articleData.content },
                 }).then(({ data, error }) => {
-                    if (error) {
-                        console.error('Error invoking NER function:', error);
-                    } else {
-                        setEntities(data);
-                    }
+                    if (error) console.error('Error invoking NER function:', error);
+                    else setEntities(data);
                 });
             }
 
             if (user && articleData) {
-                // Fetch highlights
                 const { data: highlightsData, error: highlightsError } = await supabase
                     .from('user_article_highlights')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .eq('article_id', articleData.id)
+                    .select('*').eq('user_id', user.id).eq('article_id', articleData.id)
                     .order('created_at', { ascending: true });
 
                 if (highlightsError) throw highlightsError;
                 setHighlights(highlightsData || []);
 
-                // Fetch bookmark status
                 const { data: bookmarkData, error: bookmarkError } = await supabase
-                    .from('user_article_bookmarks')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .eq('article_id', articleData.id)
+                    .from('user_article_bookmarks').select('id')
+                    .eq('user_id', user.id).eq('article_id', articleData.id)
                     .maybeSingle();
                 
                 if (bookmarkError) throw bookmarkError;
                 setIsBookmarked(!!bookmarkData);
 
-                // Fetch progress
                 const { data: progressData } = await supabase
-                    .from('user_article_progress')
-                    .select('progress_percentage')
-                    .eq('user_id', user.id)
-                    .eq('article_id', articleData.id)
+                    .from('user_article_progress').select('progress_percentage')
+                    .eq('user_id', user.id).eq('article_id', articleData.id)
                     .single();
                 if (progressData) {
                     const initialScroll = (document.documentElement.scrollHeight - document.documentElement.clientHeight) * (progressData.progress_percentage / 100);
@@ -142,7 +127,7 @@ const ArticleReaderPage = () => {
         if (contentRef.current) {
             markInstance.current = new Mark(contentRef.current);
         }
-    }, [article]); // Re-init if article changes
+    }, [article]);
 
     const performSearch = useCallback(() => {
         if (!markInstance.current) return;
@@ -157,7 +142,7 @@ const ArticleReaderPage = () => {
             done: () => {
                 markInstance.current.mark(searchQuery, {
                     className: 'search-highlight',
-                    acrossElements: true, // Fix for searching across rendered elements
+                    acrossElements: true,
                     done: (count) => {
                         const highlightedElements = contentRef.current.querySelectorAll('.search-highlight');
                         setSearchResults(Array.from(highlightedElements));
@@ -169,9 +154,7 @@ const ArticleReaderPage = () => {
     }, [searchQuery]);
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            performSearch();
-        }, 300); // Debounce search
+        const handler = setTimeout(() => performSearch(), 300);
         return () => clearTimeout(handler);
     }, [searchQuery, performSearch]);
 
@@ -180,82 +163,62 @@ const ArticleReaderPage = () => {
             el.classList.remove('current-search-highlight');
             if (index === currentResultIndex) {
                 el.classList.add('current-search-highlight');
-                el.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         });
     }, [currentResultIndex, searchResults]);
 
     const handleNextResult = () => {
         if (searchResults.length > 0) {
-            setCurrentResultIndex((prevIndex) => (prevIndex + 1) % searchResults.length);
+            setCurrentResultIndex((prev) => (prev + 1) % searchResults.length);
         }
     };
 
     const handlePrevResult = () => {
         if (searchResults.length > 0) {
-            setCurrentResultIndex((prevIndex) => (prevIndex - 1 + searchResults.length) % searchResults.length);
+            setCurrentResultIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
         }
     };
 
     useEffect(() => {
         return () => {
             if (user && article && progressToSave.current > 0) {
-                const saveProgress = async () => {
-                    await supabase.from('user_article_progress').upsert({
-                        user_id: user.id,
-                        article_id: article.id,
-                        progress_percentage: Math.min(100, progressToSave.current)
-                    }, { onConflict: 'user_id, article_id' });
-                };
-                saveProgress();
+                supabase.from('user_article_progress').upsert({
+                    user_id: user.id,
+                    article_id: article.id,
+                    progress_percentage: Math.min(100, progressToSave.current)
+                }, { onConflict: 'user_id, article_id' }).then();
             }
         };
     }, [user, article]);
 
     const handleToggleBookmark = async () => {
         if (!user || !article) return;
-
         try {
             if (isBookmarked) {
-                // Delete bookmark
-                const { error } = await supabase
-                    .from('user_article_bookmarks')
-                    .delete()
-                    .eq('user_id', user.id)
-                    .eq('article_id', article.id);
+                const { error } = await supabase.from('user_article_bookmarks')
+                    .delete().eq('user_id', user.id).eq('article_id', article.id);
                 if (error) throw error;
                 setIsBookmarked(false);
             } else {
-                // Add bookmark
-                const { error } = await supabase
-                    .from('user_article_bookmarks')
+                const { error } = await supabase.from('user_article_bookmarks')
                     .insert({ user_id: user.id, article_id: article.id });
                 if (error) throw error;
                 setIsBookmarked(true);
             }
         } catch (error) {
             console.error('Error toggling bookmark:', error);
-            alert('Failed to update bookmark.');
         }
     };
 
     const handleShare = async () => {
-        const shareData = {
-            title: article.title,
-            text: article.excerpt || '',
-            url: window.location.href
-        };
         try {
             if (navigator.share) {
-                await navigator.share(shareData);
+                await navigator.share({ title: article.title, text: article.excerpt || '', url: window.location.href });
             } else {
                 throw new Error('Web Share API not supported');
             }
         } catch (err) {
-            // Fallback to copy to clipboard
             navigator.clipboard.writeText(window.location.href).then(() => {
                 setShowCopied(true);
                 setTimeout(() => setShowCopied(false), 2000);
@@ -265,50 +228,29 @@ const ArticleReaderPage = () => {
 
     const handleDownloadPdf = async () => {
         if (!contentRef.current || isGeneratingPdf) return;
-
         setIsGeneratingPdf(true);
         try {
             const canvas = await html2canvas(contentRef.current, {
-                scale: 2, // Higher scale for better quality
-                backgroundColor: '#12131A', // Match the page background
-                useCORS: true,
-                onclone: (document) => {
-                    // Hide elements that shouldn't be in the PDF
-                    document.querySelectorAll('.no-pdf').forEach(el => el.style.display = 'none');
-                }
+                scale: 2, backgroundColor: '#12131A', useCORS: true,
+                onclone: (doc) => { doc.querySelectorAll('.no-pdf').forEach(el => el.style.display = 'none'); }
             });
-
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'p',
-                unit: 'mm',
-                format: 'a4'
-            });
-
+            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-            const canvasWidth = canvas.width;
-            const canvasHeight = canvas.height;
-            const ratio = canvasWidth / canvasHeight;
-            const imgHeight = pdfWidth / ratio;
-
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             let heightLeft = imgHeight;
             let position = 0;
-
             pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
-
+            heightLeft -= pdf.internal.pageSize.getHeight();
             while (heightLeft >= 0) {
                 position = heightLeft - imgHeight;
                 pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-                heightLeft -= pdfHeight;
+                heightLeft -= pdf.internal.pageSize.getHeight();
             }
-
             pdf.save(`${article.slug}.pdf`);
         } catch (error) {
             console.error('Error generating PDF:', error);
-            alert('Failed to generate PDF. Please try again.');
         } finally {
             setIsGeneratingPdf(false);
         }
@@ -317,16 +259,9 @@ const ArticleReaderPage = () => {
     const handleAddHighlight = async (newHighlight) => {
         if (!user || !article) return;
         try {
-            const { data, error } = await supabase
-                .from('user_article_highlights')
-                .insert({
-                    ...newHighlight,
-                    user_id: user.id,
-                    article_id: article.id,
-                })
-                .select()
-                .single();
-
+            const { data, error } = await supabase.from('user_article_highlights')
+                .insert({ ...newHighlight, user_id: user.id, article_id: article.id })
+                .select().single();
             if (error) throw error;
             setHighlights(prev => [...prev, data]);
         } catch (err) {
@@ -338,15 +273,11 @@ const ArticleReaderPage = () => {
         if (!contentRef.current) return;
         const selection = window.getSelection();
         const text = selection.toString().trim();
-
         if (text.length > 0 && contentRef.current.contains(selection.anchorNode)) {
             setSelectedText(text);
             const range = selection.getRangeAt(0);
             const rect = range.getBoundingClientRect();
-            setPopupPosition({
-                top: rect.top + window.scrollY - 40, // Position above selection
-                left: rect.left + window.scrollX + (rect.width / 2) - 30, // Center horizontally
-            });
+            setPopupPosition({ top: rect.top + window.scrollY - 40, left: rect.left + window.scrollX + (rect.width / 2) - 30 });
             setShowQuotePopup(true);
         } else {
             setShowQuotePopup(false);
@@ -355,34 +286,19 @@ const ArticleReaderPage = () => {
 
     const handleSaveQuote = async () => {
         if (!user || !article || !selectedText) return;
-
         try {
-            const { error } = await supabase
-                .from('user_quotes')
-                .insert({ 
-                    user_id: user.id, 
-                    article_id: article.id, 
-                    quote_text: selectedText 
-                });
+            const { error } = await supabase.from('user_quotes')
+                .insert({ user_id: user.id, article_id: article.id, quote_text: selectedText });
             if (error) throw error;
-            alert('Quote saved!'); // Replace with a better notification later
+            setShowQuotePopup(false);
         } catch (error) {
             console.error('Error saving quote:', error);
-            alert('Failed to save quote.');
-        } finally {
-            setShowQuotePopup(false);
-            setSelectedText('');
-            window.getSelection().removeAllRanges();
         }
     };
 
     const handleDeleteHighlight = async (highlightId) => {
         try {
-            const { error } = await supabase
-                .from('user_article_highlights')
-                .delete()
-                .eq('id', highlightId);
-
+            const { error } = await supabase.from('user_article_highlights').delete().eq('id', highlightId);
             if (error) throw error;
             setHighlights(prev => prev.filter(h => h.id !== highlightId));
         } catch (err) {
@@ -395,10 +311,80 @@ const ArticleReaderPage = () => {
         li: ({ children }) => <li><NerRenderer entities={entities}>{children}</NerRenderer></li>,
     };
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#12131A] flex items-center justify-center">
-                <div className="text-white">Loading article...</div>
+    if (loading) return <div className="min-h-screen bg-[#12131A] flex items-center justify-center"><Loader className="animate-spin text-red-500" size={48} /></div>;
+    if (error) return <div className="min-h-screen bg-[#12131A] flex items-center justify-center"><p className="text-red-500">Error: {error}</p></div>;
+
+    return (
+        <div className="min-h-screen bg-[#12131A] text-gray-300">
+            {showCopied && (
+                <div className="fixed bottom-10 right-10 bg-gray-800 border border-green-500 text-white py-2 px-4 rounded-lg z-50">
+                    <Check size={20} className="text-green-500 mr-2" /> Link copied!
+                </div>
+            )}
+            {showQuotePopup && (
+                <div style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }} className="absolute z-50">
+                    <button onClick={handleSaveQuote} className="flex items-center space-x-2 px-3 py-1 bg-gray-900 border border-gray-700 rounded-lg text-white hover:bg-red-600/50">
+                        <Quote size={16} /> <span>Save Quote</span>
+                    </button>
+                </div>
+            )}
+
+            <Header />
+            <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30"><div className="h-full bg-red-600" style={{ width: `${scrollProgress}%` }}></div></div>
+            
+            <main className="container mx-auto px-4 py-24">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div className="lg:col-span-8">
+                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700/50">
+                            <div className="flex items-center space-x-1">
+                                <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-800" title="Table of Contents"><List size={20} /></button>
+                                <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-800" title="Bookmark"><Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-red-500' : ''} /></button>
+                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-800" title="Search"><Search size={20} /></button>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-800" title="Highlights & Comments"><MessageSquare size={20} /></button>
+                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-800" title="Share"><Share2 size={20} /></button>
+                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-800 disabled:opacity-50" title="Download as PDF" disabled={isGeneratingPdf}>
+                                    {isGeneratingPdf ? <Loader size={20} className="animate-spin" /> : <Download size={20} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {isSearchVisible && (
+                            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4">
+                                <input type="text" placeholder="Search in article..." className="bg-transparent w-full focus:outline-none text-white" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                                <span className="text-gray-400 text-sm">{searchResults.length > 0 ? `${currentResultIndex + 1}/${searchResults.length}` : 'No results'}</span>
+                                <button onClick={handlePrevResult} className="p-1 rounded-full hover:bg-gray-700" disabled={!searchResults.length}><ChevronUp size={16} /></button>
+                                <button onClick={handleNextResult} className="p-1 rounded-full hover:bg-gray-700" disabled={!searchResults.length}><ChevronDown size={16} /></button>
+                                <button onClick={() => setIsSearchVisible(false)} className="p-1 rounded-full hover:bg-gray-700"><X size={16} /></button>
+                            </div>
+                        )}
+
+                        <div className="prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white" onMouseUp={handleMouseUp}>
+                            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
+                            <p className="text-lg text-gray-400 mb-8">By {article.author}</p>
+                            <div ref={contentRef}>
+                                <HighlightHandler highlights={highlights} onAddHighlight={handleAddHighlight} onDeleteHighlight={handleDeleteHighlight}>
+                                    <ReactMarkdown components={customRenderers} remarkPlugins={[remarkGfm, remarkSlug]} rehypePlugins={[rehypeRaw]}>
+                                        {article.content}
+                                    </ReactMarkdown>
+                                </HighlightHandler>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-4 lg:sticky top-24 self-start space-y-6">
+                        {isTocOpen && <TableOfContents content={article.content} />}
+                        {user && isHighlightsOpen && <HighlightsSidebar highlights={highlights} onDeleteHighlight={handleDeleteHighlight} />}
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+};
+
+export default ArticleReaderPage;
+
             </div>
         );
     }
@@ -461,31 +447,22 @@ const ArticleReaderPage = () => {
                                 </button>
                             </div>
                             <div className="flex items-center space-x-2">
-                                 <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Comments">
-
-        <Header />
-        <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30">
-            <div 
-                className="h-full bg-red-600 transition-all duration-150 ease-linear"
-                style={{ width: `${scrollProgress}%` }}
-            ></div>
-        </div>
-        
-        <main className="container mx-auto px-4 py-24">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                <div className="lg:col-span-8">
-                    {/* Article Action Bar */}
-                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
-                        <div className="flex items-center space-x-2">
-                            <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
-                                <List size={20} />
-                            </button>
-                            <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Bookmark">
-                                <Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-red-500' : ''} />
-                            </button>
-                            <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Search">
-                                <Search size={20} />
-                            </button>
+                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Comments">
+                                    <MessageSquare size={20} />
+                                </button>
+                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Share">
+                                    <Share2 size={20} />
+                                </button>
+                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Download PDF">
+                                    {isGeneratingPdf ? (
+                                        <Loader size={20} className="animate-spin" />
+                                    ) : (
+                                        <Download size={20} />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                        {isSearchVisible && (
                             <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4">
                                 <input
                                     type="text"
