@@ -143,11 +143,6 @@ const LoginPage = () => {
         setSubmissionError(null);
         setSubmissionSuccess(false);
 
-        if (!user) {
-            setSubmissionError('You must be logged in to submit an article.');
-            return;
-        }
-
         if (!file || !title || !abstract || !category || selectedTags.length === 0) {
             setSubmissionError('Please fill out all fields, select a category, choose at least one tag, and upload a manuscript.');
             return;
@@ -158,7 +153,7 @@ const LoginPage = () => {
         try {
             const fileExt = file.name.split('.').pop();
             const newFileName = `${Date.now()}.${fileExt}`;
-            const filePath = `${user.id}/${newFileName}`;
+            const filePath = user ? `${user.id}/${newFileName}` : `anonymous-submissions/${newFileName}`;
 
             const { error: uploadError } = await supabase.storage
                 .from('manuscripts')
@@ -169,17 +164,22 @@ const LoginPage = () => {
             }
 
             const tagIds = selectedTags.map(t => t.value);
+            
+            const submissionData = {
+                title,
+                abstract,
+                category_id: category,
+                tag_ids: tagIds,
+                file_path: filePath,
+            };
+
+            if (user) {
+                submissionData.user_id = user.id;
+            }
 
             const { error: insertError } = await supabase
                 .from('article_submissions')
-                .insert({
-                    user_id: user.id,
-                    title,
-                    abstract,
-                    category_id: category,
-                    tag_ids: tagIds,
-                    file_path: filePath,
-                });
+                .insert(submissionData);
 
             if (insertError) {
                 await supabase.storage.from('manuscripts').remove([filePath]);
@@ -359,7 +359,6 @@ const LoginPage = () => {
 
                         <div className="bg-black/80 backdrop-blur-sm rounded-lg border border-red-900/40 p-4">
                             <h2 className="text-2xl font-bold mb-3 text-white">Submit Your Work</h2>
-                            {user ? (
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div>
                                         <label htmlFor="category" className="block text-white mb-1 text-sm">Category</label>
@@ -400,34 +399,28 @@ const LoginPage = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-white mb-1 text-sm">Manuscript</label>
-                                        <label htmlFor="manuscript-upload" className="relative cursor-pointer bg-gray-900/70 border border-red-500/30 rounded-lg text-white p-2 flex items-center justify-center hover:bg-gray-800/70 transition text-sm">
-                                            <UploadIcon className="mr-2" size={16} />
-                                            <span className="truncate">{fileName || 'Choose a file...'}</span>
-                                        </label>
-                                        <input id="manuscript-upload" type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx" />
+                                        <label htmlFor="file-upload" className="block text-white mb-1 text-sm">Manuscript</label>
+                                        <div className="flex items-center justify-center w-full">
+                                            <label htmlFor="file-upload" className="flex flex-col items-center justify-center w-full h-24 border-2 border-red-500/30 border-dashed rounded-lg cursor-pointer bg-gray-900/70 hover:bg-gray-800/80 transition">
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <UploadIcon className="w-8 h-8 mb-2 text-gray-400" />
+                                                    <p className="mb-1 text-sm text-gray-400"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                                    <p className="text-xs text-gray-500">PDF or DOCX (MAX. 5MB)</p>
+                                                </div>
+                                                <input id="file-upload" type="file" className="hidden" onChange={handleFileChange} />
+                                            </label>
+                                        </div>
+                                        {fileName && <p className="text-sm text-gray-300 mt-2">Selected: {fileName}</p>}
                                     </div>
-                                    {submissionError && (
-                                        <div className="text-red-400 flex items-center p-2 bg-red-900/20 rounded-lg text-sm">
-                                            <AlertTriangle className="mr-2 flex-shrink-0" size={16} />
-                                            <span>{submissionError}</span>
-                                        </div>
-                                    )}
-                                    {submissionSuccess && (
-                                        <div className="text-green-400 flex items-center p-2 bg-green-900/20 rounded-lg text-sm">
-                                            <CheckCircle className="mr-2 flex-shrink-0" size={16} />
-                                            <span>Submission successful!</span>
-                                        </div>
-                                    )}
-                                    <button type="submit" disabled={submitting} className="w-full p-2 bg-red-600 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm">
-                                        {submitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Submit'}
+
+                                    {submissionError && <div className="bg-red-900/50 border border-red-700 text-red-200 p-3 rounded-lg text-center flex items-center justify-center gap-2"><AlertTriangle size={18} /> {submissionError}</div>}
+                                    {submissionSuccess && <div className="bg-green-900/50 border border-green-700 text-green-200 p-3 rounded-lg text-center flex items-center justify-center gap-2"><CheckCircle size={18} /> Submission successful!</div>}
+
+                                    <button type="submit" disabled={submitting} className="w-full p-3 bg-red-600 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                        {submitting && <Loader2 className="animate-spin" size={20} />}
+                                        {submitting ? 'Submitting...' : 'Submit Article'}
                                     </button>
                                 </form>
-                            ) : (
-                                <div className="text-center text-gray-400 p-8 border-2 border-dashed border-red-900/50 rounded-lg">
-                                    <p>Please log in to submit your work.</p>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
