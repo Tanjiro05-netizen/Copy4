@@ -15,10 +15,8 @@ const StudyPage = () => (
       <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
       <div className="absolute inset-0">
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-20 study-page-background"
           style={{
-            background: `url(${process.env.PUBLIC_URL}/images/Marx.jpg) no-repeat center center`,
-            backgroundSize: 'cover',
             filter: 'brightness(0.7) contrast(1.2)',
             mixBlendMode: 'soft-light'
           }}

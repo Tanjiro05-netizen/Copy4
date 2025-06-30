@@ -26,3 +26,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
   monospace;
 }
+
+.login-background {
+  background-image: url('/images/marx-outline.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.app-background {
+  background-image: url('/images/hammerandsickle.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.study-page-background {
+  background-image: url('/images/Marx.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
