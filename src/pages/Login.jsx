@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../supabaseClient';
 import marxOutlineBackground from '../assets/marx-outline.png';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, UploadIcon, Info, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import Select from 'react-select';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -10,8 +12,42 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
+
+    // Submission form state
+    const [title, setTitle] = useState('');
+    const [abstract, setAbstract] = useState('');
+    const [category, setCategory] = useState('');
+    const [selectedTags, setSelectedTags] = useState([]);
+    const [file, setFile] = useState(null);
+    const [fileName, setFileName] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [submissionError, setSubmissionError] = useState(null);
+    const [submissionSuccess, setSubmissionSuccess] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const { data: categoriesData, error: categoriesError } = await supabase
+                    .from('theory_categories')
+                    .select('id, name');
+                if (categoriesError) throw categoriesError;
+                setCategories(categoriesData);
+
+                const { data: tagsData, error: tagsError } = await supabase
+                    .from('theory_tags')
+                    .select('id, name');
+                if (tagsError) throw tagsError;
+                setTags(tagsData.map(t => ({ value: t.id, label: t.name })));
+            } catch (err) {
+                console.error('Error fetching data for submission form:', err);
+            }
+        };
+        fetchData();
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -77,6 +113,92 @@ const LoginPage = () => {
                 </div>
             </div>
         );
+    };
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!allowedTypes.includes(selectedFile.type)) {
+                setSubmissionError('Invalid file type. Please upload a PDF or Word document.');
+                setFile(null);
+                setFileName('');
+                return;
+            }
+            if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
+                setSubmissionError('File is too large. Maximum size is 5MB.');
+                setFile(null);
+                setFileName('');
+                return;
+            }
+            setSubmissionError(null);
+            setFile(selectedFile);
+            setFileName(selectedFile.name);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSubmissionError(null);
+        setSubmissionSuccess(false);
+
+        if (!user) {
+            setSubmissionError('You must be logged in to submit an article.');
+            return;
+        }
+
+        if (!file || !title || !abstract || !category || selectedTags.length === 0) {
+            setSubmissionError('Please fill out all fields, select a category, choose at least one tag, and upload a manuscript.');
+            return;
+        }
+
+        setSubmitting(true);
+
+        try {
+            const fileExt = file.name.split('.').pop();
+            const newFileName = `${Date.now()}.${fileExt}`;
+            const filePath = `${user.id}/${newFileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('manuscripts')
+                .upload(filePath, file);
+
+            if (uploadError) {
+                throw uploadError;
+            }
+
+            const tagIds = selectedTags.map(t => t.value);
+
+            const { error: insertError } = await supabase
+                .from('article_submissions')
+                .insert({
+                    user_id: user.id,
+                    title,
+                    abstract,
+                    category_id: category,
+                    tag_ids: tagIds,
+                    file_path: filePath,
+                });
+
+            if (insertError) {
+                await supabase.storage.from('manuscripts').remove([filePath]);
+                throw insertError;
+            }
+
+            setSubmissionSuccess(true);
+            setTitle('');
+            setAbstract('');
+            setCategory('');
+            setSelectedTags([]);
+            setFile(null);
+            setFileName('');
+
+        } catch (error) {
+            setSubmissionError(error.message);
+            console.error('Submission error:', error);
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     // No longer using the Lenin quote as requested
@@ -195,7 +317,7 @@ const LoginPage = () => {
                                 <div>
                                     <h3 className="text-xl font-semibold text-red-400">Data Collection & Analysis</h3>
                                     <p className="text-gray-200">
-                                        Since I analyze the economy and capitalism is worldwide, this section provides tools for 
+                                        Since we analyze the economy and capitalism is worldwide, this section provides tools for 
                                         tracking global economic developments and staying updated on the evolving conditions of 
                                         capitalist production and class struggle.
                                     </p>
@@ -213,23 +335,98 @@ const LoginPage = () => {
                     </div>
                     
                     {/* Right column */}
-                    <div className="lg:w-1/2 bg-black/80 backdrop-blur-sm rounded-lg border border-red-900/40 p-4">
-                        <h2 className="text-2xl font-bold mb-3 text-white">Platform Development</h2>
-                        <p className="text-gray-200 mb-3">
-                            This platform is being developed with a systematic approach to ensure it serves as a hub for genuine 
-                            Marxist thought, research, and organization. Each feature is being carefully designed to provide maximum 
-                            utility for revolutionary study and practice.
-                        </p>
-                        <p className="text-gray-200 mb-3">
-                            My development process involves extensive research into both Marxist literature and modern 
-                            technological tools that can serve my theoretical and practical needs. I'm creating a 
-                            platform that respects the rich history of Marxism while embracing the technology Capitalism gave us. Its grave will be dug by itself.
-                        </p>
-                        <div className="border-l-4 border-red-500 pl-4 py-2 mb-6">
-                            <p className="text-gray-300 italic">
-                                "The philosophers have only interpreted the world, in various ways. The point, however, is to change it."
+                    <div className="lg:w-1/2 space-y-6">
+                        <div className="bg-black/80 backdrop-blur-sm rounded-lg border border-red-900/40 p-4">
+                            <h2 className="text-2xl font-bold mb-3 text-white">Platform Development</h2>
+                            <p className="text-gray-200 mb-3">
+                                This platform is being developed with a systematic approach to ensure it serves as a hub for genuine 
+                                Marxist thought, research, and organization. Each feature is being carefully designed to provide maximum 
+                                utility for revolutionary study and practice.
                             </p>
-                            <p className="text-red-400 text-sm mt-2">— Karl Marx, Theses on Feuerbach</p>
+                            <p className="text-gray-200 mb-3">
+                                My development process involves extensive research into both Marxist literature and modern 
+                                technological tools that can serve my theoretical and practical needs. I'm creating a 
+                                platform that respects the rich history of Marxism while embracing the technology Capitalism gave us. Its grave will be dug by itself.
+                            </p>
+                            <div className="border-l-4 border-red-500 pl-4 py-2 mb-6">
+                                <p className="text-gray-300 italic">
+                                    "The philosophers have only interpreted the world, in various ways. The point, however, is to change it."
+                                </p>
+                                <p className="text-red-400 text-sm mt-2">— Karl Marx, Theses on Feuerbach</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-black/80 backdrop-blur-sm rounded-lg border border-red-900/40 p-4">
+                            <h2 className="text-2xl font-bold mb-3 text-white">Submit Your Work</h2>
+                            {user ? (
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div>
+                                        <label htmlFor="category" className="block text-white mb-1 text-sm">Category</label>
+                                        <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition text-sm" required>
+                                            <option value="" disabled>Select a category...</option>
+                                            {categories.map(cat => (
+                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="title" className="block text-white mb-1 text-sm">Title</label>
+                                        <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full p-2 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition text-sm" placeholder="Article Title" required />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="abstract" className="block text-white mb-1 text-sm">Abstract</label>
+                                        <textarea id="abstract" rows="3" value={abstract} onChange={(e) => setAbstract(e.target.value)} className="w-full p-2 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition text-sm" placeholder="Brief abstract" required></textarea>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="tags" className="block text-white mb-1 text-sm">Tags</label>
+                                        <Select
+                                            id="tags"
+                                            isMulti
+                                            options={tags}
+                                            value={selectedTags}
+                                            onChange={setSelectedTags}
+                                            className="text-white text-sm"
+                                            classNamePrefix="select"
+                                            placeholder="Select tags..."
+                                            styles={{
+                                                control: (base) => ({ ...base, backgroundColor: 'rgb(17 34 51 / 0.7)', borderColor: 'rgb(239 68 68 / 0.3)', color: 'white' }),
+                                                multiValue: (base) => ({ ...base, backgroundColor: '#C2A55A' }),
+                                                multiValueLabel: (base) => ({ ...base, color: 'black' }),
+                                                option: (base, { isFocused, isSelected }) => ({ ...base, backgroundColor: isSelected ? '#C2A55A' : isFocused ? '#4D4E5C' : 'rgb(17 34 51 / 0.7)', color: isSelected ? 'black' : 'white' }),
+                                                menu: (base) => ({ ...base, backgroundColor: 'rgb(17 34 51 / 0.9)' }),
+                                                input: (base) => ({...base, color: 'white'})
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-white mb-1 text-sm">Manuscript</label>
+                                        <label htmlFor="manuscript-upload" className="relative cursor-pointer bg-gray-900/70 border border-red-500/30 rounded-lg text-white p-2 flex items-center justify-center hover:bg-gray-800/70 transition text-sm">
+                                            <UploadIcon className="mr-2" size={16} />
+                                            <span className="truncate">{fileName || 'Choose a file...'}</span>
+                                        </label>
+                                        <input id="manuscript-upload" type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx" />
+                                    </div>
+                                    {submissionError && (
+                                        <div className="text-red-400 flex items-center p-2 bg-red-900/20 rounded-lg text-sm">
+                                            <AlertTriangle className="mr-2 flex-shrink-0" size={16} />
+                                            <span>{submissionError}</span>
+                                        </div>
+                                    )}
+                                    {submissionSuccess && (
+                                        <div className="text-green-400 flex items-center p-2 bg-green-900/20 rounded-lg text-sm">
+                                            <CheckCircle className="mr-2 flex-shrink-0" size={16} />
+                                            <span>Submission successful!</span>
+                                        </div>
+                                    )}
+                                    <button type="submit" disabled={submitting} className="w-full p-2 bg-red-600 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm">
+                                        {submitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Submit'}
+                                    </button>
+                                </form>
+                            ) : (
+                                <div className="text-center text-gray-400 p-8 border-2 border-dashed border-red-900/50 rounded-lg">
+                                    <p>Please log in to submit your work.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
