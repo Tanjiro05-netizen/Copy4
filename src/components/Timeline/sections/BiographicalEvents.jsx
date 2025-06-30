@@ -1,9 +1,11 @@
+import marxBirthImage from '../../../assets/Marx-Birth.jpg';
+
 const BiographicalEvents = [
     {
         year: 1818,
         title: "Birth of Karl Marx",
         description: "Born in Trier, Prussia (now Germany)",
-        image: "/images/Marx-Birth.jpg"  // Added image path
+        image: marxBirthImage
     },
     {
         year: 1843,

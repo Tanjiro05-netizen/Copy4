@@ -3,6 +3,7 @@ import { Menu, Book, Globe, LogOut, FileText, BookOpen, BarChart, Sun, Moon } fr
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from './context/AuthContext';
+import hammerAndSickleImage from './assets/hammerandsickle.png';
 import { useTheme } from './context/ThemeContext';
 
 
@@ -28,7 +29,7 @@ const App = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                     <img 
-                        src="/images/hammerandsickle.png"
+                        src={hammerAndSickleImage}
                         alt="Background"
                         className="w-[800px] h-[800px] opacity-20 object-contain"
                         style={{

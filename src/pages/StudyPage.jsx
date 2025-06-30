@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import StudyResources from "../components/StudyPage/StudyResources";
 import StudyMilestones from "../components/StudyPage/StudyMilestones"; // Assuming this component exists
 import StudyPathAI from "../components/StudyPage/StudyPathAI";
+import marxBackground from '../assets/Marx.jpg';
 import ConceptAnalysis from "../components/StudyPage/ConceptAnalysis";
 import Header from "../components/Header";
 import { BookOpen, Video, FileText, Users, Search } from "lucide-react";
@@ -15,7 +16,7 @@ const StudyPage = () => (
       <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
       <div className="absolute inset-0">
         <img 
-          src="/images/Marx.jpg"
+          src={marxBackground}
           alt="Study background"
           className="absolute inset-0 w-full h-full object-cover opacity-20"
           style={{

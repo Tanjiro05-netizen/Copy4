@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import marxOutlineBackground from '../assets/marx-outline.png';
 
 
 const LoginPage = () => {
@@ -29,9 +30,9 @@ const LoginPage = () => {
             {/* Background elements from the original design */}
             <div className="fixed inset-0 z-0">
                 <img 
-                    src="/images/marx-outline.png" 
+                    src={marxOutlineBackground} 
                     alt="Page background" 
-                    className="w-full h-full object-cover opacity-20" 
+                    className="w-full h-full object-cover" 
                 />
             </div>
             <div className="fixed inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
