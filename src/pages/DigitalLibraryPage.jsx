@@ -7,14 +7,14 @@ import {
     Database, DollarSign, BookOpen, Landmark, Users, Target
 } from 'lucide-react';
 
-const libraryCategories = [
-    { id: 'all', name: 'All Categories', icon: Database },
-    { id: 'Political Economy', name: 'Political Economy', icon: DollarSign },
-    { id: 'Philosophy', name: 'Philosophy', icon: BookOpen },
-    { id: 'History', name: 'History', icon: Landmark },
-    { id: 'Sociology', name: 'Sociology', icon: Users },
-    { id: 'Strategy & Tactics', name: 'Strategy & Tactics', icon: Target }
-];
+const categoryIcons = {
+    'Political Economy': DollarSign,
+    'Philosophy': BookOpen,
+    'History': Landmark,
+    'Sociology': Users,
+    'Strategy & Tactics': Target,
+    'default': Database
+};
 
 const BookCard = ({ book, viewMode }) => {
     // Get the public URL for the book's PDF file
@@ -142,48 +142,67 @@ const DigitalLibraryPage = () => {
     const [activeLanguage, setActiveLanguage] = useState('all');
     const [books, setBooks] = useState([]);
     const [allBooks, setAllBooks] = useState([]); // Store all books for stats
+    const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchBooks = async () => {
+        const fetchData = async () => {
             setIsLoading(true);
             setError(null);
             try {
-                // Fetch all books initially to calculate stats, then filter
-                const { data: allData, error: allError } = await supabase.from('digital_library_books').select('*');
-                if (allError) throw allError;
-                setAllBooks(allData || []);
+                // Fetch all books and categories in parallel
+                const [booksResponse, categoriesResponse] = await Promise.all([
+                    supabase.from('digital_library_books').select('*'),
+                    supabase.from('digital_library_books').select('category')
+                ]);
 
-                let filteredData = allData || [];
+                if (booksResponse.error) throw booksResponse.error;
+                if (categoriesResponse.error) throw categoriesResponse.error;
 
+                const allData = booksResponse.data || [];
+                setAllBooks(allData);
+
+                // Generate dynamic categories
+                const distinctCategories = [...new Set(categoriesResponse.data.map(item => item.category).filter(Boolean))];
+                const dynamicCategories = distinctCategories.map(name => ({
+                    id: name,
+                    name: name,
+                    icon: categoryIcons[name] || categoryIcons.default
+                }));
+                setCategories([
+                    { id: 'all', name: 'All Categories', icon: categoryIcons.default },
+                    ...dynamicCategories
+                ]);
+
+                // Apply filters
+                let filteredData = allData;
                 if (debouncedSearchQuery) {
-                    filteredData = filteredData.filter(book => book.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()));
+                    filteredData = filteredData.filter(book => 
+                        book.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+                        book.author.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+                    );
                 }
-
                 if (activeCategory !== 'all') {
-                    // Filter by category ID which should match the database values
                     filteredData = filteredData.filter(book => book.category === activeCategory);
                 }
-
                 if (activeEra !== 'all') {
                     filteredData = filteredData.filter(book => book.era === activeEra);
                 }
-
                 if (activeLanguage !== 'all') {
                     filteredData = filteredData.filter(book => book.language === activeLanguage);
                 }
 
                 setBooks(filteredData);
             } catch (error) {
-                setError('Error fetching books: ' + error.message);
+                setError('Error fetching data: ' + error.message);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchBooks();
-    }, [searchQuery, activeCategory, activeEra, activeLanguage]);
+        fetchData();
+    }, [debouncedSearchQuery, activeCategory, activeEra, activeLanguage]);
 
     const groupedBooks = useMemo(() => {
         return books.reduce((acc, book) => {
@@ -284,7 +303,7 @@ const DigitalLibraryPage = () => {
 
                 <div className="border-b border-red-900/30 mb-8">
                     <div className="flex overflow-x-auto py-4 gap-4 no-scrollbar">
-                        {libraryCategories.map((category) => (
+                        {categories.map((category) => (
                             <button
                                 key={category.id}
                                 onClick={() => setActiveCategory(category.id)}
@@ -308,7 +327,7 @@ const DigitalLibraryPage = () => {
                         {Object.entries(groupedBooks).map(([categoryName, booksInCategory]) => (
                             <section key={categoryName}>
                                 <h2 className="text-3xl font-bold text-red-500 mb-6 flex items-center gap-3">
-                                    {libraryCategories.find(c => c.name === categoryName)?.icon && React.createElement(libraryCategories.find(c => c.name === categoryName).icon, { className: 'w-6 h-6' })}
+                                    {categories.find(c => c.name === categoryName)?.icon && React.createElement(categories.find(c => c.name === categoryName).icon, { className: 'w-6 h-6' })}
                                     {categoryName}
                                 </h2>
                                 <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
