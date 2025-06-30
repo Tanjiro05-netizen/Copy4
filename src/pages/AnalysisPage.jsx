@@ -19,7 +19,24 @@ const AnalysisPage = () => {
     const [error, setError] = useState(null);
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [activeTab, setActiveTab] = useState('Content');
+    const [scrollToText, setScrollToText] = useState(null);
     const TABS = ['Content', 'Comments', 'Notes', 'Analysis'];
+
+    useEffect(() => {
+        if (activeTab === 'Content' && scrollToText) {
+            setTimeout(() => {
+                const highlightElement = document.getElementById('highlighted-concordance');
+                if (highlightElement) {
+                    highlightElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        setScrollToText(null);
+                    }, 2500); 
+                } else {
+                    setScrollToText(null);
+                }
+            }, 100);
+        }
+    }, [scrollToText, activeTab]);
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -80,6 +97,24 @@ const AnalysisPage = () => {
             fetchData();
         }
     }, [userRole, user]);
+
+    const handleJumpToText = (sentence) => {
+        setActiveTab('Content');
+        setScrollToText(sentence);
+    };
+
+    const articleContentHtml = useMemo(() => {
+        if (!selectedArticle?.content) return '<p>Content not available.</p>';
+        let content = selectedArticle.content;
+        if (scrollToText) {
+            const escapedSentence = scrollToText.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+            const regex = new RegExp(escapedSentence, 'i');
+            if (content.match(regex)) {
+                content = content.replace(regex, (match) => `<span id="highlighted-concordance" class="bg-yellow-500/30 transition-all duration-300 p-1 rounded">${match}</span>`);
+            }
+        }
+        return content;
+    }, [selectedArticle?.content, scrollToText]);
 
     const filteredArticles = useMemo(() => {
         let filtered = [...articles];
@@ -198,11 +233,11 @@ const AnalysisPage = () => {
 
                             <div>
                                 {activeTab === 'Content' && (
-                                    <div className="prose prose-invert max-w-none text-gray-300 bg-black/20 p-4 rounded-lg" dangerouslySetInnerHTML={{ __html: selectedArticle.content || '<p>Content not available.</p>' }}></div>
+                                    <div className="prose prose-invert max-w-none text-gray-300 bg-black/20 p-4 rounded-lg" dangerouslySetInnerHTML={{ __html: articleContentHtml }}></div>
                                 )}
                                 {activeTab === 'Comments' && <ArticleComments articleId={selectedArticle.id} userRole={userRole} />}
                                 {activeTab === 'Notes' && <PrivateNotes articleId={selectedArticle.id} />}
-                                {activeTab === 'Analysis' && <ArticleAnalysis articleId={selectedArticle.id} />}
+                                {activeTab === 'Analysis' && <ArticleAnalysis articleId={selectedArticle.id} onJumpToText={handleJumpToText} />}
                             </div>
                         </div>
                     </div>

@@ -6,7 +6,7 @@ import { hierarchy } from '@visx/hierarchy';
 import { scaleOrdinal } from '@visx/scale';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 
-const ArticleAnalysis = ({ articleId }) => {
+const ArticleAnalysis = ({ articleId, onJumpToText }) => {
     const [keywords, setKeywords] = useState([]);
     const [selectedWord, setSelectedWord] = useState(null);
     const [concordance, setConcordance] = useState({ word: '', sentences: [] });
@@ -145,7 +145,12 @@ const ArticleAnalysis = ({ articleId }) => {
                                 <ul className="space-y-3 pl-4 list-disc list-inside max-h-[320px] overflow-y-auto pr-2">
                                     {concordance.sentences.length > 0 ? (
                                         concordance.sentences.map((sentence, i) => (
-                                            <li key={i} className="text-gray-300" dangerouslySetInnerHTML={{ __html: sentence.replace(new RegExp(`\b(${concordance.word})\b`, 'gi'), '<strong class="text-red-400 font-bold">$1</strong>') }}></li>
+                                            <li 
+                                                key={i} 
+                                                className="text-gray-300 cursor-pointer hover:bg-gray-800/50 p-1 rounded-md transition-colors"
+                                                onClick={() => onJumpToText && onJumpToText(sentence)}
+                                                dangerouslySetInnerHTML={{ __html: sentence.replace(new RegExp(`\b(${concordance.word})\b`, 'gi'), '<strong class="text-red-400 font-bold">$1</strong>') }}>
+                                            </li>
                                         ))
                                     ) : (
                                         <p className="text-gray-400">No context sentences found for this word.</p>
