@@ -28,7 +28,11 @@ const LoginPage = () => {
         <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center relative overflow-hidden">
             {/* Background elements from the original design */}
             <div className="fixed inset-0 z-0">
-                <div className="w-full h-full opacity-40" style={{backgroundImage: 'url(/images/marx-outline.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}></div>
+                <img 
+                    src="/images/marx-outline.png" 
+                    alt="Page background" 
+                    className="w-full h-full object-cover opacity-20" 
+                />
             </div>
             <div className="fixed inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
 

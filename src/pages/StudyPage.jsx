@@ -14,17 +14,15 @@ const StudyPage = () => (
     <div className="relative bg-[#12131A] min-h-[40vh] mb-8">
       <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
       <div className="absolute inset-0">
-        <div
-          className="absolute inset-0 opacity-40"
+        <img 
+          src="/images/Marx.jpg"
+          alt="Study background"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
           style={{
-            backgroundImage: 'url(/images/Marx.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
             filter: 'brightness(0.7) contrast(1.2)',
             mixBlendMode: 'soft-light'
           }}
-        ></div>
+        />
       </div>
       
       <Header />
