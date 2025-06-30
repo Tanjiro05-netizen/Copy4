@@ -189,7 +189,7 @@ const ArticleComments = ({ articleId }) => {
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('role')
+                    .select('is_admin')
                     .eq('id', user.id)
                     .single();
 
@@ -198,7 +198,7 @@ const ArticleComments = ({ articleId }) => {
                 }
                 
                 if (data) {
-                    setUserRole(data.role);
+                    setUserRole(data.is_admin ? 'admin' : null);
                 }
             } catch (error) {
                 console.error('Error fetching user role:', error);

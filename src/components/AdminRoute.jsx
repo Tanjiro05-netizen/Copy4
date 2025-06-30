@@ -18,13 +18,13 @@ const AdminRoute = ({ children }) => {
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('role')
+                    .select('is_admin')
                     .eq('id', user.id)
                     .single();
 
                 if (error) throw error;
 
-                if (data && data.role === 'admin') {
+                if (data && data.is_admin === true) {
                     setIsAdmin(true);
                 }
             } catch (error) {

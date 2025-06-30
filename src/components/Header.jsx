@@ -38,12 +38,12 @@ const Header = () => {
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('role')
+                    .select('is_admin')
                     .eq('id', user.id)
                     .single();
 
                 if (error && error.code !== 'PGRST116') throw error;
-                if (data) setUserRole(data.role);
+                if (data) setUserRole(data.is_admin ? 'admin' : null);
 
             } catch (error) {
                 console.error('Error fetching user role in header:', error);
