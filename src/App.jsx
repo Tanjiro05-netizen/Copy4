@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
-import hammerAndSickle from './assets/images/hammerandsickle.png';
+
 
 
 const App = () => {
@@ -30,7 +30,7 @@ const App = () => {
                     <div
                         className="w-[800px] h-[800px] opacity-20"
                         style={{
-                            background: `url(${hammerAndSickle}) no-repeat center center`,
+                            background: `url(${process.env.PUBLIC_URL}/images/hammerandsickle.png) no-repeat center center`,
                             backgroundSize: 'contain',
                             filter: 'brightness(0.7) contrast(1.2)',
                             mixBlendMode: 'soft-light'

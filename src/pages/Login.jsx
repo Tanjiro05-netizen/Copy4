@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import marxOutline from '../assets/images/marx-outline.png';
+
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -31,7 +31,7 @@ const LoginPage = () => {
                 <div
                     className="w-full h-full opacity-20"
                     style={{
-                        backgroundImage: `url(${marxOutline})`,
+                        backgroundImage: `url(${process.env.PUBLIC_URL}/images/marx-outline.png)`,
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat'
