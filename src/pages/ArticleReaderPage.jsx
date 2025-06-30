@@ -13,6 +13,7 @@ import ArticleComments from '../components/ArticleComments';
 import HighlightHandler from '../components/HighlightHandler';
 import TableOfContents from '../components/TableOfContents';
 import HighlightsSidebar from '../components/HighlightsSidebar';
+import NerRenderer from '../components/NerRenderer';
 import { Loader, ArrowLeft, Bookmark, MessageSquare, List, Check, Share2, Search, X, ChevronUp, ChevronDown, Quote, Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -22,6 +23,7 @@ const ArticleReaderPage = () => {
     const { user } = useAuth();
     
     const [article, setArticle] = useState(null);
+    const [entities, setEntities] = useState({ people: [], places: [], organizations: [] });
     const [highlights, setHighlights] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -33,6 +35,7 @@ const ArticleReaderPage = () => {
     const [isTocOpen, setIsTocOpen] = useState(true);
     const [isHighlightsOpen, setIsHighlightsOpen] = useState(true);
     const [isSearchVisible, setIsSearchVisible] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [currentResultIndex, setCurrentResultIndex] = useState(-1);
@@ -72,8 +75,21 @@ const ArticleReaderPage = () => {
 
             if (articleError) throw articleError;
             if (!articleData) throw new Error('Article not found.');
-            
+
             setArticle(articleData);
+
+            // Fetch entities for NER
+            if (articleData.content) {
+                supabase.functions.invoke('ner', {
+                    body: { text: articleData.content },
+                }).then(({ data, error }) => {
+                    if (error) {
+                        console.error('Error invoking NER function:', error);
+                    } else {
+                        setEntities(data);
+                    }
+                });
+            }
 
             if (user && articleData) {
                 // Fetch highlights
@@ -86,6 +102,17 @@ const ArticleReaderPage = () => {
 
                 if (highlightsError) throw highlightsError;
                 setHighlights(highlightsData || []);
+
+                // Fetch bookmark status
+                const { data: bookmarkData, error: bookmarkError } = await supabase
+                    .from('user_article_bookmarks')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('article_id', articleData.id)
+                    .maybeSingle();
+                
+                if (bookmarkError) throw bookmarkError;
+                setIsBookmarked(!!bookmarkData);
 
                 // Fetch progress
                 const { data: progressData } = await supabase
@@ -130,6 +157,7 @@ const ArticleReaderPage = () => {
             done: () => {
                 markInstance.current.mark(searchQuery, {
                     className: 'search-highlight',
+                    acrossElements: true, // Fix for searching across rendered elements
                     done: (count) => {
                         const highlightedElements = contentRef.current.querySelectorAll('.search-highlight');
                         setSearchResults(Array.from(highlightedElements));
@@ -186,6 +214,33 @@ const ArticleReaderPage = () => {
             }
         };
     }, [user, article]);
+
+    const handleToggleBookmark = async () => {
+        if (!user || !article) return;
+
+        try {
+            if (isBookmarked) {
+                // Delete bookmark
+                const { error } = await supabase
+                    .from('user_article_bookmarks')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .eq('article_id', article.id);
+                if (error) throw error;
+                setIsBookmarked(false);
+            } else {
+                // Add bookmark
+                const { error } = await supabase
+                    .from('user_article_bookmarks')
+                    .insert({ user_id: user.id, article_id: article.id });
+                if (error) throw error;
+                setIsBookmarked(true);
+            }
+        } catch (error) {
+            console.error('Error toggling bookmark:', error);
+            alert('Failed to update bookmark.');
+        }
+    };
 
     const handleShare = async () => {
         const shareData = {
@@ -335,6 +390,11 @@ const ArticleReaderPage = () => {
         }
     };
 
+    const customRenderers = {
+        p: ({ children }) => <p><NerRenderer entities={entities}>{children}</NerRenderer></p>,
+        li: ({ children }) => <li><NerRenderer entities={entities}>{children}</NerRenderer></li>,
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-[#12131A] flex items-center justify-center">
@@ -390,31 +450,42 @@ const ArticleReaderPage = () => {
                         {/* Article Action Bar */}
                         <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
                             <div className="flex items-center space-x-2">
-                                <button onClick={() => setIsTocOpen(!isTocOpen)} className={`p-2 rounded-full hover:bg-gray-700 ${isTocOpen ? 'bg-gray-700' : ''}`} title="Table of Contents">
+                                <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
                                     <List size={20} />
                                 </button>
-                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className={`p-2 rounded-full hover:bg-gray-700 ${isHighlightsOpen ? 'bg-gray-700' : ''}`} title="My Highlights">
-                                    <Bookmark size={20} />
+                                <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Bookmark">
+                                    <Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-red-500' : ''} />
                                 </button>
-                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className={`p-2 rounded-full hover:bg-gray-700 ${isSearchVisible ? 'bg-gray-700' : ''}`} title="Search in article">
+                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Search">
                                     <Search size={20} />
                                 </button>
                             </div>
                             <div className="flex items-center space-x-2">
-                                 <button className="p-2 rounded-full hover:bg-gray-700" title="Comments">
-                                    <MessageSquare size={20} />
-                                </button>
-                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-700" title="Share">
-                                    <Share2 size={20} />
-                                </button>
-                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" title="Download as PDF" disabled={isGeneratingPdf}>
-                                    {isGeneratingPdf ? <Loader size={20} className="animate-spin" /> : <Download size={20} />}
-                                </button>
-                            </div>
-                        </div>
+                                 <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Comments">
 
-                        {/* Search Input Bar */}
-                        {isSearchVisible && (
+        <Header />
+        <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30">
+            <div 
+                className="h-full bg-red-600 transition-all duration-150 ease-linear"
+                style={{ width: `${scrollProgress}%` }}
+            ></div>
+        </div>
+        
+        <main className="container mx-auto px-4 py-24">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                <div className="lg:col-span-8">
+                    {/* Article Action Bar */}
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
+                        <div className="flex items-center space-x-2">
+                            <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
+                                <List size={20} />
+                            </button>
+                            <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Bookmark">
+                                <Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-red-500' : ''} />
+                            </button>
+                            <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Search">
+                                <Search size={20} />
+                            </button>
                             <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4">
                                 <input
                                     type="text"
@@ -448,15 +519,14 @@ const ArticleReaderPage = () => {
                         <HighlightHandler 
                             highlights={highlights}
                             onAddHighlight={handleAddHighlight}
+                            onDeleteHighlight={handleDeleteHighlight}
                         >
-                                                        <div 
-                                ref={contentRef}
-                                onMouseUp={handleMouseUp}
-                                className="prose prose-lg prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white prose-strong:text-white prose-a:text-red-400 hover:prose-a:text-red-500 prose-h1:text-4xl prose-h1:font-bold prose-h2:text-3xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-700 prose-h2:pb-2"
-                            >
+                            <div ref={contentRef} onMouseUp={handleMouseUp}>
                                 <ReactMarkdown 
+                                    components={customRenderers}
                                     remarkPlugins={[remarkGfm, remarkSlug]}
                                     rehypePlugins={[rehypeRaw]}
+                                    className="prose prose-invert max-w-none text-lg leading-relaxed selection:bg-red-500/50"
                                 >
                                     {article.content}
                                 </ReactMarkdown>
