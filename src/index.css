@@ -29,18 +29,8 @@ code {
 
 
 
-.app-background {
-  background-image: url('/images/hammerandsickle.png');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
 
-.study-page-background {
-  background-image: url('/images/Marx.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
+
+
 
 /* Trigger deployment */

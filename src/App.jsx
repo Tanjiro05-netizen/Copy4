@@ -28,8 +28,12 @@ const App = () => {
                 <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div
-                        className="w-[800px] h-[800px] opacity-20 app-background"
+                        className="w-[800px] h-[800px] opacity-20"
                         style={{
+                            backgroundImage: 'url(/images/hammerandsickle.png)',
+                            backgroundSize: 'contain',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
                             filter: 'brightness(0.7) contrast(1.2)',
                             mixBlendMode: 'soft-light'
                         }}
