@@ -260,15 +260,7 @@ const SubmitPage = () => {
             <header className="relative h-[50vh]">
                 <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                        className="absolute inset-0 opacity-20"
-                        style={{
-                            background: `url('/images/gramsci-bg.jpg') no-repeat center center`,
-                            backgroundSize: 'cover',
-                            filter: 'brightness(0.7) contrast(1.2)',
-                            mixBlendMode: 'soft-light'
-                        }}
-                    ></div>
+
                 </div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                     <div className="text-center space-y-8 max-w-4xl px-4">
