@@ -234,7 +234,7 @@ const LoginPage = () => {
                     {/* Header Section */}
                     <div className="mb-8">
                         <h1 className="text-4xl md:text-6xl font-bold text-red-500 mb-6">Marxist Theory: Marxist.info</h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-2">
+                        <p className="text-xl md:text-2xl text-gray-300 mb-2 [text-shadow:0_1px_3px_rgb(0_0_0_/_0.8)]">
                             A Renaissance of Revolutionary Theory and Practice
                         </p>
                     </div>
