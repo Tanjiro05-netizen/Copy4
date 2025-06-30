@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
 import { Menu, Book, Globe, LogOut, FileText, BookOpen, BarChart, Sun, Moon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+
 import { useAuth } from './context/AuthContext';
 import { useTheme } from './context/ThemeContext';
 
 
 const App = () => {
     const [activeSection, setActiveSection] = useState('home');
-    const { t, i18n } = useTranslation();
     const { logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
-
-    const toggleLanguage = () => {
-        const newLang = i18n.language === 'en' ? 'kr' : 'en';
-        i18n.changeLanguage(newLang);
-    };
 
     const handleLogout = () => {
         logout();
@@ -46,23 +40,23 @@ const App = () => {
                 <div className="absolute inset-0 flex items-center justify-center text-white">
                     <div className="text-center space-y-8 max-w-4xl px-4">
                         <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-                            {t('hero.title')}
+                            Advancing Revolutionary Theory
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
-                            {t('hero.subtitle')}
+                            A platform for the new generation of Marxist theorists and researchers.
                         </p>
                         <div className="flex justify-center gap-4">
                             <Link
                                 to="/theory"
                                 className="bg-red-600 text-white px-8 py-3 rounded-full hover:bg-red-700 transition-colors inline-block"
                             >
-                                {t('hero.buttons.explore')}
+                                Explore Theory
                             </Link>
                             <Link
                                 to="/submit"
                                 className="border border-white px-8 py-3 rounded-full hover:bg-white hover:text-red-900 transition-all"
                             >
-                                {t('hero.buttons.submit')}
+                                Submit Work
                             </Link>
                         </div>
                     </div>
@@ -75,10 +69,10 @@ const App = () => {
                     <div className="max-w-4xl mx-auto text-center">
                         <div className="space-y-6">
                             <h2 className="text-3xl md:text-4xl font-bold text-white">
-                                {t('about.title', 'About Our Collective')}
+                                About Our Collective
                             </h2>
                             <p className="text-gray-300 text-lg leading-relaxed">
-                                {t('about.description', 'We are a collective of researchers, theorists, and activists dedicated to advancing Marxist theory and practice in the contemporary world. Our platform serves as a hub for critical analysis, theoretical development, and revolutionary scholarship.')}
+                                We are a collective of researchers, theorists, and activists dedicated to advancing Marxist theory and practice in the contemporary world. Our platform serves as a hub for critical analysis, theoretical development, and revolutionary scholarship.
                             </p>
                             <div className="grid sm:grid-cols-2 gap-8 pt-6 text-left">
                                 <div className="flex items-start space-x-4">
@@ -86,8 +80,8 @@ const App = () => {
                                         <Book className="w-6 h-6 text-red-500" />
                                     </div>
                                     <div>
-                                        <h3 className="text-white font-semibold mb-2">{t('about.research.title', 'Research Focus')}</h3>
-                                        <p className="text-gray-400">{t('about.research.description', 'Conducting rigorous theoretical research and analysis of contemporary social, economic, and political phenomena through a Marxist lens.')}</p>
+                                        <h3 className="text-white font-semibold mb-2">Research Focus</h3>
+                                        <p className="text-gray-400">Conducting rigorous theoretical research and analysis of contemporary social, economic, and political phenomena through a Marxist lens.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start space-x-4">
@@ -95,8 +89,8 @@ const App = () => {
                                         <FileText className="w-6 h-6 text-red-500" />
                                     </div>
                                     <div>
-                                        <h3 className="text-white font-semibold mb-2">{t('about.publication.title', 'Publication Platform')}</h3>
-                                        <p className="text-gray-400">{t('about.publication.description', 'Providing a platform for revolutionary scholars to publish and share their research, analyses, and theoretical contributions.')}</p>
+                                        <h3 className="text-white font-semibold mb-2">Publication Platform</h3>
+                                        <p className="text-gray-400">Providing a platform for revolutionary scholars to publish and share their research, analyses, and theoretical contributions.</p>
                                     </div>
                                 </div>
                             </div>

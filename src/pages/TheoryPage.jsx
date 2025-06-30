@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ChevronRight, Search, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+
 import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
 const TheoryPage = () => {
-    const { t } = useTranslation();
+
     const { user } = useAuth();
 
     // State for data, loading, and errors
@@ -190,13 +190,13 @@ const TheoryPage = () => {
             <Header />
             <main className="pt-24 pb-16 max-w-7xl mx-auto px-4">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-4xl font-bold">{t('Revolutionary Theory')}</h1>
+                    <h1 className="text-4xl font-bold">Revolutionary Theory</h1>
                     <div className="relative w-full max-w-xs">
                         <input 
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={t('Search articles...')}
+                            placeholder='Search articles...'
                             className="w-full bg-black/30 border border-gray-700 rounded-lg py-2 pl-10 pr-4 text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
                         />
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -206,9 +206,9 @@ const TheoryPage = () => {
                     {/* Left Sidebar for Categories */}
                     <aside className="lg:col-span-1">
                         <div className="bg-black/30 rounded-lg p-4 sticky top-24">
-                            <h2 className="text-xl font-semibold mb-4">{t('Categories')}</h2>
+                            <h2 className="text-xl font-semibold mb-4">Categories</h2>
                             {loadingCategories ? (
-                                <p>{t('Loading categories...')}</p>
+                                <p>Loading categories...</p>
                             ) : (
                                 <div className="space-y-2">
                                     {categories.map(category => (
@@ -222,7 +222,7 @@ const TheoryPage = () => {
                                             }`}
                                         >
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm font-medium">{t(category.name)}</span>
+                                                <span className="text-sm font-medium">{category.name}</span>
                                                 {activeCategory === category.id && <ChevronRight className="w-4 h-4 text-red-400" />}
                                             </div>
                                         </button>
@@ -235,14 +235,14 @@ const TheoryPage = () => {
                     {/* Main Content Area */}
                     <section className="lg:col-span-3 space-y-8">
                         {loadingArticles ? (
-                            <p>{t('Loading articles...')}</p>
+                            <p>Loading articles...</p>
                         ) : error ? (
                             <p className="text-red-500">Error: {error}</p>
                         ) : (
                             <>
                                 {featuredArticles.length > 0 && (
                                     <div className="bg-gradient-to-r from-red-900/30 to-black/30 rounded-lg p-6">
-                                        <h2 className="text-2xl font-bold mb-4">{t('Featured Materials')}</h2>
+                                        <h2 className="text-2xl font-bold mb-4">Featured Materials</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {featuredArticles.map(renderArticleCard)}
                                         </div>
@@ -251,7 +251,7 @@ const TheoryPage = () => {
 
                                 {collections.map(([collectionName, collectionArticles]) => (
                                     <div key={collectionName} className="bg-black/30 rounded-lg p-6">
-                                        <h3 className="text-xl font-semibold mb-4">{t(collectionName)}</h3>
+                                        <h3 className="text-xl font-semibold mb-4">{collectionName}</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             {collectionArticles.map(renderArticleCard)}
                                         </div>
@@ -260,8 +260,8 @@ const TheoryPage = () => {
 
                                 {articles.length === 0 && !loadingArticles && (
                                     <div className="text-center py-12 bg-black/30 rounded-lg">
-                                        <h3 className="text-xl font-semibold">{t('No Articles Found')}</h3>
-                                        <p className="text-gray-400 mt-2">{t('There are no articles in this category yet.')}</p>
+                                        <h3 className="text-xl font-semibold">No Articles Found</h3>
+                                        <p className="text-gray-400 mt-2">There are no articles in this category yet.</p>
                                     </div>
                                 )}
                             </>

@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+
 import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 
 const ArticleCollectionPage = () => {
     const { collectionType } = useParams(); // 'classics', 'contemporary', or 'featured'
-    const { t } = useTranslation();
+    
     
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [title, setTitle] = useState('');
 
-    useEffect(() => {
+        useEffect(() => {
         const fetchArticles = async () => {
             setLoading(true);
             setError(null);
@@ -26,13 +26,13 @@ const ArticleCollectionPage = () => {
             // Determine the filter and title based on the URL parameter
             if (collectionType === 'classics') {
                 query = query.eq('is_classic', true);
-                setTitle(t('Marxist Classics'));
+                setTitle('Marxist Classics');
             } else if (collectionType === 'contemporary') {
                 query = query.eq('is_contemporary', true);
-                setTitle(t('Contemporary Theory'));
+                setTitle('Contemporary Theory');
             } else if (collectionType === 'featured') {
                 query = query.eq('is_featured', true);
-                setTitle(t('Featured Materials'));
+                setTitle('Featured Materials');
             } else {
                 setError('Invalid collection type.');
                 setLoading(false);
@@ -66,7 +66,7 @@ const ArticleCollectionPage = () => {
         };
 
         fetchArticles();
-    }, [collectionType, t]);
+    }, [collectionType]);
 
     return (
         <div className="min-h-screen bg-[#12131A] text-white">

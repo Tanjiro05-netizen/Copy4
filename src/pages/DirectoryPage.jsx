@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import Header from '../components/Header';
 import { Clock, Network, BookCopy, GitFork, Book } from 'lucide-react';
 import Timeline from '../components/Timeline';
@@ -11,39 +11,39 @@ import SpotifyEmbed from '../components/SpotifyEmbed';
 
 
 const DirectoryPage = () => {
-    const { t } = useTranslation();
+
     const [activeTab, setActiveTab] = useState(null); // Changed from 'timeline' to null
 
     const tools = [
         {
             id: 'concepts',
-            name: t('directory.conceptMapping'),
+            name: 'Concept Mapping',
             icon: Network,
-            description: t('directory.conceptMappingDesc')
+            description: 'Visualize connections between key Marxist concepts.'
         },
         {
             id: 'bibliography',
-            name: t('directory.bibliography'),
+            name: 'AI-Powered Bibliography',
             icon: BookCopy,
-            description: t('directory.bibliographyDesc')
+            description: 'Generate and explore bibliographies on specific topics.'
         },
         {
             id: 'references',
-            name: t('directory.crossReferences'),
+            name: 'Cross-Textual References',
             icon: GitFork,
-            description: t('directory.crossReferencesDesc')
+            description: 'Find links and references between different texts.'
         },
         {
             id: 'glossary',
-            name: t('directory.marxistGlossary'),
+            name: 'Marxist Glossary',
             icon: Book,
-            description: t('directory.marxistGlossaryDesc')
+            description: 'Look up definitions of key Marxist terms.'
         },
         {
             id: 'timeline',
-            name: t('directory.historicalTimeline'),
+            name: 'Historical Timeline',
             icon: Clock,
-            description: t('directory.historicalTimelineDesc')
+            description: 'Explore a timeline of key historical events.'
         }
     ];
 
@@ -56,7 +56,7 @@ const DirectoryPage = () => {
             <Header />
             
             <main className="container mx-auto px-4 pt-24 pb-16">
-                <h1 className="text-4xl font-bold text-white mb-8">{t('directory.researchDirectory')}</h1>
+                <h1 className="text-4xl font-bold text-white mb-8">Research Directory</h1>
                 
                 <div className="flex gap-8">
                     {/* Left Side Navigation Tiles */}
@@ -120,7 +120,7 @@ const DirectoryPage = () => {
                                             : 'text-gray-400'
                                     }`} />
                                     <span className={activeTab === 'timeline' ? 'text-white' : 'text-gray-300'}>
-                                        {activeTab === 'timeline' ? t('directory.closeTimeline') : t('directory.historicalTimeline')}
+                                        {activeTab === 'timeline' ? 'Close Timeline' : 'Historical Timeline'}
                                     </span>
                                 </div>
                             </button>
@@ -151,8 +151,8 @@ const DirectoryPage = () => {
                                 relative overflow-hidden transition-all duration-300">
                                 <div className="absolute inset-0 bg-[radial-gradient(#ff000022_1px,transparent_1px)] [background-size:16px_16px] opacity-10"></div>
                                 <div className="relative z-10">
-                                    <h2 className="text-2xl font-bold text-white mb-4">{t('directory.selectTool')}</h2>
-                                    <p className="text-gray-400">{t('directory.selectToolDesc')}</p>
+                                    <h2 className="text-2xl font-bold text-white mb-4">Select a Tool</h2>
+                                    <p className="text-gray-400">Choose a research tool from the left to get started.</p>
                                 </div>
                             </div>
                         )}

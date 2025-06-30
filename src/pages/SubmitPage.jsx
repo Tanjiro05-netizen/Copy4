@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { UploadIcon, Info, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
@@ -7,7 +7,7 @@ import SubmissionGuidelines from "../components/SubmissionGuidelines";
 import Select from 'react-select';
 
 const SubmitPage = () => {
-    const { t } = useTranslation();
+
     const { user } = useAuth();
     const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -168,13 +168,13 @@ const SubmitPage = () => {
         if (selectedFile) {
             const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
             if (!allowedTypes.includes(selectedFile.type)) {
-                setError(t('error.invalidFileType', 'Invalid file type. Please upload a PDF or Word document.'));
+                setError('Invalid file type. Please upload a PDF or Word document.');
                 setFile(null);
                 setFileName('');
                 return;
             }
             if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-                setError(t('error.fileTooLarge', 'File is too large. Maximum size is 5MB.'));
+                setError('File is too large. Maximum size is 5MB.');
                 setFile(null);
                 setFileName('');
                 return;
@@ -191,12 +191,12 @@ const SubmitPage = () => {
         setSuccess(false);
 
         if (!user) {
-            setError(t('error.notAuthenticated', 'You must be logged in to submit an article.'));
+            setError('You must be logged in to submit an article.');
             return;
         }
 
         if (!file || !title || !abstract || !category || selectedTags.length === 0) {
-            setError(t('error.allFieldsRequired', 'Please fill out all fields, select a category, choose at least one tag, and upload a manuscript.'));
+            setError('Please fill out all fields, select a category, choose at least one tag, and upload a manuscript.');
             return;
         }
 
@@ -272,9 +272,9 @@ const SubmitPage = () => {
                 </div>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                     <div className="text-center space-y-8 max-w-4xl px-4">
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">{t('submit.title', 'Submit Your Work')}</h1>
+                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">Submit Your Work</h1>
                         <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
-                            {t('submit.quote', '"Every social class creates its own organic intellectuals."')}
+                            "Every social class creates its own organic intellectuals."
                         </p>
                     </div>
                 </div>
@@ -291,7 +291,7 @@ const SubmitPage = () => {
                                 className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"
                             >
                                 <Info className="w-5 h-5" />
-                                <span>{t('submit.viewGuidelines', 'View Submission Guidelines')}</span>
+                                <span>View Submission Guidelines</span>
                             </button>
                             
                             {isAdmin && (
@@ -315,9 +315,9 @@ const SubmitPage = () => {
                         
                         {/* Category Selection */}
                         <div>
-                            <label htmlFor="category" className="block text-white mb-2">{t('submit.categoryLabel', 'Category')}</label>
+                            <label htmlFor="category" className="block text-white mb-2">Category</label>
                             <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-3 bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C2A55A] transition-colors" required>
-                                <option value="" disabled>{t('submit.selectCategory', 'Select a category...')}</option>
+                                <option value="" disabled>Select a category...</option>
                                 {categories.map(cat => (
                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
@@ -326,35 +326,35 @@ const SubmitPage = () => {
 
                         {/* Title */}
                         <div>
-                            <label htmlFor="title" className="block text-white mb-2">{t('submit.titleLabel', 'Title')}</label>
+                            <label htmlFor="title" className="block text-white mb-2">Title</label>
                             <input
                                 type="text"
                                 id="title"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 className="w-full p-3 bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C2A55A] transition-colors"
-                                placeholder={t('submit.titlePlaceholder', "Enter your work's title")}
+                                placeholder="Enter your work's title"
                                 required
                             />
                         </div>
 
                         {/* Abstract */}
                         <div>
-                            <label htmlFor="abstract" className="block text-white mb-2">{t('submit.abstractLabel', 'Abstract')}</label>
+                            <label htmlFor="abstract" className="block text-white mb-2">Abstract</label>
                             <textarea
                                 id="abstract"
                                 rows="4"
                                 value={abstract}
                                 onChange={(e) => setAbstract(e.target.value)}
                                 className="w-full p-3 bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C2A55A] transition-colors h-32"
-                                placeholder={t('submit.abstractPlaceholder', 'Provide a brief abstract of your work')}
+                                placeholder="Provide a brief abstract of your work"
                                 required
                             ></textarea>
                         </div>
 
                         {/* Tags Selection */}
                         <div>
-                            <label htmlFor="tags" className="block text-white mb-2">{t('submit.tagsLabel', 'Tags')}</label>
+                            <label htmlFor="tags" className="block text-white mb-2">Tags</label>
                             <Select
                                 id="tags"
                                 isMulti
@@ -363,7 +363,7 @@ const SubmitPage = () => {
                                 onChange={setSelectedTags}
                                 className="text-white"
                                 classNamePrefix="select"
-                                placeholder={t('submit.selectTags', 'Select tags...')}
+                                placeholder="Select tags..."
                                 styles={{
                                     control: (base) => ({ ...base, backgroundColor: '#2E2F38', borderColor: '#4D4E5C', color: 'white' }),
                                     multiValue: (base) => ({ ...base, backgroundColor: '#C2A55A' }),
@@ -377,14 +377,14 @@ const SubmitPage = () => {
 
                         {/* File Upload Section */}
                         <div>
-                            <label className="block text-white mb-2">{t('submit.uploadLabel', 'Upload Manuscript')}</label>
+                            <label className="block text-white mb-2">Upload Manuscript</label>
                             <label htmlFor="manuscript-upload" className="relative cursor-pointer bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white p-3 flex items-center justify-center hover:bg-[#3c3d47] transition-colors">
                                 <UploadIcon className="mr-3" size={20} />
-                                <span className="truncate">{fileName || t('submit.chooseFile', 'Choose a file...')}</span>
+                                <span className="truncate">{fileName || 'Choose a file...'}</span>
                             </label>
                             <input id="manuscript-upload" type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx" />
                             <p className="text-gray-400 text-sm text-center mt-2">
-                                {t('submit.fileHint', 'PDF, DOC, DOCX. Max 5MB.')}
+                                PDF, DOC, DOCX. Max 5MB.
                             </p>
                         </div>
 
@@ -398,7 +398,7 @@ const SubmitPage = () => {
                         {success && (
                             <div className="text-green-400 flex items-center p-3 bg-green-900/20 rounded-lg">
                                 <CheckCircle className="mr-3 flex-shrink-0" />
-                                <span>{t('submit.successMessage', 'Submission successful! Thank you for your contribution.')}</span>
+                                <span>Submission successful! Thank you for your contribution.</span>
                             </div>
                         )}
 
@@ -412,12 +412,12 @@ const SubmitPage = () => {
                                 {submitting ? (
                                     <>
                                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                        {t('submit.submittingButton', 'Submitting...')}
+                                        Submitting...
                                     </>
                                 ) : (
                                     <>
                                         <UploadIcon size={20} />
-                                        {t('submit.submitButton', 'Submit Work')}
+                                        Submit Work
                                     </>
                                 )}
                             </button>
