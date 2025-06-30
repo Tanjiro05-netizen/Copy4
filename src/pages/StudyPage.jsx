@@ -6,6 +6,7 @@ import StudyPathAI from "../components/StudyPage/StudyPathAI";
 import ConceptAnalysis from "../components/StudyPage/ConceptAnalysis";
 import Header from "../components/Header";
 import { BookOpen, Video, FileText, Users, Search } from "lucide-react";
+import MarxImage from '../assets/images/Marx.jpg';
 
 const StudyPage = () => (
   <div className="min-h-screen bg-[#12131A] overflow-y-auto">
@@ -16,7 +17,7 @@ const StudyPage = () => (
         <div
           className="absolute inset-0 opacity-20"
           style={{
-            background: `url('/Images/Marx.jpg') no-repeat center center`,
+            background: `url(${MarxImage}) no-repeat center center`,
             backgroundSize: 'cover',
             filter: 'brightness(0.7) contrast(1.2)',
             mixBlendMode: 'soft-light'
