@@ -3,8 +3,59 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import marxOutlineBackground from '../assets/marx-outline.png';
-import { X, ExternalLink, UploadIcon, Info, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { X, ExternalLink, UploadIcon, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import Select from 'react-select';
+
+const LoginModal = ({ show, onClose, onSubmit, email, onEmailChange, password, onPasswordChange, error, loading }) => {
+    if (!show) return null;
+    
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4 border border-red-900/50 backdrop-blur-sm">
+                <div className="flex items-start justify-between mb-4">
+                    <h2 className="text-xl font-bold text-red-500">Login</h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white">
+                        <X size={24} />
+                    </button>
+                </div>
+                <form onSubmit={onSubmit} className="space-y-6">
+                    <div>
+                        <label className="block mb-2 text-sm font-medium">Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => onEmailChange(e.target.value)}
+                            className="w-full p-3 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block mb-2 text-sm font-medium">Password</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => onPasswordChange(e.target.value)}
+                            className="w-full p-3 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition"
+                            required
+                        />
+                    </div>
+                    {error && (
+                        <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-lg text-center">
+                            {error}
+                        </div>
+                    )}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full p-3 bg-red-600 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -63,57 +114,7 @@ const LoginPage = () => {
         setLoading(false);
     };
 
-    // Login Modal Component
-    const LoginModal = () => {
-        if (!showLoginModal) return null;
-        
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-                <div className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md mx-4 border border-red-900/50 backdrop-blur-sm">
-                    <div className="flex items-start justify-between mb-4">
-                        <h2 className="text-xl font-bold text-red-500">Login</h2>
-                        <button onClick={() => setShowLoginModal(false)} className="text-gray-400 hover:text-white">
-                            <X size={24} />
-                        </button>
-                    </div>
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div>
-                            <label className="block mb-2 text-sm font-medium">Email</label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full p-3 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block mb-2 text-sm font-medium">Password</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-3 bg-gray-900/70 border border-red-500/30 rounded-lg focus:border-red-500 focus:outline-none transition"
-                                required
-                            />
-                        </div>
-                        {error && (
-                            <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-lg text-center">
-                                {error}
-                            </div>
-                        )}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full p-3 bg-red-600 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? 'Logging in...' : 'Login'}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    };
+
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -443,7 +444,17 @@ const LoginPage = () => {
                 </div>
             </div>
             {/* Login Modal */}
-            <LoginModal />
+            <LoginModal 
+                show={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+                onSubmit={handleLogin}
+                email={email}
+                onEmailChange={setEmail}
+                password={password}
+                onPasswordChange={setPassword}
+                error={error}
+                loading={loading}
+            />
         </div>
     );
 };
