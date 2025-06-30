@@ -21,6 +21,9 @@ const TagManagementPage = () => {
     const [editingTagId, setEditingTagId] = useState(null);
     const [editingTagName, setEditingTagName] = useState('');
 
+    // State for deleting confirmation
+    const [deletingTagId, setDeletingTagId] = useState(null);
+
     // Define fetchCategories outside useEffect so it can be called from other functions
     const fetchCategories = async () => {
         try {
@@ -161,13 +164,14 @@ const TagManagementPage = () => {
     };
 
     const handleDeleteTag = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this tag?')) return;
         try {
             const { error } = await supabase.from('theory_tags').delete().eq('id', id);
             if (error) throw error;
             setTags(tags.filter(t => t.id !== id));
         } catch (err) {
             alert(`Error deleting tag: ${err.message}`);
+        } finally {
+            setDeletingTagId(null);
         }
     };
 
@@ -275,7 +279,15 @@ const TagManagementPage = () => {
                     <div className="space-y-3">
                         {tags.map(tag => (
                             <div key={tag.id} className="flex justify-between items-center bg-gray-900/50 p-3 rounded-md">
-                                {editingTagId === tag.id ? (
+                                {deletingTagId === tag.id ? (
+                                    <div className="flex-grow flex items-center justify-between">
+                                        <span className="text-red-400 font-semibold">Are you sure?</span>
+                                        <div className="flex items-center gap-4">
+                                            <button onClick={() => handleDeleteTag(tag.id)} className="text-green-400 hover:text-white p-1"><Check size={20}/></button>
+                                            <button onClick={() => setDeletingTagId(null)} className="text-red-400 hover:text-white p-1"><X size={20}/></button>
+                                        </div>
+                                    </div>
+                                ) : editingTagId === tag.id ? (
                                     <form onSubmit={handleUpdateTag} className="flex-grow flex items-center gap-4">
                                         <input
                                             type="text"
@@ -293,7 +305,7 @@ const TagManagementPage = () => {
                                         <span className="font-medium">{tag.name}</span>
                                         <div className="flex gap-4">
                                             <button onClick={() => handleStartEditTag(tag.id, tag.name)} className="text-gray-400 hover:text-white"><Edit size={18}/></button>
-                                            <button onClick={() => handleDeleteTag(tag.id)} className="text-gray-400 hover:text-red-500"><Trash size={18}/></button>
+                                            <button onClick={() => setDeletingTagId(tag.id)} className="text-gray-400 hover:text-red-500"><Trash size={18}/></button>
                                         </div>
                                     </>
                                 )}
