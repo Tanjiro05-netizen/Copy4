@@ -129,7 +129,7 @@ const LoginPage = () => {
                                 analysis and provide a hub for writers with revolutionary potential.
                             </p>
                             <p className="text-gray-200 mb-4">
-                                In recent decades, Marxism has been neglected and perverted beyond recognition. This site 
+                                In the latter part of the century, Marxism has been neglected and perverted beyond recognition. This site 
                                 aims to correct this trajectory by returning to scientific principles while addressing 
                                 contemporary conditions.
                             </p>
