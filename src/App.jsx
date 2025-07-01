@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import hammerAndSickleImage from './assets/hammerandsickle.png';
 import { useTheme } from './context/ThemeContext';
+import { Analytics } from '@vercel/analytics/react';
 
 
 
@@ -25,6 +26,7 @@ const App = () => {
 
     return (
         <div className="min-h-screen bg-[#12131A]">
+            <Analytics />
             <div className="relative h-screen">
                 <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
