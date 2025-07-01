@@ -95,7 +95,7 @@ const ArticleReaderPage = () => {
                 setHighlights(highlightsData || []);
 
                 const { data: bookmarkData, error: bookmarkError } = await supabase
-                    .from('user_article_bookmarks').select('id')
+                    .from('user_article_bookmarks').select('*')
                     .eq('user_id', user.id).eq('article_id', articleData.id)
                     .maybeSingle();
                 
@@ -194,17 +194,20 @@ const ArticleReaderPage = () => {
 
     const handleToggleBookmark = async () => {
         if (!user || !article) return;
+        console.log('Toggling bookmark. Current state:', isBookmarked);
         try {
             if (isBookmarked) {
                 const { error } = await supabase.from('user_article_bookmarks')
                     .delete().eq('user_id', user.id).eq('article_id', article.id);
                 if (error) throw error;
                 setIsBookmarked(false);
+                console.log('Bookmark removed.');
             } else {
                 const { error } = await supabase.from('user_article_bookmarks')
                     .insert({ user_id: user.id, article_id: article.id });
                 if (error) throw error;
                 setIsBookmarked(true);
+                console.log('Bookmark added.');
             }
         } catch (error) {
             console.error('Error toggling bookmark:', error);
@@ -306,111 +309,125 @@ const ArticleReaderPage = () => {
         }
     };
 
-    const customRenderers = {
-        p: ({ children }) => <p><NerRenderer entities={entities}>{children}</NerRenderer></p>,
-        li: ({ children }) => <li><NerRenderer entities={entities}>{children}</NerRenderer></li>,
-    };
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
+                <Loader size={48} className="animate-spin" />
+            </div>
+        );
+    }
 
-    if (loading) return <div className="min-h-screen bg-[#12131A] flex items-center justify-center"><Loader className="animate-spin text-red-500" size={48} /></div>;
-    if (error) return <div className="min-h-screen bg-[#12131A] flex items-center justify-center"><p className="text-red-500">Error: {error}</p></div>;
+    if (error) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
+                <p>Error: {error}</p>
+            </div>
+        );
+    }
+
+    if (!article) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
+                <p>Article not found.</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-gray-300">
-            {showCopied && (
-                <div className="fixed bottom-10 right-10 bg-gray-800 border border-green-500 text-white py-2 px-4 rounded-lg z-50">
-                    <Check size={20} className="text-green-500 mr-2" /> Link copied!
-                </div>
-            )}
-            {showQuotePopup && (
-                <div style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }} className="absolute z-50">
-                    <button onClick={handleSaveQuote} className="flex items-center space-x-2 px-3 py-1 bg-gray-900 border border-gray-700 rounded-lg text-white hover:bg-red-600/50">
-                        <Quote size={16} /> <span>Save Quote</span>
-                    </button>
-                </div>
-            )}
-
+        <>
             <Header />
-            <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30"><div className="h-full bg-red-600" style={{ width: `${scrollProgress}%` }}></div></div>
+            <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30">
+                <div 
+                    className="h-full bg-red-600 transition-all duration-150 ease-linear"
+                    style={{ width: `${scrollProgress}%` }}
+                ></div>
+            </div>
             
-            <main className="container mx-auto px-4 py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <main className="container mx-auto px-4 py-24" onMouseUp={handleMouseUp}>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                    
+                    <div className={`lg:col-span-2 transition-all duration-300 ${isTocOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                        {isTocOpen && article && <TableOfContents contentRef={contentRef} />}
+                    </div>
+
                     <div className="lg:col-span-8">
-                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700/50">
-                            <div className="flex items-center space-x-1">
-                                <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-800" title="Table of Contents"><List size={20} /></button>
-                                <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-800" title="Bookmark"><Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-red-500' : ''} /></button>
-                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-800" title="Search"><Search size={20} /></button>
+                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700 no-pdf">
+                            <div className="flex items-center space-x-2">
+                                <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
+                                    <List size={20} />
+                                </button>
+                                <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Bookmark">
+                                    <Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-current' : ''} />
+                                </button>
+                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Search">
+                                    <Search size={20} />
+                                </button>
                             </div>
-                            <div className="flex items-center space-x-1">
-                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-800" title="Highlights & Comments"><MessageSquare size={20} /></button>
-                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-800" title="Share"><Share2 size={20} /></button>
-                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-800 disabled:opacity-50" title="Download as PDF" disabled={isGeneratingPdf}>
+                            <div className="flex items-center space-x-2">
+                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Highlights & Comments">
+                                    <MessageSquare size={20} />
+                                </button>
+                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Share">
+                                    <Share2 size={20} />
+                                </button>
+                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Download PDF">
                                     {isGeneratingPdf ? <Loader size={20} className="animate-spin" /> : <Download size={20} />}
                                 </button>
                             </div>
                         </div>
-
                         {isSearchVisible && (
-                            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4">
-                                <input type="text" placeholder="Search in article..." className="bg-transparent w-full focus:outline-none text-white" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                                <span className="text-gray-400 text-sm">{searchResults.length > 0 ? `${currentResultIndex + 1}/${searchResults.length}` : 'No results'}</span>
-                                <button onClick={handlePrevResult} className="p-1 rounded-full hover:bg-gray-700" disabled={!searchResults.length}><ChevronUp size={16} /></button>
-                                <button onClick={handleNextResult} className="p-1 rounded-full hover:bg-gray-700" disabled={!searchResults.length}><ChevronDown size={16} /></button>
+                            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4 no-pdf">
+                                <input
+                                    type="text"
+                                    placeholder="Search in text..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="bg-transparent w-full focus:outline-none"
+                                />
+                                {searchResults.length > 0 && (
+                                    <span className="text-sm text-gray-400">{currentResultIndex + 1} / {searchResults.length}</span>
+                                )}
+                                <button onClick={handlePrevResult} disabled={searchResults.length === 0} className="p-1 rounded-full hover:bg-gray-700 disabled:opacity-50"><ChevronUp size={16} /></button>
+                                <button onClick={handleNextResult} disabled={searchResults.length === 0} className="p-1 rounded-full hover:bg-gray-700 disabled:opacity-50"><ChevronDown size={16} /></button>
                                 <button onClick={() => setIsSearchVisible(false)} className="p-1 rounded-full hover:bg-gray-700"><X size={16} /></button>
                             </div>
                         )}
-
-                        <div className="prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white" onMouseUp={handleMouseUp}>
-                            <h1 className="text-4xl font-bold mb-4">{article.title}</h1>
-                            <p className="text-lg text-gray-400 mb-8">By {article.author}</p>
-                            <div ref={contentRef}>
-                                <HighlightHandler highlights={highlights} onAddHighlight={handleAddHighlight} onDeleteHighlight={handleDeleteHighlight}>
-                                    <ReactMarkdown components={customRenderers} remarkPlugins={[remarkGfm, remarkSlug]} rehypePlugins={[rehypeRaw]}>
-                                        {article.content}
-                                    </ReactMarkdown>
-                                </HighlightHandler>
-                            </div>
+                        <h1 className="text-4xl font-bold mb-2">{article.title}</h1>
+                        <p className="text-lg text-gray-400 mb-6">{article.author}</p>
+                        
+                        <div ref={contentRef} className="prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-red-400 hover:prose-a:text-red-500">
+                            <HighlightHandler
+                                articleId={article.id}
+                                highlights={highlights}
+                                onAddHighlight={handleAddHighlight}
+                            >
+                                <NerRenderer entities={entities}>
+                                    <ReactMarkdown
+                                        children={article.content}
+                                        remarkPlugins={[remarkGfm, remarkSlug]}
+                                        rehypePlugins={[rehypeRaw]}
+                                    />
+                                </NerRenderer>
+                            </HighlightHandler>
                         </div>
+                        <ArticleComments articleId={article.id} />
                     </div>
 
-                    <div className="lg:col-span-4 lg:sticky top-24 self-start space-y-6">
-                        {isTocOpen && <TableOfContents content={article.content} />}
-                        {user && isHighlightsOpen && <HighlightsSidebar highlights={highlights} onDeleteHighlight={handleDeleteHighlight} />}
+                    <div className={`lg:col-span-2 transition-all duration-300 ${isHighlightsOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                        {isHighlightsOpen && user && (
+                            <HighlightsSidebar
+                                highlights={highlights}
+                                onDeleteHighlight={handleDeleteHighlight}
+                            />
+                        )}
                     </div>
                 </div>
             </main>
-        </div>
-    );
-};
 
-export default ArticleReaderPage;
-
-            </div>
-        );
-    }
-
-    if (error || !article) {
-        return (
-            <div className="min-h-screen bg-[#12131A] flex items-center justify-center">
-                <p className="text-red-500">Error: {error || 'Article not found.'}</p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="min-h-screen bg-[#12131A]">
-            {showCopied && (
-                <div className="fixed bottom-10 right-10 bg-gray-800 border border-green-500 text-white py-2 px-4 rounded-lg shadow-lg z-50">
-                    <div className="flex items-center">
-                        <Check size={20} className="text-green-500 mr-2" />
-                        <span>Link copied to clipboard!</span>
-                    </div>
-                </div>
-            )}
             {showQuotePopup && (
                 <div
                     style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }}
-                    className="absolute z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-lg"
+                    className="absolute z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-lg no-pdf"
                 >
                     <button 
                         onClick={handleSaveQuote}
@@ -422,111 +439,13 @@ export default ArticleReaderPage;
                 </div>
             )}
 
-            <Header />
-            <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30">
-                <div 
-                    className="h-full bg-red-600 transition-all duration-150 ease-linear"
-                    style={{ width: `${scrollProgress}%` }}
-                ></div>
-            </div>
-            
-            <main className="container mx-auto px-4 py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                    <div className="lg:col-span-8">
-                        {/* Article Action Bar */}
-                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700">
-                            <div className="flex items-center space-x-2">
-                                <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
-                                    <List size={20} />
-                                </button>
-                                <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Bookmark">
-                                    <Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-red-500' : ''} />
-                                </button>
-                                <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Search">
-                                    <Search size={20} />
-                                </button>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Comments">
-                                    <MessageSquare size={20} />
-                                </button>
-                                <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Share">
-                                    <Share2 size={20} />
-                                </button>
-                                <button onClick={handleDownloadPdf} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Download PDF">
-                                    {isGeneratingPdf ? (
-                                        <Loader size={20} className="animate-spin" />
-                                    ) : (
-                                        <Download size={20} />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                        {isSearchVisible && (
-                            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4">
-                                <input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.shiftKey ? handlePrevResult() : handleNextResult();
-                                        }
-                                    }}
-                                    className="bg-gray-900 text-white placeholder-gray-500 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-red-500 w-full"
-                                />
-                                <span className="text-sm text-gray-400 whitespace-nowrap">
-                                    {searchResults.length > 0 ? `${currentResultIndex + 1} of ${searchResults.length}` : 'No results'}
-                                </span>
-                                <button onClick={handlePrevResult} className="p-1 hover:bg-gray-700 rounded" title="Previous result" disabled={searchResults.length === 0}>
-                                    <ChevronUp size={16} />
-                                </button>
-                                <button onClick={handleNextResult} className="p-1 hover:bg-gray-700 rounded" title="Next result" disabled={searchResults.length === 0}>
-                                    <ChevronDown size={16} />
-                                </button>
-                                <button onClick={() => setIsSearchVisible(false)} className="p-1 hover:bg-gray-700 rounded" title="Close search">
-                                    <X size={16} />
-                                </button>
-                            </div>
-                        )}
-
-                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{article.title}</h1>
-                        
-                        <HighlightHandler 
-                            highlights={highlights}
-                            onAddHighlight={handleAddHighlight}
-                            onDeleteHighlight={handleDeleteHighlight}
-                        >
-                            <div ref={contentRef} onMouseUp={handleMouseUp}>
-                                <ReactMarkdown 
-                                    components={customRenderers}
-                                    remarkPlugins={[remarkGfm, remarkSlug]}
-                                    rehypePlugins={[rehypeRaw]}
-                                    className="prose prose-invert max-w-none text-lg leading-relaxed selection:bg-red-500/50"
-                                >
-                                    {article.content}
-                                </ReactMarkdown>
-                            </div>
-                        </HighlightHandler>
-
-                        <div className="mt-12">
-                            <ArticleComments articleId={article.id} />
-                        </div>
-                    </div>
-
-                    <aside className="lg:col-span-4 lg:block space-y-8">
-                        {isTocOpen && <TableOfContents contentRef={contentRef} />}
-                        {user && isHighlightsOpen &&
-                            <HighlightsSidebar 
-                                highlights={highlights} 
-                                onDelete={handleDeleteHighlight} 
-                            />
-                        }
-                    </aside>
+            {showCopied && (
+                <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+                    <Check size={20} />
+                    <span>Link copied to clipboard!</span>
                 </div>
-            </main>
-        </div>
+            )}
+        </>
     );
 };
 

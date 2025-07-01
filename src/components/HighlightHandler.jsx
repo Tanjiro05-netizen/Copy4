@@ -103,8 +103,9 @@ const HighlightHandler = ({ children, highlights, onAddHighlight }) => {
     };
 
     return (
-        <div ref={contentRef}>
-            {showPopover && (
+        <div ref={contentRef} style={{ position: 'relative' }}>
+          {children}
+          {showPopover && (
                 <div
                     style={{
                         position: 'absolute',
