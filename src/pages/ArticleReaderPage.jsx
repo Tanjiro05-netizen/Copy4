@@ -347,7 +347,7 @@ const ArticleReaderPage = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                     
                     <div className={`lg:col-span-2 transition-all duration-300 ${isTocOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                        {isTocOpen && article && <TableOfContents contentRef={contentRef} />}
+                        {isTocOpen && article && <TableOfContents contentRef={contentRef} content={article.content} />}
                     </div>
 
                     <div className="lg:col-span-8">

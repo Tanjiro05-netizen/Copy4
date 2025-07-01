@@ -1,24 +1,43 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
 
-const TableOfContents = ({ contentRef }) => {
+const slugify = (text) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')       // Replace spaces with -
+        .replace(/&/g, '-and-')    // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '')   // Remove all non-word chars
+        .replace(/--+/g, '-');      // Replace multiple - with single -
+};
+
+const TableOfContents = ({ contentRef, content }) => {
     const [headings, setHeadings] = useState([]);
     const [activeId, setActiveId] = useState('');
     const observer = useRef(null);
 
-    useEffect(() => {
-        if (!contentRef.current) return;
+        useEffect(() => {
+        if (!content) return;
 
-        const headingElements = Array.from(
-            contentRef.current.querySelectorAll('h2, h3, h4')
-        );
+        const processor = unified().use(remarkParse);
+        const tree = processor.parse(content);
 
-        setHeadings(headingElements.map(h => ({
-            id: h.id,
-            text: h.innerText,
-            level: Number(h.tagName.substring(1))
-        })));
+        const extractedHeadings = [];
+        tree.children.forEach(node => {
+            if (node.type === 'heading' && [2, 3, 4].includes(node.depth)) {
+                const text = node.children.map(child => child.value).join('');
+                extractedHeadings.push({
+                    id: slugify(text),
+                    text: text,
+                    level: node.depth
+                });
+            }
+        });
 
-    }, [contentRef, contentRef.current]); // Rerun when content is loaded
+        setHeadings(extractedHeadings);
+    }, [content]);
 
     useEffect(() => {
         if (observer.current) {
