@@ -34,7 +34,8 @@ const AppRouter = () => {
                         <Route path="/login" element={<LoginPage />} />
 
                         {/* Common Protected routes (available to all authenticated users) */}
-                        <Route path="/" element={<MainLayout><App /></MainLayout>} />
+                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/home" element={<ProtectedRoute><MainLayout><App /></MainLayout></ProtectedRoute>} />
                         <Route path="/theory" element={<ProtectedRoute><MainLayout><TheoryPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/theory/:collectionType" element={<ProtectedRoute><MainLayout><ArticleCollectionPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/theory/article/:slug" element={<ProtectedRoute><MainLayout><ArticleReaderPage /></MainLayout></ProtectedRoute>} />
