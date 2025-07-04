@@ -42,11 +42,6 @@ const ArticleReaderPage = () => {
     const markInstance = useRef(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-    // Quote state
-    const [showQuotePopup, setShowQuotePopup] = useState(false);
-    const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
-    const [selectedText, setSelectedText] = useState('');
-
     const handleScroll = () => {
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
         const windowHeight = scrollHeight - clientHeight;
@@ -73,6 +68,8 @@ const ArticleReaderPage = () => {
 
             if (articleError) throw articleError;
             if (!articleData) throw new Error('Article not found.');
+
+            console.log('Fetched article content:', articleData.content);
 
             setArticle(articleData);
 
@@ -272,33 +269,6 @@ const ArticleReaderPage = () => {
         }
     };
 
-    const handleMouseUp = () => {
-        if (!contentRef.current) return;
-        const selection = window.getSelection();
-        const text = selection.toString().trim();
-        if (text.length > 0 && contentRef.current.contains(selection.anchorNode)) {
-            setSelectedText(text);
-            const range = selection.getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-            setPopupPosition({ top: rect.top + window.scrollY - 40, left: rect.left + window.scrollX + (rect.width / 2) - 30 });
-            setShowQuotePopup(true);
-        } else {
-            setShowQuotePopup(false);
-        }
-    };
-
-    const handleSaveQuote = async () => {
-        if (!user || !article || !selectedText) return;
-        try {
-            const { error } = await supabase.from('user_quotes')
-                .insert({ user_id: user.id, article_id: article.id, quote_text: selectedText });
-            if (error) throw error;
-            setShowQuotePopup(false);
-        } catch (error) {
-            console.error('Error saving quote:', error);
-        }
-    };
-
     const handleDeleteHighlight = async (highlightId) => {
         try {
             const { error } = await supabase.from('user_article_highlights').delete().eq('id', highlightId);
@@ -343,7 +313,7 @@ const ArticleReaderPage = () => {
                 ></div>
             </div>
             
-            <main className="container mx-auto px-4 py-24" onMouseUp={handleMouseUp}>
+            <main className="container mx-auto px-4 py-24">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                     
                     <div className={`lg:col-span-2 transition-all duration-300 ${isTocOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
@@ -397,17 +367,13 @@ const ArticleReaderPage = () => {
                         
                         <div ref={contentRef} className="prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-red-400 hover:prose-a:text-red-500">
                             <HighlightHandler
-                                articleId={article.id}
                                 highlights={highlights}
                                 onAddHighlight={handleAddHighlight}
                             >
-                                <NerRenderer entities={entities}>
-                                    <ReactMarkdown
-                                        children={article.content}
-                                        remarkPlugins={[remarkGfm, remarkSlug]}
-                                        rehypePlugins={[rehypeRaw]}
-                                    />
-                                </NerRenderer>
+                                <NerRenderer
+                                    text={article.content}
+                                    entities={entities}
+                                />
                             </HighlightHandler>
                         </div>
                         <ArticleComments articleId={article.id} />
@@ -423,22 +389,6 @@ const ArticleReaderPage = () => {
                     </div>
                 </div>
             </main>
-
-            {showQuotePopup && (
-                <div
-                    style={{ top: `${popupPosition.top}px`, left: `${popupPosition.left}px` }}
-                    className="absolute z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-lg no-pdf"
-                >
-                    <button 
-                        onClick={handleSaveQuote}
-                        className="flex items-center space-x-2 px-3 py-1 text-white hover:bg-red-600/50 rounded-lg"
-                    >
-                        <Quote size={16} />
-                        <span>Save Quote</span>
-                    </button>
-                </div>
-            )}
-
             {showCopied && (
                 <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
                     <Check size={20} />

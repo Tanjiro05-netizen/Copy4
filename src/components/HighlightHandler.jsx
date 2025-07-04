@@ -13,16 +13,16 @@ const HighlightHandler = ({ children, highlights, onAddHighlight }) => {
 
     useEffect(() => {
         rangy.init();
-        const applier = rangy.createClassApplier('highlight', {
+        const applier = rangy.createClassApplier('highlight-red', {
             elementTagName: 'span',
             normalize: true,
         });
         setHighlighter(applier);
 
-        const handleSelectionChange = () => {
-            const selection = window.getSelection();
-            if (selection.rangeCount === 0 || selection.isCollapsed) {
-                setShowPopover(false);
+        const handleMouseUp = () => {
+            const selection = rangy.getSelection();
+            if (selection.isCollapsed) {
+                if (showPopover) setShowPopover(false);
                 return;
             }
 
@@ -32,74 +32,67 @@ const HighlightHandler = ({ children, highlights, onAddHighlight }) => {
             if (text && contentRef.current && contentRef.current.contains(range.commonAncestorContainer)) {
                 const rect = range.getBoundingClientRect();
                 setPopoverPosition({
-                    top: rect.top - 40 + window.scrollY,
+                    top: rect.top - 50 + window.scrollY,
                     left: rect.left + rect.width / 2 - 40 + window.scrollX
                 });
                 setSelectedText(text);
                 setSelectedRange(range);
                 setShowPopover(true);
             } else {
-                setShowPopover(false);
+                if (showPopover) setShowPopover(false);
             }
         };
-
+        
         const handleDocumentClick = (e) => {
-            if (contentRef.current && !contentRef.current.contains(e.target)) {
+            if (showPopover && !e.target.closest('.highlight-popover')) {
                 setShowPopover(false);
             }
         };
 
-        document.addEventListener('selectionchange', handleSelectionChange);
-        document.addEventListener('mousedown', handleDocumentClick);
+        document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('click', handleDocumentClick, true); // Use capture phase
 
         return () => {
-            document.removeEventListener('selectionchange', handleSelectionChange);
-            document.removeEventListener('mousedown', handleDocumentClick);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('click', handleDocumentClick, true);
         };
-    }, []);
+    }, [showPopover]);
 
     const applyHighlights = useCallback((applier) => {
         if (!applier || !contentRef.current || !highlights) return;
 
-        // Create a range that covers the entire content area and undo all highlights.
-        const contentRange = rangy.createRange();
-        contentRange.selectNodeContents(contentRef.current);
-        applier.undoToRange(contentRange);
+        applier.undoToRange(rangy.createRange(document.body));
 
-        // Re-apply all current highlights from the state.
         highlights.forEach(highlight => {
             try {
-                const range = rangy.deserializeRange(highlight.serialized_range, contentRef.current);
+                const range = rangy.deserializeRange(highlight.serialized_range, contentRef.current, document);
                 applier.applyToRange(range);
             } catch (e) {
-                console.error('Failed to apply highlight:', e);
+                console.error('Failed to apply highlight:', e, highlight.serialized_range);
             }
         });
     }, [highlights]);
 
     useEffect(() => {
         if (highlighter && contentRef.current) {
-            const timer = setTimeout(() => applyHighlights(highlighter), 0);
+            const timer = setTimeout(() => applyHighlights(highlighter), 100);
             return () => clearTimeout(timer);
         }
     }, [highlighter, highlights, children, applyHighlights]);
 
     const handleHighlight = () => {
         if (!selectedText || !highlighter || !selectedRange) return;
-
-        const rangyRange = rangy.createRange();
-        rangyRange.setStart(selectedRange.startContainer, selectedRange.startOffset);
-        rangyRange.setEnd(selectedRange.endContainer, selectedRange.endOffset);
         
-        const serializedRange = rangy.serializeRange(rangyRange, true, contentRef.current);
+        const serializedRange = rangy.serializeRange(selectedRange, true, contentRef.current);
         
         onAddHighlight({
             serialized_range: serializedRange,
             selected_text: selectedText,
         });
-        
-        window.getSelection().removeAllRanges();
+
+        highlighter.applyToRange(selectedRange);
         setShowPopover(false);
+        rangy.getSelection().removeAllRanges();
     };
 
     return (
@@ -107,27 +100,25 @@ const HighlightHandler = ({ children, highlights, onAddHighlight }) => {
           {children}
           {showPopover && (
                 <div
+                    className="highlight-popover bg-gray-800 border border-gray-600 rounded-md shadow-lg p-1"
                     style={{
                         position: 'absolute',
                         top: `${popoverPosition.top}px`,
                         left: `${popoverPosition.left}px`,
                         zIndex: 1000,
                     }}
-                    className="p-1"
                 >
-                    <button 
+                    <button
                         onClick={handleHighlight}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded-md shadow-lg hover:bg-red-700 transition-colors"
+                        className="px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded text-sm"
                     >
                         Highlight
                     </button>
                 </div>
             )}
-            {children}
             <style>{`
-                .highlight {
+                .highlight-red {
                     background-color: rgba(239, 68, 68, 0.4);
-                    cursor: pointer;
                 }
             `}</style>
         </div>
