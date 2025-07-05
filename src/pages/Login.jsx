@@ -110,7 +110,7 @@ const LoginPage = () => {
             setError(error.message);
         } else {
             setShowLoginModal(false);
-            navigate('/');
+            navigate('/home');
         }
         setLoading(false);
     };

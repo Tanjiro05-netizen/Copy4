@@ -237,7 +237,7 @@ const AnalysisPage = () => {
                                 )}
                                 {activeTab === 'Comments' && <ArticleComments articleId={selectedArticle.id} userRole={userRole} />}
                                 {activeTab === 'Notes' && <PrivateNotes articleId={selectedArticle.id} />}
-                                {activeTab === 'Analysis' && <ArticleAnalysis articleId={selectedArticle.id} onJumpToText={handleJumpToText} />}
+                                {activeTab === 'Analysis' && <ArticleAnalysis articleId={selectedArticle.id} articleContent={selectedArticle.content} onJumpToText={handleJumpToText} />}
                             </div>
                         </div>
                     </div>

@@ -6,6 +6,7 @@ import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
 import LoginPage from './pages/Login.jsx';
+import Root from './Root.jsx';
 import App from './App.jsx';
 import TheoryPage from './pages/TheoryPage.jsx';
 import DigitalLibraryPage from './pages/DigitalLibraryPage.jsx';
@@ -34,7 +35,7 @@ const AppRouter = () => {
                         <Route path="/login" element={<LoginPage />} />
 
                         {/* Common Protected routes (available to all authenticated users) */}
-                        <Route path="/" element={<LoginPage />} />
+                        <Route path="/" element={<Root />} />
                         <Route path="/home" element={<ProtectedRoute><MainLayout><App /></MainLayout></ProtectedRoute>} />
                         <Route path="/theory" element={<ProtectedRoute><MainLayout><TheoryPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/theory/:collectionType" element={<ProtectedRoute><MainLayout><ArticleCollectionPage /></MainLayout></ProtectedRoute>} />
