@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle, Circle } from "lucide-react";
+import { CheckCircle, Circle, Trophy, ChevronRight } from "lucide-react";
 
 const dummyMilestones = [
   { step: 1, title: "阅读《共产党宣言》", englishTitle: "Read The Communist Manifesto", completed: true },
@@ -8,43 +8,72 @@ const dummyMilestones = [
   { step: 4, title: "参加社区讨论", englishTitle: "Join Community Discussion", completed: false }
 ];
 
-const StudyMilestones = () => (
-  <section>
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center gap-2">
-        <div className="w-2 h-6 bg-red-600 rounded-sm"></div>
-        <span className="text-sm text-gray-400">学习进度 - Learning Progress</span>
+const StudyMilestones = () => {
+  const completedCount = dummyMilestones.filter(m => m.completed).length;
+  const totalCount = dummyMilestones.length;
+  const progress = (completedCount / totalCount) * 100;
+
+  return (
+    <section className="space-y-6">
+      {/* Progress Header */}
+      <div className="bg-black/20 rounded-xl p-4 border border-white/5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-4 h-4 text-yellow-500" />
+            <span className="text-sm font-bold text-gray-200">Level 1 Scholar</span>
+          </div>
+          <span className="text-xs font-mono text-red-400">{progress}% Complete</span>
+        </div>
+        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-red-900 to-red-600 rounded-full transition-all duration-1000 ease-out relative"
+            style={{ width: `${progress}%` }}
+          >
+            <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+          </div>
+        </div>
       </div>
-      <span className="text-sm text-red-400">1/4 完成</span>
-    </div>
-    <ol className="space-y-4">
-      {dummyMilestones.map((milestone) => (
-        <li 
-          key={milestone.step} 
-          className={`bg-black/50 rounded-lg overflow-hidden border transition-all duration-300 ${milestone.completed ? 'border-red-600/60' : 'border-red-900/30 hover:border-red-600/40'}`}
-        >
-          <div className="flex items-center p-4">
-            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
-              {milestone.completed ? 
-                <CheckCircle className="w-6 h-6 text-red-500" /> : 
-                <Circle className="w-6 h-6 text-gray-600" />}
+
+      {/* Timeline */}
+      <div className="relative pl-2 space-y-1">
+        {/* Vertical Line */}
+        <div className="absolute left-[15px] top-2 bottom-4 w-0.5 bg-gray-800"></div>
+
+        {dummyMilestones.map((milestone, idx) => (
+          <div key={milestone.step} className="relative pl-8 py-2 group">
+            {/* Dot */}
+            <div className={`absolute left-[7px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 flex items-center justify-center z-10 transition-colors duration-300 ${
+              milestone.completed 
+                ? 'bg-black border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' 
+                : 'bg-black border-gray-700 group-hover:border-gray-500'
+            }`}>
+              {milestone.completed && <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />}
             </div>
-            <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                <h3 className={`text-lg font-semibold ${milestone.completed ? 'text-red-400' : 'text-gray-400'}`}>
+
+            <div className={`p-3 rounded-lg border transition-all duration-300 flex items-center justify-between ${
+              milestone.completed 
+                ? 'bg-red-900/10 border-red-900/30' 
+                : 'bg-transparent border-transparent hover:bg-white/5'
+            }`}>
+              <div className="flex-1 min-w-0 mr-4">
+                <h3 className={`text-sm font-medium truncate ${
+                  milestone.completed ? 'text-red-200' : 'text-gray-400 group-hover:text-gray-200'
+                }`}>
                   {milestone.title}
                 </h3>
-                <span className="text-sm text-gray-500">- {milestone.englishTitle}</span>
+                <p className="text-xs text-gray-600 truncate">{milestone.englishTitle}</p>
               </div>
-            </div>
-            <div className="ml-2 px-2 py-1 rounded bg-red-900/20 text-xs text-red-400">
-              步骤 {milestone.step}
+              {milestone.completed ? (
+                <CheckCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-500 flex-shrink-0" />
+              )}
             </div>
           </div>
-        </li>
-      ))}
-    </ol>
-  </section>
-);
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export default StudyMilestones;

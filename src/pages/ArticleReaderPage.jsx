@@ -82,7 +82,7 @@ const ArticleReaderPage = () => {
                 });
             }
 
-            if (user && articleData) {
+            if (user && articleData && user.id !== 'dev-admin') {
                 const { data: highlightsData, error: highlightsError } = await supabase
                     .from('user_article_highlights')
                     .select('*').eq('user_id', user.id).eq('article_id', articleData.id)
@@ -179,7 +179,7 @@ const ArticleReaderPage = () => {
 
     useEffect(() => {
         return () => {
-            if (user && article && progressToSave.current > 0) {
+            if (user && article && progressToSave.current > 0 && user.id !== 'dev-admin') {
                 supabase.from('user_article_progress').upsert({
                     user_id: user.id,
                     article_id: article.id,
@@ -190,7 +190,7 @@ const ArticleReaderPage = () => {
     }, [user, article]);
 
     const handleToggleBookmark = async () => {
-        if (!user || !article) return;
+        if (!user || !article || user.id === 'dev-admin') return;
         console.log('Toggling bookmark. Current state:', isBookmarked);
         try {
             if (isBookmarked) {
@@ -257,7 +257,7 @@ const ArticleReaderPage = () => {
     };
 
     const handleAddHighlight = async (newHighlight) => {
-        if (!user || !article) return;
+        if (!user || !article || user.id === 'dev-admin') return;
         try {
             const { data, error } = await supabase.from('user_article_highlights')
                 .insert({ ...newHighlight, user_id: user.id, article_id: article.id })

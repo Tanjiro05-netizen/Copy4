@@ -9,6 +9,13 @@ const AdminRoute = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Development bypass: skip all authentication on localhost
+        if (window.location.hostname === 'localhost') {
+            setIsAdmin(true);
+            setLoading(false);
+            return;
+        }
+
         if (!user) {
             setLoading(false);
             return;

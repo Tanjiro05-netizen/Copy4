@@ -9,6 +9,13 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const getSession = async () => {
+            // Check for dev auth bypass
+            if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+                setUser({ id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' });
+                setLoading(false);
+                return;
+            }
+
             try {
                 const { data: { session } } = await supabase.auth.getSession();
                 setUser(session?.user ?? null);
@@ -22,6 +29,10 @@ export const AuthProvider = ({ children }) => {
         getSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            // Respect dev auth if present
+            if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+                return;
+            }
             setUser(session?.user ?? null);
         });
 
@@ -32,9 +43,23 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         signUp: (data) => supabase.auth.signUp(data),
-        login: (data) => supabase.auth.signInWithPassword(data),
-        logout: () => supabase.auth.signOut(),
+        login: async (data) => {
+    if (window.location.hostname === 'localhost' && data.email === 'admin@localhost' && data.password === 'admin123') {
+        localStorage.setItem('marxist_dev_auth', 'true');
+        setUser({ id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' });
+        return { error: null };
+    }
+    return supabase.auth.signInWithPassword(data);
+}
+,
+        logout: async () => {
+            if (window.location.hostname === 'localhost') {
+                localStorage.removeItem('marxist_dev_auth');
+            }
+            return supabase.auth.signOut();
+        },
         user,
+        loading,
     };
 
     return (

@@ -37,9 +37,9 @@ const AppRouter = () => {
                         {/* Common Protected routes (available to all authenticated users) */}
                         <Route path="/" element={<Root />} />
                         <Route path="/home" element={<ProtectedRoute><MainLayout><App /></MainLayout></ProtectedRoute>} />
-                        <Route path="/theory" element={<ProtectedRoute><MainLayout><TheoryPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/theory" element={<MainLayout><TheoryPage /></MainLayout>} />
                         <Route path="/theory/:collectionType" element={<ProtectedRoute><MainLayout><ArticleCollectionPage /></MainLayout></ProtectedRoute>} />
-                        <Route path="/theory/article/:slug" element={<ProtectedRoute><MainLayout><ArticleReaderPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/theory/article/:slug" element={<MainLayout><ArticleReaderPage /></MainLayout>} />
                         <Route path="/digital-library" element={<ProtectedRoute><MainLayout><DigitalLibraryPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/analysis" element={<ProtectedRoute><MainLayout><AnalysisPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/submit" element={<ProtectedRoute><MainLayout><SubmitPage /></MainLayout></ProtectedRoute>} />
@@ -47,11 +47,13 @@ const AppRouter = () => {
                         <Route path="/book/:bookId" element={<ProtectedRoute><MainLayout><BookReaderPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute><MainLayout><ProfilePage /></MainLayout></ProtectedRoute>} />
 
+                        {/* Previously Admin-only routes, now opened up */}
+                        <Route path="/directory" element={<ProtectedRoute><MainLayout><DirectoryPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/study" element={<ProtectedRoute><MainLayout><StudyPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/science-tech" element={<ProtectedRoute><MainLayout><ScienceTechPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/visualizations" element={<ProtectedRoute><MainLayout><DataVisualizationPage /></MainLayout></ProtectedRoute>} />
+                        
                         {/* Admin-only routes */}
-                        <Route path="/directory" element={<AdminRoute><MainLayout><DirectoryPage /></MainLayout></AdminRoute>} />
-                        <Route path="/study" element={<AdminRoute><MainLayout><StudyPage /></MainLayout></AdminRoute>} />
-                        <Route path="/science-tech" element={<AdminRoute><MainLayout><ScienceTechPage /></MainLayout></AdminRoute>} />
-                        <Route path="/visualizations" element={<AdminRoute><MainLayout><DataVisualizationPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/tags" element={<AdminRoute><MainLayout><TagManagementPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/submissions" element={<AdminRoute><MainLayout><AdminSubmissionsPage /></MainLayout></AdminRoute>} />
                         

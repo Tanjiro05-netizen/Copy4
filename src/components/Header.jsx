@@ -126,13 +126,15 @@ const Header = () => {
                             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                         </button>
                         
-                        <button
-                            onClick={handleLogout}
-                            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
-                            title='Logout'
-                        >
-                            <LogOut className="w-5 h-5" />
-                        </button>
+                        {user && (
+                            <button
+                                onClick={handleLogout}
+                                className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                                title='Logout'
+                            >
+                                <LogOut className="w-5 h-5" />
+                            </button>
+                        )}
                     </div>
                 </div>
                 
@@ -204,16 +206,18 @@ const Header = () => {
                                 {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                                 <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                             </button>
-                            <button
-                                onClick={() => {
-                                    handleLogout();
-                                    setMobileMenuOpen(false);
-                                }}
-                                className="flex items-center space-x-2 text-white hover:text-red-400 transition-colors"
-                            >
-                                <LogOut className="w-5 h-5" />
-                                <span>Logout</span>
-                            </button>
+                            {user && (
+                                <button
+                                    onClick={() => {
+                                        handleLogout();
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className="flex items-center space-x-2 text-white hover:text-red-400 transition-colors"
+                                >
+                                    <LogOut className="w-5 h-5" />
+                                    <span>Logout</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

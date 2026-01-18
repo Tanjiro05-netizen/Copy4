@@ -3,11 +3,11 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
 
-    // While loading, you might want to show a spinner or nothing
-    // For now, we'll just wait until the user object is determined.
-    // The AuthProvider handles the loading state.
+    if (loading) {
+        return <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white">Loading...</div>;
+    }
 
     if (!user) {
         return <Navigate to="/login" replace />;

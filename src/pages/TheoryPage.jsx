@@ -64,7 +64,7 @@ const TheoryPage = () => {
                 if (articlesError) throw articlesError;
 
                 // Fetch user progress for these articles
-                if (user && articlesData.length > 0) {
+                if (user && articlesData.length > 0 && user.id !== 'dev-admin') {
                     const articleIds = articlesData.map(a => a.id);
 
                     // Fetch progress
@@ -131,7 +131,7 @@ const TheoryPage = () => {
     const featuredArticles = useMemo(() => filteredArticles.filter(a => a.is_featured), [filteredArticles]);
 
     const handleBookmarkToggle = async (articleId, isBookmarked) => {
-        if (!user) return;
+        if (!user || user.id === 'dev-admin') return;
 
         try {
             if (isBookmarked) {

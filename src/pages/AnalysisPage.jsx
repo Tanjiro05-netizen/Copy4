@@ -40,7 +40,11 @@ const AnalysisPage = () => {
 
     useEffect(() => {
         const fetchUserRole = async () => {
-            if (!user) return;
+            if (!user) {
+                // If no user, ensure we don't hang in loading state (though ProtectedRoute should prevent this)
+                setLoading(false);
+                return;
+            }
             try {
                 const { data, error } = await supabase
                     .from('profiles')
@@ -51,7 +55,11 @@ const AnalysisPage = () => {
                 setUserRole(data?.role || 'user');
             } catch (err) {
                 console.error('Error fetching user role:', err);
-                setError('Could not verify user role.');
+                // Fallback to 'user' role on error so fetchData can run and stop loading
+                setUserRole('user');
+                // Optional: keep the error if you want to notify the user, 
+                // but usually we want to allow read-only access or partial functionality
+                // setError('Could not verify user role.'); 
             }
         };
         fetchUserRole();
@@ -207,7 +215,7 @@ const AnalysisPage = () => {
                             onClick={() => setSelectedArticle(null)}
                             className="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                         >
-                            &larr; Back to Laboratory
+                            &larr; Back to Articles
                         </button>
                         <div className="bg-black/30 rounded-lg border border-red-900/20 p-6">
                             <h1 className="text-3xl font-bold text-white mb-2">{selectedArticle.title}</h1>
@@ -247,7 +255,7 @@ const AnalysisPage = () => {
                             <div className="flex items-center justify-between mb-4">
                                 <h1 className="text-4xl font-bold text-white flex items-center">
                                     <BookText size={36} className="mr-3 text-red-500"/> 
-                                    Analysis Laboratory
+                                    Analysis
                                 </h1>
                                 <div className="text-gray-400">
                                     {filteredArticles.length} papers available
