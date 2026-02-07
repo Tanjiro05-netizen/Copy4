@@ -50,6 +50,9 @@ export function validateThreadTitle(title) {
   if (title.length > LIMITS.TITLE_MAX) {
     return { valid: false, error: `Title must be at most ${LIMITS.TITLE_MAX} characters` }
   }
+
+  const spamCheck = checkSpamPatterns(title)
+  if (!spamCheck.valid) return spamCheck
   
   return { valid: true }
 }
@@ -62,7 +65,30 @@ export function validateContent(content, minLength = LIMITS.CONTENT_MIN) {
   if (content.length < minLength) {
     return { valid: false, error: `Content must be at least ${minLength} characters` }
   }
+
+  const spamCheck = checkSpamPatterns(content)
+  if (!spamCheck.valid) return spamCheck
   
+  return { valid: true }
+}
+
+function checkSpamPatterns(text) {
+  // Reject if mostly repeated single character (e.g. "aaaaaaaaaa")
+  if (/^(.)\1{9,}$/.test(text.trim())) {
+    return { valid: false, error: 'Content appears to be spam' }
+  }
+
+  // Reject if the same word is repeated excessively (5+ times in a row)
+  if (/(\b\w+\b)(\s+\1){4,}/i.test(text)) {
+    return { valid: false, error: 'Content appears to be spam' }
+  }
+
+  // Reject excessive URLs (3+)
+  const urlCount = (text.match(/https?:\/\//g) || []).length
+  if (urlCount >= 3) {
+    return { valid: false, error: 'Too many links. Please reduce the number of URLs.' }
+  }
+
   return { valid: true }
 }
 
