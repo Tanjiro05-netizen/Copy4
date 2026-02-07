@@ -1,6 +1,17 @@
 import { supabase } from '../../../supabaseClient'
 
 class ForumApiService {
+  _attachCommentCounts(threads) {
+    if (!threads) return []
+    return threads.map(t => ({
+      ...t,
+      comment_count: Array.isArray(t.forum_comments) && t.forum_comments.length > 0
+        ? t.forum_comments[0].count
+        : (t.comment_count || 0),
+      forum_comments: undefined,
+    }))
+  }
+
   async getProfile(userId) {
     try {
       const { data, error } = await supabase
@@ -42,7 +53,8 @@ class ForumApiService {
         .from('forum_threads')
         .select(`
           *,
-          author:profiles(id, username, avatar_url, ideology, is_certified)
+          author:profiles(id, username, avatar_url, ideology, is_certified),
+          forum_comments(count)
         `, { count: 'exact' })
       
       if (category) {
@@ -65,7 +77,7 @@ class ForumApiService {
       if (error) throw error
       
       return {
-        data: data || [],
+        data: this._attachCommentCounts(data || []),
         page,
         totalPages: Math.ceil((count || 0) / limit),
         total: count || 0,
@@ -82,7 +94,8 @@ class ForumApiService {
         .from('forum_threads')
         .select(`
           *,
-          author:profiles(id, username, avatar_url, ideology, is_certified)
+          author:profiles(id, username, avatar_url, ideology, is_certified),
+          forum_comments(count)
         `)
         .eq('id', threadId)
         .single()
@@ -94,7 +107,8 @@ class ForumApiService {
         .update({ view_count: (data.view_count || 0) + 1 })
         .eq('id', threadId)
       
-      return data
+      const normalized = this._attachCommentCounts([data])[0]
+      return normalized
     } catch (err) {
       console.error('Error fetching thread:', err)
       return null
@@ -182,13 +196,14 @@ class ForumApiService {
         .from('forum_threads')
         .select(`
           *,
-          author:profiles(id, username, avatar_url, ideology, is_certified)
+          author:profiles(id, username, avatar_url, ideology, is_certified),
+          forum_comments(count)
         `)
         .eq('author_id', userId)
         .order('created_at', { ascending: false })
       
       if (error) throw error
-      return data || []
+      return this._attachCommentCounts(data || [])
     } catch (err) {
       console.error('Error fetching user threads:', err)
       return []
@@ -240,20 +255,6 @@ class ForumApiService {
         .single()
       
       if (error) throw error
-      
-      // Increment comment_count on the thread
-      const { data: threadData } = await supabase
-        .from('forum_threads')
-        .select('comment_count')
-        .eq('id', commentData.thread_id)
-        .single()
-      
-      if (threadData) {
-        await supabase
-          .from('forum_threads')
-          .update({ comment_count: (threadData.comment_count || 0) + 1 })
-          .eq('id', commentData.thread_id)
-      }
       
       return data
     } catch (err) {
@@ -387,12 +388,13 @@ class ForumApiService {
         .from('forum_threads')
         .select(`
           *,
-          author:profiles(id, username, avatar_url, ideology, is_certified)
+          author:profiles(id, username, avatar_url, ideology, is_certified),
+          forum_comments(count)
         `)
         .in('id', threadIds)
       
       if (error) throw error
-      return data || []
+      return this._attachCommentCounts(data || [])
     } catch (err) {
       console.error('Error fetching liked threads:', err)
       return []
@@ -783,7 +785,8 @@ class ForumApiService {
         .from('forum_threads')
         .select(`
           *,
-          author:profiles(id, username, avatar_url, ideology, is_certified)
+          author:profiles(id, username, avatar_url, ideology, is_certified),
+          forum_comments(count)
         `, { count: 'exact' })
       
       if (category) {
@@ -832,7 +835,8 @@ class ForumApiService {
       if (repostsError) throw repostsError
       
       // Mark threads as type 'thread'
-      const threadItems = (threads || []).map(t => ({
+      const normalizedThreads = this._attachCommentCounts(threads || [])
+      const threadItems = normalizedThreads.map(t => ({
         ...t,
         feedType: 'thread',
         feedDate: t.created_at,
