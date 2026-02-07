@@ -168,6 +168,52 @@ class ForumApiService {
     }
   }
 
+  async purgeSpamThreads(titlePatterns) {
+    try {
+      // Find threads matching any of the spam patterns
+      let query = supabase
+        .from('forum_threads')
+        .select('id, title')
+
+      const { data: threads, error: fetchError } = await query
+      if (fetchError) throw fetchError
+
+      const spamThreads = (threads || []).filter(t =>
+        titlePatterns.some(pattern =>
+          t.title.toLowerCase().includes(pattern.toLowerCase())
+        )
+      )
+
+      if (spamThreads.length === 0) {
+        console.log('No spam threads found matching patterns:', titlePatterns)
+        return { deleted: 0 }
+      }
+
+      const spamIds = spamThreads.map(t => t.id)
+      console.log(`Found ${spamIds.length} spam threads to delete:`, spamThreads.map(t => t.title))
+
+      // Delete comments on spam threads first
+      const { error: commentsError } = await supabase
+        .from('forum_comments')
+        .delete()
+        .in('thread_id', spamIds)
+      if (commentsError) console.warn('Error deleting spam comments:', commentsError)
+
+      // Delete the spam threads
+      const { error: threadsError } = await supabase
+        .from('forum_threads')
+        .delete()
+        .in('id', spamIds)
+      if (threadsError) throw threadsError
+
+      console.log(`Successfully deleted ${spamIds.length} spam threads`)
+      return { deleted: spamIds.length }
+    } catch (err) {
+      console.error('Error purging spam threads:', err)
+      throw err
+    }
+  }
+
   async deleteThread(threadId) {
     try {
       const { data, error } = await supabase

@@ -152,6 +152,25 @@ function ForumPage() {
     return isLiked('comment', commentId)
   }, [isLiked])
 
+  const handlePurgeSpam = useCallback(async () => {
+    if (!window.confirm('Purge all spam threads? This will delete threads matching known spam patterns.')) return
+    try {
+      const result = await forumApiService.purgeSpamThreads([
+        'bots by 764',
+        'fashfront',
+        'patriotfront',
+        'heil hitler',
+        'kill nigger',
+        'jewish nigger',
+        'botted by 764',
+      ])
+      alert(`Purged ${result.deleted} spam threads.`)
+      refetchThreads()
+    } catch (err) {
+      alert('Failed to purge spam: ' + err.message)
+    }
+  }, [refetchThreads])
+
   const currentBoard = BOARDS.find(b => b.name === currentCategory) || BOARDS[0]
 
   if (currentView === 'thread') {
@@ -334,6 +353,15 @@ function ForumPage() {
         >
           [refresh]
         </button>
+
+        {userIsAdmin && (
+          <button
+            onClick={handlePurgeSpam}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: colors.state.error, font: 'inherit' }}
+          >
+            [purge spam]
+          </button>
+        )}
         
         <span style={{ marginLeft: 'auto', display: 'flex', gap: spacing.sm }}>
           <button
