@@ -34,14 +34,14 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Apply trigger to forum_threads
 DROP TRIGGER IF EXISTS block_spam_threads_trigger ON public.forum_threads;
 CREATE TRIGGER block_spam_threads_trigger
-    BEFORE INSERT OR UPDATE ON public.forum_threads
+    BEFORE INSERT ON public.forum_threads
     FOR EACH ROW
     EXECUTE FUNCTION public.block_forum_spam();
 
 -- Apply trigger to forum_comments (comments have content but no title)
 DROP TRIGGER IF EXISTS block_spam_comments_trigger ON public.forum_comments;
 CREATE TRIGGER block_spam_comments_trigger
-    BEFORE INSERT OR UPDATE ON public.forum_comments
+    BEFORE INSERT ON public.forum_comments
     FOR EACH ROW
     EXECUTE FUNCTION public.block_forum_spam();
 
