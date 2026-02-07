@@ -406,16 +406,10 @@ const LandingPage = () => {
                                     <ExternalLink size={16} />
                                     @Leninistwarrior on Twitter
                                 </a>
-                                <a 
-                                    href="https://ko-fi.com/MarxistInfo" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="landing-highlightable btn-kofi flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white"
-                                    ref={registerHighlightable}
-                                >
+                                <span className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-gray-500 border border-gray-700 cursor-default">
                                     <Heart size={18} />
-                                    Support on Ko-fi
-                                </a>
+                                    Donations coming soon
+                                </span>
                             </div>
                         </div>
                     </section>
@@ -871,15 +865,10 @@ const LandingPage = () => {
                                     <ExternalLink size={16} />
                                     @Leninistwarrior on Twitter
                                 </a>
-                                <a 
-                                    href="https://ko-fi.com/MarxistInfo" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-[#FF5E5B] hover:bg-[#e54e4b] rounded-lg font-semibold transition text-white"
-                                >
+                                <span className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-gray-500 border border-gray-700 cursor-default">
                                     <Heart size={18} />
-                                    Support on Ko-fi
-                                </a>
+                                    Donations coming soon
+                                </span>
                             </div>
                         </div>
                     </div>
