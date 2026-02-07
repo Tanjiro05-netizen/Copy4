@@ -24,7 +24,7 @@ function ThreadCard({ thread, onView, onLike, isLiked, onRepost, isReposted, cur
     quoteContent,
   } = thread
 
-  const displayName = author?.username || anonymous_name || 'Anonymous'
+  const displayName = author?.username || (anonymous_name && anonymous_name !== 'undefined' ? anonymous_name : null) || 'Anonymous'
 
   return (
     <div style={{

@@ -26,7 +26,7 @@ function Comment({
     is_deleted,
   } = comment
   
-  const displayName = author?.username || anonymous_name || 'Anonymous'
+  const displayName = author?.username || (anonymous_name && anonymous_name !== 'undefined' ? anonymous_name : null) || 'Anonymous'
 
   const contentSegments = parseContent(content)
   const maxDepth = 4
