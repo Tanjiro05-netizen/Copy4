@@ -112,7 +112,9 @@ class ForumApiService {
       if (userId) {
         insertData.author_id = userId
       } else {
-        insertData.anonymous_name = threadData.anonymous_name || 'Anonymous'
+        const rawName = threadData.anonymous_name
+        const cleanName = rawName && !['undefined', 'null'].includes(String(rawName).toLowerCase().trim()) && String(rawName).trim() ? String(rawName).trim() : 'Anonymous'
+        insertData.anonymous_name = cleanName
       }
       
       const { data, error } = await supabase
@@ -223,7 +225,9 @@ class ForumApiService {
       if (userId) {
         insertData.author_id = userId
       } else {
-        insertData.anonymous_name = commentData.anonymous_name || 'Anonymous'
+        const rawName = commentData.anonymous_name
+        const cleanName = rawName && !['undefined', 'null'].includes(String(rawName).toLowerCase().trim()) && String(rawName).trim() ? String(rawName).trim() : 'Anonymous'
+        insertData.anonymous_name = cleanName
       }
       
       const { data, error } = await supabase

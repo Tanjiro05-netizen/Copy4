@@ -47,7 +47,8 @@ function ThreadView({
     is_locked,
   } = thread
 
-  const displayName = author?.username || (anonymous_name && anonymous_name !== 'undefined' ? anonymous_name : null) || 'Anonymous'
+  const sanitizedAnonName = anonymous_name && !['undefined', 'null'].includes(anonymous_name.toLowerCase().trim()) && anonymous_name.trim() ? anonymous_name.trim() : null
+  const displayName = author?.username || sanitizedAnonName || 'Anonymous'
   const contentSegments = parseContent(content)
 
   const handleReply = (parentId = null) => {

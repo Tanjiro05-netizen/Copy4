@@ -224,7 +224,7 @@ const ArticleComments = ({ articleId }) => {
         } else {
             const processedComments = data.map(c => ({
                 ...c,
-                author_name: c.author?.username,
+                author_name: c.author?.username || null,
                 author_avatar: c.author?.avatar_url,
                 author_is_certified: c.author?.is_certified
             }));
