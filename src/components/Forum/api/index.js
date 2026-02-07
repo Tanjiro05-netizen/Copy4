@@ -170,44 +170,59 @@ class ForumApiService {
 
   async purgeSpamThreads(titlePatterns) {
     try {
-      // Find threads matching any of the spam patterns
-      let query = supabase
-        .from('forum_threads')
-        .select('id, title')
+      const BATCH_SIZE = 50
+      let totalDeleted = 0
+      let hasMore = true
 
-      const { data: threads, error: fetchError } = await query
-      if (fetchError) throw fetchError
+      while (hasMore) {
+        // Fetch a batch of threads
+        const { data: threads, error: fetchError } = await supabase
+          .from('forum_threads')
+          .select('id, title')
+          .limit(1000)
 
-      const spamThreads = (threads || []).filter(t =>
-        titlePatterns.some(pattern =>
-          t.title.toLowerCase().includes(pattern.toLowerCase())
+        if (fetchError) throw fetchError
+
+        const spamThreads = (threads || []).filter(t =>
+          titlePatterns.some(pattern =>
+            t.title && t.title.toLowerCase().includes(pattern.toLowerCase())
+          )
         )
-      )
 
-      if (spamThreads.length === 0) {
-        console.log('No spam threads found matching patterns:', titlePatterns)
-        return { deleted: 0 }
+        if (spamThreads.length === 0) {
+          hasMore = false
+          break
+        }
+
+        // Process in batches of BATCH_SIZE
+        for (let i = 0; i < spamThreads.length; i += BATCH_SIZE) {
+          const batch = spamThreads.slice(i, i + BATCH_SIZE)
+          const batchIds = batch.map(t => t.id)
+
+          console.log(`Deleting batch ${Math.floor(i / BATCH_SIZE) + 1}: ${batchIds.length} threads`)
+
+          // Delete comments on these threads first
+          const { error: commentsError } = await supabase
+            .from('forum_comments')
+            .delete()
+            .in('thread_id', batchIds)
+          if (commentsError) console.warn('Error deleting spam comments:', commentsError)
+
+          // Delete the threads
+          const { error: threadsError } = await supabase
+            .from('forum_threads')
+            .delete()
+            .in('id', batchIds)
+          if (threadsError) console.warn('Error deleting spam threads batch:', threadsError)
+          else totalDeleted += batchIds.length
+        }
+
+        // If we found spam in this round, check for more
+        if (spamThreads.length < 100) hasMore = false
       }
 
-      const spamIds = spamThreads.map(t => t.id)
-      console.log(`Found ${spamIds.length} spam threads to delete:`, spamThreads.map(t => t.title))
-
-      // Delete comments on spam threads first
-      const { error: commentsError } = await supabase
-        .from('forum_comments')
-        .delete()
-        .in('thread_id', spamIds)
-      if (commentsError) console.warn('Error deleting spam comments:', commentsError)
-
-      // Delete the spam threads
-      const { error: threadsError } = await supabase
-        .from('forum_threads')
-        .delete()
-        .in('id', spamIds)
-      if (threadsError) throw threadsError
-
-      console.log(`Successfully deleted ${spamIds.length} spam threads`)
-      return { deleted: spamIds.length }
+      console.log(`Successfully deleted ${totalDeleted} spam threads total`)
+      return { deleted: totalDeleted }
     } catch (err) {
       console.error('Error purging spam threads:', err)
       throw err
