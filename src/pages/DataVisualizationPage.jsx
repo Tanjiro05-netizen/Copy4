@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import { BarChart3, Users, TrendingUp, Map, Eye, EyeOff, BarChart, LineChart, PieChart, Sliders, SplitSquareVertical } from 'lucide-react';
-import StockMarketCrash from '../components/visualizations/StockMarketCrash';
-import DynamicBackground from '../components/visualizations/DynamicBackground';
+import { BarChart3, Users, TrendingUp, Map, BarChart, LineChart, PieChart, Sliders, SplitSquareVertical } from 'lucide-react';
 import EnhancedChart from '../components/visualizations/EnhancedChart';
 import WhatIfAnalysis from '../components/visualizations/WhatIfAnalysis';
 import SplitView from '../components/visualizations/SplitView';
@@ -13,7 +11,6 @@ import MovementsVisualization from '../components/visualizations/MovementsVisual
 
 const DataVisualizationPage = () => {
     const [activeView, setActiveView] = useState('economic');
-    const [showAnimation, setShowAnimation] = useState(true);
     const [chartType, setChartType] = useState('bar');
     const [sentiment, setSentiment] = useState('neutral');
     const [hoveredData, setHoveredData] = useState(null);
@@ -106,29 +103,6 @@ const DataVisualizationPage = () => {
 
     return (
         <div className="min-h-screen bg-[#12131A] relative overflow-hidden">
-            {/* Dynamic Background */}
-            <DynamicBackground 
-                sentiment={sentiment} 
-                intensity={0.7} 
-                interactionEnabled={true} 
-            />
-            
-            {/* Legacy Background Animation - can be removed if desired */}
-            {showAnimation && <StockMarketCrash show={showAnimation} />}
-
-            {/* Background Toggle */}
-            <button
-                onClick={() => setShowAnimation(!showAnimation)}
-                className="fixed top-20 right-4 z-50 p-2 bg-black/50 backdrop-blur-sm rounded-full border border-red-500/30 hover:border-red-500/50 transition-colors"
-                title={showAnimation ? 'Disable animation' : 'Enable animation'}
-            >
-                {showAnimation ? (
-                    <EyeOff className="w-5 h-5 text-red-400" />
-                ) : (
-                    <Eye className="w-5 h-5 text-red-400" />
-                )}
-            </button>
-
             <Header />
             
             <main className="container mx-auto px-4 py-16 relative z-10">

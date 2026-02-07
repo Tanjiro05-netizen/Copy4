@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, Search, Bookmark } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { ChevronRight, Search, Bookmark, BookOpen, Plus, Send, Check, Loader2, User, Calendar } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
@@ -8,7 +8,8 @@ import { useAuth } from '../context/AuthContext';
 
 const TheoryPage = () => {
 
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
+    const navigate = useNavigate();
 
     // State for data, loading, and errors
     const [categories, setCategories] = useState([]);
@@ -18,6 +19,12 @@ const TheoryPage = () => {
     const [loadingArticles, setLoadingArticles] = useState(false);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Community writings state
+    const [communityTexts, setCommunityTexts] = useState([]);
+    const [loadingCommunity, setLoadingCommunity] = useState(true);
+    const [savedTextIds, setSavedTextIds] = useState(new Set());
+    const [savingTextId, setSavingTextId] = useState(null);
 
     // Fetch categories once on component mount
     useEffect(() => {
@@ -105,6 +112,84 @@ const TheoryPage = () => {
 
         fetchArticles();
     }, [activeCategory, user]);
+
+    // Fetch community writings (analysis_texts) and user's saved library
+    useEffect(() => {
+        const fetchCommunityTexts = async () => {
+            setLoadingCommunity(true);
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('analysis_texts')
+                    .select('id, slug, primary_language, metadata, category, tags, created_at')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
+
+                if (fetchError) throw fetchError;
+                setCommunityTexts(data || []);
+
+                // Fetch user's saved texts
+                if (user && user.id !== 'dev-admin') {
+                    const { data: savedData, error: savedError } = await supabase
+                        .from('user_analysis_library')
+                        .select('text_id')
+                        .eq('user_id', user.id);
+
+                    if (savedError) console.error('Error fetching saved texts:', savedError);
+                    setSavedTextIds(new Set(savedData?.map(s => s.text_id) || []));
+                }
+            } catch (err) {
+                console.error('Error fetching community texts:', err);
+            } finally {
+                setLoadingCommunity(false);
+            }
+        };
+
+        fetchCommunityTexts();
+    }, [user]);
+
+    const handleSaveToAnalysis = useCallback(async (textId) => {
+        if (!user || user.id === 'dev-admin') return;
+        setSavingTextId(textId);
+
+        try {
+            const isSaved = savedTextIds.has(textId);
+            if (isSaved) {
+                const { error } = await supabase
+                    .from('user_analysis_library')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .eq('text_id', textId);
+                if (error) throw error;
+                setSavedTextIds(prev => {
+                    const next = new Set(prev);
+                    next.delete(textId);
+                    return next;
+                });
+            } else {
+                const { error } = await supabase
+                    .from('user_analysis_library')
+                    .insert({ user_id: user.id, text_id: textId });
+                if (error) throw error;
+                setSavedTextIds(prev => new Set([...prev, textId]));
+            }
+        } catch (err) {
+            console.error('Error toggling save:', err);
+            alert('Failed to update your analysis library.');
+        } finally {
+            setSavingTextId(null);
+        }
+    }, [user, savedTextIds]);
+
+    const filteredCommunityTexts = useMemo(() => {
+        if (!searchQuery) return communityTexts;
+        const query = searchQuery.toLowerCase();
+        return communityTexts.filter(text => {
+            const meta = text.metadata?.[text.primary_language] || text.metadata?.en || {};
+            const title = meta.title?.toLowerCase() || '';
+            const authors = (meta.authors || []).join(' ').toLowerCase();
+            return title.includes(query) || authors.includes(query);
+        });
+    }, [communityTexts, searchQuery]);
 
     // Memoize collections to avoid re-computation on every render
     const filteredArticles = useMemo(() => {
@@ -267,6 +352,89 @@ const TheoryPage = () => {
                             </>
                         )}
                     </section>
+                </div>
+
+                {/* Community Writings Section */}
+                <div className="mt-12">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <BookOpen className="w-7 h-7 text-red-500" />
+                            <h2 className="text-2xl font-bold">Community Writings</h2>
+                        </div>
+                        {isAdmin && isAdmin() && (
+                            <button
+                                onClick={() => navigate('/admin/analysis/upload')}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm font-medium"
+                            >
+                                <Plus size={16} />
+                                Upload Text
+                            </button>
+                        )}
+                    </div>
+
+                    {loadingCommunity ? (
+                        <div className="flex items-center justify-center py-12">
+                            <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                        </div>
+                    ) : filteredCommunityTexts.length === 0 ? (
+                        <div className="text-center py-12 bg-black/30 rounded-lg">
+                            <BookOpen className="w-12 h-12 mx-auto text-gray-600 mb-3" />
+                            <h3 className="text-xl font-semibold">No Community Texts Yet</h3>
+                            <p className="text-gray-400 mt-2">Community writings will appear here once uploaded.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {filteredCommunityTexts.map(text => {
+                                const meta = text.metadata?.[text.primary_language] || text.metadata?.en || {};
+                                const isSaved = savedTextIds.has(text.id);
+                                const isSaving = savingTextId === text.id;
+                                return (
+                                    <div key={text.id} className="bg-black/40 rounded-lg p-4 flex flex-col hover:bg-black/60 transition-colors duration-200">
+                                        <Link to={`/analysis/text/${text.slug}`} className="flex-grow">
+                                            <h3 className="text-lg font-semibold mb-1 text-white">{meta.title || 'Untitled'}</h3>
+                                            {meta.authors?.length > 0 && (
+                                                <p className="text-sm text-gray-400 flex items-center gap-1 mb-2">
+                                                    <User size={14} />
+                                                    {meta.authors.join(', ')}
+                                                </p>
+                                            )}
+                                            {text.category && (
+                                                <span className="inline-block text-xs px-2 py-0.5 bg-red-600/20 text-red-400 rounded-full mb-2">
+                                                    {text.category}
+                                                </span>
+                                            )}
+                                        </Link>
+                                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-800/50">
+                                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                                                <Calendar size={12} />
+                                                {new Date(text.created_at).toLocaleDateString()}
+                                            </span>
+                                            {user && user.id !== 'dev-admin' && (
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSaveToAnalysis(text.id); }}
+                                                    disabled={isSaving}
+                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                                        isSaved
+                                                            ? 'bg-green-600/20 text-green-400 hover:bg-red-600/20 hover:text-red-400'
+                                                            : 'bg-gray-800 text-gray-300 hover:bg-red-600/20 hover:text-red-400'
+                                                    }`}
+                                                    title={isSaved ? 'Remove from Analysis' : 'Save to Analysis'}
+                                                >
+                                                    {isSaving ? (
+                                                        <Loader2 size={14} className="animate-spin" />
+                                                    ) : isSaved ? (
+                                                        <><Check size={14} /> Saved</>
+                                                    ) : (
+                                                        <><Send size={14} /> Save to Analysis</>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

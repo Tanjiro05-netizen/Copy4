@@ -1,65 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, Globe, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users, Shield, MessageSquare, HelpCircle } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { supabase } from '../supabaseClient';
 
 const Header = () => {
-    
-    const { user, logout } = useAuth();
+    const { user, profile, logout, isAdmin } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [userRole, setUserRole] = useState(null);
 
-    const isActive = (path) => {
-        return location.pathname === path;
-    };
-
-
+    const isActive = (path) => location.pathname === path;
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/');
     };
-
-    useEffect(() => {
-        const fetchUserRole = async () => {
-            if (!user) {
-                setUserRole(null);
-                return;
-            }
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('is_admin')
-                    .eq('id', user.id)
-                    .single();
-
-                if (error && error.code !== 'PGRST116') throw error;
-                if (data) setUserRole(data.is_admin ? 'admin' : null);
-
-            } catch (error) {
-                console.error('Error fetching user role in header:', error);
-            }
-        };
-
-        fetchUserRole();
-    }, [user]);
     
-    const navItems = [
-        { path: '/', label: 'Home', icon: Home },
-        { path: '/theory', label: 'Revolutionary Theory', icon: BookMarked },
-        { path: '/analysis', label: 'Analysis', icon: FileText },
-        { path: '/digital-library', label: 'Digital Library', icon: BookOpen },
-        { path: '/study', label: 'Study Center', icon: BarChart },
-        { path: '/science-tech', label: 'Science & Tech', icon: FileText },
-        { path: '/visualizations', label: 'Data', icon: LineChart },
-        { path: '/directory', label: 'Directory', icon: Users }
+    // All nav items - some are guest-accessible, others require login
+    const allNavItems = [
+        { path: '/home', label: 'Home', icon: Home, guestAccessible: true },
+        { path: '/theory', label: 'Revolutionary Theory', icon: BookMarked, guestAccessible: false },
+        { path: '/analysis', label: 'Analysis', icon: FileText, guestAccessible: false },
+        { path: '/digital-library', label: 'Digital Library', icon: BookOpen, guestAccessible: true },
+        { path: '/study', label: 'Study Center', icon: BarChart, guestAccessible: false },
+        { path: '/science-tech', label: 'Science & Tech', icon: FileText, guestAccessible: false },
+        { path: '/politics', label: 'Politics', icon: FileText, guestAccessible: false },
+        { path: '/visualizations', label: 'Data', icon: LineChart, guestAccessible: false },
+        { path: '/directory', label: 'Directory', icon: Users, guestAccessible: false },
+        { path: '/forum', label: 'Forum', icon: MessageSquare, guestAccessible: true },
+        { path: '/knowledge', label: 'Knowledge Q&A', icon: HelpCircle, guestAccessible: false }
     ];
+    
+    // Show all nav items to everyone (guests see "Coming Soon" for restricted ones)
+    const navItems = allNavItems;
     
     return (
         <header className="fixed top-0 w-full bg-black text-white py-3 z-50 border-b border-gray-800">
@@ -71,18 +46,25 @@ const Header = () => {
                 {/* Desktop Navigation */}
                 <div className="hidden md:flex items-center">
                     <nav className="flex items-center">
-                        {navItems.map((item) => (
-                            <Link 
-                                key={item.path}
-                                to={item.path}
-                                className={`flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors ${
-                                    isActive(item.path) ? 'text-red-500' : 'text-gray-300'
-                                }`}
-                            >
-                                <span>{item.label}</span>
-                            </Link>
-                        ))}
-                        {userRole === 'admin' && (
+                        {navItems.map((item) => {
+                            const isRestricted = !user && !item.guestAccessible;
+                            return (
+                                <Link 
+                                    key={item.path}
+                                    to={isRestricted ? '/coming-soon' : item.path}
+                                    className={`flex items-center px-4 py-2 text-sm font-medium transition-colors ${
+                                        isRestricted
+                                            ? 'text-gray-600 hover:text-gray-500'
+                                            : isActive(item.path) ? 'text-red-500' : 'text-gray-300 hover:text-red-400'
+                                    }`}
+                                    title={isRestricted ? 'Coming Soon' : ''}
+                                >
+                                    <span>{item.label}</span>
+                                    {isRestricted && <span className="ml-1 text-[10px] text-gray-600">✦</span>}
+                                </Link>
+                            );
+                        })}
+                        {isAdmin() && (
                             <div className="relative group">
                                 <div className="flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors cursor-pointer">
                                     <Shield size={16} className="mr-2" />
@@ -106,6 +88,62 @@ const Header = () => {
                                         >
                                             Review Submissions
                                         </Link>
+                                        <Link 
+                                            to="/admin/knowledge"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/knowledge') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Knowledge Moderation
+                                        </Link>
+                                        <Link 
+                                            to="/admin/quizzes"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/quizzes') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Quiz Management
+                                        </Link>
+                                        <Link 
+                                            to="/admin/scenarios"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/scenarios') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Scenario Management
+                                        </Link>
+                                        <Link 
+                                            to="/admin/world-sim"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/world-sim') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            World Sim
+                                        </Link>
+                                        <Link 
+                                            to="/admin/analysis/upload"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/analysis/upload') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Upload Analysis Text
+                                        </Link>
+                                        <Link 
+                                            to="/admin/library/upload"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/library/upload') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Library Upload
+                                        </Link>
+                                        <Link 
+                                            to="/admin/stem"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/stem') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            STEM Courses
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
@@ -126,7 +164,7 @@ const Header = () => {
                             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                         </button>
                         
-                        {user && (
+                        {user ? (
                             <button
                                 onClick={handleLogout}
                                 className="p-2 hover:bg-gray-800 rounded-full transition-colors"
@@ -134,6 +172,13 @@ const Header = () => {
                             >
                                 <LogOut className="w-5 h-5" />
                             </button>
+                        ) : (
+                            <Link
+                                to="/"
+                                className="px-4 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
+                            >
+                                Log In
+                            </Link>
                         )}
                     </div>
                 </div>
@@ -160,19 +205,25 @@ const Header = () => {
                             </button>
                         </div>
                         <nav className="flex flex-col space-y-6">
-                            {navItems.map((item) => (
-                                <Link 
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
-                                        isActive(item.path) ? 'text-red-500' : 'text-white'
-                                    }`}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    <span>{item.label}</span>
-                                </Link>
-                            ))}
-                            {userRole === 'admin' && (
+                            {navItems.map((item) => {
+                                const isRestricted = !user && !item.guestAccessible;
+                                return (
+                                    <Link 
+                                        key={item.path}
+                                        to={isRestricted ? '/coming-soon' : item.path}
+                                        className={`flex items-center text-lg font-medium transition-colors ${
+                                            isRestricted
+                                                ? 'text-gray-600 hover:text-gray-500'
+                                                : isActive(item.path) ? 'text-red-500' : 'text-white hover:text-red-400'
+                                        }`}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        <span>{item.label}</span>
+                                        {isRestricted && <span className="ml-2 text-xs text-gray-600">Coming Soon</span>}
+                                    </Link>
+                                );
+                            })}
+                            {isAdmin() && (
                                 <Link 
                                     to="/admin/tags"
                                     className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
@@ -206,7 +257,7 @@ const Header = () => {
                                 {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                                 <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                             </button>
-                            {user && (
+                            {user ? (
                                 <button
                                     onClick={() => {
                                         handleLogout();
@@ -217,6 +268,14 @@ const Header = () => {
                                     <LogOut className="w-5 h-5" />
                                     <span>Logout</span>
                                 </button>
+                            ) : (
+                                <Link
+                                    to="/"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
+                                >
+                                    Log In
+                                </Link>
                             )}
                         </div>
                     </div>

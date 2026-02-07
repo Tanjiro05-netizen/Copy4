@@ -7,7 +7,6 @@ import ConceptMapper from '../components/AIFeatures/ConceptMapper';
 import Bibliography from '../components/AIFeatures/Bibliography';
 import CrossReferences from '../components/AIFeatures/CrossReferences';
 import MarxistGlossary from '../components/AIFeatures/MarxistGlossary';
-import SpotifyEmbed from '../components/SpotifyEmbed';
 
 
 const DirectoryPage = () => {
@@ -125,10 +124,6 @@ const DirectoryPage = () => {
                                 </div>
                             </button>
 
-                            {/* Spotify Player directly under Timeline */}
-                            <div className="w-full">
-                                <SpotifyEmbed />
-                            </div>
                         </div>
                     </div>
 

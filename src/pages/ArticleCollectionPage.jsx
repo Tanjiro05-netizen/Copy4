@@ -43,20 +43,7 @@ const ArticleCollectionPage = () => {
                 const { data, error: queryError } = await query;
                 if (queryError) throw queryError;
 
-                let fetchedArticles = data || [];
-                if (collectionType === 'classics') {
-                    const manifestoArticle = {
-                        id: 'local-communist-manifesto',
-                        slug: 'communist-manifesto',
-                        title: 'The Communist Manifesto',
-                        excerpt: 'The foundational text of Marxism, outlining the principles of communism.',
-                        estimated_time_min: 45,
-                        category: { name: 'Manifesto' }
-                    };
-                    fetchedArticles = [manifestoArticle, ...fetchedArticles.filter(a => a.slug !== 'communist-manifesto')];
-                }
-
-                setArticles(fetchedArticles);
+                setArticles(data || []);
             } catch (err) {
                 setError(err.message);
                 console.error(`Error fetching ${collectionType} articles:`, err);

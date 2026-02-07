@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 import { 
     Search, List, Grid, ExternalLink, FileText, Download,
-    Database, DollarSign, BookOpen, Landmark, Users, Target
+    Database, BookOpen, Landmark, Users, Target, Plus
 } from 'lucide-react';
 
 const categoryIcons = {
-    'Political Economy': DollarSign,
+    'Political Economy': Database,
     'Philosophy': BookOpen,
     'History': Landmark,
     'Sociology': Users,
@@ -134,6 +135,8 @@ const useDebounce = (value, delay) => {
 };
 
 const DigitalLibraryPage = () => {
+    const navigate = useNavigate();
+    const { isAdmin } = useAuth();
     const [viewMode, setViewMode] = useState('grid');
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms delay
@@ -227,7 +230,18 @@ const DigitalLibraryPage = () => {
             
             <div className="relative bg-black/40 py-24">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-5xl font-bold text-white mb-6">Digital Library</h1>
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <h1 className="text-5xl font-bold text-white mb-6">Digital Library</h1>
+                        {isAdmin && isAdmin() && (
+                            <button
+                                onClick={() => navigate('/admin/library/upload')}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-white font-medium"
+                            >
+                                <Plus size={18} />
+                                Upload Book
+                            </button>
+                        )}
+                    </div>
                     <p className="text-xl text-gray-300 max-w-2xl">
                         Access the complete archive of Marxist literature, from foundational texts to contemporary works.
                     </p>
@@ -309,7 +323,6 @@ const DigitalLibraryPage = () => {
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`px-4 py-2 ${activeCategory === category.id ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400 hover:bg-black/50'} rounded-lg transition-colors whitespace-nowrap flex items-center gap-2`}
                             >
-                                <category.icon className="w-4 h-4" />
                                 <span>{category.name}</span>
                             </button>
                         ))}
@@ -326,8 +339,7 @@ const DigitalLibraryPage = () => {
                     <div className="space-y-12">
                         {Object.entries(groupedBooks).map(([categoryName, booksInCategory]) => (
                             <section key={categoryName}>
-                                <h2 className="text-3xl font-bold text-red-500 mb-6 flex items-center gap-3">
-                                    {categories.find(c => c.name === categoryName)?.icon && React.createElement(categories.find(c => c.name === categoryName).icon, { className: 'w-6 h-6' })}
+                                <h2 className="text-3xl font-bold text-red-500 mb-6">
                                     {categoryName}
                                 </h2>
                                 <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import LoginPage from './pages/Login';
+import LandingPage from './pages/LandingPage';
 
 const Root = () => {
     const { user, loading } = useAuth();
@@ -14,7 +14,7 @@ const Root = () => {
         return <Navigate to="/home" replace />;
     }
 
-    return <LoginPage />;
+    return <LandingPage />;
 };
 
 export default Root;
