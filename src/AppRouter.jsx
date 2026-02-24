@@ -47,8 +47,27 @@ import { TextBrowser } from './components/Analysis/AnalysisBrowser';
 import { AnalysisReader } from './components/Analysis/AnalysisReader';
 import ErrorBoundary from './components/ErrorBoundary';
 import NotFoundPage from './pages/NotFoundPage';
+import MaintenancePage from './pages/MaintenancePage.jsx';
+
+// ╔══════════════════════════════════════════════════════╗
+// ║  MAINTENANCE MODE — set to false to restore site    ║
+// ╚══════════════════════════════════════════════════════╝
+const MAINTENANCE_MODE = true;
 
 const AppRouter = () => {
+    // When maintenance mode is on, every route shows the maintenance page
+    if (MAINTENANCE_MODE) {
+        return (
+            <ErrorBoundary>
+                <Router>
+                    <Routes>
+                        <Route path="*" element={<MaintenancePage />} />
+                    </Routes>
+                </Router>
+            </ErrorBoundary>
+        );
+    }
+
     return (
         <ErrorBoundary>
         <AuthProvider>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Loader2, ArrowLeft, Users, MessageSquare, Bookmark, Highlighter, Link2, BarChart3, Trash2 } from 'lucide-react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { Loader2, ArrowLeft, Users, MessageSquare, Bookmark, Highlighter, Link2, BarChart3, Trash2, BookOpen } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../supabaseClient';
 import useAnalysisText from '../hooks/useAnalysisText';
@@ -20,7 +20,16 @@ import useCrossReferences from '../hooks/useCrossReferences';
 const AnalysisReader = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { isAdmin } = useAuth();
+    const [viewMode, setViewMode] = useState(searchParams.get('mode') === 'read' ? 'reading' : 'analysis');
+    const isReadingMode = viewMode === 'reading';
+
+    const toggleViewMode = useCallback(() => {
+        const newMode = isReadingMode ? 'analysis' : 'reading';
+        setViewMode(newMode);
+        setSearchParams(newMode === 'reading' ? { mode: 'read' } : {}, { replace: true });
+    }, [isReadingMode, setSearchParams]);
     const {
         text,
         loading,
@@ -225,6 +234,35 @@ const AnalysisReader = () => {
 
             {/* Main 3-column layout */}
             <div className="container mx-auto px-4 pt-24 pb-16">
+                {/* Mode indicator banner */}
+                <div className={`flex items-center justify-between mb-4 px-4 py-2.5 rounded-xl ${
+                    isReadingMode
+                        ? 'bg-emerald-900/30 border border-emerald-700/40'
+                        : 'bg-red-900/25 border border-red-700/30'
+                }`}>
+                    <div className="flex items-center gap-2">
+                        {isReadingMode ? (
+                            <>
+                                <BookOpen size={16} className="text-emerald-400" />
+                                <span className="text-sm font-medium text-emerald-300">Reading Mode</span>
+                                <span className="text-xs text-emerald-500/70 hidden sm:inline">— focused, distraction-free reading</span>
+                            </>
+                        ) : (
+                            <>
+                                <BarChart3 size={16} className="text-red-400" />
+                                <span className="text-sm font-medium text-red-300">Analysis Mode</span>
+                                <span className="text-xs text-red-500/70 hidden sm:inline">— comments, highlights, cross-references & deep analysis</span>
+                            </>
+                        )}
+                    </div>
+                    <button
+                        onClick={toggleViewMode}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white transition-colors"
+                    >
+                        {isReadingMode ? <><BarChart3 size={14} /> Switch to Analysis</> : <><BookOpen size={14} /> Switch to Reading</>}
+                    </button>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Left Sidebar - TOC */}
                     <aside className="hidden lg:block lg:col-span-3">
@@ -235,8 +273,8 @@ const AnalysisReader = () => {
                                 onSectionClick={scrollToSection}
                             />
 
-                            {/* Active viewers */}
-                            <div className="mt-4 p-4 bg-gray-900/50 rounded-xl">
+                            {/* Active viewers - analysis mode only */}
+                            {!isReadingMode && <div className="mt-4 p-4 bg-gray-900/50 rounded-xl">
                                 <h4 className="text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
                                     <Users size={14} />
                                     Active Readers ({activeUsers.length + 1})
@@ -262,12 +300,12 @@ const AnalysisReader = () => {
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                     </aside>
 
                     {/* Main Content */}
-                    <main className="lg:col-span-6">
+                    <main className={isReadingMode ? 'lg:col-span-9' : 'lg:col-span-6'}>
                         <TextMetadata
                             metadata={metadata}
                             currentLanguage={currentLanguage}
@@ -297,14 +335,15 @@ const AnalysisReader = () => {
                                         onCommentClick={handleCommentClick}
                                         onBookmarkClick={handleBookmarkClick}
                                         onCrossRefClick={handleCrossRefClick}
+                                        readingMode={isReadingMode}
                                     />
                                 );
                             })}
                         </div>
                     </main>
 
-                    {/* Right Sidebar - Tools */}
-                    <aside className="hidden lg:block lg:col-span-3">
+                    {/* Right Sidebar - Tools (analysis mode only) */}
+                    {!isReadingMode && <aside className="hidden lg:block lg:col-span-3">
                         <div className="sticky top-24">
                             {/* Tab Navigation */}
                             <div className="flex flex-wrap gap-1 mb-4 bg-gray-900/50 rounded-xl p-2">
@@ -437,12 +476,12 @@ const AnalysisReader = () => {
                                 )}
                             </div>
                         </div>
-                    </aside>
+                    </aside>}
                 </div>
             </div>
 
-            {/* Mobile Bottom Navigation */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-40">
+            {/* Mobile Bottom Navigation (analysis mode only) */}
+            {!isReadingMode && <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-40">
                 <div className="flex justify-around p-2">
                     {tabs.slice(0, 4).map((tab) => (
                         <button
@@ -458,7 +497,7 @@ const AnalysisReader = () => {
                         </button>
                     ))}
                 </div>
-            </div>
+            </div>}
         </div>
     );
 };

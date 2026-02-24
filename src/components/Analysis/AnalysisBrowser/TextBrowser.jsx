@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../../supabaseClient';
 import { useAuth } from '../../../context/AuthContext';
 import { 
     Search, Filter, Grid, List, Plus, Loader2, BookOpen, 
-    Calendar, User, Globe, Tag, Clock, ChevronDown 
+    Calendar, User, Globe, Tag, Clock, ChevronDown,
+    MessageSquare, Highlighter, Link2, BarChart3, Library
 } from 'lucide-react';
 import TextCard from './TextCard';
 
@@ -21,6 +22,9 @@ const TextBrowser = () => {
     const [sortBy, setSortBy] = useState('newest');
     const [viewMode, setViewMode] = useState('grid');
     const [showFilters, setShowFilters] = useState(false);
+    const [browseMode, setBrowseMode] = useState('all');
+    const [allTexts, setAllTexts] = useState([]);
+    const [savedTextIds, setSavedTextIds] = useState(new Set());
 
     const categories = useMemo(() => {
         const cats = new Set(texts.map(t => t.category).filter(Boolean));
@@ -34,6 +38,7 @@ const TextBrowser = () => {
 
     useEffect(() => {
         fetchTexts();
+        if (user && user.id !== 'dev-admin') fetchSavedIds();
     }, [user]);
 
     const handleDeleteText = async (textId) => {
@@ -54,70 +59,44 @@ const TextBrowser = () => {
         }
     };
 
+    const fetchSavedIds = async () => {
+        try {
+            const { data, error: savedError } = await supabase
+                .from('user_analysis_library')
+                .select('text_id')
+                .eq('user_id', user.id);
+            if (savedError) throw savedError;
+            setSavedTextIds(new Set(data?.map(s => s.text_id) || []));
+        } catch (err) {
+            console.error('Error fetching saved IDs:', err);
+        }
+    };
+
     const fetchTexts = async () => {
         setLoading(true);
         setError(null);
         try {
-            // Admins see all published texts; regular users see only their saved texts
-            if (isAdmin && isAdmin()) {
-                const { data, error: fetchError } = await supabase
-                    .from('analysis_texts')
-                    .select(`
-                        id,
-                        slug,
-                        primary_language,
-                        available_languages,
-                        metadata,
-                        category,
-                        tags,
-                        is_published,
-                        created_at,
-                        uploaded_by,
-                        profiles:uploaded_by(username)
-                    `)
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false });
+            const { data, error: fetchError } = await supabase
+                .from('analysis_texts')
+                .select(`
+                    id,
+                    slug,
+                    primary_language,
+                    available_languages,
+                    metadata,
+                    category,
+                    tags,
+                    is_published,
+                    created_at,
+                    uploaded_by,
+                    profiles:uploaded_by(username)
+                `)
+                .eq('is_published', true)
+                .order('created_at', { ascending: false });
 
-                if (fetchError) throw fetchError;
-                setTexts(data || []);
-            } else if (user && user.id !== 'dev-admin') {
-                // Get user's saved text IDs
-                const { data: savedData, error: savedError } = await supabase
-                    .from('user_analysis_library')
-                    .select('text_id')
-                    .eq('user_id', user.id);
-
-                if (savedError) throw savedError;
-                const savedIds = savedData?.map(s => s.text_id) || [];
-
-                if (savedIds.length === 0) {
-                    setTexts([]);
-                } else {
-                    const { data, error: fetchError } = await supabase
-                        .from('analysis_texts')
-                        .select(`
-                            id,
-                            slug,
-                            primary_language,
-                            available_languages,
-                            metadata,
-                            category,
-                            tags,
-                            is_published,
-                            created_at,
-                            uploaded_by,
-                            profiles:uploaded_by(username)
-                        `)
-                        .in('id', savedIds)
-                        .eq('is_published', true)
-                        .order('created_at', { ascending: false });
-
-                    if (fetchError) throw fetchError;
-                    setTexts(data || []);
-                }
-            } else {
-                setTexts([]);
-            }
+            if (fetchError) throw fetchError;
+            setAllTexts(data || []);
+            setTexts(data || []);
         } catch (err) {
             console.error('Error fetching texts:', err);
             setError('Failed to load texts');
@@ -126,8 +105,15 @@ const TextBrowser = () => {
         }
     };
 
+    const activeTexts = useMemo(() => {
+        if (browseMode === 'library') {
+            return allTexts.filter(t => savedTextIds.has(t.id));
+        }
+        return allTexts;
+    }, [allTexts, savedTextIds, browseMode]);
+
     const filteredTexts = useMemo(() => {
-        let result = [...texts];
+        let result = [...activeTexts];
 
         // Search filter
         if (searchQuery.trim()) {
@@ -173,7 +159,7 @@ const TextBrowser = () => {
         });
 
         return result;
-    }, [texts, searchQuery, selectedCategory, selectedLanguage, sortBy]);
+    }, [activeTexts, searchQuery, selectedCategory, selectedLanguage, sortBy]);
 
     const LanguageNames = {
         en: 'English',
@@ -188,18 +174,68 @@ const TextBrowser = () => {
         <div className="min-h-screen bg-black text-white">
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3">
-                            <BookOpen className="text-red-500" />
+                            <BarChart3 className="text-red-500" />
                             Text Analysis
                         </h1>
                         <p className="text-gray-400 mt-2">
-                            Your personal library of saved texts for deep analysis
+                            Read, annotate, and deeply analyze revolutionary texts
                         </p>
                     </div>
-                    
-                    
+                    <Link
+                        to="/theory"
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-medium transition-colors"
+                    >
+                        <BookOpen size={16} />
+                        Browse Theory
+                    </Link>
+                </div>
+
+                {/* Feature highlights */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    {[
+                        { icon: MessageSquare, label: 'Section Comments', desc: 'Discuss passages' },
+                        { icon: Highlighter, label: 'Highlights & Notes', desc: 'Annotate key ideas' },
+                        { icon: Link2, label: 'Cross-References', desc: 'Link related texts' },
+                        { icon: BarChart3, label: 'Text Analysis', desc: 'AI-powered insights' },
+                    ].map(({ icon: Icon, label, desc }) => (
+                        <div key={label} className="bg-gray-900/50 border border-gray-800 rounded-lg p-3 flex items-start gap-3">
+                            <Icon size={18} className="text-red-500 mt-0.5 shrink-0" />
+                            <div>
+                                <span className="text-xs font-medium text-white">{label}</span>
+                                <span className="block text-[11px] text-gray-500">{desc}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Browse mode toggle */}
+                <div className="flex items-center gap-2 mb-4">
+                    <button
+                        onClick={() => setBrowseMode('all')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            browseMode === 'all'
+                                ? 'bg-red-600 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
+                        }`}
+                    >
+                        All Texts ({allTexts.length})
+                    </button>
+                    {user && user.id !== 'dev-admin' && (
+                        <button
+                            onClick={() => setBrowseMode('library')}
+                            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                browseMode === 'library'
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
+                            }`}
+                        >
+                            <Library size={14} />
+                            My Library ({allTexts.filter(t => savedTextIds.has(t.id)).length})
+                        </button>
+                    )}
                 </div>
 
                 {/* Search & Filters */}
@@ -327,8 +363,23 @@ const TextBrowser = () => {
                 ) : filteredTexts.length === 0 ? (
                     <div className="text-center py-20">
                         <BookOpen className="w-16 h-16 mx-auto text-gray-600 mb-4" />
-                        <p className="text-gray-400 text-lg">No saved texts yet</p>
-                        <p className="text-gray-500 text-sm mt-2">Save texts from the Revolutionary Theory page to start analyzing</p>
+                        {browseMode === 'library' ? (
+                            <>
+                                <p className="text-gray-400 text-lg">No saved texts in your library</p>
+                                <p className="text-gray-500 text-sm mt-2">Save texts from the Revolutionary Theory page or browse all texts above</p>
+                                <button
+                                    onClick={() => setBrowseMode('all')}
+                                    className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    Browse All Texts
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-gray-400 text-lg">No texts available yet</p>
+                                <p className="text-gray-500 text-sm mt-2">Texts will appear here once uploaded by admins or the community</p>
+                            </>
+                        )}
                     </div>
                 ) : viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

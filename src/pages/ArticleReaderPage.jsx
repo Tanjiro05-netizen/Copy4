@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -13,12 +13,18 @@ import HighlightHandler from '../components/HighlightHandler';
 import TableOfContents from '../components/TableOfContents';
 import HighlightsSidebar from '../components/HighlightsSidebar';
 import NerRenderer from '../components/NerRenderer';
-import { Loader, Bookmark, MessageSquare, List, Check, Share2, Search, X, ChevronUp, ChevronDown, Quote, Download } from 'lucide-react';
+import StudySidebar from '../components/Reader/StudySidebar';
+import PassageFinder from '../components/Reader/PassageFinder';
+import ConceptMapPanel from '../components/Reader/ConceptMapPanel';
+import { extractPassages, buildPassageResults, buildConceptGraphData } from '../utils/readerInsights';
+import { Loader, Bookmark, MessageSquare, List, Check, Share2, Search, X, ChevronUp, ChevronDown, Download, BarChart3, BookOpen } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const ArticleReaderPage = () => {
     const { slug } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
     const { user } = useAuth();
     
     const [article, setArticle] = useState(null);
@@ -41,6 +47,59 @@ const ArticleReaderPage = () => {
     const [showCopied, setShowCopied] = useState(false);
     const markInstance = useRef(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+    const [readingMode, setReadingMode] = useState('study');
+    const [isPassageFinderOpen, setIsPassageFinderOpen] = useState(false);
+    const [isConceptMapOpen, setIsConceptMapOpen] = useState(false);
+    const [passageQuery, setPassageQuery] = useState('');
+    const [glossaryTerms, setGlossaryTerms] = useState([]);
+
+    const articlePassages = useMemo(() => extractPassages(article?.content || ''), [article?.content]);
+
+    const studyConcepts = useMemo(() => {
+        if (!article?.content || !glossaryTerms.length) return [];
+        const lowerContent = article.content.toLowerCase();
+        return glossaryTerms
+            .filter((entry) => lowerContent.includes(entry.term.toLowerCase()))
+            .slice(0, 16);
+    }, [article?.content, glossaryTerms]);
+
+    const derivedEntities = useMemo(() => {
+        if (!article?.content || !glossaryTerms.length) return { people: [], places: [], organizations: [] };
+
+        const lowerContent = article.content.toLowerCase();
+        const matchesByType = (type) => glossaryTerms
+            .filter((entry) => entry.type === type && lowerContent.includes(entry.term.toLowerCase()))
+            .map((entry) => entry.term)
+            .slice(0, 24);
+
+        return {
+            people: matchesByType('person'),
+            places: matchesByType('place'),
+            organizations: matchesByType('organization')
+        };
+    }, [article?.content, glossaryTerms]);
+
+    const rankedPassages = useMemo(() => {
+        return buildPassageResults({
+            passages: articlePassages,
+            query: passageQuery,
+            glossaryTerms: studyConcepts
+        });
+    }, [articlePassages, passageQuery, studyConcepts]);
+
+    const conceptGraphData = useMemo(() => {
+        return buildConceptGraphData({ passages: articlePassages, glossaryTerms: studyConcepts });
+    }, [articlePassages, studyConcepts]);
+
+    const progressMilestone = useMemo(() => {
+        if (scrollProgress >= 100) return 'Done';
+        if (scrollProgress >= 75) return '75% checkpoint';
+        if (scrollProgress >= 50) return '50% checkpoint';
+        if (scrollProgress >= 25) return '25% checkpoint';
+        return 'Start';
+    }, [scrollProgress]);
+
+    const isStudyMode = readingMode === 'study';
 
     const handleScroll = () => {
         const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
@@ -55,6 +114,34 @@ const ArticleReaderPage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        const storedMode = localStorage.getItem('reader_mode');
+        if (storedMode === 'study' || storedMode === 'focus') {
+            setReadingMode(storedMode);
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('reader_mode', readingMode);
+    }, [readingMode]);
+
+    useEffect(() => {
+        const fetchGlossaryTerms = async () => {
+            const { data, error: glossaryError } = await supabase
+                .from('glossary')
+                .select('term, type, explanation')
+                .order('term', { ascending: true });
+
+            if (glossaryError) {
+                console.error('Error fetching glossary terms:', glossaryError);
+                return;
+            }
+            setGlossaryTerms(data || []);
+        };
+
+        fetchGlossaryTerms();
+    }, []);
+
     const fetchArticleAndHighlights = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -64,23 +151,16 @@ const ArticleReaderPage = () => {
                 .from('theory_articles')
                 .select('*')
                 .eq('slug', slug)
-                .single();
+                .maybeSingle();
 
             if (articleError) throw articleError;
-            if (!articleData) throw new Error('Article not found.');
+            if (!articleData) throw new Error('Article not found. Please select an article from the Theory page.');
 
             console.log('Fetched article content:', articleData.content);
 
             setArticle(articleData);
 
-            if (articleData.content) {
-                supabase.functions.invoke('ner', {
-                    body: { text: articleData.content },
-                }).then(({ data, error }) => {
-                    if (error) console.error('Error invoking NER function:', error);
-                    else setEntities(data);
-                });
-            }
+            setEntities(derivedEntities);
 
             if (user && articleData && user.id !== 'dev-admin') {
                 const { data: highlightsData, error: highlightsError } = await supabase
@@ -99,10 +179,13 @@ const ArticleReaderPage = () => {
                 if (bookmarkError) throw bookmarkError;
                 setIsBookmarked(!!bookmarkData);
 
-                const { data: progressData } = await supabase
+                const { data: progressData, error: progressError } = await supabase
                     .from('user_article_progress').select('progress_percentage')
                     .eq('user_id', user.id).eq('article_id', articleData.id)
-                    .single();
+                    .maybeSingle();
+                if (progressError) {
+                    console.error('Error fetching article progress:', progressError);
+                }
                 if (progressData) {
                     const initialScroll = (document.documentElement.scrollHeight - document.documentElement.clientHeight) * (progressData.progress_percentage / 100);
                     window.scrollTo(0, initialScroll);
@@ -114,7 +197,7 @@ const ArticleReaderPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [slug, user]);
+    }, [slug, user, derivedEntities]);
 
     useEffect(() => {
         fetchArticleAndHighlights();
@@ -125,6 +208,43 @@ const ArticleReaderPage = () => {
             markInstance.current = new Mark(contentRef.current);
         }
     }, [article]);
+
+    useEffect(() => {
+        if (!contentRef.current || !articlePassages.length) return;
+        const paragraphs = Array.from(contentRef.current.querySelectorAll('p'));
+        let passageIndex = 0;
+
+        paragraphs.forEach((paragraph) => {
+            const text = paragraph.textContent?.trim() || '';
+            if (text.length < 40 || passageIndex >= articlePassages.length) return;
+            paragraph.setAttribute('data-passage-id', articlePassages[passageIndex].id);
+            passageIndex += 1;
+        });
+    }, [articlePassages, article]);
+
+    useEffect(() => {
+        const passageFromUrl = searchParams.get('passage');
+        if (!passageFromUrl || !contentRef.current) return;
+
+        const target = contentRef.current.querySelector(`[data-passage-id="${passageFromUrl}"]`);
+        if (!target) return;
+
+        target.classList.add('current-search-highlight');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const timer = setTimeout(() => {
+            target.classList.remove('current-search-highlight');
+        }, 1800);
+
+        return () => clearTimeout(timer);
+    }, [searchParams, article]);
+
+    useEffect(() => {
+        const conceptFromUrl = searchParams.get('concept');
+        if (!conceptFromUrl) return;
+        setPassageQuery(conceptFromUrl);
+        setIsPassageFinderOpen(true);
+    }, [searchParams]);
 
     const performSearch = useCallback(() => {
         if (!markInstance.current) return;
@@ -174,6 +294,46 @@ const ArticleReaderPage = () => {
     const handlePrevResult = () => {
         if (searchResults.length > 0) {
             setCurrentResultIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
+        }
+    };
+
+    const jumpToPassage = useCallback((passage) => {
+        if (!contentRef.current || !passage?.id) return;
+
+        const el = contentRef.current.querySelector(`[data-passage-id="${passage.id}"]`);
+        if (!el) return;
+
+        el.classList.add('current-search-highlight');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('passage', passage.id);
+            return next;
+        });
+
+        setTimeout(() => el.classList.remove('current-search-highlight'), 1800);
+    }, [setSearchParams]);
+
+    const handleStudyConceptSelect = (concept) => {
+        setPassageQuery(concept.term);
+        setIsPassageFinderOpen(true);
+    };
+
+    const handleConceptNodeClick = (node) => {
+        if (!node) return;
+        if (node.type === 'heading' && node.passageId) {
+            jumpToPassage({ id: node.passageId });
+            return;
+        }
+        if (node.type === 'concept' && node.concept) {
+            setPassageQuery(node.concept);
+            setIsPassageFinderOpen(true);
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.set('concept', node.concept);
+                return next;
+            });
         }
     };
 
@@ -289,8 +449,13 @@ const ArticleReaderPage = () => {
 
     if (error) {
         return (
-            <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
-                <p>Error: {error}</p>
+            <div className="min-h-screen bg-[#12131A] text-white">
+                <div className="flex flex-col items-center justify-center pt-24 px-4">
+                    <p className="text-red-400 text-lg mb-4">{error}</p>
+                    <a href="/theory" className="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors">
+                        Browse Theory Articles
+                    </a>
+                </div>
             </div>
         );
     }
@@ -305,38 +470,71 @@ const ArticleReaderPage = () => {
 
     return (
         <>
-            <Header />
             <div className="fixed top-0 left-0 w-full h-1 z-50 bg-black/30">
-                <div 
+                <div
                     className="h-full bg-red-600 transition-all duration-150 ease-linear"
                     style={{ width: `${scrollProgress}%` }}
                 ></div>
             </div>
-            
-            <main className="container mx-auto px-4 py-24">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                    
-                    <div className={`lg:col-span-2 transition-all duration-300 ${isTocOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                        {isTocOpen && article && <TableOfContents contentRef={contentRef} content={article.content} />}
-                    </div>
 
-                    <div className="lg:col-span-8">
-                        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-700 no-pdf">
-                            <div className="flex items-center space-x-2">
-                                <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
-                                    <List size={20} />
-                                </button>
+            <main className={`container mx-auto px-4 py-8 ${!isStudyMode ? 'max-w-5xl' : ''}`}>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+                    {isStudyMode && (
+                        <div className={`lg:col-span-2 transition-all duration-300 ${isTocOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                            {isTocOpen && article && <TableOfContents contentRef={contentRef} content={article.content} />}
+                        </div>
+                    )}
+
+                    <div className={`${isStudyMode ? 'lg:col-span-7' : 'lg:col-span-12'} min-w-0`}>
+                        {/* Mode indicator banner */}
+                        <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-emerald-900/30 border border-emerald-700/40 rounded-xl no-pdf">
+                            <div className="flex items-center gap-2">
+                                <BookOpen size={16} className="text-emerald-400" />
+                                <span className="text-sm font-medium text-emerald-300">Reading Mode</span>
+                                <span className="text-xs text-emerald-500/70 hidden sm:inline">— focused reading with study tools</span>
+                            </div>
+                            <button
+                                onClick={() => navigate(`/analysis/text/${slug}`)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white transition-colors"
+                            >
+                                <BarChart3 size={14} />
+                                Switch to Analysis
+                            </button>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-gray-700 no-pdf">
+                            <div className="flex items-center gap-2">
+                                {isStudyMode && (
+                                    <button onClick={() => setIsTocOpen(!isTocOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Table of Contents">
+                                        <List size={20} />
+                                    </button>
+                                )}
                                 <button onClick={handleToggleBookmark} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Bookmark">
                                     <Bookmark size={20} className={isBookmarked ? 'text-red-500 fill-current' : ''} />
                                 </button>
                                 <button onClick={() => setIsSearchVisible(!isSearchVisible)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Search">
                                     <Search size={20} />
                                 </button>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Highlights & Comments">
-                                    <MessageSquare size={20} />
+                                <button onClick={() => setIsPassageFinderOpen((prev) => !prev)} className="px-3 py-1.5 text-xs rounded-full bg-gray-800 hover:bg-gray-700">
+                                    Passage Finder
                                 </button>
+                                <button onClick={() => setIsConceptMapOpen((prev) => !prev)} className="px-3 py-1.5 text-xs rounded-full bg-gray-800 hover:bg-gray-700">
+                                    Concept Map
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setReadingMode((prev) => (prev === 'study' ? 'focus' : 'study'))}
+                                    className="px-3 py-1.5 text-xs rounded-full bg-red-600/20 text-red-300 hover:bg-red-600/30"
+                                >
+                                    {isStudyMode ? 'Deep Focus Mode' : 'Study Mode'}
+                                </button>
+                                {isStudyMode && (
+                                    <button onClick={() => setIsHighlightsOpen(!isHighlightsOpen)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Highlights & Comments">
+                                        <MessageSquare size={20} />
+                                    </button>
+                                )}
                                 <button onClick={handleShare} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="Share">
                                     <Share2 size={20} />
                                 </button>
@@ -345,11 +543,21 @@ const ArticleReaderPage = () => {
                                 </button>
                             </div>
                         </div>
+
+                        {!isStudyMode && (
+                            <div className="mb-4 no-pdf">
+                                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800/70 border border-gray-700 text-xs text-gray-300">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                                    Progress milestone: {progressMilestone}
+                                </div>
+                            </div>
+                        )}
+
                         {isSearchVisible && (
                             <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4 no-pdf">
                                 <input
                                     type="text"
-                                    placeholder="Search in text..."
+                                    placeholder="Find in page..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="bg-transparent w-full focus:outline-none"
@@ -362,31 +570,60 @@ const ArticleReaderPage = () => {
                                 <button onClick={() => setIsSearchVisible(false)} className="p-1 rounded-full hover:bg-gray-700"><X size={16} /></button>
                             </div>
                         )}
+
+                        <PassageFinder
+                            isOpen={isPassageFinderOpen}
+                            query={passageQuery}
+                            onQueryChange={setPassageQuery}
+                            results={rankedPassages}
+                            onSelectResult={jumpToPassage}
+                            onClose={() => setIsPassageFinderOpen(false)}
+                        />
+
+                        {isConceptMapOpen && (
+                            <div className="mb-4">
+                                <ConceptMapPanel graphData={conceptGraphData} onNodeClick={handleConceptNodeClick} />
+                            </div>
+                        )}
+
                         <h1 className="text-4xl font-bold mb-2">{article.title}</h1>
                         <p className="text-lg text-gray-400 mb-6">{article.author}</p>
-                        
-                        <div ref={contentRef} className="prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-red-400 hover:prose-a:text-red-500">
+
+                        <div ref={contentRef} className={`prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-red-400 hover:prose-a:text-red-500 ${!isStudyMode ? 'prose-lg' : ''}`}>
                             <HighlightHandler
                                 highlights={highlights}
                                 onAddHighlight={handleAddHighlight}
                             >
-                                <NerRenderer
-                                    text={article.content}
-                                    entities={entities}
-                                />
+                                <NerRenderer entities={entities}>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkSlug]} rehypePlugins={[rehypeRaw]}>
+                                        {article.content || ''}
+                                    </ReactMarkdown>
+                                </NerRenderer>
                             </HighlightHandler>
                         </div>
+
                         <ArticleComments articleId={article.id} />
                     </div>
 
-                    <div className={`lg:col-span-2 transition-all duration-300 ${isHighlightsOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                        {isHighlightsOpen && user && (
-                            <HighlightsSidebar
+                    {isStudyMode && isHighlightsOpen && (
+                        <div className="lg:col-span-3 space-y-4">
+                            <StudySidebar
+                                concepts={studyConcepts}
                                 highlights={highlights}
-                                onDeleteHighlight={handleDeleteHighlight}
+                                onSelectConcept={handleStudyConceptSelect}
+                                onSelectHighlight={(highlight) => {
+                                    setSearchQuery(highlight.selected_text || '');
+                                    setIsSearchVisible(true);
+                                }}
                             />
-                        )}
-                    </div>
+                            {user && (
+                                <HighlightsSidebar
+                                    highlights={highlights}
+                                    onDeleteHighlight={handleDeleteHighlight}
+                                />
+                            )}
+                        </div>
+                    )}
                 </div>
             </main>
             {showCopied && (

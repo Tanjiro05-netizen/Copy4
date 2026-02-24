@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ChevronRight, Search, Bookmark, BookOpen, Plus, Send, Check, Loader2, User, Calendar } from 'lucide-react';
+import { ChevronRight, Search, Bookmark, BookOpen, BookOpenCheck, BarChart3, Plus, Send, Check, Loader2, User, Calendar } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import Header from '../components/Header';
@@ -390,7 +390,7 @@ const TheoryPage = () => {
                                 const isSaving = savingTextId === text.id;
                                 return (
                                     <div key={text.id} className="bg-black/40 rounded-lg p-4 flex flex-col hover:bg-black/60 transition-colors duration-200">
-                                        <Link to={`/analysis/text/${text.slug}`} className="flex-grow">
+                                        <Link to={`/analysis/text/${text.slug}?mode=read`} className="flex-grow">
                                             <h3 className="text-lg font-semibold mb-1 text-white">{meta.title || 'Untitled'}</h3>
                                             {meta.authors?.length > 0 && (
                                                 <p className="text-sm text-gray-400 flex items-center gap-1 mb-2">

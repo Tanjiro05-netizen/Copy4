@@ -3,11 +3,11 @@ import { Search, Bell, MessageSquare, Zap } from 'lucide-react';
 
 const KnowledgeLayout = ({ children, sidebar, widgets }) => {
   return (
-    <div className="min-h-full bg-[#12131A] text-slate-300 font-sans selection:bg-red-500/30 selection:text-white -mt-4">
+    <div className="min-h-screen bg-[#12131A] text-slate-300 font-sans selection:bg-red-500/30 selection:text-white">
       
       {/* --- Action Toolbar (Sub-Header) --- */}
       <div className="sticky top-16 z-40 bg-[#12131A]/95 backdrop-blur border-b border-gray-800 py-2 mb-4 shadow-lg shadow-black/20">
-        <div className="w-full max-w-[1800px] mx-auto px-4 flex items-center justify-between gap-4">
+        <div className="w-full max-w-[1600px] mx-auto px-3 md:px-4 flex items-center justify-between gap-3 md:gap-4">
            {/* Branding / Breadcrumb */}
            <div className="hidden md:flex items-center gap-2 text-sm font-medium text-slate-400 shrink-0">
               <span className="text-red-500 font-bold tracking-tight">KNOWLEDGE<span className="text-[10px] text-slate-500 ml-0.5">BASE</span></span>
@@ -29,10 +29,10 @@ const KnowledgeLayout = ({ children, sidebar, widgets }) => {
            </div>
 
            {/* Actions */}
-           <div className="flex items-center gap-4 shrink-0">
-             <button className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-5 py-1.5 rounded-sm text-xs font-bold shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all hover:shadow-[0_0_20px_rgba(255,42,42,0.5)] border border-red-500/20">
+           <div className="flex items-center gap-2 md:gap-4 shrink-0">
+             <button className="flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-3 md:px-5 py-1.5 rounded-sm text-xs font-bold shadow-[0_0_15px_rgba(220,38,38,0.3)] transition-all hover:shadow-[0_0_20px_rgba(255,42,42,0.5)] border border-red-500/20">
                 <Zap className="w-3.5 h-3.5" />
-                <span>Ask Question</span>
+                <span className="hidden md:inline">Ask Question</span>
              </button>
              
              <div className="h-6 w-[1px] bg-white/10"></div>
@@ -51,20 +51,20 @@ const KnowledgeLayout = ({ children, sidebar, widgets }) => {
       </div>
 
       {/* --- Main Content Grid --- */}
-      <div className="w-full max-w-[1800px] mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-6 pb-12">
+      <div className="w-full max-w-[1600px] mx-auto px-3 md:px-4 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 pb-12 items-start">
         
         {/* Left Sidebar (Dense Nav) */}
-        <div className="hidden md:block md:col-span-2 lg:col-span-2 sticky top-36 h-fit space-y-2">
+        <div className="hidden md:block md:col-span-3 xl:col-span-2 sticky top-36 h-fit space-y-2">
            {sidebar}
         </div>
 
         {/* Center Feed (Dense) */}
-        <main className="md:col-span-10 lg:col-span-7 min-h-screen space-y-4">
+        <main className="md:col-span-9 xl:col-span-7 min-h-0 space-y-4">
           {children}
         </main>
 
         {/* Right Sidebar (Widgets) */}
-        <aside className="hidden lg:block lg:col-span-3 space-y-4 sticky top-36 h-fit">
+        <aside className="hidden xl:block xl:col-span-3 space-y-4 sticky top-36 h-fit">
           {widgets}
         </aside>
       </div>

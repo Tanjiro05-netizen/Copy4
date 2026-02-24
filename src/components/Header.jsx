@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users, Shield, MessageSquare, HelpCircle } from 'lucide-react';
+import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users, Shield, MessageSquare, HelpCircle, ChevronDown } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -21,8 +21,15 @@ const Header = () => {
     // All nav items - some are guest-accessible, others require login
     const allNavItems = [
         { path: '/home', label: 'Home', icon: Home, guestAccessible: true },
-        { path: '/theory', label: 'Revolutionary Theory', icon: BookMarked, guestAccessible: false },
-        { path: '/analysis', label: 'Analysis', icon: FileText, guestAccessible: false },
+        {
+            label: 'Revolutionary Theory',
+            icon: BookMarked,
+            guestAccessible: false,
+            children: [
+                { path: '/theory', label: 'Read', description: 'Browse & read theory articles' },
+                { path: '/analysis', label: 'Analyze', description: 'Deep analysis tools & texts' },
+            ],
+        },
         { path: '/digital-library', label: 'Digital Library', icon: BookOpen, guestAccessible: true },
         { path: '/study', label: 'Study Center', icon: BarChart, guestAccessible: false },
         { path: '/science-tech', label: 'Science & Tech', icon: FileText, guestAccessible: false },
@@ -48,6 +55,46 @@ const Header = () => {
                     <nav className="flex items-center">
                         {navItems.map((item) => {
                             const isRestricted = !user && !item.guestAccessible;
+
+                            if (item.children) {
+                                const anyChildActive = item.children.some(c => isActive(c.path));
+                                return (
+                                    <div key={item.label} className="relative group">
+                                        <button
+                                            className={`flex items-center px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+                                                isRestricted
+                                                    ? 'text-gray-600 hover:text-gray-500'
+                                                    : anyChildActive ? 'text-red-500' : 'text-gray-300 hover:text-red-400'
+                                            }`}
+                                        >
+                                            <span>{item.label}</span>
+                                            <ChevronDown size={14} className="ml-1" />
+                                            {isRestricted && <span className="ml-1 text-[10px] text-gray-600">✦</span>}
+                                        </button>
+                                        <div className="absolute left-0 mt-0 w-56 rounded-md shadow-lg bg-black border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                            <div className="py-1">
+                                                {item.children.map(child => (
+                                                    <Link
+                                                        key={child.path}
+                                                        to={isRestricted ? '/coming-soon' : child.path}
+                                                        className={`block px-4 py-2.5 text-sm transition-colors ${
+                                                            isActive(child.path)
+                                                                ? 'bg-gray-900 text-white'
+                                                                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                                                        }`}
+                                                    >
+                                                        <span className="font-medium">{child.label}</span>
+                                                        {child.description && (
+                                                            <span className="block text-xs text-gray-500 mt-0.5">{child.description}</span>
+                                                        )}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+
                             return (
                                 <Link 
                                     key={item.path}
@@ -207,6 +254,32 @@ const Header = () => {
                         <nav className="flex flex-col space-y-6">
                             {navItems.map((item) => {
                                 const isRestricted = !user && !item.guestAccessible;
+
+                                if (item.children) {
+                                    return (
+                                        <div key={item.label} className="space-y-2">
+                                            <span className="text-lg font-medium text-gray-400">{item.label}</span>
+                                            <div className="pl-4 space-y-3">
+                                                {item.children.map(child => (
+                                                    <Link
+                                                        key={child.path}
+                                                        to={isRestricted ? '/coming-soon' : child.path}
+                                                        className={`block text-base font-medium transition-colors ${
+                                                            isActive(child.path) ? 'text-red-500' : 'text-white hover:text-red-400'
+                                                        }`}
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                    >
+                                                        {child.label}
+                                                        {child.description && (
+                                                            <span className="block text-xs text-gray-500">{child.description}</span>
+                                                        )}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
                                 return (
                                     <Link 
                                         key={item.path}

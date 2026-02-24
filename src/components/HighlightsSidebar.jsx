@@ -1,6 +1,7 @@
 import React from 'react';
 
-const HighlightsSidebar = ({ highlights, onDelete }) => {
+const HighlightsSidebar = ({ highlights, onDelete, onDeleteHighlight }) => {
+    const handleDelete = onDeleteHighlight || onDelete;
     return (
         <div className="">
             <div className="bg-gray-900/50 backdrop-blur-sm p-4 rounded-lg border border-gray-700/50">
@@ -14,7 +15,7 @@ const HighlightsSidebar = ({ highlights, onDelete }) => {
                                 <p className="text-gray-300 italic">"{highlight.selected_text}"</p>
                                 <div className="flex justify-end mt-2">
                                     <button
-                                        onClick={() => onDelete(highlight.id)}
+                                        onClick={() => handleDelete?.(highlight.id)}
                                         className="text-xs text-red-400 hover:text-red-500 transition-colors"
                                     >
                                         Delete

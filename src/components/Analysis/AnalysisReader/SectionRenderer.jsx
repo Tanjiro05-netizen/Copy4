@@ -9,6 +9,7 @@ const SectionRenderer = forwardRef(({
     onCommentClick,
     onBookmarkClick,
     onCrossRefClick,
+    readingMode = false,
 }, ref) => {
     const { id, title, level, content } = section;
 
@@ -33,8 +34,8 @@ const SectionRenderer = forwardRef(({
                 ${isActive ? 'bg-red-900/10 -mx-4 px-4 rounded-lg' : ''}
             `}
         >
-            {/* Section Actions - appear on hover */}
-            <div className="absolute right-0 top-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            {/* Section Actions - appear on hover (analysis mode only) */}
+            {!readingMode && <div className="absolute right-0 top-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                     onClick={() => onCommentClick?.(id)}
                     className="p-2 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors flex items-center gap-1"
@@ -63,16 +64,16 @@ const SectionRenderer = forwardRef(({
                 >
                     <Link2 size={16} />
                 </button>
-            </div>
+            </div>}
 
             {/* Section Title */}
             {title && (
                 <HeadingTag 
                     className={`font-bold text-white mb-4 ${headingSize} flex items-center gap-3`}
                 >
-                    <span className="text-red-500/50 font-mono text-sm">
+                    {!readingMode && <span className="text-red-500/50 font-mono text-sm">
                         §{id}
-                    </span>
+                    </span>}
                     {title}
                 </HeadingTag>
             )}
@@ -94,8 +95,8 @@ const SectionRenderer = forwardRef(({
                 dangerouslySetInnerHTML={{ __html: formatContent(content) }}
             />
 
-            {/* Comment indicator badge */}
-            {commentCount > 0 && (
+            {/* Comment indicator badge (analysis mode only) */}
+            {!readingMode && commentCount > 0 && (
                 <div className="absolute -left-2 top-8 w-1 h-8 bg-red-500 rounded-full" title={`${commentCount} comments`} />
             )}
         </section>
