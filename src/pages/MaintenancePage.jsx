@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MaintenancePage.css';
 
 const PARTICLE_COUNT = 25;
 
 const MaintenancePage = () => {
+    const navigate = useNavigate();
     const rootRef = useRef(null);
     const revealRef = useRef(null);
     const bgRef = useRef(null);
@@ -193,7 +195,12 @@ const MaintenancePage = () => {
                 {/* Footer */}
                 <div className="maintenance-footer mt-12 text-center">
                     <p className="text-gray-700 text-xs tracking-widest uppercase">
-                        &copy; 2026 Marxist.info &mdash; Advancing Revolutionary Theory
+                        &copy; 2026 Marxist
+                        <span 
+                            onClick={() => navigate('/gate')} 
+                            style={{ cursor: 'inherit', userSelect: 'none' }}
+                        >.</span>
+                        info &mdash; Advancing Revolutionary Theory
                     </p>
                 </div>
             </div>

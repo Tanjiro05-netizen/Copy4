@@ -59,11 +59,17 @@ const AppRouter = () => {
     if (MAINTENANCE_MODE) {
         return (
             <ErrorBoundary>
-                <Router>
-                    <Routes>
-                        <Route path="*" element={<MaintenancePage />} />
-                    </Routes>
-                </Router>
+                <AuthProvider>
+                    <ThemeProvider>
+                        <Router>
+                            <Routes>
+                                <Route path="/gate" element={<LandingPage />} />
+                                <Route path="/home" element={<MainLayout><App /></MainLayout>} />
+                                <Route path="*" element={<MaintenancePage />} />
+                            </Routes>
+                        </Router>
+                    </ThemeProvider>
+                </AuthProvider>
             </ErrorBoundary>
         );
     }
