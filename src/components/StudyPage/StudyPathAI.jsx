@@ -1,38 +1,41 @@
-import React, { useState, useRef, useEffect } from "react";
-import { BookOpen, Video, Users, FileText, Send, Bot, User, Sparkles, MessageSquare, Map, ChevronRight } from "lucide-react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { BookOpen, Video, Users, FileText, Send, Bot, User, Sparkles, MessageSquare, Map, ChevronRight, CheckCircle, AlertCircle } from "lucide-react";
+import { supabase } from '../../supabaseClient';
 
-const dummyPath = [
-  {
-    step: 1,
-    title: "基础理论",
-    subtitle: "Foundational Theory",
-    icon: <BookOpen className="w-5 h-5" />,
-    suggestion: "Start with foundational texts: The Communist Manifesto."
-  },
-  {
-    step: 2,
-    title: "视频讲座",
-    subtitle: "Video Lectures",
-    icon: <Video className="w-5 h-5" />,
-    suggestion: "Watch introductory video lectures on Marxist theory."
-  },
-  {
-    step: 3,
-    title: "概念分析",
-    subtitle: "Concept Analysis",
-    icon: <FileText className="w-5 h-5" />,
-    suggestion: "Analyze key concepts: Historical Materialism, Class Struggle."
-  },
-  {
-    step: 4,
-    title: "社区讨论",
-    subtitle: "Community Discussion",
-    icon: <Users className="w-5 h-5" />,
-    suggestion: "Participate in community Q&A for clarification."
-  }
-];
+const TYPE_ICONS = { text: BookOpen, video: Video, audio: FileText, lecture: Video };
 
-const StudyPathAI = () => {
+const StudyPathAI = ({ milestones = [], resources = [], userProgress = {} }) => {
+  const incompleteMilestones = useMemo(
+    () => milestones.filter((m) => !userProgress[m.id]?.completed),
+    [milestones, userProgress]
+  );
+
+  const nextMilestone = incompleteMilestones[0] || null;
+  const nextResource = nextMilestone?.resource_id
+    ? resources.find((r) => r.id === nextMilestone.resource_id)
+    : null;
+
+  const recommendationText = nextMilestone
+    ? `Based on your progress, we recommend completing "${nextMilestone.title}" next.`
+    : milestones.length > 0
+      ? 'Congratulations! You have completed all current milestones.'
+      : 'No milestones are available yet. Check back soon!';
+
+  const pathSteps = useMemo(() => {
+    return milestones.map((m, idx) => {
+      const linkedResource = resources.find((r) => r.id === m.resource_id);
+      const completed = userProgress[m.id]?.completed === true;
+      const IconComp = linkedResource ? (TYPE_ICONS[linkedResource.type] || BookOpen) : BookOpen;
+      return {
+        step: idx + 1,
+        title: m.chinese_title || m.title,
+        subtitle: m.chinese_title ? m.title : (m.description || ''),
+        suggestion: m.description || (linkedResource ? `Resource: ${linkedResource.title}` : 'Complete this milestone.'),
+        IconComp,
+        completed,
+      };
+    });
+  }, [milestones, resources, userProgress]);
   const [activeTab, setActiveTab] = useState('path'); // 'path' or 'chat'
   const [messages, setMessages] = useState([
     { type: 'bot', content: 'Hello! I am your AI Study Assistant. How can I help you with your Marxist theory studies today?' }
@@ -49,30 +52,79 @@ const StudyPathAI = () => {
     scrollToBottom();
   }, [messages, activeTab]);
 
+  const buildContext = useCallback(() => {
+    const completedCount = milestones.filter((m) => userProgress[m.id]?.completed).length;
+    return {
+      milestones: milestones.map((m) => ({
+        title: m.title,
+        description: m.description,
+        completed: !!userProgress[m.id]?.completed,
+      })),
+      resources: resources.map((r) => ({
+        title: r.title,
+        type: r.type,
+        author: r.author,
+      })),
+      completedCount,
+      totalCount: milestones.length,
+      nextMilestone: nextMilestone?.title || null,
+    };
+  }, [milestones, resources, userProgress, nextMilestone]);
+
+  const getLocalFallback = useCallback((userInput) => {
+    const lower = userInput.toLowerCase();
+    if (lower.includes('path') || lower.includes('plan') || lower.includes('next')) {
+      return nextMilestone
+        ? `Your next milestone is "${nextMilestone.title}". ${nextMilestone.description || ''}`
+        : milestones.length > 0
+          ? "You've completed all milestones! Great work, comrade."
+          : "No milestones available yet. Try exploring the Study Resources section.";
+    }
+    if (lower.includes('progress') || lower.includes('done') || lower.includes('completed')) {
+      const completed = milestones.filter((m) => userProgress[m.id]?.completed).length;
+      return `You've completed ${completed} of ${milestones.length} milestones. ${completed < milestones.length ? 'Keep going!' : 'All done!'}`;
+    }
+    if (lower.includes('book') || lower.includes('read') || lower.includes('text')) {
+      const textResources = resources.filter((r) => r.type === 'text');
+      return textResources.length > 0
+        ? `Available texts: ${textResources.map((r) => `"${r.title}"`).join(', ')}. I recommend starting with the featured ones.`
+        : "No text resources are available yet. Check back soon!";
+    }
+    return "I can help you with study planning, understanding Marxist concepts, or finding resources. Try asking about your next steps, specific concepts, or recommended readings!";
+  }, [milestones, resources, userProgress, nextMilestone]);
+
   const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage = { type: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      let botResponse = "I can help you find resources on that topic. Would you like me to create a custom study path for you?";
-      
-      const lowerInput = input.toLowerCase();
-      if (lowerInput.includes('path') || lowerInput.includes('plan')) {
-        botResponse = "I've analyzed your request. Based on your interest, I recommend starting with 'Wage Labour and Capital' followed by 'Value, Price and Profit'.";
-      } else if (lowerInput.includes('concept') || lowerInput.includes('explain') || lowerInput.includes('what is')) {
-        botResponse = "That's a complex concept. In Marxist theory, it typically refers to the way material conditions influence social organization.";
-      } else if (lowerInput.includes('book') || lowerInput.includes('read')) {
-        botResponse = "For reading, I highly recommend 'Das Kapital' if you are ready for a deep dive, or 'The Principles of Communism' for a quicker overview.";
-      }
+    try {
+      // Send only the last 10 messages for context window efficiency
+      const recentMessages = updatedMessages.slice(-10);
+      const { data, error } = await supabase.functions.invoke('study-ai-chat', {
+        body: {
+          messages: recentMessages,
+          context: buildContext(),
+        },
+      });
 
-      setMessages(prev => [...prev, { type: 'bot', content: botResponse }]);
+      if (error) throw new Error(error.message);
+
+      const reply = data?.reply;
+      if (!reply) throw new Error('Empty response');
+
+      setMessages((prev) => [...prev, { type: 'bot', content: reply }]);
+    } catch (err) {
+      console.warn('AI chat error, using fallback:', err);
+      const fallback = getLocalFallback(input);
+      setMessages((prev) => [...prev, { type: 'bot', content: fallback }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -120,26 +172,39 @@ const StudyPathAI = () => {
                 <span className="font-bold text-xs uppercase tracking-wider">AI Insight</span>
               </div>
               <p className="text-sm text-gray-300 relative z-10 leading-relaxed">
-                Based on your recent activity, we recommend focusing on <strong className="text-white">Historical Materialism</strong> next to build a solid foundation.
+                {recommendationText}
               </p>
             </div>
             
             <div className="relative pl-4 space-y-6 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-red-900/50 before:via-red-900/30 before:to-transparent">
-              {dummyPath.map((item, idx) => (
+              {pathSteps.length === 0 ? (
+                <p className="text-xs text-gray-500 pl-8">No study path steps available yet.</p>
+              ) : pathSteps.map((item) => (
                 <div key={item.step} className="relative pl-8 group">
-                  <div className="absolute left-[-12px] top-1 w-6 h-6 rounded-full bg-[#13141c] border-2 border-red-900/50 flex items-center justify-center z-10 group-hover:border-red-500 group-hover:scale-110 transition-all duration-300">
-                    <span className="text-[10px] font-bold text-gray-500 group-hover:text-red-400">{item.step}</span>
+                  <div className={`absolute left-[-12px] top-1 w-6 h-6 rounded-full bg-[#13141c] border-2 flex items-center justify-center z-10 transition-all duration-300 ${
+                    item.completed
+                      ? 'border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+                      : 'border-red-900/50 group-hover:border-red-500 group-hover:scale-110'
+                  }`}>
+                    {item.completed
+                      ? <CheckCircle className="w-3 h-3 text-green-400" />
+                      : <span className="text-[10px] font-bold text-gray-500 group-hover:text-red-400">{item.step}</span>
+                    }
                   </div>
                   
-                  <div className="bg-white/5 border border-white/5 rounded-lg p-3 transition-all duration-300 hover:bg-white/10 hover:translate-x-1">
+                  <div className={`bg-white/5 border rounded-lg p-3 transition-all duration-300 hover:bg-white/10 hover:translate-x-1 ${
+                    item.completed ? 'border-green-500/20' : 'border-white/5'
+                  }`}>
                     <div className="flex items-start justify-between mb-1">
-                      <h3 className="text-sm font-bold text-gray-200 group-hover:text-red-400 transition-colors">{item.title}</h3>
+                      <h3 className={`text-sm font-bold transition-colors ${
+                        item.completed ? 'text-green-300' : 'text-gray-200 group-hover:text-red-400'
+                      }`}>{item.title}</h3>
                       <span className="text-[10px] text-gray-600 uppercase">{item.subtitle}</span>
                     </div>
                     <p className="text-xs text-gray-400 leading-relaxed mb-2">{item.suggestion}</p>
                     <div className="flex items-center gap-2 text-[10px] text-red-400/80 font-medium">
-                      {React.cloneElement(item.icon, { className: "w-3 h-3" })}
-                      <span>Recommended Resource</span>
+                      <item.IconComp className="w-3 h-3" />
+                      <span>{item.completed ? 'Completed' : 'Recommended Resource'}</span>
                     </div>
                   </div>
                 </div>

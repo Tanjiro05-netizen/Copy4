@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
+import RoleRoute from './components/RoleRoute.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import Root from './Root.jsx';
 import App from './App.jsx';
@@ -24,6 +25,7 @@ import TextbookReaderPage from './pages/TextbookReaderPage.jsx';
 import CertificateVerifyPage from './pages/CertificateVerifyPage.jsx';
 import ChapterTestPage from './pages/ChapterTestPage.jsx';
 import PoliticsPage from './pages/PoliticsPage.jsx';
+import PoliticsArticleReader from './pages/PoliticsArticleReader.jsx';
 import MainLayout from './components/MainLayout.jsx';
 import ArticleCollectionPage from './pages/ArticleCollectionPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
@@ -39,10 +41,14 @@ import KnowledgeStudyPage from './pages/KnowledgeStudyPage.jsx';
 import KnowledgeModerationPage from './pages/admin/KnowledgeModerationPage.jsx';
 import AnalysisUploadPage from './pages/admin/AnalysisUploadPage.jsx';
 import LibraryUploadPage from './pages/admin/LibraryUploadPage.jsx';
+import PoliticsUploadPage from './pages/admin/PoliticsUploadPage.jsx';
 import QuizAdminPage from './pages/admin/QuizAdminPage.jsx';
+import RoleManagementPage from './pages/admin/RoleManagementPage.jsx';
 import ScenarioAdminPage from './pages/admin/ScenarioAdminPage.jsx';
 import STEMAdminPage from './pages/admin/STEMAdminPage.jsx';
+import StudyAdminPage from './pages/admin/StudyAdminPage.jsx';
 import WorldSimPage from './pages/WorldSimPage.jsx';
+import MarxBotPage from './pages/MarxBotPage.jsx';
 import { TextBrowser } from './components/Analysis/AnalysisBrowser';
 import { AnalysisReader } from './components/Analysis/AnalysisReader';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -52,7 +58,7 @@ import MaintenancePage from './pages/MaintenancePage.jsx';
 // ╔══════════════════════════════════════════════════════╗
 // ║  MAINTENANCE MODE — set to false to restore site    ║
 // ╚══════════════════════════════════════════════════════╝
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 const AppRouter = () => {
     // When maintenance mode is on, every route shows the maintenance page
@@ -102,17 +108,21 @@ const AppRouter = () => {
                         <Route path="/science-tech/textbooks/:id" element={<ProtectedRoute><MainLayout><TextbookReaderPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/verify/:certificateNumber" element={<MainLayout><CertificateVerifyPage /></MainLayout>} />
                         <Route path="/politics" element={<ProtectedRoute><MainLayout><PoliticsPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/politics/:slug" element={<ProtectedRoute><MainLayout><PoliticsArticleReader /></MainLayout></ProtectedRoute>} />
                         <Route path="/visualizations" element={<ProtectedRoute><MainLayout><DataVisualizationPage /></MainLayout></ProtectedRoute>} />
                         
                         {/* Admin-only routes */}
                         <Route path="/admin/tags" element={<AdminRoute><MainLayout><TagManagementPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/roles" element={<AdminRoute><MainLayout><RoleManagementPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/submissions" element={<AdminRoute><MainLayout><AdminSubmissionsPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/knowledge" element={<AdminRoute><MainLayout><KnowledgeModerationPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/analysis/upload" element={<AdminRoute><MainLayout><AnalysisUploadPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/library/upload" element={<AdminRoute><MainLayout><LibraryUploadPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/politics/upload" element={<RoleRoute allowedEditorialRoles={['News']}><MainLayout><PoliticsUploadPage /></MainLayout></RoleRoute>} />
                         <Route path="/admin/quizzes" element={<AdminRoute><MainLayout><QuizAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/scenarios" element={<AdminRoute><MainLayout><ScenarioAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/stem" element={<AdminRoute><MainLayout><STEMAdminPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/study" element={<RoleRoute allowedEditorialRoles={['Teacher']}><MainLayout><StudyAdminPage /></MainLayout></RoleRoute>} />
                         <Route path="/admin/world-sim" element={<AdminRoute><WorldSimPage /></AdminRoute>} />
                         
                         {/* Forum routes */}
@@ -130,6 +140,9 @@ const AppRouter = () => {
 
                         {/* Coming Soon page (accessible to everyone including guests) */}
                         <Route path="/coming-soon" element={<MainLayout><ComingSoonPage /></MainLayout>} />
+
+                        {/* MarxBot cinematic coming-soon (full-screen, no layout chrome) */}
+                        <Route path="/marxbot" element={<MarxBotPage />} />
 
                         {/* 404 Catch-all */}
                         <Route path="*" element={<NotFoundPage />} />

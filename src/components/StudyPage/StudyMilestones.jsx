@@ -1,31 +1,47 @@
 import React from "react";
-import { CheckCircle, Circle, Trophy, ChevronRight } from "lucide-react";
+import { CheckCircle, Trophy, ChevronRight, Loader2 } from "lucide-react";
 
-const dummyMilestones = [
-  { step: 1, title: "阅读《共产党宣言》", englishTitle: "Read The Communist Manifesto", completed: true },
-  { step: 2, title: "观看《资本论》讲座", englishTitle: "Watch Das Kapital Lecture", completed: false },
-  { step: 3, title: "完成历史唯物主义播客", englishTitle: "Complete Historical Materialism Podcast", completed: false },
-  { step: 4, title: "参加社区讨论", englishTitle: "Join Community Discussion", completed: false }
-];
+const StudyMilestones = ({ milestones = [], userProgress = {}, loading = false, onToggle }) => {
+  const totalCount = milestones.length;
+  const completedCount = milestones.filter((m) => userProgress[m.id]?.completed).length;
+  const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-const StudyMilestones = () => {
-  const completedCount = dummyMilestones.filter(m => m.completed).length;
-  const totalCount = dummyMilestones.length;
-  const progress = (completedCount / totalCount) * 100;
+  const levelLabel = progress >= 100
+    ? 'Revolutionary Scholar'
+    : progress >= 75
+      ? 'Level 3 Scholar'
+      : progress >= 50
+        ? 'Level 2 Scholar'
+        : progress >= 25
+          ? 'Level 1 Scholar'
+          : 'New Student';
+
+  if (loading) {
+    return (
+      <section className="flex items-center justify-center py-12">
+        <Loader2 className="w-6 h-6 text-red-500 animate-spin" />
+      </section>
+    );
+  }
+
+  if (totalCount === 0) {
+    return (
+      <section className="py-8 text-center text-gray-500 text-sm">No milestones defined yet.</section>
+    );
+  }
 
   return (
     <section className="space-y-6">
-      {/* Progress Header */}
       <div className="bg-black/20 rounded-xl p-4 border border-white/5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-bold text-gray-200">Level 1 Scholar</span>
+            <span className="text-sm font-bold text-gray-200">{levelLabel}</span>
           </div>
           <span className="text-xs font-mono text-red-400">{progress}% Complete</span>
         </div>
         <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-          <div 
+          <div
             className="h-full bg-gradient-to-r from-red-900 to-red-600 rounded-full transition-all duration-1000 ease-out relative"
             style={{ width: `${progress}%` }}
           >
@@ -34,43 +50,50 @@ const StudyMilestones = () => {
         </div>
       </div>
 
-      {/* Timeline */}
       <div className="relative pl-2 space-y-1">
-        {/* Vertical Line */}
         <div className="absolute left-[15px] top-2 bottom-4 w-0.5 bg-gray-800"></div>
 
-        {dummyMilestones.map((milestone, idx) => (
-          <div key={milestone.step} className="relative pl-8 py-2 group">
-            {/* Dot */}
-            <div className={`absolute left-[7px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 flex items-center justify-center z-10 transition-colors duration-300 ${
-              milestone.completed 
-                ? 'bg-black border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' 
-                : 'bg-black border-gray-700 group-hover:border-gray-500'
-            }`}>
-              {milestone.completed && <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />}
-            </div>
+        {milestones.map((milestone) => {
+          const isCompleted = userProgress[milestone.id]?.completed === true;
 
-            <div className={`p-3 rounded-lg border transition-all duration-300 flex items-center justify-between ${
-              milestone.completed 
-                ? 'bg-red-900/10 border-red-900/30' 
-                : 'bg-transparent border-transparent hover:bg-white/5'
-            }`}>
-              <div className="flex-1 min-w-0 mr-4">
-                <h3 className={`text-sm font-medium truncate ${
-                  milestone.completed ? 'text-red-200' : 'text-gray-400 group-hover:text-gray-200'
-                }`}>
-                  {milestone.title}
-                </h3>
-                <p className="text-xs text-gray-600 truncate">{milestone.englishTitle}</p>
+          return (
+            <div key={milestone.id} className="relative pl-8 py-2 group">
+              <div className={`absolute left-[7px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 flex items-center justify-center z-10 transition-colors duration-300 ${
+                isCompleted
+                  ? 'bg-black border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'
+                  : 'bg-black border-gray-700 group-hover:border-gray-500'
+              }`}>
+                {isCompleted && <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />}
               </div>
-              {milestone.completed ? (
-                <CheckCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-500 flex-shrink-0" />
-              )}
+
+              <button
+                type="button"
+                onClick={() => onToggle?.(milestone.id, !isCompleted)}
+                className={`w-full text-left p-3 rounded-lg border transition-all duration-300 flex items-center justify-between ${
+                  isCompleted
+                    ? 'bg-red-900/10 border-red-900/30'
+                    : 'bg-transparent border-transparent hover:bg-white/5'
+                }`}
+              >
+                <div className="flex-1 min-w-0 mr-4">
+                  <h3 className={`text-sm font-medium truncate ${
+                    isCompleted ? 'text-red-200' : 'text-gray-400 group-hover:text-gray-200'
+                  }`}>
+                    {milestone.chinese_title || milestone.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 truncate">
+                    {milestone.chinese_title ? milestone.title : (milestone.description || '')}
+                  </p>
+                </div>
+                {isCompleted ? (
+                  <CheckCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-500 flex-shrink-0" />
+                )}
+              </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

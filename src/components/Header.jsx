@@ -5,17 +5,20 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
 const Header = () => {
-    const { user, profile, logout, isAdmin } = useAuth();
+    const { user, logout, isAdmin, canManagePolitics } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    const isAdminUser = isAdmin();
+    const canEditPolitics = canManagePolitics();
+
     const isActive = (path) => location.pathname === path;
 
-    const handleLogout = () => {
-        logout();
-        navigate('/');
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
     };
     
     // All nav items - some are guest-accessible, others require login
@@ -101,17 +104,38 @@ const Header = () => {
                                     to={isRestricted ? '/coming-soon' : item.path}
                                     className={`flex items-center px-4 py-2 text-sm font-medium transition-colors ${
                                         isRestricted
-                                            ? 'text-gray-600 hover:text-gray-500'
+                                            ? 'text-gray-600 hover:text-gray-300'
                                             : isActive(item.path) ? 'text-red-500' : 'text-gray-300 hover:text-red-400'
                                     }`}
                                     title={isRestricted ? 'Coming Soon' : ''}
                                 >
                                     <span>{item.label}</span>
-                                    {isRestricted && <span className="ml-1 text-[10px] text-gray-600">✦</span>}
+                                    {isRestricted && <span className="ml-1 text-[10px] text-gray-500">✦</span>}
                                 </Link>
                             );
                         })}
-                        {isAdmin() && (
+                        {canEditPolitics && !isAdminUser && (
+                            <div className="relative group">
+                                <div className="flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors cursor-pointer">
+                                    <FileText size={16} className="mr-2" />
+                                    <span>Editorial</span>
+                                </div>
+                                <div className="absolute left-0 mt-2 w-52 rounded-md shadow-lg bg-black border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <div className="py-1">
+                                        <Link
+                                            to="/admin/politics/upload"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/politics/upload') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Politics Upload
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {isAdminUser && (
                             <div className="relative group">
                                 <div className="flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors cursor-pointer">
                                     <Shield size={16} className="mr-2" />
@@ -126,6 +150,14 @@ const Header = () => {
                                             }`}
                                         >
                                             Category & Tag Management
+                                        </Link>
+                                        <Link
+                                            to="/admin/roles"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/roles') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            User Role Management
                                         </Link>
                                         <Link 
                                             to="/admin/submissions"
@@ -182,6 +214,14 @@ const Header = () => {
                                             }`}
                                         >
                                             Library Upload
+                                        </Link>
+                                        <Link
+                                            to="/admin/politics/upload"
+                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
+                                                isActive('/admin/politics/upload') ? 'bg-gray-900 text-white' : ''
+                                            }`}
+                                        >
+                                            Politics Upload
                                         </Link>
                                         <Link 
                                             to="/admin/stem"
@@ -286,26 +326,58 @@ const Header = () => {
                                         to={isRestricted ? '/coming-soon' : item.path}
                                         className={`flex items-center text-lg font-medium transition-colors ${
                                             isRestricted
-                                                ? 'text-gray-600 hover:text-gray-500'
+                                                ? 'text-gray-600 hover:text-gray-300'
                                                 : isActive(item.path) ? 'text-red-500' : 'text-white hover:text-red-400'
                                         }`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <span>{item.label}</span>
-                                        {isRestricted && <span className="ml-2 text-xs text-gray-600">Coming Soon</span>}
+                                        {isRestricted && <span className="ml-2 text-xs text-gray-500">Coming Soon</span>}
                                     </Link>
                                 );
                             })}
-                            {isAdmin() && (
-                                <Link 
-                                    to="/admin/tags"
+                            {isAdminUser && (
+                                <>
+                                    <Link
+                                        to="/admin/tags"
+                                        className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
+                                            isActive('/admin/tags') ? 'text-red-500' : 'text-white'
+                                        }`}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        <Shield size={20} className="mr-2" />
+                                        <span>Admin Tools</span>
+                                    </Link>
+                                    <Link
+                                        to="/admin/roles"
+                                        className={`pl-7 text-base font-medium hover:text-red-400 transition-colors ${
+                                            isActive('/admin/roles') ? 'text-red-500' : 'text-gray-200'
+                                        }`}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Role Management
+                                    </Link>
+                                    <Link
+                                        to="/admin/politics/upload"
+                                        className={`pl-7 text-base font-medium hover:text-red-400 transition-colors ${
+                                            isActive('/admin/politics/upload') ? 'text-red-500' : 'text-gray-200'
+                                        }`}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Politics Upload
+                                    </Link>
+                                </>
+                            )}
+                            {!isAdminUser && canEditPolitics && (
+                                <Link
+                                    to="/admin/politics/upload"
                                     className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
-                                        isActive('/admin/tags') ? 'text-red-500' : 'text-white'
+                                        isActive('/admin/politics/upload') ? 'text-red-500' : 'text-white'
                                     }`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
-                                    <Shield size={20} className="mr-2" />
-                                    <span>Admin</span>
+                                    <FileText size={20} className="mr-2" />
+                                    <span>Politics Upload</span>
                                 </Link>
                             )}
                             {user && (

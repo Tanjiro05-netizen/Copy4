@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HelpCircle, Plus, Save, Trash2, X } from 'lucide-react';
+import { Bot, HelpCircle, Plus, Save, Trash2, X, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './worldsim.css';
 
 const Terminal = ({ 
@@ -17,6 +18,8 @@ const Terminal = ({
   const [commandHistory, setCommandHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showCustomModal, setShowCustomModal] = useState(false);
+  const [showMarxBotTooltip, setShowMarxBotTooltip] = useState(false);
+  const marxBotNavigate = useNavigate();
   const [customInput, setCustomInput] = useState('');
   const outputRef = useRef(null);
   const inputRef = useRef(null);
@@ -121,6 +124,34 @@ const Terminal = ({
           >
             <HelpCircle className="w-4 h-4" />
           </button>
+          <div className="relative flex items-center gap-2 ml-2 pl-2 border-l border-phosphor/20">
+            <Bot className="w-4 h-4 text-phosphor-dim" />
+            <button
+              onClick={() => {
+                setShowMarxBotTooltip(true);
+                setTimeout(() => setShowMarxBotTooltip(false), 2000);
+              }}
+              className="relative w-9 h-5 rounded-full transition-colors duration-200 bg-gray-700"
+              title="MarxBot — Coming Soon"
+            >
+              <span
+                className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full transition-transform duration-200 translate-x-0 bg-gray-400"
+              />
+            </button>
+            <button
+              onClick={() => marxBotNavigate('/marxbot')}
+              className="flex items-center gap-1 text-xs text-phosphor-dim hover:text-phosphor font-mono whitespace-nowrap transition-colors"
+              title="Open MarxBot page"
+            >
+              MarxBot
+              <ExternalLink className="w-3 h-3" />
+            </button>
+            {showMarxBotTooltip && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-black border border-phosphor/30 rounded text-xs text-phosphor font-mono whitespace-nowrap z-50">
+                MarxBot — Coming Soon
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

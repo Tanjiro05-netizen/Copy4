@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import StudyResources from "../components/StudyPage/StudyResources";
 import StudyMilestones from "../components/StudyPage/StudyMilestones";
@@ -6,10 +6,157 @@ import StudyPathAI from "../components/StudyPage/StudyPathAI";
 import marxBackground from '../assets/Marx.jpg';
 import ConceptAnalysis from "../components/StudyPage/ConceptAnalysis";
 import Header from "../components/Header";
-import { BookOpen, Video, FileText, Users, Search, Sparkles, ChevronRight } from "lucide-react";
+import { BookOpen, Video, FileText, Users, Search, Sparkles, ChevronRight, Settings } from "lucide-react";
+import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 
-const StudyPage = () => (
+const StudyPage = () => {
+  const { user, canManageStudy } = useAuth();
+  const showAdminLink = canManageStudy();
+
+  const [resources, setResources] = useState([]);
+  const [concepts, setConcepts] = useState([]);
+  const [milestones, setMilestones] = useState([]);
+  const [userProgress, setUserProgress] = useState({});
+  const [loadingResources, setLoadingResources] = useState(true);
+  const [loadingConcepts, setLoadingConcepts] = useState(true);
+  const [loadingMilestones, setLoadingMilestones] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeNavTab, setActiveNavTab] = useState('Resources');
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      setLoadingResources(true);
+      try {
+        const { data, error } = await supabase
+          .from('study_resources')
+          .select('*')
+          .order('sort_order');
+        if (error) throw error;
+        setResources(data || []);
+      } catch (err) {
+        console.error('Error fetching study resources:', err);
+      } finally {
+        setLoadingResources(false);
+      }
+    };
+    fetchResources();
+  }, []);
+
+  useEffect(() => {
+    const fetchConcepts = async () => {
+      setLoadingConcepts(true);
+      try {
+        const { data, error } = await supabase
+          .from('study_concepts')
+          .select('*')
+          .order('sort_order');
+        if (error) throw error;
+        setConcepts(data || []);
+      } catch (err) {
+        console.error('Error fetching study concepts:', err);
+      } finally {
+        setLoadingConcepts(false);
+      }
+    };
+    fetchConcepts();
+  }, []);
+
+  useEffect(() => {
+    const fetchMilestones = async () => {
+      setLoadingMilestones(true);
+      try {
+        const { data: milestoneData, error: milestoneError } = await supabase
+          .from('study_milestones')
+          .select('*')
+          .order('sort_order');
+        if (milestoneError) throw milestoneError;
+        setMilestones(milestoneData || []);
+
+        if (user && user.id !== 'dev-admin') {
+          const { data: progressData, error: progressError } = await supabase
+            .from('study_user_progress')
+            .select('*')
+            .eq('user_id', user.id);
+          if (progressError) throw progressError;
+
+          const progressMap = {};
+          (progressData || []).forEach((row) => {
+            progressMap[row.milestone_id] = row;
+          });
+          setUserProgress(progressMap);
+        }
+      } catch (err) {
+        console.error('Error fetching study milestones:', err);
+      } finally {
+        setLoadingMilestones(false);
+      }
+    };
+    fetchMilestones();
+  }, [user]);
+
+  const handleToggleMilestone = useCallback(async (milestoneId, shouldComplete) => {
+    if (!user || user.id === 'dev-admin') return;
+
+    const now = new Date().toISOString();
+
+    try {
+      if (shouldComplete) {
+        const { error } = await supabase
+          .from('study_user_progress')
+          .upsert({
+            user_id: user.id,
+            milestone_id: milestoneId,
+            completed: true,
+            completed_at: now,
+          }, { onConflict: 'user_id,milestone_id' });
+        if (error) throw error;
+
+        setUserProgress((prev) => ({
+          ...prev,
+          [milestoneId]: { ...prev[milestoneId], completed: true, completed_at: now },
+        }));
+      } else {
+        const { error } = await supabase
+          .from('study_user_progress')
+          .update({ completed: false, completed_at: null })
+          .eq('user_id', user.id)
+          .eq('milestone_id', milestoneId);
+        if (error) throw error;
+
+        setUserProgress((prev) => ({
+          ...prev,
+          [milestoneId]: { ...prev[milestoneId], completed: false, completed_at: null },
+        }));
+      }
+    } catch (err) {
+      console.error('Error toggling milestone:', err);
+    }
+  }, [user]);
+
+  const filteredResources = useMemo(() => {
+    let filtered = resources;
+
+    if (activeNavTab !== 'Resources') {
+      const typeMap = { Lectures: 'lecture', Texts: 'text', Groups: null };
+      const targetType = typeMap[activeNavTab];
+      if (targetType) {
+        filtered = filtered.filter((r) => r.type === targetType);
+      }
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      filtered = filtered.filter((r) =>
+        `${r.title} ${r.excerpt || ''} ${r.author || ''} ${r.category || ''}`.toLowerCase().includes(q)
+      );
+    }
+
+    return filtered;
+  }, [activeNavTab, resources, searchQuery]);
+
+  return (
   <div className="min-h-screen bg-[#0a0b10] text-gray-200 font-sans selection:bg-red-900 selection:text-white">
     {/* Background Elements */}
     <div className="fixed inset-0 pointer-events-none">
@@ -62,9 +209,15 @@ const StudyPage = () => (
                 <input
                   type="text"
                   placeholder="Search theories, concepts, or resources..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-transparent border-none text-white placeholder-gray-500 focus:ring-0 text-base px-4 py-2"
                 />
-                <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-medium transition-all duration-300 shadow-lg shadow-red-900/20">
+                <button
+                  type="button"
+                  onClick={() => setActiveNavTab('Resources')}
+                  className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-medium transition-all duration-300 shadow-lg shadow-red-900/20"
+                >
                   Search
                 </button>
               </div>
@@ -79,15 +232,17 @@ const StudyPage = () => (
       <div className="container mx-auto px-4">
         <div className="flex overflow-x-auto py-4 gap-2 md:gap-4 no-scrollbar md:justify-center">
           {[
-            { icon: BookOpen, label: "Resources", active: true },
-            { icon: Video, label: "Lectures", active: false },
-            { icon: FileText, label: "Texts", active: false },
-            { icon: Users, label: "Groups", active: false }
-          ].map((item, idx) => (
+            { icon: BookOpen, label: "Resources" },
+            { icon: Video, label: "Lectures" },
+            { icon: FileText, label: "Texts" },
+            { icon: Users, label: "Groups" }
+          ].map((item) => (
             <button 
-              key={idx}
+              key={item.label}
+              type="button"
+              onClick={() => setActiveNavTab(item.label)}
               className={`px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap flex items-center gap-2 border ${
-                item.active 
+                activeNavTab === item.label
                   ? "bg-red-600/10 text-red-400 border-red-500/30" 
                   : "bg-white/5 text-gray-400 border-transparent hover:bg-white/10 hover:text-white"
               }`}
@@ -96,6 +251,15 @@ const StudyPage = () => (
               <span className="text-sm font-medium">{item.label}</span>
             </button>
           ))}
+          {showAdminLink && (
+            <Link
+              to="/admin/study"
+              className="px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap flex items-center gap-2 border bg-white/5 text-gray-400 border-transparent hover:bg-white/10 hover:text-white ml-auto"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm font-medium">Admin</span>
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -124,7 +288,7 @@ const StudyPage = () => (
                   <ChevronRight className="w-5 h-5" />
                 </Link>
               </div>
-              <StudyPathAI />
+              <StudyPathAI milestones={milestones} resources={resources} userProgress={userProgress} />
             </div>
           </div>
 
@@ -135,7 +299,12 @@ const StudyPage = () => (
                 <h2 className="text-lg font-bold text-white">Current Progress</h2>
                 <Link to="/milestones" className="text-xs text-red-400 hover:text-red-300 uppercase tracking-wider font-medium">Details</Link>
               </div>
-              <StudyMilestones />
+              <StudyMilestones
+                milestones={milestones}
+                userProgress={userProgress}
+                loading={loadingMilestones}
+                onToggle={handleToggleMilestone}
+              />
             </div>
           </div>
         </div>
@@ -150,11 +319,11 @@ const StudyPage = () => (
                 <h2 className="text-2xl font-bold text-white mb-2">Study Resources</h2>
                 <p className="text-gray-400 text-sm">Curated materials for your theoretical development</p>
               </div>
-              <Link to="/resources" className="hidden md:flex items-center gap-1 text-sm text-red-400 hover:text-red-300 transition-colors group">
-                View All Library <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+              <Link to="/digital-library" className="hidden md:flex items-center gap-1 text-sm text-red-400 hover:text-red-300 transition-colors group">
+                View All Library <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-            <StudyResources />
+            <StudyResources resources={filteredResources} loading={loadingResources} />
           </div>
 
           {/* Key Concepts Section */}
@@ -166,20 +335,24 @@ const StudyPage = () => (
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <ConceptAnalysis />
+               <ConceptAnalysis concepts={concepts} loading={loadingConcepts} />
             </div>
           </div>
 
           {/* Video Lectures Preview */}
+          {resources.filter((r) => r.type === 'video' || r.type === 'lecture').length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">Latest Lectures</h2>
-              <Link to="/lectures" className="text-sm text-red-400 hover:text-white transition-colors">View All</Link>
+              <button type="button" onClick={() => setActiveNavTab('Lectures')} className="text-sm text-red-400 hover:text-white transition-colors">View All</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="group cursor-pointer">
+              {resources.filter((r) => r.type === 'video' || r.type === 'lecture').slice(0, 3).map((item) => (
+                <a key={item.id} href={item.content_url || '#'} target="_blank" rel="noopener noreferrer" className="group cursor-pointer">
                   <div className="aspect-video bg-gray-900 rounded-xl overflow-hidden border border-white/5 relative mb-3 group-hover:border-red-500/30 transition-all duration-300">
+                    {item.cover_image_url ? (
+                      <img src={item.cover_image_url} alt={item.title} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : null}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
                       <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 group-hover:bg-red-600 transition-all duration-300">
                         <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1"></div>
@@ -187,24 +360,19 @@ const StudyPage = () => (
                     </div>
                   </div>
                   <h3 className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors line-clamp-2">
-                    Lecture {item}: Dialectical Materialism and Modern Science
+                    {item.title}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-1">15 mins • Dr. Smith</p>
-                </div>
+                  <p className="text-xs text-gray-500 mt-1">{item.author || 'Study Center'}</p>
+                </a>
               ))}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>
   </div>
-);
-
-// Helper icon component
-const ArrowRight = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M5 12h14M12 5l7 7-7 7"/>
-  </svg>
-);
+  );
+};
 
 export default StudyPage;

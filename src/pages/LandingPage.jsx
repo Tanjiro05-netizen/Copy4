@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { 
@@ -10,16 +10,25 @@ import {
     Layers
 } from 'lucide-react';
 import MarxBg from '../assets/Marx.jpg';
+import KoFiButton from '../components/KoFiButton';
 import './LandingPage.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { user, login, signUp } = useAuth();
     
     // Modal states
-    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(location.pathname === '/login');
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showAboutModal, setShowAboutModal] = useState(false);
+
+    // Effect to handle navigation changes
+    useEffect(() => {
+        if (location.pathname === '/login') {
+            setShowLoginModal(true);
+        }
+    }, [location.pathname]);
     
     // Login form
     const [loginEmail, setLoginEmail] = useState('');
@@ -865,10 +874,7 @@ const LandingPage = () => {
                                     <ExternalLink size={16} />
                                     @Leninistwarrior on Twitter
                                 </a>
-                                <span className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-gray-500 border border-gray-700 cursor-default">
-                                    <Heart size={18} />
-                                    Donations coming soon
-                                </span>
+                                <KoFiButton text="Support me on Ko-fi" color="#a61b1b" id="Z8Z31TQLEW" />
                             </div>
                         </div>
                     </div>

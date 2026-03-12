@@ -3,6 +3,32 @@ import { supabase } from '../supabaseClient';
 
 const AuthContext = createContext();
 
+const normalizeRoleToken = (value) => `${value || ''}`.trim().toLowerCase();
+
+export const isAdminProfile = (profile) =>
+    profile?.is_admin === true || normalizeRoleToken(profile?.role) === 'admin';
+
+export const hasEditorialRoleInProfile = (profile, roleName) => {
+    const normalizedTarget = normalizeRoleToken(roleName);
+    if (!normalizedTarget) return false;
+
+    const editorialRoles = Array.isArray(profile?.editorial_roles) ? profile.editorial_roles : [];
+
+    const matchesEditorialArray = editorialRoles.some(
+        (role) => normalizeRoleToken(role) === normalizedTarget
+    );
+
+    const matchesLegacyRole = normalizeRoleToken(profile?.role) === normalizedTarget;
+
+    return matchesEditorialArray || matchesLegacyRole;
+};
+
+export const canProfileManagePolitics = (profile) =>
+    isAdminProfile(profile) || hasEditorialRoleInProfile(profile, 'News');
+
+export const canProfileManageStudy = (profile) =>
+    isAdminProfile(profile) || hasEditorialRoleInProfile(profile, 'Teacher');
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
@@ -78,7 +104,25 @@ export const AuthProvider = ({ children }) => {
         if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
             return true;
         }
-        return profile?.is_admin === true || profile?.role === 'admin';
+        return isAdminProfile(profile);
+    };
+
+    const hasEditorialRole = (roleName) => {
+        return hasEditorialRoleInProfile(profile, roleName);
+    };
+
+    const canManagePolitics = () => {
+        if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+            return true;
+        }
+        return canProfileManagePolitics(profile);
+    };
+
+    const canManageStudy = () => {
+        if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+            return true;
+        }
+        return canProfileManageStudy(profile);
     };
 
     const value = {
@@ -107,6 +151,9 @@ export const AuthProvider = ({ children }) => {
         profile,
         loading,
         isAdmin,
+        hasEditorialRole,
+        canManagePolitics,
+        canManageStudy,
     };
 
     return (
