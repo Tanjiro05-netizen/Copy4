@@ -210,7 +210,7 @@ const MarxBotPage = () => {
                     MARXBOT v0.0.1-alpha &mdash; STANDBY
                 </div>
                 <div>
-                    STATUS: PRE-RELEASE &nbsp;|&nbsp; ACCESS: MEMBERS
+                    STATUS: PRE-RELEASE &nbsp;|&nbsp; ACCESS: PUBLIC PREVIEW
                 </div>
             </div>
         </div>

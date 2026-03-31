@@ -116,7 +116,7 @@ export const buildConceptGraphData = ({ passages = [], glossaryTerms = [] }) => 
         label: passage.heading,
         type: 'heading',
         passageId: passage.id,
-        val: 10
+        val: 6
       });
     }
   });
@@ -129,31 +129,45 @@ export const buildConceptGraphData = ({ passages = [], glossaryTerms = [] }) => 
       }, 0);
       return { term, hitCount };
     })
-    .filter((entry) => entry.hitCount > 0)
+    .filter((entry) => entry.hitCount >= 2)
     .sort((a, b) => b.hitCount - a.hitCount)
-    .slice(0, 24);
+    .slice(0, 12);
 
   const conceptNodes = concepts.map((entry) => ({
     id: `concept:${entry.term.term}`,
     label: entry.term.term,
     type: 'concept',
-    val: Math.min(14, 4 + entry.hitCount),
+    val: Math.min(12, 4 + entry.hitCount),
     concept: entry.term.term
   }));
 
-  nodes.push(...Array.from(headingMap.values()), ...conceptNodes);
+  const usedHeadings = new Set();
 
   concepts.forEach((entry) => {
+    const lower = entry.term.term.toLowerCase();
+    const headingHits = new Map();
+
     passages.forEach((passage) => {
-      const containsConcept = passage.text.toLowerCase().includes(entry.term.term.toLowerCase());
-      if (!containsConcept || !passage.heading || !headingMap.has(passage.heading)) return;
+      if (!passage.text.toLowerCase().includes(lower)) return;
+      if (!passage.heading || !headingMap.has(passage.heading)) return;
+      headingHits.set(passage.heading, (headingHits.get(passage.heading) || 0) + 1);
+    });
+
+    const sorted = [...headingHits.entries()].sort((a, b) => b[1] - a[1]);
+    const topHeadings = sorted.slice(0, 2);
+
+    topHeadings.forEach(([heading]) => {
+      usedHeadings.add(heading);
       links.push({
         source: `concept:${entry.term.term}`,
-        target: `heading:${passage.heading}`,
+        target: `heading:${heading}`,
         value: 1
       });
     });
   });
+
+  const filteredHeadings = [...headingMap.values()].filter((h) => usedHeadings.has(h.label));
+  nodes.push(...filteredHeadings, ...conceptNodes);
 
   const seenPairs = new Set();
   for (let i = 0; i < concepts.length; i += 1) {
@@ -163,16 +177,16 @@ export const buildConceptGraphData = ({ passages = [], glossaryTerms = [] }) => 
       const pairKey = `${a}::${b}`;
       if (seenPairs.has(pairKey)) continue;
 
-      const coOccurrence = passages.some((passage) => {
+      const coCount = passages.filter((passage) => {
         const lower = passage.text.toLowerCase();
         return lower.includes(a) && lower.includes(b);
-      });
+      }).length;
 
-      if (coOccurrence) {
+      if (coCount >= 2) {
         links.push({
           source: `concept:${concepts[i].term.term}`,
           target: `concept:${concepts[j].term.term}`,
-          value: 0.4
+          value: 0.5
         });
       }
       seenPairs.add(pairKey);

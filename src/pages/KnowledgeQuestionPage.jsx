@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Header from '../components/Header';
 import { knowledgeApiService } from '../components/Knowledge/api';
 import { useQuestion } from '../components/Knowledge/hooks/useQuestions';
 import { useAnswers } from '../components/Knowledge/hooks/useAnswers';
@@ -10,6 +9,7 @@ import {
     ArrowLeft, ThumbsUp, ThumbsDown, Eye, Clock, CheckCircle, 
     User, Award, MessageSquare, Loader2, AlertCircle, Send
 } from 'lucide-react';
+import * as s from './KnowledgeQuestionPage.css.ts';
 
 const KnowledgeQuestionPage = () => {
     const { questionId } = useParams();
@@ -69,12 +69,11 @@ const KnowledgeQuestionPage = () => {
 
     if (questionLoading) {
         return (
-            <div className="min-h-screen bg-gray-900 text-white">
-                <Header />
-                <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
-                    <div className="flex items-center justify-center py-12">
-                        <Loader2 className="animate-spin mr-2" size={24} />
-                        <span className="text-gray-400">Loading question...</span>
+            <div className={s.page}>
+                <main className={s.main}>
+                    <div className={s.loadingWrap}>
+                        <Loader2 size={24} style={{marginRight:8}} />
+                        <span style={{color:'rgba(255,255,255,0.48)'}}>Loading question...</span>
                     </div>
                 </main>
             </div>
@@ -83,16 +82,13 @@ const KnowledgeQuestionPage = () => {
 
     if (!question) {
         return (
-            <div className="min-h-screen bg-gray-900 text-white">
-                <Header />
-                <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
-                    <div className="text-center py-12">
-                        <AlertCircle size={48} className="mx-auto text-red-500 mb-3" />
-                        <h2 className="text-xl font-semibold mb-2">Question not found</h2>
-                        <p className="text-gray-400 mb-4">This question may have been removed or is pending approval.</p>
-                        <Link to="/knowledge" className="text-red-400 hover:underline">
-                            ← Back to Knowledge Q&A
-                        </Link>
+            <div className={s.page}>
+                <main className={s.main}>
+                    <div className={s.errorWrap}>
+                        <AlertCircle size={48} className={s.errorIcon} />
+                        <h2 className={s.errorTitle}>Question not found</h2>
+                        <p className={s.errorText}>This question may have been removed or is pending approval.</p>
+                        <Link to="/knowledge" className={s.errorLink}>← Back to Knowledge Q&A</Link>
                     </div>
                 </main>
             </div>
@@ -102,16 +98,10 @@ const KnowledgeQuestionPage = () => {
     const questionVote = getQuestionVote(questionId);
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white">
-            <Header />
-            <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
-                {/* Back link */}
-                <Link 
-                    to="/knowledge" 
-                    className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
-                >
-                    <ArrowLeft size={18} />
-                    Back to Questions
+        <div className={s.page}>
+            <main className={s.main}>
+                <Link to="/knowledge" className={s.backLink}>
+                    <ArrowLeft size={18} /> Back to Questions
                 </Link>
 
                 {/* Question */}

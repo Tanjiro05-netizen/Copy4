@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ChevronRight, Search, Bookmark, BookOpen, BookOpenCheck, BarChart3, Plus, Send, Check, Loader2, User, Calendar } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import * as s from './TheoryPage.css.ts';
 
 const TheoryPage = () => {
 
@@ -246,23 +246,20 @@ const TheoryPage = () => {
     };
 
     const renderArticleCard = (article) => (
-        <div key={article.id} className="bg-black/40 rounded-lg p-4 flex flex-col hover:bg-black/60 transition-colors duration-200">
-            <Link to={`/theory/article/${article.slug}`} className="flex-grow">
-                <h3 className="text-lg font-semibold mb-2 text-white">{article.title}</h3>
-                <p className="text-gray-400 text-sm mb-4 line-clamp-2">{article.excerpt}</p>
+        <div key={article.id} className={s.card}>
+            <Link to={`/theory/article/${article.slug}`} style={{ flexGrow: 1 }}>
+                <h3 className={s.cardTitle}>{article.title}</h3>
+                <p className={s.cardExcerpt}>{article.excerpt}</p>
             </Link>
-            <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800/50">
-                <span className="text-xs text-gray-400">{article.estimated_time_min} min read</span>
-                <div className="flex items-center space-x-4">
-                    <div className="relative w-24 h-1 bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                            className="absolute top-0 left-0 h-full bg-red-500 rounded-full"
-                            style={{ width: `${article.progress || 0}%` }}
-                        ></div>
+            <div className={s.cardFooter}>
+                <span className={s.cardMeta}>{article.estimated_time_min} min read</span>
+                <div className={s.cardActions}>
+                    <div className={s.progressBar}>
+                        <div className={s.progressFill} style={{ width: `${article.progress || 0}%` }} />
                     </div>
                     {user && (
-                        <button onClick={(e) => { e.stopPropagation(); handleBookmarkToggle(article.id, article.isBookmarked); }} className="text-gray-400 hover:text-red-500">
-                            <Bookmark className={`w-5 h-5 ${article.isBookmarked ? 'fill-current text-red-500' : ''}`} />
+                        <button onClick={(e) => { e.stopPropagation(); handleBookmarkToggle(article.id, article.isBookmarked); }} className={`${s.bookmarkBtn} ${article.isBookmarked ? s.bookmarkActive : ''}`}>
+                            <Bookmark size={18} />
                         </button>
                     )}
                 </div>
@@ -271,45 +268,38 @@ const TheoryPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-white">
-            <Header />
-            <main className="pt-24 pb-16 max-w-7xl mx-auto px-4">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-4xl font-bold">Revolutionary Theory</h1>
-                    <div className="relative w-full max-w-xs">
-                        <input 
+        <div className={s.page}>
+            <main className={s.main}>
+                <div className={s.topBar}>
+                    <h1 className={s.pageTitle}>Revolutionary Theory</h1>
+                    <div className={s.searchWrap}>
+                        <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder='Search articles...'
-                            className="w-full bg-black/30 border border-gray-700 rounded-lg py-2 pl-10 pr-4 text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
+                            className={s.searchInput}
                         />
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Search size={18} className={s.searchIcon} />
                     </div>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div className={s.grid}>
                     {/* Left Sidebar for Categories */}
-                    <aside className="lg:col-span-1">
-                        <div className="bg-black/30 rounded-lg p-4 sticky top-24">
-                            <h2 className="text-xl font-semibold mb-4">Categories</h2>
+                    <aside className={s.sidebar}>
+                        <div className={s.sidePanel}>
+                            <h2 className={s.sidePanelTitle}>Categories</h2>
                             {loadingCategories ? (
                                 <p>Loading categories...</p>
                             ) : (
-                                <div className="space-y-2">
+                                <div className={s.catStack}>
                                     {categories.map(category => (
                                         <button
                                             key={category.id}
                                             onClick={() => setActiveCategory(category.id)}
-                                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                                                activeCategory === category.id
-                                                    ? 'bg-red-600/20 text-white'
-                                                    : 'text-gray-400 hover:bg-black/50'
-                                            }`}
+                                            className={`${s.catButton} ${activeCategory === category.id ? s.catButtonActive : ''}`}
                                         >
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm font-medium">{category.name}</span>
-                                                {activeCategory === category.id && <ChevronRight className="w-4 h-4 text-red-400" />}
-                                            </div>
+                                            <span>{category.name}</span>
+                                            {activeCategory === category.id && <ChevronRight size={14} className={s.catChevron} />}
                                         </button>
                                     ))}
                                 </div>
@@ -318,35 +308,35 @@ const TheoryPage = () => {
                     </aside>
 
                     {/* Main Content Area */}
-                    <section className="lg:col-span-3 space-y-8">
+                    <section className={s.contentArea}>
                         {loadingArticles ? (
                             <p>Loading articles...</p>
                         ) : error ? (
-                            <p className="text-red-500">Error: {error}</p>
+                            <p className={s.errorText}>Error: {error}</p>
                         ) : (
                             <>
                                 {featuredArticles.length > 0 && (
-                                    <div className="bg-gradient-to-r from-red-900/30 to-black/30 rounded-lg p-6">
-                                        <h2 className="text-2xl font-bold mb-4">Featured Materials</h2>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className={s.featuredBlock}>
+                                        <h2 className={s.blockTitle}>Featured Materials</h2>
+                                        <div className={s.cardGrid}>
                                             {featuredArticles.map(renderArticleCard)}
                                         </div>
                                     </div>
                                 )}
 
                                 {collections.map(([collectionName, collectionArticles]) => (
-                                    <div key={collectionName} className="bg-black/30 rounded-lg p-6">
-                                        <h3 className="text-xl font-semibold mb-4">{collectionName}</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div key={collectionName} className={s.collectionBlock}>
+                                        <h3 className={s.blockTitle}>{collectionName}</h3>
+                                        <div className={s.cardGrid}>
                                             {collectionArticles.map(renderArticleCard)}
                                         </div>
                                     </div>
                                 ))}
 
                                 {articles.length === 0 && !loadingArticles && (
-                                    <div className="text-center py-12 bg-black/30 rounded-lg">
-                                        <h3 className="text-xl font-semibold">No Articles Found</h3>
-                                        <p className="text-gray-400 mt-2">There are no articles in this category yet.</p>
+                                    <div className={s.emptyBlock}>
+                                        <h3 className={s.emptyTitle}>No Articles Found</h3>
+                                        <p className={s.emptyText}>There are no articles in this category yet.</p>
                                     </div>
                                 )}
                             </>
@@ -355,17 +345,14 @@ const TheoryPage = () => {
                 </div>
 
                 {/* Community Writings Section */}
-                <div className="mt-12">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
-                            <BookOpen className="w-7 h-7 text-red-500" />
-                            <h2 className="text-2xl font-bold">Community Writings</h2>
+                <div className={s.communitySection}>
+                    <div className={s.communityHeader}>
+                        <div className={s.communityTitleRow}>
+                            <BookOpen size={28} className={s.communityIcon} />
+                            <h2 className={s.blockTitle}>Community Writings</h2>
                         </div>
                         {isAdmin && isAdmin() && (
-                            <button
-                                onClick={() => navigate('/admin/analysis/upload')}
-                                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm font-medium"
-                            >
+                            <button onClick={() => navigate('/admin/analysis/upload')} className={s.uploadBtn}>
                                 <Plus size={16} />
                                 Upload Text
                             </button>
@@ -373,39 +360,37 @@ const TheoryPage = () => {
                     </div>
 
                     {loadingCommunity ? (
-                        <div className="flex items-center justify-center py-12">
-                            <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                        <div className={s.loadingCenter}>
+                            <Loader2 size={28} className={s.spinner} />
                         </div>
                     ) : filteredCommunityTexts.length === 0 ? (
-                        <div className="text-center py-12 bg-black/30 rounded-lg">
-                            <BookOpen className="w-12 h-12 mx-auto text-gray-600 mb-3" />
-                            <h3 className="text-xl font-semibold">No Community Texts Yet</h3>
-                            <p className="text-gray-400 mt-2">Community writings will appear here once uploaded.</p>
+                        <div className={s.emptyBlock}>
+                            <BookOpen size={40} style={{ margin: '0 auto 12px', color: 'var(--textFaint)' }} />
+                            <h3 className={s.emptyTitle}>No Community Texts Yet</h3>
+                            <p className={s.emptyText}>Community writings will appear here once uploaded.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className={s.communityGrid}>
                             {filteredCommunityTexts.map(text => {
                                 const meta = text.metadata?.[text.primary_language] || text.metadata?.en || {};
                                 const isSaved = savedTextIds.has(text.id);
                                 const isSaving = savingTextId === text.id;
                                 return (
-                                    <div key={text.id} className="bg-black/40 rounded-lg p-4 flex flex-col hover:bg-black/60 transition-colors duration-200">
-                                        <Link to={`/analysis/text/${text.slug}?mode=read`} className="flex-grow">
-                                            <h3 className="text-lg font-semibold mb-1 text-white">{meta.title || 'Untitled'}</h3>
+                                    <div key={text.id} className={s.communityCard}>
+                                        <Link to={`/analysis/text/${text.slug}?mode=read`} style={{ flexGrow: 1 }}>
+                                            <h3 className={s.communityCardTitle}>{meta.title || 'Untitled'}</h3>
                                             {meta.authors?.length > 0 && (
-                                                <p className="text-sm text-gray-400 flex items-center gap-1 mb-2">
+                                                <p className={s.communityAuthors}>
                                                     <User size={14} />
                                                     {meta.authors.join(', ')}
                                                 </p>
                                             )}
                                             {text.category && (
-                                                <span className="inline-block text-xs px-2 py-0.5 bg-red-600/20 text-red-400 rounded-full mb-2">
-                                                    {text.category}
-                                                </span>
+                                                <span className={s.communityTag}>{text.category}</span>
                                             )}
                                         </Link>
-                                        <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-800/50">
-                                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                                        <div className={s.communityFooter}>
+                                            <span className={s.communityDate}>
                                                 <Calendar size={12} />
                                                 {new Date(text.created_at).toLocaleDateString()}
                                             </span>
@@ -413,15 +398,11 @@ const TheoryPage = () => {
                                                 <button
                                                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSaveToAnalysis(text.id); }}
                                                     disabled={isSaving}
-                                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                                                        isSaved
-                                                            ? 'bg-green-600/20 text-green-400 hover:bg-red-600/20 hover:text-red-400'
-                                                            : 'bg-gray-800 text-gray-300 hover:bg-red-600/20 hover:text-red-400'
-                                                    }`}
+                                                    className={`${s.saveBtn} ${isSaved ? s.saveBtnSaved : ''}`}
                                                     title={isSaved ? 'Remove from Analysis' : 'Save to Analysis'}
                                                 >
                                                     {isSaving ? (
-                                                        <Loader2 size={14} className="animate-spin" />
+                                                        <Loader2 size={14} />
                                                     ) : isSaved ? (
                                                         <><Check size={14} /> Saved</>
                                                     ) : (

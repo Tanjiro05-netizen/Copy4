@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 import { ArrowLeft, Download, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
+import * as s from './TextbookReaderPage.css.ts';
 
 const TextbookReaderPage = () => {
   const { id } = useParams();
@@ -54,20 +54,18 @@ const TextbookReaderPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <div className="pt-24 text-center text-gray-400">Loading textbook...</div>
+      <div className={s.page}>
+        <div className={s.loadingWrap}>Loading textbook...</div>
       </div>
     );
   }
 
   if (!textbook) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <div className="pt-24 text-center">
-          <p className="text-gray-400 text-lg">Textbook not found</p>
-          <Link to="/science-tech" className="text-red-400 hover:text-red-300 mt-4 inline-block">
+      <div className={s.page}>
+        <div className={s.notFoundWrap}>
+          <p className={s.notFoundText}>Textbook not found</p>
+          <Link to="/science-tech" className={s.notFoundLink}>
             ← Back to Science & Tech
           </Link>
         </div>
@@ -76,8 +74,7 @@ const TextbookReaderPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#12131A] flex flex-col">
-      <Header />
+    <div className={s.page} style={{display:'flex',flexDirection:'column'}}>
       
       {/* Top Bar */}
       <div className="fixed top-16 left-0 right-0 z-10 bg-[#12131A]/95 backdrop-blur-sm border-b border-red-900/30">

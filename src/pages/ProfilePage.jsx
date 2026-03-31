@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { Link, useSearchParams } from 'react-router-dom';
-import Header from '../components/Header';
 import { User, Edit3, Save, Image, Shield, Trash2, CheckCircle, Award, Cpu, Eye, Heart, Users, MessageSquare, TrendingUp, Star, Loader2, GraduationCap, Zap, BarChart2 } from 'lucide-react';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { knowledgeApiService } from '../components/Knowledge/api';
+import * as s from './ProfilePage.css.ts';
 
 // Level thresholds (same as Widgets.jsx)
 const LEVEL_THRESHOLDS = [
@@ -356,7 +356,7 @@ const ProfilePage = () => {
     };
 
     if (loading && !profile) {
-        return <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">Loading...</div>;
+        return <div className={s.loadingPage}>Loading...</div>;
     }
 
     // Learning Tab Content
@@ -651,133 +651,84 @@ const ProfilePage = () => {
                 title={modalContent.title}
                 message={modalContent.message}
             />
-        <div className="min-h-screen bg-gray-900 text-white">
-            <Header />
-            <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className={s.page}>
+            <main className={s.main}>
                 {/* Tab Navigation */}
-                <div className="flex gap-4 mb-6 border-b border-gray-700 pb-4">
-                    <button
-                        onClick={() => setActiveTab('profile')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            activeTab === 'profile' 
-                                ? 'bg-red-600 text-white' 
-                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                        }`}
-                    >
-                        <User className="w-4 h-4 inline mr-2" />Profile
+                <div className={s.tabRow}>
+                    <button onClick={() => setActiveTab('profile')} className={`${s.tabBtn} ${activeTab === 'profile' ? s.tabBtnActive : ''}`}>
+                        <User size={16} style={{marginRight:8}} />Profile
                     </button>
-                    <button
-                        onClick={() => setActiveTab('learning')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            activeTab === 'learning' 
-                                ? 'bg-red-600 text-white' 
-                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                        }`}
-                    >
-                        <GraduationCap className="w-4 h-4 inline mr-2" />Learning
+                    <button onClick={() => setActiveTab('learning')} className={`${s.tabBtn} ${activeTab === 'learning' ? s.tabBtnActive : ''}`}>
+                        <GraduationCap size={16} style={{marginRight:8}} />Learning
                     </button>
-                    <button
-                        onClick={() => setActiveTab('dashboard')}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                            activeTab === 'dashboard' 
-                                ? 'bg-red-600 text-white' 
-                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                        }`}
-                    >
-                        <Cpu className="w-4 h-4 inline mr-2" />Creator Dashboard
+                    <button onClick={() => setActiveTab('dashboard')} className={`${s.tabBtn} ${activeTab === 'dashboard' ? s.tabBtnActive : ''}`}>
+                        <Cpu size={16} style={{marginRight:8}} />Creator Dashboard
                     </button>
                 </div>
                 
                 {activeTab === 'dashboard' ? renderDashboard() : activeTab === 'learning' ? renderLearning() : (
                 <>
                 {/* Banner Placeholder */}
-                <div className="relative h-48 bg-gray-800 rounded-t-lg flex items-center justify-center border-2 border-dashed border-gray-600">
-                    <div className="text-center text-gray-500">
-                        <Image size={48} className="mx-auto" />
-                        <p className="mt-2 font-semibold">Banner Coming Soon</p>
+                <div className={s.banner}>
+                    <div className={s.bannerPlaceholder}>
+                        <Image size={48} />
+                        <p style={{marginTop:8,fontWeight:600}}>Banner Coming Soon</p>
                     </div>
                 </div>
 
-                <div className="relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-b-lg shadow-lg">
-                    {/* Profile Picture Placeholder */}
-                    <div className="absolute -top-16 left-8 w-32 h-32 bg-gray-700 rounded-full border-4 border-gray-900 flex items-center justify-center border-dashed">
-                        <div className="text-center text-gray-500">
+                <div className={s.profileCard}>
+                    <div className={s.avatarWrap}>
+                        <div style={{textAlign:'center'}}>
                             <User size={40} />
-                            <p className="text-xs mt-1">Coming Soon</p>
+                            <p style={{fontSize:11,marginTop:4}}>Coming Soon</p>
                         </div>
                     </div>
 
-                    <div className="flex justify-end mb-4">
+                    <div className={s.editRow}>
                         <button 
                             onClick={() => setEditing(!editing)}
-                            className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md transition-colors duration-200 disabled:opacity-50"
+                            className={s.editBtn}
                             disabled={loading}
                         >
-                            {editing ? <Save size={20} className="mr-2" /> : <Edit3 size={20} className="mr-2" />}
+                            {editing ? <Save size={18} style={{marginRight:8}} /> : <Edit3 size={18} style={{marginRight:8}} />}
                             {editing ? 'Cancel' : 'Edit Profile'}
                         </button>
                     </div>
 
-                    <div className="mt-16">
+                    <div className={s.profileBody}>
                         <form onSubmit={handleUpdateProfile}>
                             {editing ? (
-                                <div className="mb-6">
-                                    <label htmlFor="username" className="block text-sm font-medium text-gray-400">Username</label>
-                                    <input 
-                                        type="text"
-                                        id="username"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        className="mt-1 block w-full bg-gray-900/50 border border-gray-700 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
-                                    />
+                                <div className={s.fieldBlock}>
+                                    <label htmlFor="username" className={s.fieldLabel}>Username</label>
+                                    <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} className={s.textInput} />
                                 </div>
                             ) : (
-                                <div className="flex items-center mb-4">
-                                    <h1 className="text-3xl font-bold text-white">{profile?.username || ''}</h1>
+                                <div className={s.profileName}>
+                                    <span>{profile?.username || ''}</span>
                                     {profile?.is_certified && (
-                                        <span className="ml-3 flex items-center bg-blue-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                            <CheckCircle size={14} className="mr-1"/> Certified
+                                        <span className={s.certBadge}>
+                                            <CheckCircle size={14} /> Certified
                                         </span>
                                     )}
                                 </div>
                             )}
 
-                            <div className="mb-6">
-                                <label htmlFor="bio" className="block text-sm font-medium text-gray-400">Bio</label>
-                                <textarea 
-                                    id="bio"
-                                    rows="4"
-                                    value={bio}
-                                    onChange={(e) => setBio(e.target.value)}
-                                    readOnly={!editing}
-                                    placeholder={editing ? 'Tell us about yourself...' : 'No bio yet.'}
-                                    className="mt-1 block w-full bg-gray-900/50 border border-gray-700 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm disabled:opacity-70"
-                                ></textarea>
+                            <div className={s.fieldBlock}>
+                                <label htmlFor="bio" className={s.fieldLabel}>Bio</label>
+                                <textarea id="bio" rows="4" value={bio} onChange={(e) => setBio(e.target.value)} readOnly={!editing} placeholder={editing ? 'Tell us about yourself...' : 'No bio yet.'} className={s.textArea} />
                             </div>
 
-                            <div className="mb-6">
-                                <label htmlFor="ideology" className="block text-sm font-medium text-gray-400 flex items-center">
-                                    <Shield size={16} className="mr-2"/> Ideology
+                            <div className={s.fieldBlock}>
+                                <label htmlFor="ideology" className={s.fieldLabel} style={{display:'flex',alignItems:'center'}}>
+                                    <Shield size={16} style={{marginRight:8}} /> Ideology
                                 </label>
-                                <input 
-                                    type="text"
-                                    id="ideology"
-                                    value={ideology}
-                                    onChange={(e) => setIdeology(e.target.value)}
-                                    readOnly={!editing}
-                                    placeholder={editing ? 'e.g., Marxist-Leninist, Anarcho-Syndicalist...' : 'No ideology specified.'}
-                                    className="mt-1 block w-full bg-gray-900/50 border border-gray-700 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm disabled:opacity-70"
-                                />
+                                <input type="text" id="ideology" value={ideology} onChange={(e) => setIdeology(e.target.value)} readOnly={!editing} placeholder={editing ? 'e.g., Marxist-Leninist, Anarcho-Syndicalist...' : 'No ideology specified.'} className={s.textInput} />
                             </div>
 
                             {editing && (
-                                <div className="flex justify-end">
-                                    <button 
-                                        type="submit"
-                                        className="flex items-center px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md transition-colors duration-200 disabled:opacity-50"
-                                        disabled={loading}
-                                    >
-                                        <Save size={20} className="mr-2" />
+                                <div className={s.saveRow}>
+                                    <button type="submit" className={s.saveBtn} disabled={loading}>
+                                        <Save size={18} style={{marginRight:8}} />
                                         {loading ? 'Saving...' : 'Save Changes'}
                                     </button>
                                 </div>

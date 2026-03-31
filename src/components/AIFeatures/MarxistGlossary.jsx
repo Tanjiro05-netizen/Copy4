@@ -1,11 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../supabaseClient';
-import { Loader, BookOpen, ExternalLink } from 'lucide-react';
+import { Loader, BookOpen, Search, ChevronDown, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+function stripMarkdown(text) {
+    if (!text) return '';
+    return text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+}
+
+const TYPE_CONFIG = {
+    event:        { label: 'Events',        color: '#ef4444' },
+    concept:      { label: 'Concepts',      color: '#f59e0b' },
+    person:       { label: 'People',        color: '#3b82f6' },
+    publication:  { label: 'Publications',  color: '#8b5cf6' },
+    organization: { label: 'Organizations', color: '#10b981' },
+    place:        { label: 'Places',        color: '#06b6d4' },
+    term:         { label: 'Terms',         color: '#6b7280' },
+};
+
+const TYPE_ORDER = ['event', 'concept', 'person', 'publication', 'organization', 'place', 'term'];
 
 const MarxistGlossary = () => {
     const [glossary, setGlossary] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [search, setSearch] = useState('');
+    const [activeType, setActiveType] = useState('all');
+    const [collapsedGroups, setCollapsedGroups] = useState({});
 
     useEffect(() => {
         const fetchGlossary = async () => {
@@ -13,34 +34,56 @@ const MarxistGlossary = () => {
                 setLoading(true);
                 const { data, error } = await supabase
                     .from('glossary')
-                    .select('term, type, explanation, url')
+                    .select('term, type, explanation')
                     .order('term', { ascending: true });
 
-                if (error) {
-                    throw error;
-                }
-                setGlossary(data);
+                if (error) throw error;
+                setGlossary(data || []);
             } catch (err) {
                 setError(err.message);
-                console.error("Error fetching glossary:", err);
+                console.error('Error fetching glossary:', err);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchGlossary();
     }, []);
 
-    const groupedGlossary = glossary.reduce((acc, item) => {
-        const { type } = item;
-        if (!acc[type]) {
-            acc[type] = [];
+    const filtered = useMemo(() => {
+        let items = glossary;
+        if (activeType !== 'all') {
+            items = items.filter(i => i.type === activeType);
         }
-        acc[type].push(item);
-        return acc;
-    }, {});
+        if (search.trim()) {
+            const q = search.toLowerCase();
+            items = items.filter(i =>
+                i.term.toLowerCase().includes(q) ||
+                i.explanation.toLowerCase().includes(q)
+            );
+        }
+        return items;
+    }, [glossary, activeType, search]);
 
-    const groupOrder = ['person', 'organization', 'place', 'concept']; // Add other types as needed
+    const grouped = useMemo(() => {
+        const g = {};
+        for (const item of filtered) {
+            if (!g[item.type]) g[item.type] = [];
+            g[item.type].push(item);
+        }
+        return g;
+    }, [filtered]);
+
+    const typeCounts = useMemo(() => {
+        const c = {};
+        for (const item of glossary) {
+            c[item.type] = (c[item.type] || 0) + 1;
+        }
+        return c;
+    }, [glossary]);
+
+    const toggleGroup = (type) => {
+        setCollapsedGroups(prev => ({ ...prev, [type]: !prev[type] }));
+    };
 
     if (loading) {
         return (
@@ -53,7 +96,7 @@ const MarxistGlossary = () => {
     if (error) {
         return (
             <div className="bg-black/30 backdrop-blur-sm p-6 rounded-lg">
-                <h2 className="text-2xl text-white mb-4">Marxist Glossary</h2>
+                <h2 className="text-2xl text-white mb-4">Internal Wiki</h2>
                 <div className="flex items-center justify-center h-[500px] border border-red-900/30 rounded">
                     <p className="text-red-400">Error loading glossary: {error}</p>
                 </div>
@@ -63,37 +106,120 @@ const MarxistGlossary = () => {
 
     return (
         <div className="bg-black/30 backdrop-blur-sm p-6 rounded-lg min-h-[600px]">
-            <h2 className="text-3xl font-bold text-white mb-6 flex items-center">
+            {/* Header */}
+            <h2 className="text-3xl font-bold text-white mb-2 flex items-center">
                 <BookOpen className="mr-3 text-red-500" />
-                Marxist Glossary
+                Internal Wiki
             </h2>
-            <div className="space-y-8">
-                {groupOrder.map(group => (
-                    groupedGlossary[group] && (
-                        <div key={group}>
-                            <h3 className="text-2xl font-semibold text-red-400 capitalize mb-4 border-b-2 border-red-500/30 pb-2">{group}s</h3>
-                            <div className="space-y-4">
-                                {groupedGlossary[group].map(item => (
-                                    <div key={item.term} className="bg-gray-900/50 p-4 rounded-lg">
-                                        <h4 className="text-xl font-bold text-white">{item.term}</h4>
-                                        <p className="text-gray-300 mt-2">{item.explanation}</p>
-                                        {item.url && (
-                                            <a
-                                                href={item.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-red-400 hover:text-red-300 transition-colors duration-200 mt-2 inline-flex items-center text-sm"
-                                            >
-                                                Read More <ExternalLink className="ml-1.5" size={14} />
-                                            </a>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+            <p className="text-gray-400 text-sm mb-6">
+                {glossary.length} entries across {Object.keys(typeCounts).length} categories
+            </p>
+
+            {/* Search */}
+            <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <input
+                    type="text"
+                    placeholder="Search terms, concepts, events..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="w-full bg-gray-900/70 border border-red-900/30 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 transition-colors"
+                />
+            </div>
+
+            {/* Type filter tabs */}
+            <div className="flex flex-wrap gap-2 mb-6">
+                <button
+                    onClick={() => setActiveType('all')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                        activeType === 'all'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-gray-800/60 text-gray-400 hover:text-white'
+                    }`}
+                >
+                    All ({glossary.length})
+                </button>
+                {TYPE_ORDER.map(t => (
+                    typeCounts[t] > 0 && (
+                        <button
+                            key={t}
+                            onClick={() => setActiveType(activeType === t ? 'all' : t)}
+                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                                activeType === t
+                                    ? 'text-white'
+                                    : 'bg-gray-800/60 text-gray-400 hover:text-white'
+                            }`}
+                            style={activeType === t ? { backgroundColor: TYPE_CONFIG[t]?.color || '#ef4444' } : {}}
+                        >
+                            {TYPE_CONFIG[t]?.label || t} ({typeCounts[t]})
+                        </button>
                     )
                 ))}
             </div>
+
+            {/* Results */}
+            {filtered.length === 0 ? (
+                <div className="text-center py-16 text-gray-500">
+                    <p className="text-lg">No entries found</p>
+                    <p className="text-sm mt-1">Try adjusting your search or filter</p>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {TYPE_ORDER.map(type => {
+                        const items = grouped[type];
+                        if (!items || items.length === 0) return null;
+                        const cfg = TYPE_CONFIG[type] || { label: type, color: '#6b7280' };
+                        const isCollapsed = collapsedGroups[type];
+
+                        return (
+                            <div key={type}>
+                                <button
+                                    onClick={() => toggleGroup(type)}
+                                    className="w-full flex items-center justify-between text-left mb-3 group"
+                                >
+                                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                                        <span
+                                            className="inline-block w-3 h-3 rounded-full"
+                                            style={{ backgroundColor: cfg.color }}
+                                        />
+                                        <span style={{ color: cfg.color }}>{cfg.label}</span>
+                                        <span className="text-gray-500 text-sm font-normal">({items.length})</span>
+                                    </h3>
+                                    {isCollapsed
+                                        ? <ChevronRight className="text-gray-500" size={20} />
+                                        : <ChevronDown className="text-gray-500" size={20} />
+                                    }
+                                </button>
+
+                                {!isCollapsed && (
+                                    <div className="space-y-2">
+                                        {items.map(item => (
+                                            <Link
+                                                key={item.term}
+                                                to={`/glossary/${encodeURIComponent(item.term)}`}
+                                                className="block bg-gray-900/50 hover:bg-gray-900/80 p-4 rounded-lg transition-colors border border-transparent hover:border-red-900/30"
+                                            >
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div className="min-w-0 flex-1">
+                                                        <h4 className="text-lg font-bold text-white truncate">{item.term}</h4>
+                                                        <p className="text-gray-400 mt-1 text-sm line-clamp-2">{stripMarkdown(item.explanation)}</p>
+                                                    </div>
+                                                    <span
+                                                        className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium mt-1"
+                                                        style={{ backgroundColor: cfg.color + '22', color: cfg.color }}
+                                                    >
+                                                        {type}
+                                                    </span>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 };

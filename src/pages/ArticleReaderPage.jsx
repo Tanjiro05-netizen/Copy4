@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import ReactMarkdown from 'react-markdown';
@@ -14,6 +13,7 @@ import TableOfContents from '../components/TableOfContents';
 import HighlightsSidebar from '../components/HighlightsSidebar';
 import NerRenderer from '../components/NerRenderer';
 import StudySidebar from '../components/Reader/StudySidebar';
+import * as s from './ArticleReaderPage.css.ts';
 import PassageFinder from '../components/Reader/PassageFinder';
 import ConceptMapPanel from '../components/Reader/ConceptMapPanel';
 import { extractPassages, buildPassageResults, buildConceptGraphData } from '../utils/readerInsights';
@@ -449,8 +449,8 @@ const ArticleReaderPage = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-[#12131A] text-white">
-                <div className="flex flex-col items-center justify-center pt-24 px-4">
+            <div className={s.page}>
+                <div className="flex flex-col items-center justify-center pt-8 px-4">
                     <p className="text-red-400 text-lg mb-4">{error}</p>
                     <a href="/theory" className="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors">
                         Browse Theory Articles

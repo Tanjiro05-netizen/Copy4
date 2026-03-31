@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { emailWrapper, confirmationEmailBody } from '../_shared/emailTemplate.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
@@ -51,49 +52,26 @@ serve(async (req) => {
       if (notify_invite_codes !== false) notifyItems.push('<li>When invite codes become available</li>')
       if (notify_public_beta !== false) notifyItems.push('<li>When public beta launches</li>')
 
-      await fetch('https://api.resend.com/emails', {
+      const html = emailWrapper(confirmationEmailBody(notifyItems))
+
+      const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: 'Marxist.info <onboarding@resend.dev>',
+          from: 'Marxist.info <noreply@marxist.info>',
           to: [email],
           subject: 'Welcome to the Marxist.info Waitlist',
-          html: `
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a2e; color: #e0e0e0; padding: 40px; border-radius: 12px;">
-  <h1 style="color: #dc2626; font-size: 28px; margin-bottom: 8px;">Marxist.info</h1>
-  <p style="color: #9ca3af; font-size: 14px; margin-bottom: 32px;">Advancing Revolutionary Theory</p>
-
-  <h2 style="color: #ffffff; font-size: 20px;">You're on the list!</h2>
-  <p style="color: #d1d5db; line-height: 1.6;">
-    Thank you for your interest in Marxist.info. You've been added to our notification list and we'll keep you updated.
-  </p>
-
-  ${notifyItems.length > 0 ? `
-  <div style="background: #2d2d44; border-radius: 8px; padding: 20px; margin: 24px 0;">
-    <p style="color: #d1d5db; margin: 0 0 8px 0; font-size: 14px; font-weight: 600;">We'll notify you:</p>
-    <ul style="color: #9ca3af; font-size: 14px; padding-left: 20px; margin: 0;">
-      ${notifyItems.join('')}
-    </ul>
-  </div>
-  ` : ''}
-
-  <p style="color: #d1d5db; line-height: 1.6;">
-    In the meantime, feel free to browse the site as a guest at
-    <a href="https://marxist.info" style="color: #dc2626; text-decoration: none;">marxist.info</a>.
-  </p>
-
-  <hr style="border: none; border-top: 1px solid #374151; margin: 32px 0;" />
-  <p style="color: #6b7280; font-size: 12px; margin: 0;">
-    Follow us on Twitter: <a href="https://x.com/Leninistwarrior" style="color: #9ca3af;">@Leninistwarrior</a><br/>
-    Support the project: <a href="https://ko-fi.com/MarxistInfo" style="color: #9ca3af;">ko-fi.com/MarxistInfo</a>
-  </p>
-</div>
-          `,
+          html,
         }),
       })
+
+      if (!resendRes.ok) {
+        const errBody = await resendRes.text()
+        console.error('Resend API error:', resendRes.status, errBody)
+      }
     }
 
     return new Response(

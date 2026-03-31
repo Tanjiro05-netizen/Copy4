@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { UploadIcon, Info, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import SubmissionGuidelines from "../components/SubmissionGuidelines";
 import Select from 'react-select';
+import * as s from './SubmitPage.css.ts';
 
 const SubmitPage = () => {
 
@@ -256,162 +257,100 @@ const SubmitPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#12131A]">
-            <header className="relative h-[50vh]">
-                <div className="absolute inset-0 bg-[radial-gradient(#ff000033_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-
-                </div>
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                    <div className="text-center space-y-8 max-w-4xl px-4">
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">Submit Your Work</h1>
-                        <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
+        <div className={s.page}>
+            <header className={s.hero}>
+                <div className={s.heroGrid} />
+                <div className={s.heroContent}>
+                    <div className={s.heroCopy}>
+                        <h1 className={s.heroTitle}>Submit Your Work</h1>
+                        <p className={s.heroQuote}>
                             "Every social class creates its own organic intellectuals."
                         </p>
                     </div>
                 </div>
             </header>
 
-            {/* Submission Form Section */}
-            <section className="container mx-auto px-4 -mt-16 pb-16">
-                <div className="max-w-3xl mx-auto bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-red-900/20">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="flex justify-end">
-                            <button
-                                type="button"
-                                onClick={() => setShowGuidelinesModal(true)}
-                                className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"
-                            >
-                                <Info className="w-5 h-5" />
+            <section className={s.formSection}>
+                <div className={s.formCard}>
+                    <form onSubmit={handleSubmit} className={s.form}>
+                        <div className={s.topActions}>
+                            <button type="button" onClick={() => setShowGuidelinesModal(true)} className={s.guidelineBtn}>
+                                <Info size={18} />
                                 <span>View Submission Guidelines</span>
                             </button>
-                            
                             {isAdmin && (
-                                <button
-                                    type="button"
-                                    onClick={initializeTags}
-                                    disabled={initializingTags}
-                                    className="ml-4 flex items-center space-x-2 text-green-500 hover:text-green-400 transition-colors"
-                                >
-                                    {initializingTags ? (
-                                        <>
-                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                            <span>Adding tags...</span>
-                                        </>
-                                    ) : (
-                                        <span className="text-sm">Initialize Tags (Admin)</span>
-                                    )}
+                                <button type="button" onClick={initializeTags} disabled={initializingTags} className={s.adminBtn}>
+                                    {initializingTags ? (<><Loader2 size={14} /> Adding tags...</>) : (<span>Initialize Tags (Admin)</span>)}
                                 </button>
                             )}
                         </div>
-                        
-                        {/* Category Selection */}
-                        <div>
-                            <label htmlFor="category" className="block text-white mb-2">Category</label>
-                            <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-3 bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C2A55A] transition-colors" required>
+
+                        <div className={s.fieldBlock}>
+                            <label htmlFor="category" className={s.fieldLabel}>Category</label>
+                            <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className={s.selectInput} required>
                                 <option value="" disabled>Select a category...</option>
-                                {categories.map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
+                                {categories.map(cat => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
                             </select>
                         </div>
 
-                        {/* Title */}
-                        <div>
-                            <label htmlFor="title" className="block text-white mb-2">Title</label>
-                            <input
-                                type="text"
-                                id="title"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="w-full p-3 bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C2A55A] transition-colors"
-                                placeholder="Enter your work's title"
-                                required
-                            />
+                        <div className={s.fieldBlock}>
+                            <label htmlFor="title" className={s.fieldLabel}>Title</label>
+                            <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className={s.textInput} placeholder="Enter your work's title" required />
                         </div>
 
-                        {/* Abstract */}
-                        <div>
-                            <label htmlFor="abstract" className="block text-white mb-2">Abstract</label>
-                            <textarea
-                                id="abstract"
-                                rows="4"
-                                value={abstract}
-                                onChange={(e) => setAbstract(e.target.value)}
-                                className="w-full p-3 bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C2A55A] transition-colors h-32"
-                                placeholder="Provide a brief abstract of your work"
-                                required
-                            ></textarea>
+                        <div className={s.fieldBlock}>
+                            <label htmlFor="abstract" className={s.fieldLabel}>Abstract</label>
+                            <textarea id="abstract" rows="4" value={abstract} onChange={(e) => setAbstract(e.target.value)} className={s.textArea} placeholder="Provide a brief abstract of your work" required />
                         </div>
 
-                        {/* Tags Selection */}
-                        <div>
-                            <label htmlFor="tags" className="block text-white mb-2">Tags</label>
+                        <div className={s.fieldBlock}>
+                            <label htmlFor="tags" className={s.fieldLabel}>Tags</label>
                             <Select
                                 id="tags"
                                 isMulti
                                 options={tags}
                                 value={selectedTags}
                                 onChange={setSelectedTags}
-                                className="text-white"
                                 classNamePrefix="select"
                                 placeholder="Select tags..."
                                 styles={{
-                                    control: (base) => ({ ...base, backgroundColor: '#2E2F38', borderColor: '#4D4E5C', color: 'white' }),
-                                    multiValue: (base) => ({ ...base, backgroundColor: '#C2A55A' }),
-                                    multiValueLabel: (base) => ({ ...base, color: 'black' }),
-                                    option: (base, { isFocused, isSelected }) => ({ ...base, backgroundColor: isSelected ? '#C2A55A' : isFocused ? '#4D4E5C' : '#2E2F38', color: isSelected ? 'black' : 'white' }),
-                                    menu: (base) => ({ ...base, backgroundColor: '#2E2F38' }),
-                                    input: (base) => ({...base, color: 'white'})
+                                    control: (base) => ({ ...base, backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.06)', color: 'white' }),
+                                    multiValue: (base) => ({ ...base, backgroundColor: '#c81e1e' }),
+                                    multiValueLabel: (base) => ({ ...base, color: 'white' }),
+                                    option: (base, { isFocused, isSelected }) => ({ ...base, backgroundColor: isSelected ? '#c81e1e' : isFocused ? '#1f1f1f' : '#0f0f0f', color: 'white' }),
+                                    menu: (base) => ({ ...base, backgroundColor: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }),
+                                    input: (base) => ({ ...base, color: 'white' }),
+                                    singleValue: (base) => ({ ...base, color: 'white' }),
                                 }}
                             />
                         </div>
 
-                        {/* File Upload Section */}
-                        <div>
-                            <label className="block text-white mb-2">Upload Manuscript</label>
-                            <label htmlFor="manuscript-upload" className="relative cursor-pointer bg-[#2E2F38] border border-[#4D4E5C] rounded-lg text-white p-3 flex items-center justify-center hover:bg-[#3c3d47] transition-colors">
-                                <UploadIcon className="mr-3" size={20} />
-                                <span className="truncate">{fileName || 'Choose a file...'}</span>
+                        <div className={s.fieldBlock}>
+                            <label className={s.fieldLabel}>Upload Manuscript</label>
+                            <label htmlFor="manuscript-upload" className={s.uploadLabel}>
+                                <UploadIcon size={18} style={{ marginRight: 12 }} />
+                                <span>{fileName || 'Choose a file...'}</span>
                             </label>
-                            <input id="manuscript-upload" type="file" className="hidden" onChange={handleFileChange} accept=".pdf,.doc,.docx" />
-                            <p className="text-gray-400 text-sm text-center mt-2">
-                                PDF, DOC, DOCX. Max 5MB.
-                            </p>
+                            <input id="manuscript-upload" type="file" style={{ display: 'none' }} onChange={handleFileChange} accept=".pdf,.doc,.docx" />
+                            <p className={s.uploadHint}>PDF, DOC, DOCX. Max 5MB.</p>
                         </div>
 
-                        {/* Feedback Messages */}
                         {error && (
-                            <div className="text-red-400 flex items-center p-3 bg-red-900/20 rounded-lg">
-                                <AlertTriangle className="mr-3 flex-shrink-0" />
+                            <div className={s.errorBox}>
+                                <AlertTriangle size={18} style={{ flexShrink: 0 }} />
                                 <span>{error}</span>
                             </div>
                         )}
                         {success && (
-                            <div className="text-green-400 flex items-center p-3 bg-green-900/20 rounded-lg">
-                                <CheckCircle className="mr-3 flex-shrink-0" />
+                            <div className={s.successBox}>
+                                <CheckCircle size={18} style={{ flexShrink: 0 }} />
                                 <span>Submission successful! Thank you for your contribution.</span>
                             </div>
                         )}
 
-                        {/* Submit Button */}
-                        <div className="flex justify-center pt-6">
-                            <button
-                                type="submit"
-                                disabled={submitting}
-                                className="bg-[#C2A55A] text-black font-bold py-3 px-8 rounded-lg hover:bg-yellow-500 transition-colors duration-300 flex items-center gap-2 disabled:bg-gray-600 disabled:cursor-not-allowed"
-                            >
-                                {submitting ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                        Submitting...
-                                    </>
-                                ) : (
-                                    <>
-                                        <UploadIcon size={20} />
-                                        Submit Work
-                                    </>
-                                )}
+                        <div className={s.submitRow}>
+                            <button type="submit" disabled={submitting} className={s.submitBtn}>
+                                {submitting ? (<><Loader2 size={18} /> Submitting...</>) : (<><UploadIcon size={18} /> Submit Work</>)}
                             </button>
                         </div>
                     </form>

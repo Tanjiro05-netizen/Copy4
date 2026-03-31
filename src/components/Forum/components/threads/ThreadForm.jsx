@@ -115,7 +115,7 @@ function ThreadForm({ onSubmit, onCancel, initialCategory, isAuthenticated = fal
             disabled={loading}
           >
             {BOARDS.map(board => (
-              <option key={board.slug} value={board.name}>
+              <option key={board.slug} value={board.slug}>
                 /{board.slug}/ - {board.fullName}
               </option>
             ))}

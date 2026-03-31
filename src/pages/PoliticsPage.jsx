@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import './PoliticsPage.css';
+import * as s from './PoliticsPage.css.ts';
 
 const categories = [
   { id: 'all', name: 'All Fronts', icon: Globe },

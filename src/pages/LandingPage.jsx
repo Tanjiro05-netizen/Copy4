@@ -19,16 +19,11 @@ const LandingPage = () => {
     const { user, login, signUp } = useAuth();
     
     // Modal states
-    const [showLoginModal, setShowLoginModal] = useState(location.pathname === '/login');
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showAboutModal, setShowAboutModal] = useState(false);
 
-    // Effect to handle navigation changes
-    useEffect(() => {
-        if (location.pathname === '/login') {
-            setShowLoginModal(true);
-        }
-    }, [location.pathname]);
+    // Login modal is now only opened by explicit user click on "Log In" buttons
     
     // Login form
     const [loginEmail, setLoginEmail] = useState('');
@@ -204,16 +199,21 @@ const LandingPage = () => {
         e.preventDefault();
         setLoginError('');
         setLoginLoading(true);
-        
-        const result = await login({ email: loginEmail, password: loginPassword });
-        
-        if (result.error) {
-            setLoginError(result.error.message);
-        } else {
-            setShowLoginModal(false);
-            navigate('/home');
+
+        try {
+            const result = await login({ email: loginEmail, password: loginPassword });
+
+            if (result.error) {
+                setLoginError(result.error.message);
+            } else {
+                setShowLoginModal(false);
+                navigate('/home');
+            }
+        } catch (err) {
+            setLoginError('Login failed. Please try again.');
+        } finally {
+            setLoginLoading(false);
         }
-        setLoginLoading(false);
     };
 
     const handleRegister = async (e) => {
@@ -266,19 +266,21 @@ const LandingPage = () => {
         setWaitlistLoading(true);
         
         try {
-            const { error: dbError } = await supabase
-                .from('waitlist')
-                .insert({
+            const { data, error } = await supabase.functions.invoke('waitlist-signup', {
+                body: {
                     email: waitlistEmail,
                     notify_invite_codes: notifyInvites,
                     notify_public_beta: notifyBeta,
-                });
+                },
+            });
 
-            if (dbError) {
-                if (dbError.code === '23505') {
+            if (error) {
+                setWaitlistError('Failed to join. Please try again.');
+            } else if (data?.error) {
+                if (data.error.includes('already on the list')) {
                     setWaitlistError('This email is already on the list.');
                 } else {
-                    setWaitlistError('Failed to join. Please try again.');
+                    setWaitlistError(data.error);
                 }
             } else {
                 setWaitlistSuccess(true);

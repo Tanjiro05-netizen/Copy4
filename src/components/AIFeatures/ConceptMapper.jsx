@@ -87,11 +87,11 @@ const ConceptMapper = () => {
             </div>
 
             {loading ? (
-                <div className="h-[360px] rounded border border-gray-800 flex items-center justify-center">
+                <div className="h-[420px] rounded border border-gray-800 flex items-center justify-center">
                     <Loader2 className="w-7 h-7 text-red-400 animate-spin" />
                 </div>
             ) : error ? (
-                <div className="h-[360px] rounded border border-gray-800 flex items-center justify-center text-red-400 text-sm">
+                <div className="h-[420px] rounded border border-gray-800 flex items-center justify-center text-red-400 text-sm">
                     {error}
                 </div>
             ) : (

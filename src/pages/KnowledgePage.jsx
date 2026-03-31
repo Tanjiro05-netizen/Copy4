@@ -10,6 +10,7 @@ import DenseSidebar from '../components/Knowledge/FutureUI/DenseSidebar';
 import FeedStream from '../components/Knowledge/FutureUI/FeedStream';
 import { Widgets } from '../components/Knowledge/FutureUI/Widgets';
 import DailyChallenge from '../components/Knowledge/Study/DailyChallenge';
+import * as s from './KnowledgePage.css.ts';
 
 const KnowledgePage = () => {
     const { user, profile } = useAuth();

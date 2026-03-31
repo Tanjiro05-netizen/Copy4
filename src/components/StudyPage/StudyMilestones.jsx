@@ -1,94 +1,100 @@
 import React from "react";
-import { CheckCircle, Trophy, ChevronRight, Loader2 } from "lucide-react";
+import { CheckCircle2, ChevronRight, Trophy } from "lucide-react";
+import { emptyState, loadingSpinner, loadingState } from "./studyTheme.css.ts";
+import * as styles from "./StudyMilestones.css.ts";
 
 const StudyMilestones = ({ milestones = [], userProgress = {}, loading = false, onToggle }) => {
   const totalCount = milestones.length;
-  const completedCount = milestones.filter((m) => userProgress[m.id]?.completed).length;
+  const completedCount = milestones.filter((milestone) => userProgress[milestone.id]?.completed).length;
+  const remainingCount = Math.max(totalCount - completedCount, 0);
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const levelLabel = progress >= 100
-    ? 'Revolutionary Scholar'
+    ? "Revolutionary Scholar"
     : progress >= 75
-      ? 'Level 3 Scholar'
+      ? "Level III Scholar"
       : progress >= 50
-        ? 'Level 2 Scholar'
+        ? "Level II Scholar"
         : progress >= 25
-          ? 'Level 1 Scholar'
-          : 'New Student';
+          ? "Level I Scholar"
+          : "New Student";
 
   if (loading) {
     return (
-      <section className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 text-red-500 animate-spin" />
+      <section className={loadingState}>
+        <div className={loadingSpinner} aria-label="Loading milestones" />
       </section>
     );
   }
 
   if (totalCount === 0) {
     return (
-      <section className="py-8 text-center text-gray-500 text-sm">No milestones defined yet.</section>
+      <section className={emptyState}>No milestones defined yet.</section>
     );
   }
 
   return (
-    <section className="space-y-6">
-      <div className="bg-black/20 rounded-xl p-4 border border-white/5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="text-sm font-bold text-gray-200">{levelLabel}</span>
+    <section className={styles.root}>
+      <div className={styles.summary}>
+        <div className={styles.summaryHeader}>
+          <div>
+            <p className={styles.summaryLabel}>Progress ledger</p>
+            <h3 className={styles.summaryLevel}>{levelLabel}</h3>
+            <p className={styles.summaryMeta}>
+              Continue the current reading line and mark each finished study block to keep the archive in motion.
+            </p>
           </div>
-          <span className="text-xs font-mono text-red-400">{progress}% Complete</span>
+          <div className={styles.summaryValue}>{progress}% complete</div>
         </div>
-        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-red-900 to-red-600 rounded-full transition-all duration-1000 ease-out relative"
-            style={{ width: `${progress}%` }}
-          >
-            <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+
+        <div className={styles.progressTrack} aria-hidden="true">
+          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+        </div>
+
+        <div className={styles.summaryStats}>
+          <div className={styles.statTile}>
+            <p className={styles.summaryLabel}>Completed</p>
+            <p className={styles.statValue}>{completedCount}</p>
+            <p className={styles.statCopy}>Finished milestones currently recorded.</p>
+          </div>
+          <div className={styles.statTile}>
+            <p className={styles.summaryLabel}>Remaining</p>
+            <p className={styles.statValue}>{remainingCount}</p>
+            <p className={styles.statCopy}>Milestones still open in your present line of study.</p>
           </div>
         </div>
       </div>
 
-      <div className="relative pl-2 space-y-1">
-        <div className="absolute left-[15px] top-2 bottom-4 w-0.5 bg-gray-800"></div>
+      <div className={styles.timeline}>
+        <div className={styles.timelineLine} aria-hidden="true" />
 
         {milestones.map((milestone) => {
           const isCompleted = userProgress[milestone.id]?.completed === true;
+          const milestoneState = isCompleted ? "completed" : "pending";
+          const title = milestone.chinese_title || milestone.title;
+          const subtitle = milestone.chinese_title ? milestone.title : (milestone.description || "No description available yet.");
 
           return (
-            <div key={milestone.id} className="relative pl-8 py-2 group">
-              <div className={`absolute left-[7px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 flex items-center justify-center z-10 transition-colors duration-300 ${
-                isCompleted
-                  ? 'bg-black border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'
-                  : 'bg-black border-gray-700 group-hover:border-gray-500'
-              }`}>
-                {isCompleted && <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />}
-              </div>
+            <div key={milestone.id} className={styles.milestoneRow}>
+              <div className={styles.milestoneBullet[milestoneState]} aria-hidden="true" />
 
               <button
                 type="button"
                 onClick={() => onToggle?.(milestone.id, !isCompleted)}
-                className={`w-full text-left p-3 rounded-lg border transition-all duration-300 flex items-center justify-between ${
-                  isCompleted
-                    ? 'bg-red-900/10 border-red-900/30'
-                    : 'bg-transparent border-transparent hover:bg-white/5'
-                }`}
+                className={`${styles.milestoneButton} ${styles.milestoneButtonState[milestoneState]}`}
               >
-                <div className="flex-1 min-w-0 mr-4">
-                  <h3 className={`text-sm font-medium truncate ${
-                    isCompleted ? 'text-red-200' : 'text-gray-400 group-hover:text-gray-200'
-                  }`}>
-                    {milestone.chinese_title || milestone.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 truncate">
-                    {milestone.chinese_title ? milestone.title : (milestone.description || '')}
-                  </p>
+                <div className={styles.milestoneCopy}>
+                  <h3 className={styles.milestoneTitle}>{title}</h3>
+                  <p className={styles.milestoneSubtitle}>{subtitle}</p>
+                  <div className={styles.milestoneMeta}>
+                    {isCompleted ? "Completed entry" : "Click to mark complete"}
+                  </div>
                 </div>
+
                 {isCompleted ? (
-                  <CheckCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                  <CheckCircle2 size={18} className={styles.milestoneStateIcon.completed} />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-gray-500 flex-shrink-0" />
+                  <ChevronRight size={18} className={styles.milestoneStateIcon.pending} />
                 )}
               </button>
             </div>

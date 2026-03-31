@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Header from '../components/Header';
 import ArticleComments from '../components/ArticleComments';
 import PrivateNotes from '../components/PrivateNotes';
 import ArticleAnalysis from '../components/ArticleAnalysis';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { BookText, Loader, Search, List, Grid, BookOpen } from 'lucide-react';
+import * as s from './AnalysisPage.css.ts';
 
 const AnalysisPage = () => {
     const { user } = useAuth();
@@ -167,34 +167,22 @@ const AnalysisPage = () => {
     };
 
     const renderArticleCard = (article) => (
-        <div key={article.id} className={
-            viewMode === 'grid'
-                ? 'bg-black/30 rounded-lg border border-red-900/20 hover:border-red-900/40 transition-colors flex flex-col'
-                : 'flex bg-black/30 rounded-lg border border-red-900/20 hover:border-red-900/40 transition-colors'
-        }>
-            <div className={viewMode === 'grid' ? 'p-4 flex-1 flex flex-col' : 'p-4 flex-1'}>
-                <div className="mb-4">
-                    <div className="flex items-start justify-between mb-2">
-                        <div className="text-sm text-red-400 mb-1">
-                            {article.theory_categories?.name || 'Uncategorized'}
-                        </div>
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{article.title}</h3>
-                    {article.description && (
-                        <p className="text-gray-300 text-sm mb-3 line-clamp-3">{article.description}</p>
-                    )}
-                </div>
+        <div key={article.id} className={viewMode === 'grid' ? s.card : s.cardList}>
+            <div className={s.cardBody}>
+                <div className={s.cardCategory}>{article.theory_categories?.name || 'Uncategorized'}</div>
+                <h3 className={s.cardTitle}>{article.title}</h3>
+                {article.description && <p className={s.cardDesc}>{article.description}</p>}
             </div>
-            <div className="p-4 border-t border-gray-800/50 mt-auto">
+            <div className={s.cardFooter}>
                 <button
                     onClick={() => handleSelectArticle(article)}
                     disabled={selectedArticle?.loadingContent && selectedArticle?.id === article.id}
-                    className="w-full text-center bg-red-600/20 hover:bg-red-600/40 text-red-300 font-semibold py-2 rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={s.analyzeBtn}
                 >
                     {selectedArticle?.loadingContent && selectedArticle?.id === article.id ? (
-                        <><Loader size={16} className="animate-spin mr-2" /> Loading...</>
+                        <><Loader size={16} style={{marginRight:8}} /> Loading...</>
                     ) : (
-                        <><BookOpen size={16} className="mr-2" /> Analyze</>
+                        <><BookOpen size={16} style={{marginRight:8}} /> Analyze</>
                     )}
                 </button>
             </div>
@@ -202,46 +190,36 @@ const AnalysisPage = () => {
     );
 
     if (loading && !articles.length) {
-        return <div className="min-h-screen bg-[#12131A] flex items-center justify-center text-white"><Loader className="animate-spin mr-2"/>Loading Analysis Page...</div>;
+        return <div className={s.loadingWrap}><Loader className="animate-spin mr-2"/>Loading Analysis Page...</div>;
     }
 
     return (
-        <div className="min-h-screen bg-[#12131A]">
-            <Header />
-            <main className="container mx-auto px-4 py-24">
+        <div className={s.page}>
+            <main className={s.main}>
                 {selectedArticle && !selectedArticle.loadingContent ? (
                     <div>
-                        <button
-                            onClick={() => setSelectedArticle(null)}
-                            className="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-                        >
-                            &larr; Back to Articles
+                        <button onClick={() => setSelectedArticle(null)} className={s.backBtn}>
+                            ← Back to Articles
                         </button>
-                        <div className="bg-black/30 rounded-lg border border-red-900/20 p-6">
-                            <h1 className="text-3xl font-bold text-white mb-2">{selectedArticle.title}</h1>
-                            <p className="text-red-400 mb-6">{selectedArticle.theory_categories?.name || 'Uncategorized'}</p>
+                        <div className={s.readerCard}>
+                            <h1 className={s.readerTitle}>{selectedArticle.title}</h1>
+                            <p className={s.readerCategory}>{selectedArticle.theory_categories?.name || 'Uncategorized'}</p>
 
-                            <div className="border-b border-gray-700 mb-6">
-                                <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                                    {TABS.map((tab) => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab)}
-                                            className={`
-                                                ${activeTab === tab
-                                                    ? 'border-red-500 text-red-400'
-                                                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
-                                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
-                                        >
-                                            {tab}
-                                        </button>
-                                    ))}
-                                </nav>
+                            <div className={s.tabRow}>
+                                {TABS.map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`${s.tabBtn} ${activeTab === tab ? s.tabBtnActive : ''}`}
+                                    >
+                                        {tab}
+                                    </button>
+                                ))}
                             </div>
 
                             <div>
                                 {activeTab === 'Content' && (
-                                    <div className="prose prose-invert max-w-none text-gray-300 bg-black/20 p-4 rounded-lg" dangerouslySetInnerHTML={{ __html: articleContentHtml }}></div>
+                                    <div className={s.contentPane} dangerouslySetInnerHTML={{ __html: articleContentHtml }} style={{color:'rgba(255,255,255,0.72)',lineHeight:1.8}} />
                                 )}
                                 {activeTab === 'Comments' && <ArticleComments articleId={selectedArticle.id} userRole={userRole} />}
                                 {activeTab === 'Notes' && <PrivateNotes articleId={selectedArticle.id} />}
@@ -251,88 +229,42 @@ const AnalysisPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="mb-8">
-                            <div className="flex items-center justify-between mb-4">
-                                <h1 className="text-4xl font-bold text-white flex items-center">
-                                    <BookText size={36} className="mr-3 text-red-500"/> 
+                        <div style={{marginBottom:32}}>
+                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+                                <h1 className={s.pageTitle}>
+                                    <BookText size={36} className={s.pageTitleIcon} />
                                     Analysis
                                 </h1>
-                                <div className="text-gray-400">
-                                    {filteredArticles.length} papers available
-                                </div>
+                                <div className={s.pageCount}>{filteredArticles.length} papers available</div>
                             </div>
                         </div>
 
-                        <div className="mb-8 space-y-4">
-                            <div className="flex flex-col md:flex-row gap-4">
-                                <div className="flex-1 relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                                    <input
-                                        type="text"
-                                        placeholder="Search articles and analyses..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-black/30 border border-gray-800 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500 focus:outline-none"
-                                    />
-                                </div>
-                                <div className="flex gap-2">
-                                    <select
-                                        value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.target.value)}
-                                        className="bg-black/30 border border-gray-800 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-red-500 focus:outline-none"
-                                    >
-                                        <option value="all">All Categories</option>
-                                        {categories.map(category => (
-                                            <option key={category.id} value={category.name}>
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button
-                                        onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-                                        className="bg-black/30 border border-gray-800 rounded-lg px-4 py-3 text-white hover:bg-black/50 transition-colors"
-                                    >
-                                        {viewMode === 'grid' ? <List size={20} /> : <Grid size={20} />}
-                                    </button>
-                                </div>
+                        <div className={s.searchRow}>
+                            <div className={s.searchWrap}>
+                                <Search size={20} className={s.searchIcon} />
+                                <input type="text" placeholder="Search articles and analyses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className={s.searchInput} />
                             </div>
-                        </div>
-
-                        <div className="mb-8">
-                            <div className="flex flex-wrap gap-2">
-                                <button
-                                    onClick={() => setSelectedCategory('all')}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        selectedCategory === 'all'
-                                            ? 'bg-red-600 text-white'
-                                            : 'bg-black/30 text-gray-300 hover:bg-black/50'
-                                    }`}
-                                >
-                                    All
+                            <div style={{display:'flex',gap:8}}>
+                                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className={s.selectInput}>
+                                    <option value="all">All Categories</option>
+                                    {categories.map(category => (<option key={category.id} value={category.name}>{category.name}</option>))}
+                                </select>
+                                <button onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')} className={s.viewToggle}>
+                                    {viewMode === 'grid' ? <List size={20} /> : <Grid size={20} />}
                                 </button>
-                                {categories.map(category => (
-                                    <button
-                                        key={category.id}
-                                        onClick={() => setSelectedCategory(category.name)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                            selectedCategory === category.name
-                                                ? 'bg-red-600 text-white'
-                                                : 'bg-black/30 text-gray-300 hover:bg-black/50'
-                                        }`}
-                                    >
-                                        {category.name}
-                                    </button>
-                                ))}
                             </div>
                         </div>
 
-                        {error && <p className="text-red-500 bg-red-900/20 p-3 rounded-lg mb-6">{error}</p>}
+                        <div className={s.filterRow}>
+                            <button onClick={() => setSelectedCategory('all')} className={`${s.filterPill} ${selectedCategory === 'all' ? s.filterPillActive : ''}`}>All</button>
+                            {categories.map(category => (
+                                <button key={category.id} onClick={() => setSelectedCategory(category.name)} className={`${s.filterPill} ${selectedCategory === category.name ? s.filterPillActive : ''}`}>{category.name}</button>
+                            ))}
+                        </div>
 
-                        <div className={
-                            viewMode === 'grid' 
-                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                                : 'space-y-6'
-                        }>
+                        {error && <p className={s.errorBox}>{error}</p>}
+
+                        <div className={viewMode === 'grid' ? s.gridView : s.listView}>
                             {filteredArticles.map(article => renderArticleCard(article))}
                         </div>
                     </>

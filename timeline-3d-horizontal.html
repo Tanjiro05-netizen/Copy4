@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline - Marxist Theory</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #12131A;
+            --bg-secondary: rgba(0, 0, 0, 0.3);
+            --surface: rgba(18, 19, 26, 0.8);
+            --surface-raised: rgba(24, 25, 35, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-faint: #6b7280;
+            --accent: #dc2626;
+            --accent-hover: #ef4444;
+            --accent-wash: rgba(220, 38, 38, 0.1);
+            --accent-glow: 0 0 20px rgba(220, 38, 38, 0.3);
+            --border-subtle: 1px solid rgba(185, 28, 28, 0.2);
+            --border-accent: rgba(185, 28, 28, 0.4);
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            padding: 48px 48px 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .header-title {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            position: sticky;
+            top: 16px;
+            z-index: 20;
+            padding: 0 48px;
+            margin-bottom: 48px;
+        }
+
+        .filter-inner {
+            max-width: fit-content;
+            margin: 0 auto;
+            background: rgba(9, 9, 9, 0.72);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            padding: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            border: var(--border-subtle);
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 180ms ease;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: var(--text-primary);
+            box-shadow: var(--accent-glow);
+        }
+
+        /* 3D Scene Container */
+        .timeline-section {
+            position: relative;
+            padding: 24px 0 80px;
+        }
+
+        .scene-3d {
+            perspective: 1800px;
+            perspective-origin: 50% 40%;
+        }
+
+        /* Horizontal Timeline Track */
+        .timeline-track {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            transform-style: preserve-3d;
+            transform: rotateX(8deg);
+            transform-origin: center center;
+        }
+
+        /* The central spine line */
+        .spine {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--accent) 10%,
+                var(--accent) 90%,
+                transparent 100%
+            );
+            opacity: 0.5;
+            transform: translateY(-50%);
+        }
+
+        .spine::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,255,255,0.4) 50%,
+                transparent 100%
+            );
+            animation: spineShine 4s ease-in-out infinite;
+        }
+
+        @keyframes spineShine {
+            0%, 100% { opacity: 0.3; transform: translateX(-100%); }
+            50% { opacity: 1; transform: translateX(100%); }
+        }
+
+        /* Events Container - Horizontal Scroll */
+        .events-container {
+            display: flex;
+            gap: 80px;
+            padding: 0 15vw;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+            transform-style: preserve-3d;
+            cursor: grab;
+        }
+
+        .events-container:active {
+            cursor: grabbing;
+        }
+
+        .events-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .events-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .events-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        /* Event Card */
+        .event-card {
+            position: relative;
+            flex-shrink: 0;
+            width: 320px;
+            background: var(--surface-raised);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-xl);
+            border: var(--border-subtle);
+            padding: 28px;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInCard 0.6s ease forwards;
+        }
+
+        .event-card:nth-child(1) { animation-delay: 0.1s; }
+        .event-card:nth-child(2) { animation-delay: 0.15s; }
+        .event-card:nth-child(3) { animation-delay: 0.2s; }
+        .event-card:nth-child(4) { animation-delay: 0.25s; }
+        .event-card:nth-child(5) { animation-delay: 0.3s; }
+        .event-card:nth-child(6) { animation-delay: 0.35s; }
+
+        @keyframes fadeInCard {
+            from {
+                opacity: 0;
+                transform: translateZ(-50px) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateZ(0) translateY(0);
+            }
+        }
+
+        .event-card:hover {
+            transform: translateZ(40px) scale(1.03);
+border-color: var(--border-accent);
+            box-shadow: var(--accent-glow);
+        }
+
+        /* 3D Card reflection */
+        .event-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(255,255,255,0.06) 0%,
+                transparent 40%
+            );
+            border-radius: inherit;
+            transform: translateZ(1px);
+            pointer-events: none;
+        }
+
+        /* Year Marker on Spine */
+        .year-marker {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .year-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 3px solid var(--bg-primary);
+            box-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover .year-dot {
+            transform: scale(1.3);
+            box-shadow: 0 0 24px rgba(220, 38, 38, 0.8);
+        }
+
+        .year-label {
+            position: absolute;
+            top: calc(50% + 40px);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        /* Card Content */
+        .card-category {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--accent-wash);
+            border-radius: 20px;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            font-size: 14px;
+            line-height: 1.7;
+            font-weight: 300;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+        }
+
+        .card-meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-meta-item svg {
+            width: 12px;
+            height: 12px;
+            opacity: 0.7;
+        }
+
+        /* Card Image */
+        .card-image {
+            margin-top: 16px;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 140px;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .event-card:hover .card-image img {
+            transform: scale(1.08);
+        }
+
+        /* Related People Tags */
+        .card-people {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 14px;
+        }
+
+        .person-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: var(--accent-wash);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        /* Connecting Line to Spine */
+        .card-connector {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            width: 2px;
+            height: 60px;
+            background: linear-gradient(180deg, transparent, var(--accent));
+            transform: translateX(-50%);
+            opacity: 0.5;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(9, 9, 9, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: var(--border-subtle);
+            z-index: 30;
+        }
+
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+
+        .progress-year {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Navigation Arrows */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(9, 9, 9, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 30;
+            color: var(--text-muted);
+        }
+
+        .nav-arrow:hover {
+            background: var(--accent);
+            color: var(--text-primary);
+            box-shadow: var(--accent-glow);
+        }
+
+        .nav-arrow.prev { left: 24px; }
+        .nav-arrow.next { right: 24px; }
+
+        .nav-arrow svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            animation: fadeIn 0.2s ease forwards;
+        }
+
+        .modal-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 101;
+            width: 90vw;
+            max-width: 680px;
+            max-height: 85vh;
+            overflow-y: auto;
+            background: rgba(14, 14, 14, 0.95);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(200, 30, 30, 0.18);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 0 60px rgba(200, 30, 30, 0.08);
+            padding: 40px;
+            animation: scaleIn 0.25s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-faint);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            display: flex;
+        }
+
+        .modal-close:hover {
+            color: var(--accent);
+            background: var(--accent-wash);
+        }
+
+        .modal-hero {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+        }
+
+        .modal-category {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--accent-wash);
+            border-radius: 20px;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 500;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            color: var(--text-faint);
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .modal-meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-divider {
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            border: none;
+            margin-bottom: 24px;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.85;
+            font-weight: 300;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+        }
+
+        .modal-people {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Scroll Hint */
+        .scroll-hint {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-faint);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+            opacity: 0;
+            animation: fadeInOut 3s ease-in-out infinite, fadeIn 0.5s ease 0.5s forwards;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.6; }
+        }
+
+        .scroll-hint svg {
+            width: 20px;
+            height: 20px;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%); }
+            50% { transform: translateX(calc(-50% + 8px)); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-label">Historical Timeline</div>
+        <h1 class="header-title">Chronicle of Revolutionary Thought</h1>
+        <p class="header-subtitle">Explore the pivotal moments that shaped Marxist theory and the global workers' movement</p>
+    </header>
+
+    <div class="filter-bar">
+        <div class="filter-inner">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="biography">Biography</button>
+            <button class="filter-btn" data-filter="publication">Publication</button>
+            <button class="filter-btn" data-filter="historical">Historical</button>
+            <button class="filter-btn" data-filter="revolution">Revolution</button>
+            <button class="filter-btn" data-filter="organization">Organization</button>
+        </div>
+    </div>
+
+    <section class="timeline-section">
+        <div class="scene-3d">
+            <div class="timeline-track">
+                <div class="spine"></div>
+                
+                <div class="events-container" id="eventsContainer">
+                    <!-- Events will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-hint">
+            <span>Scroll to explore</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </section>
+
+    <div class="progress-indicator">
+        <span class="progress-label">Progress</span>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 16.67%"></div>
+        </div>
+        <span class="progress-year" id="currentYear">1818</span>
+    </div>
+
+    <button class="nav-arrow prev" id="prevBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
+        </svg>
+    </button>
+    
+    <button class="nav-arrow next" id="nextBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5l7 7-7 7"/>
+        </svg>
+    </button>
+
+    <script>
+        // Timeline Data
+        const timelineEvents = [
+            {
+                id: 1,
+                year: 1818,
+                title: "Karl Marx Born",
+                description: "Karl Heinrich Marx was born in Trier, Prussia (modern-day Germany), the third of nine children.",
+                detailed_description: "Born on May 5, 1818, in Trier, Marx would become one of the most influential thinkers in human history. His birthplace, a city with deep Roman heritage, would later influence his historical materialism. Coming from a family of rabbis on both sides, Marx would eventually break with religious tradition to develop his revolutionary theory of society.",
+                category: "biography",
+                location: "Trier, Prussia",
+                related_people: ["Karl Marx"],
+                image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Karl_Marx_1875.jpg/440px-Karl_Marx_1875.jpg"
+            },
+            {
+                id: 2,
+                year: 1848,
+                title: "The Communist Manifesto",
+                description: "Marx and Engels published 'The Communist Manifesto,' one of the most influential political texts in history.",
+                detailed_description: "Published on February 21, 1848, the Manifesto was commissioned by the Communist League and written in London. Its famous opening line — 'A spectre is haunting Europe — the spectre of communism' — announced the rise of a new political force. The work distilled years of theoretical development and outlined the class struggle that would define modern history.",
+                category: "publication",
+                location: "London, England",
+                related_people: ["Karl Marx", "Friedrich Engels"],
+                image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/First_edition_of_The_Communist_Manifesto.jpg/440px-First_edition_of_The_Communist_Manifesto.jpg"
+            },
+            {
+                id: 3,
+                year: 1867,
+                title: "Das Kapital Volume I",
+                description: "Marx published the first volume of 'Das Kapital,' his magnum opus on political economy.",
+                detailed_description: "Published on September 14, 1867, in Hamburg, Das Kapital presented Marx's analysis of capitalism's inner workings. The work introduced the labor theory of value, the concept of surplus value, and explained the inherent contradictions of capitalism that would eventually lead to its downfall. Volume I focuses on the production process of capital.",
+                category: "publication",
+                location: "Hamburg, Germany",
+                related_people: ["Karl Marx"],
+                image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Kapitalvol1.jpg/440px-Kapitalvol1.jpg"
+            },
+            {
+                id: 4,
+                year: 1883,
+                title: "Death of Karl Marx",
+                description: "Karl Marx died in London at age 64, leaving behind an incomplete theoretical framework.",
+                detailed_description: "Marx died on March 14, 1883, at his home in London. He was buried in Highgate Cemetery, where his tombstone bears the famous epitaph: 'The philosophers have only interpreted the world; the point is to change it.' Though Volumes II and III of Das Kapital remained unpublished, his ideas would reshape the 20th century.",
+                category: "biography",
+                location: "London, England",
+                related_people: ["Karl Marx", "Friedrich Engels"],
+                image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Highgate_Cemetery_-_Marx_memorial.jpg/440px-Highgate_Cemetery_-_Marx_memorial.jpg"
+            },
+            {
+                id: 5,
+                year: 1917,
+                title: "Russian October Revolution",
+                description: "The Bolsheviks seized power in Russia, implementing Marxist theory for the first time.",
+                detailed_description: "On October 25, 1917 (Julian calendar), the Bolsheviks led by Vladimir Lenin overthrew the Provisional Government. This marked the first successful attempt to establish a socialist state based on Marxist principles. The revolution sent shockwaves through global capitalism and inspired revolutionary movements worldwide throughout the 20th century.",
+                category: "revolution",
+                location: "Petrograd, Russia",
+                related_people: ["Vladimir Lenin", "Leon Trotsky"],
+                image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Bolshevik_Leader_1920.jpg/440px-Bolshevik_Leader_1920.jpg"
+            },
+            {
+                id: 6,
+                year: 1949,
+                title: "People's Republic of China",
+                description: "Mao Zedong proclaimed the People's Republic of China, creating the world's largest socialist state.",
+                detailed_description: "On October 1, 1949, Mao Zedong declared the founding of the People's Republic of China on Tiananmen Gate in Beijing. The communist victory in the Chinese Civil War created a socialist state that would house one-quarter of humanity. This event fundamentally altered the global balance of power and the Cold War dynamics.",
+                category: "revolution",
+                location: "Beijing, China",
+                related_people: ["Mao Zedong"],
+                image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Mao_Zedong_1959.jpg/440px-Mao_Zedong_1959.jpg"
+            }
+        ];
+
+        // DOM Elements
+        const eventsContainer = document.getElementById('eventsContainer');
+        const progressFill = document.getElementById('progressFill');
+        const currentYearEl = document.getElementById('currentYear');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        let currentFilter = 'all';
+        let currentIndex = 0;
+
+        // Category Labels
+        const categoryLabels = {
+            biography: 'Biography',
+            academic: 'Academic',
+            publication: 'Publication',
+            organization: 'Organization',
+            historical: 'Historical',
+            revolution: 'Revolution',
+            war: 'War',
+            economic: 'Economic'
+        };
+
+        // Render Events
+        function renderEvents(filter = 'all') {
+            const filtered = filter === 'all' 
+                ? timelineEvents 
+                : timelineEvents.filter(e => e.category === filter);
+            
+            eventsContainer.innerHTML = '';
+            
+            filtered.forEach((event, index) => {
+                const card = document.createElement('div');
+                card.className = 'event-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.innerHTML = `
+                    <div class="card-connector"></div>
+                    <span class="card-category">${categoryLabels[event.category] || event.category}</span>
+                    <h3 class="card-title">${event.title}</h3>
+                    <p class="card-description">${event.description}</p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            ${event.year}
+                        </span>
+                        <span class="card-meta-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            ${event.location}
+                        </span>
+                    </div>
+                    ${event.image_url ? `
+                        <div class="card-image">
+                            <img src="${event.image_url}" alt="${event.title}" loading="lazy">
+                        </div>
+                    ` : ''}
+                    ${event.related_people && event.related_people.length > 0 ? `
+                        <div class="card-people">
+                            ${event.related_people.map(p => `<span class="person-tag">${p}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                `;
+                
+                card.addEventListener('click', () => openModal(event));
+                eventsContainer.appendChild(card);
+            });
+
+            // Update progress
+            updateProgress();
+        }
+
+        // Update Progress
+        function updateProgress() {
+            const cards = document.querySelectorAll('.event-card');
+            if (cards.length === 0) return;
+            
+            const scrollPercent = eventsContainer.scrollLeft / (eventsContainer.scrollWidth - eventsContainer.clientWidth);
+            const progress = Math.max(16.67, Math.min(100, scrollPercent * 100 + 16.67));
+            progressFill.style.width = `${progress}%`;
+            
+            // Find closest card to center
+            const centerX = eventsContainer.scrollLeft + eventsContainer.clientWidth / 2;
+            let closestIndex = 0;
+            let closestDist = Infinity;
+            
+            cards.forEach((card, index) => {
+                const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                const dist = Math.abs(cardCenter - centerX);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestIndex = index;
+                }
+            });
+            
+            currentIndex = closestIndex;
+            const currentEvent = timelineEvents.find(e => e.year === parseInt(cards[closestIndex]?.querySelector('.card-meta-item')?.textContent?.trim()));
+            if (currentEvent) {
+                currentYearEl.textContent = currentEvent.year;
+            }
+        }
+
+        // Open Modal
+        function openModal(event) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-panel">
+                    <button class="modal-close">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    ${event.image_url ? `<img class="modal-hero" src="${event.image_url}" alt="${event.title}">` : ''}
+                    <span class="modal-category">${categoryLabels[event.category] || event.category}</span>
+                    <h2 class="modal-title">${event.title}</h2>
+                    <div class="modal-meta">
+                        <span class="modal-meta-item">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            ${event.year}
+                        </span>
+                        <span class="modal-meta-item">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            ${event.location}
+                        </span>
+                    </div>
+                    <hr class="modal-divider">
+                    <p class="modal-body">${event.detailed_description || event.description}</p>
+                    ${event.related_people && event.related_people.length > 0 ? `
+                        <div class="modal-people">
+                            ${event.related_people.map(p => `<span class="person-tag">${p}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+            
+            modal.querySelector('.modal-close').addEventListener('click', () => closeModal(modal));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal(modal);
+            });
+            
+            // Close on escape
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal(modal);
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        }
+
+        function closeModal(modal) {
+            modal.style.animation = 'fadeIn 0.2s ease reverse forwards';
+            setTimeout(() => {
+                modal.remove();
+                document.body.style.overflow = '';
+            }, 200);
+        }
+
+        // Navigation
+        function scrollToIndex(index) {
+            const cards = document.querySelectorAll('.event-card');
+            if (cards[index]) {
+                cards[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                scrollToIndex(currentIndex - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            const cards = document.querySelectorAll('.event-card');
+            if (currentIndex < cards.length - 1) {
+                scrollToIndex(currentIndex + 1);
+            }
+        });
+
+        // Filter
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderEvents(currentFilter);
+            });
+        });
+
+        // Drag to scroll
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        eventsContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - eventsContainer.offsetLeft;
+            scrollLeft = eventsContainer.scrollLeft;
+        });
+
+        eventsContainer.addEventListener('mouseleave', () => isDown = false);
+        eventsContainer.addEventListener('mouseup', () => isDown = false);
+        
+        eventsContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - eventsContainer.offsetLeft;
+            const walk = (x - startX) * 2;
+            eventsContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        // Scroll progress update
+        eventsContainer.addEventListener('scroll', updateProgress);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextBtn.click();
+            } else if (e.key === 'ArrowLeft') {
+                prevBtn.click();
+            }
+        });
+
+        // Initial render
+        renderEvents();
+    </script>
+</body>
+</html>

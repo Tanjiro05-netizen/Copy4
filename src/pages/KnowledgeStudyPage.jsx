@@ -8,6 +8,7 @@ import QuizPlayer from '../components/Knowledge/Study/QuizPlayer';
 import CellLeaderboard from '../components/Knowledge/Study/CellLeaderboard';
 import ScenarioPlayer from '../components/Knowledge/Study/ScenarioPlayer';
 import MasteryTree from '../components/Knowledge/Study/MasteryTree';
+import * as s from './KnowledgeStudyPage.css.ts';
 
 const KnowledgeStudyPage = () => {
   const { user } = useAuth();
@@ -144,7 +145,7 @@ const KnowledgeStudyPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#12131A] text-white flex items-center justify-center">
+      <div className={s.page} style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="text-center space-y-4">
           <Zap className="w-12 h-12 text-red-500 mx-auto" />
           <h1 className="text-2xl font-bold">Study Arena</h1>
@@ -161,7 +162,7 @@ const KnowledgeStudyPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#12131A] text-white">
+    <div className={s.page}>
       {/* Header */}
       <div className="sticky top-16 z-40 bg-[#12131A]/95 backdrop-blur border-b border-gray-800 py-3">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">

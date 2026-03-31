@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Sun, Moon, Users, Shield, MessageSquare, HelpCircle, ChevronDown } from 'lucide-react';
+import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, MessageSquare, HelpCircle, ChevronDown } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import * as s from './Header.css.ts';
 
 const Header = () => {
     const { user, logout, isAdmin, canManagePolitics } = useAuth();
-    const { theme, toggleTheme } = useTheme();
+    const { theme } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,52 +48,42 @@ const Header = () => {
     const navItems = allNavItems;
     
     return (
-        <header className="fixed top-0 w-full bg-black text-white py-3 z-50 border-b border-gray-800">
-            <div className="container mx-auto flex justify-between items-center px-4">
-                <Link to="/" className="text-xl font-bold tracking-wider">
+        <header className={s.header}>
+            <div className={s.headerInner}>
+                <Link to="/" className={s.logo}>
                     Marxist.info
                 </Link>
                 
                 {/* Desktop Navigation */}
-                <div className="hidden md:flex items-center">
-                    <nav className="flex items-center">
+                <div className={s.desktopNav}>
+                    <nav className={s.navRow}>
                         {navItems.map((item) => {
                             const isRestricted = !user && !item.guestAccessible;
 
                             if (item.children) {
                                 const anyChildActive = item.children.some(c => isActive(c.path));
                                 return (
-                                    <div key={item.label} className="relative group">
+                                    <div key={item.label} className={s.dropdownWrap}>
                                         <button
-                                            className={`flex items-center px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
-                                                isRestricted
-                                                    ? 'text-gray-600 hover:text-gray-500'
-                                                    : anyChildActive ? 'text-red-500' : 'text-gray-300 hover:text-red-400'
-                                            }`}
+                                            className={`${s.dropdownTrigger} ${isRestricted ? s.navLinkRestricted : anyChildActive ? s.dropdownTriggerActive : ''}`}
                                         >
                                             <span>{item.label}</span>
-                                            <ChevronDown size={14} className="ml-1" />
-                                            {isRestricted && <span className="ml-1 text-[10px] text-gray-600">✦</span>}
+                                            <ChevronDown size={14} style={{ marginLeft: 4 }} />
+                                            {isRestricted && <span className={s.restrictedMark}>✦</span>}
                                         </button>
-                                        <div className="absolute left-0 mt-0 w-56 rounded-md shadow-lg bg-black border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                            <div className="py-1">
+                                        <div className={s.dropdownMenu}>
                                                 {item.children.map(child => (
                                                     <Link
                                                         key={child.path}
                                                         to={isRestricted ? '/coming-soon' : child.path}
-                                                        className={`block px-4 py-2.5 text-sm transition-colors ${
-                                                            isActive(child.path)
-                                                                ? 'bg-gray-900 text-white'
-                                                                : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                                                        }`}
+                                                        className={`${s.dropdownItem} ${isActive(child.path) ? s.dropdownItemActive : ''}`}
                                                     >
-                                                        <span className="font-medium">{child.label}</span>
+                                                        <span className={s.dropdownItemLabel}>{child.label}</span>
                                                         {child.description && (
-                                                            <span className="block text-xs text-gray-500 mt-0.5">{child.description}</span>
+                                                            <span className={s.dropdownItemDesc}>{child.description}</span>
                                                         )}
                                                     </Link>
                                                 ))}
-                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -102,168 +93,80 @@ const Header = () => {
                                 <Link 
                                     key={item.path}
                                     to={isRestricted ? '/coming-soon' : item.path}
-                                    className={`flex items-center px-4 py-2 text-sm font-medium transition-colors ${
-                                        isRestricted
-                                            ? 'text-gray-600 hover:text-gray-300'
-                                            : isActive(item.path) ? 'text-red-500' : 'text-gray-300 hover:text-red-400'
-                                    }`}
+                                    className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : ''}`}
                                     title={isRestricted ? 'Coming Soon' : ''}
                                 >
                                     <span>{item.label}</span>
-                                    {isRestricted && <span className="ml-1 text-[10px] text-gray-500">✦</span>}
+                                    {isRestricted && <span className={s.restrictedMark}>✦</span>}
                                 </Link>
                             );
                         })}
                         {canEditPolitics && !isAdminUser && (
-                            <div className="relative group">
-                                <div className="flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors cursor-pointer">
-                                    <FileText size={16} className="mr-2" />
+                            <div className={s.dropdownWrap}>
+                                <div className={s.dropdownTrigger}>
+                                    <FileText size={16} style={{ marginRight: 8 }} />
                                     <span>Editorial</span>
                                 </div>
-                                <div className="absolute left-0 mt-2 w-52 rounded-md shadow-lg bg-black border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                    <div className="py-1">
+                                <div className={s.dropdownMenu}>
                                         <Link
                                             to="/admin/politics/upload"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/politics/upload') ? 'bg-gray-900 text-white' : ''
-                                            }`}
+                                            className={`${s.dropdownItem} ${isActive('/admin/politics/upload') ? s.dropdownItemActive : ''}`}
                                         >
                                             Politics Upload
                                         </Link>
-                                    </div>
                                 </div>
                             </div>
                         )}
 
                         {isAdminUser && (
-                            <div className="relative group">
-                                <div className="flex items-center px-4 py-2 text-sm font-medium hover:text-red-400 transition-colors cursor-pointer">
-                                    <Shield size={16} className="mr-2" />
+                            <div className={s.dropdownWrap}>
+                                <div className={s.dropdownTrigger}>
+                                    <Shield size={16} style={{ marginRight: 8 }} />
                                     <span>Admin</span>
                                 </div>
-                                <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-black border border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                    <div className="py-1">
-                                        <Link 
-                                            to="/admin/tags"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/tags') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Category & Tag Management
-                                        </Link>
-                                        <Link
-                                            to="/admin/roles"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/roles') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            User Role Management
-                                        </Link>
-                                        <Link 
-                                            to="/admin/submissions"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/submissions') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Review Submissions
-                                        </Link>
-                                        <Link 
-                                            to="/admin/knowledge"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/knowledge') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Knowledge Moderation
-                                        </Link>
-                                        <Link 
-                                            to="/admin/quizzes"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/quizzes') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Quiz Management
-                                        </Link>
-                                        <Link 
-                                            to="/admin/scenarios"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/scenarios') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Scenario Management
-                                        </Link>
-                                        <Link 
-                                            to="/admin/world-sim"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/world-sim') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            World Sim
-                                        </Link>
-                                        <Link 
-                                            to="/admin/analysis/upload"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/analysis/upload') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Upload Analysis Text
-                                        </Link>
-                                        <Link 
-                                            to="/admin/library/upload"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/library/upload') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Library Upload
-                                        </Link>
-                                        <Link
-                                            to="/admin/politics/upload"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/politics/upload') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            Politics Upload
-                                        </Link>
-                                        <Link 
-                                            to="/admin/stem"
-                                            className={`flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white ${
-                                                isActive('/admin/stem') ? 'bg-gray-900 text-white' : ''
-                                            }`}
-                                        >
-                                            STEM Courses
-                                        </Link>
-                                    </div>
+                                <div className={s.dropdownMenu}>
+                                        {[
+                                            { to: '/admin/tags', label: 'Category & Tag Management' },
+                                            { to: '/admin/roles', label: 'User Role Management' },
+                                            { to: '/admin/submissions', label: 'Review Submissions' },
+                                            { to: '/admin/knowledge', label: 'Knowledge Moderation' },
+                                            { to: '/admin/quizzes', label: 'Quiz Management' },
+                                            { to: '/admin/scenarios', label: 'Scenario Management' },
+                                            { to: '/admin/world-sim', label: 'World Sim' },
+                                            { to: '/admin/analysis/upload', label: 'Upload Analysis Text' },
+                                            { to: '/admin/library/upload', label: 'Library Upload' },
+                                            { to: '/admin/politics/upload', label: 'Politics Upload' },
+                                            { to: '/admin/stem', label: 'STEM Courses' },
+                                        ].map((link) => (
+                                            <Link
+                                                key={link.to}
+                                                to={link.to}
+                                                className={`${s.dropdownItem} ${isActive(link.to) ? s.dropdownItemActive : ''}`}
+                                            >
+                                                {link.label}
+                                            </Link>
+                                        ))}
                                 </div>
                             </div>
                         )}
                         {user && (
-                            <Link to="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <Link to="/profile" className={s.navLink}>
                                 My Profile
                             </Link>
                         )}
                     </nav>
                     
-                    <div className="flex items-center space-x-3">
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 hover:bg-gray-800 rounded-full transition-colors"
-                            title='Toggle Theme'
-                        >
-                            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                        </button>
-                        
+                    <div className={s.actionsRow}>
                         {user ? (
                             <button
                                 onClick={handleLogout}
-                                className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                                className={s.iconButton}
                                 title='Logout'
                             >
-                                <LogOut className="w-5 h-5" />
+                                <LogOut size={18} />
                             </button>
                         ) : (
-                            <Link
-                                to="/"
-                                className="px-4 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
-                            >
+                            <Link to="/" className={s.loginButton}>
                                 Log In
                             </Link>
                         )}
@@ -272,46 +175,41 @@ const Header = () => {
                 
                 {/* Mobile Menu Button */}
                 <button 
-                    className="md:hidden p-2 hover:bg-gray-800 rounded-full transition-colors"
+                    className={s.mobileMenuBtn}
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 >
-                    <Menu className="w-6 h-6" />
+                    <Menu size={22} />
                 </button>
             </div>
             
             {/* Mobile Menu */}
             {mobileMenuOpen && (
-                <div className="md:hidden fixed inset-0 z-50 bg-black pt-16">
-                    <div className="container mx-auto px-4 py-8 flex flex-col">
-                        <div className="flex justify-end mb-4">
-                            <button 
-                                className="p-2 hover:bg-gray-800 rounded-full transition-colors"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                <Menu className="w-6 h-6 text-white" />
+                <div className={s.mobileOverlay}>
+                    <div className={s.mobileInner}>
+                        <div className={s.mobileCloseRow}>
+                            <button className={s.iconButton} onClick={() => setMobileMenuOpen(false)}>
+                                <Menu size={22} />
                             </button>
                         </div>
-                        <nav className="flex flex-col space-y-6">
+                        <nav className={s.mobileNavStack}>
                             {navItems.map((item) => {
                                 const isRestricted = !user && !item.guestAccessible;
 
                                 if (item.children) {
                                     return (
-                                        <div key={item.label} className="space-y-2">
-                                            <span className="text-lg font-medium text-gray-400">{item.label}</span>
-                                            <div className="pl-4 space-y-3">
+                                        <div key={item.label}>
+                                            <span className={s.mobileGroupLabel}>{item.label}</span>
+                                            <div className={s.mobileSubStack}>
                                                 {item.children.map(child => (
                                                     <Link
                                                         key={child.path}
                                                         to={isRestricted ? '/coming-soon' : child.path}
-                                                        className={`block text-base font-medium transition-colors ${
-                                                            isActive(child.path) ? 'text-red-500' : 'text-white hover:text-red-400'
-                                                        }`}
+                                                        className={`${s.mobileSubLink} ${isActive(child.path) ? s.mobileLinkActive : ''}`}
                                                         onClick={() => setMobileMenuOpen(false)}
                                                     >
                                                         {child.label}
                                                         {child.description && (
-                                                            <span className="block text-xs text-gray-500">{child.description}</span>
+                                                            <span className={s.mobileSubDesc}>{child.description}</span>
                                                         )}
                                                     </Link>
                                                 ))}
@@ -324,15 +222,11 @@ const Header = () => {
                                     <Link 
                                         key={item.path}
                                         to={isRestricted ? '/coming-soon' : item.path}
-                                        className={`flex items-center text-lg font-medium transition-colors ${
-                                            isRestricted
-                                                ? 'text-gray-600 hover:text-gray-300'
-                                                : isActive(item.path) ? 'text-red-500' : 'text-white hover:text-red-400'
-                                        }`}
+                                        className={`${s.mobileLink} ${isRestricted ? s.mobileLinkRestricted : isActive(item.path) ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <span>{item.label}</span>
-                                        {isRestricted && <span className="ml-2 text-xs text-gray-500">Coming Soon</span>}
+                                        {isRestricted && <span className={s.mobileComingSoon}>Coming Soon</span>}
                                     </Link>
                                 );
                             })}
@@ -340,28 +234,22 @@ const Header = () => {
                                 <>
                                     <Link
                                         to="/admin/tags"
-                                        className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
-                                            isActive('/admin/tags') ? 'text-red-500' : 'text-white'
-                                        }`}
+                                        className={`${s.mobileLink} ${isActive('/admin/tags') ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
-                                        <Shield size={20} className="mr-2" />
+                                        <Shield size={20} style={{ marginRight: 8 }} />
                                         <span>Admin Tools</span>
                                     </Link>
                                     <Link
                                         to="/admin/roles"
-                                        className={`pl-7 text-base font-medium hover:text-red-400 transition-colors ${
-                                            isActive('/admin/roles') ? 'text-red-500' : 'text-gray-200'
-                                        }`}
+                                        className={`${s.mobileSubLink} ${isActive('/admin/roles') ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         Role Management
                                     </Link>
                                     <Link
                                         to="/admin/politics/upload"
-                                        className={`pl-7 text-base font-medium hover:text-red-400 transition-colors ${
-                                            isActive('/admin/politics/upload') ? 'text-red-500' : 'text-gray-200'
-                                        }`}
+                                        className={`${s.mobileSubLink} ${isActive('/admin/politics/upload') ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         Politics Upload
@@ -371,54 +259,34 @@ const Header = () => {
                             {!isAdminUser && canEditPolitics && (
                                 <Link
                                     to="/admin/politics/upload"
-                                    className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors ${
-                                        isActive('/admin/politics/upload') ? 'text-red-500' : 'text-white'
-                                    }`}
+                                    className={`${s.mobileLink} ${isActive('/admin/politics/upload') ? s.mobileLinkActive : ''}`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
-                                    <FileText size={20} className="mr-2" />
+                                    <FileText size={20} style={{ marginRight: 8 }} />
                                     <span>Politics Upload</span>
                                 </Link>
                             )}
                             {user && (
                                 <Link 
                                     to="/profile"
-                                    className={`flex items-center text-lg font-medium hover:text-red-400 transition-colors text-white`}
+                                    className={s.mobileLink}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     <span>My Profile</span>
                                 </Link>
                             )}
-
                         </nav>
-                        <div className="mt-8 flex justify-center space-x-6">
-                            <button
-                                onClick={() => {
-                                    toggleTheme();
-                                    setMobileMenuOpen(false);
-                                }}
-                                className="flex items-center space-x-2 text-white hover:text-red-400 transition-colors"
-                            >
-                                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                                <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-                            </button>
+                        <div className={s.mobileActions}>
                             {user ? (
                                 <button
-                                    onClick={() => {
-                                        handleLogout();
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    className="flex items-center space-x-2 text-white hover:text-red-400 transition-colors"
+                                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                                    className={s.mobileLogout}
                                 >
-                                    <LogOut className="w-5 h-5" />
+                                    <LogOut size={18} />
                                     <span>Logout</span>
                                 </button>
                             ) : (
-                                <Link
-                                    to="/"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors"
-                                >
+                                <Link to="/" onClick={() => setMobileMenuOpen(false)} className={s.loginButton}>
                                     Log In
                                 </Link>
                             )}

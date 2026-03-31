@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import Header from '../components/Header';
 import { User, Image, Shield, CheckCircle, ArrowLeft, FileText, MessageSquare, Repeat2, Loader2 } from 'lucide-react';
 import { forumApiService } from '../components/Forum/api';
+import * as s from './PublicProfilePage.css.ts';
 
 const PublicProfilePage = () => {
     const { username } = useParams();
@@ -74,10 +74,9 @@ const PublicProfilePage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-900 text-white">
-                <Header />
-                <div className="flex justify-center items-center h-[calc(100vh-64px)]">
-                    <div className="animate-pulse text-gray-400">Loading profile...</div>
+            <div className={s.page}>
+                <div className={s.loadingWrap}>
+                    <div className={s.loadingText}>Loading profile...</div>
                 </div>
             </div>
         );
@@ -85,20 +84,16 @@ const PublicProfilePage = () => {
 
     if (notFound) {
         return (
-            <div className="min-h-screen bg-gray-900 text-white">
-                <Header />
-                <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
-                    <div className="text-center py-16">
-                        <User size={64} className="mx-auto text-gray-600 mb-4" />
-                        <h1 className="text-2xl font-bold mb-2">User Not Found</h1>
-                        <p className="text-gray-400 mb-6">
+            <div className={s.page}>
+                <main className={s.main}>
+                    <div className={s.notFoundWrap}>
+                        <User size={64} className={s.notFoundIcon} />
+                        <h1 className={s.notFoundTitle}>User Not Found</h1>
+                        <p className={s.notFoundText}>
                             The user "{username}" doesn't exist or their profile is not available.
                         </p>
-                        <Link 
-                            to="/"
-                            className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md transition-colors"
-                        >
-                            <ArrowLeft size={18} className="mr-2" />
+                        <Link to="/" className={s.backBtn}>
+                            <ArrowLeft size={18} style={{marginRight:8}} />
                             Go Back Home
                         </Link>
                     </div>
@@ -108,9 +103,8 @@ const PublicProfilePage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white">
-            <Header />
-            <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
+        <div className={s.page}>
+            <main className={s.main}>
                 {/* Banner */}
                 <div className="relative h-48 bg-gray-800 rounded-t-lg flex items-center justify-center">
                     {profile.banner_url ? (

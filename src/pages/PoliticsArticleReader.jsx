@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { ArrowLeft, CalendarDays, ChevronLeft, ChevronRight, Newspaper, Tag } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import * as s from './PoliticsArticleReader.css.ts';
 
 const formatDate = (value) => {
     if (!value) return 'Undated';
@@ -179,9 +180,9 @@ const PoliticsArticleReader = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#12131A] text-white px-4 py-10">
-                <div className="max-w-4xl mx-auto">
-                    <p className="text-gray-400">Loading dispatch...</p>
+            <div className={s.page}>
+                <div className={s.main}>
+                    <p style={{color:'rgba(255,255,255,0.48)'}}>Loading dispatch...</p>
                 </div>
             </div>
         );
@@ -189,8 +190,8 @@ const PoliticsArticleReader = () => {
 
     if (error || !article) {
         return (
-            <div className="min-h-screen bg-[#12131A] text-white px-4 py-10">
-                <div className="max-w-4xl mx-auto bg-[#181A23] border border-gray-800 rounded-2xl p-8">
+            <div className={s.page}>
+                <div className={s.main} style={{background:'#181A23',border:'1px solid rgba(255,255,255,0.06)',borderRadius:18,padding:32}}>
                     <h1 className="text-2xl font-semibold mb-3">Dispatch unavailable</h1>
                     <p className="text-gray-400 mb-6">{error || 'This dispatch is unavailable right now.'}</p>
                     <Link
@@ -205,39 +206,32 @@ const PoliticsArticleReader = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-white px-4 py-10">
-            <article className="max-w-4xl mx-auto">
-                <Link
-                    to={backToFeedHref}
-                    className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-red-400 transition-colors mb-6"
-                >
+        <div className={s.page}>
+            <article className={s.main}>
+                <Link to={backToFeedHref} className={s.backLink}>
                     <ArrowLeft size={16} /> Back to front page
                 </Link>
 
-                <header className="bg-[#181A23] border border-gray-800 rounded-2xl p-6 md:p-8 mb-6">
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-600/20 text-red-300 text-xs uppercase tracking-wide">
+                <header className={s.articleCard}>
+                    <div className={s.badgeRow}>
+                        <span className={`${s.badge} ${s.badgeAccent}`}>
                             <Tag size={12} /> {article.category || 'analysis'}
                         </span>
                         {article.status && (
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-700/60 text-gray-200 text-xs uppercase tracking-wide">
+                            <span className={`${s.badge} ${s.badgeDefault}`}>
                                 <Newspaper size={12} /> {article.status}
                             </span>
                         )}
                     </div>
 
-                    <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
-                        {article.title || 'Untitled dispatch'}
-                    </h1>
+                    <h1 className={s.articleTitle}>{article.title || 'Untitled dispatch'}</h1>
 
                     {article.excerpt && (
-                        <p className="text-gray-300 text-lg leading-relaxed mb-5">
-                            {article.excerpt}
-                        </p>
+                        <p className={s.articleExcerpt}>{article.excerpt}</p>
                     )}
 
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
-                        <span className="inline-flex items-center gap-2">
+                    <div className={s.articleMeta}>
+                        <span className={s.metaItem}>
                             <CalendarDays size={15} />
                             {formatDate(article.published_at || article.created_at)}
                         </span>
@@ -246,72 +240,49 @@ const PoliticsArticleReader = () => {
                 </header>
 
                 {article.image_url && (
-                    <div className="mb-8 overflow-hidden rounded-2xl border border-gray-800 bg-[#181A23]">
-                        <img
-                            src={article.image_url}
-                            alt={article.title || 'Politics dispatch image'}
-                            className="w-full max-h-[520px] object-cover"
-                        />
+                    <div className={s.imageWrap}>
+                        <img src={article.image_url} alt={article.title || 'Politics dispatch image'} className={s.articleImage} />
                     </div>
                 )}
 
-                <section className="bg-[#181A23] border border-gray-800 rounded-2xl p-6 md:p-8">
+                <section className={s.contentCard}>
                     {renderedContent || (
-                        <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                            {article.content || 'No article body available for this dispatch yet.'}
-                        </p>
+                        <p className={s.contentBody}>{article.content || 'No article body available for this dispatch yet.'}</p>
                     )}
                 </section>
 
                 {(adjacentDispatches.previous || adjacentDispatches.next) && (
-                    <section className="mt-6 bg-[#181A23] border border-gray-800 rounded-2xl p-5">
-                        <h2 className="text-lg font-semibold mb-3">Navigate this edition</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <section className={s.navSection}>
+                        <h2 className={s.navTitle}>Navigate this edition</h2>
+                        <div className={s.navGrid}>
                             {adjacentDispatches.previous ? (
-                                <Link
-                                    to={`/politics/${adjacentDispatches.previous.slug}?edition=${article.edition_date || editionParam}`}
-                                    className="p-3 rounded-xl border border-gray-700 hover:border-gray-500 transition-colors"
-                                >
-                                    <p className="text-xs text-gray-400 inline-flex items-center gap-1">
-                                        <ChevronLeft size={13} /> Previous in edition
-                                    </p>
-                                    <p className="text-sm text-white mt-1">{adjacentDispatches.previous.title}</p>
+                                <Link to={`/politics/${adjacentDispatches.previous.slug}?edition=${article.edition_date || editionParam}`} className={s.navCard}>
+                                    <p className={s.navLabel}><ChevronLeft size={13} /> Previous in edition</p>
+                                    <p className={s.navCardTitle}>{adjacentDispatches.previous.title}</p>
                                 </Link>
                             ) : (
-                                <div className="p-3 rounded-xl border border-gray-800 text-xs text-gray-500">No previous dispatch</div>
+                                <div className={s.navCardEmpty}>No previous dispatch</div>
                             )}
-
                             {adjacentDispatches.next ? (
-                                <Link
-                                    to={`/politics/${adjacentDispatches.next.slug}?edition=${article.edition_date || editionParam}`}
-                                    className="p-3 rounded-xl border border-gray-700 hover:border-gray-500 transition-colors"
-                                >
-                                    <p className="text-xs text-gray-400 inline-flex items-center gap-1">
-                                        Next in edition <ChevronRight size={13} />
-                                    </p>
-                                    <p className="text-sm text-white mt-1">{adjacentDispatches.next.title}</p>
+                                <Link to={`/politics/${adjacentDispatches.next.slug}?edition=${article.edition_date || editionParam}`} className={s.navCard}>
+                                    <p className={s.navLabel}>Next in edition <ChevronRight size={13} /></p>
+                                    <p className={s.navCardTitle}>{adjacentDispatches.next.title}</p>
                                 </Link>
                             ) : (
-                                <div className="p-3 rounded-xl border border-gray-800 text-xs text-gray-500">No next dispatch</div>
+                                <div className={s.navCardEmpty}>No next dispatch</div>
                             )}
                         </div>
                     </section>
                 )}
 
                 {relatedDispatches.length > 0 && (
-                    <section className="mt-6 bg-[#181A23] border border-gray-800 rounded-2xl p-5">
-                        <h2 className="text-lg font-semibold mb-3">Related dispatches</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <section className={s.navSection}>
+                        <h2 className={s.navTitle}>Related dispatches</h2>
+                        <div className={s.navGrid}>
                             {relatedDispatches.map((related) => (
-                                <Link
-                                    key={related.id || related.slug}
-                                    to={`/politics/${related.slug}?edition=${related.edition_date || article.edition_date || editionParam}`}
-                                    className="p-3 rounded-xl border border-gray-700 hover:border-gray-500 transition-colors"
-                                >
-                                    <p className="text-xs text-gray-400 uppercase tracking-wide">
-                                        {related.category || 'analysis'} • {formatDate(related.published_at || related.created_at)}
-                                    </p>
-                                    <p className="text-sm text-white mt-1">{related.title}</p>
+                                <Link key={related.id || related.slug} to={`/politics/${related.slug}?edition=${related.edition_date || article.edition_date || editionParam}`} className={s.navCard}>
+                                    <p className={s.relatedMeta}>{related.category || 'analysis'} · {formatDate(related.published_at || related.created_at)}</p>
+                                    <p className={s.relatedTitle}>{related.title}</p>
                                 </Link>
                             ))}
                         </div>

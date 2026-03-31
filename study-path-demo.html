@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Path Generator - New UI Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(220, 38, 38, 0.8); }
+        }
+        
+        @keyframes typing {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes progress-bar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-slide-up { animation: slide-up 0.5s ease-out forwards; }
+        .animate-bounce-in { animation: bounce-in 0.4s ease-out forwards; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        
+        .typing-dot {
+            animation: typing 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        .step-transition {
+            transition: all 0.3s ease-out;
+        }
+        
+        .glass-card {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .milestone-card:hover {
+            transform: translateX(4px);
+            border-color: rgba(220, 38, 38, 0.5);
+        }
+        
+        .preset-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .level-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .level-card:hover {
+            transform: translateY(-4px);
+        }
+        .level-card.selected {
+            transform: scale(1.02);
+        }
+        
+        .interest-pill {
+            transition: all 0.2s ease;
+        }
+        .interest-pill:hover {
+            transform: scale(1.05);
+        }
+        .interest-pill.selected {
+            animation: bounce-in 0.3s ease-out;
+        }
+        
+        .progress-fill {
+            animation: progress-bar 2s ease-out forwards;
+        }
+        
+        .timeline-connector {
+            background: linear-gradient(to bottom, #dc2626, #71717a, #3f3f46);
+        }
+        
+        .glow-red {
+            filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6));
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-zinc-950 via-red-950/20 to-zinc-950 text-white">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-900/40 bg-red-950/30 text-red-200 text-sm mb-4">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                AI-Powered Study Path Generator
+            </div>
+            <h1 class="text-4xl font-bold mb-2">Design Your Learning Journey</h1>
+            <p class="text-zinc-400">Answer a few questions and get a personalized roadmap through Marxist theory</p>
+        </div>
+
+        <!-- Main Container -->
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden">
+            
+            <!-- Step Indicator -->
+            <div class="flex items-center justify-center gap-4 mb-10">
+                <div class="flex items-center gap-2">
+                    <div id="step1-dot" class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-sm font-bold animate-pulse-glow">1</div>
+                    <span id="step1-label" class="text-sm text-red-400 font-medium">Level</span>
+                </div>
+                <div class="w-16 h-0.5 bg-zinc-700 rounded"></div>
+                <div class="flex items-center gap-2">
+                    <div id="step2-dot" class="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-600 flex items-center justify-center text-sm font-medium text-zinc-400">2</div>
+                    <span id="step2-label" class="text-sm text-zinc-500">Interests</span>
+                </div>
+                <div class="w-16 h-0.5 bg-zinc-700 rounded"></div>
+                <div class="flex items-center gap-2">
+                    <div id="step3-dot" class="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-600 flex items-center justify-center text-sm font-medium text-zinc-400">3</div>
+                    <span id="step3-label" class="text-sm text-zinc-500">Time</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Level Selection -->
+            <div id="step1" class="step-content animate-slide-up">
+                <h2 class="text-2xl font-semibold text-center mb-2">How much Marxist theory do you know?</h2>
+                <p class="text-zinc-400 text-center mb-8">Select the level that best describes your current knowledge</p>
+                
+                <div class="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                    <!-- Beginner -->
+                    <button onclick="selectLevel('beginner')" class="level-card glass-card rounded-2xl p-6 text-left border-2 border-transparent hover:border-red-900/50 cursor-pointer" id="level-beginner">
+                        <div class="text-4xl mb-4">🐣</div>
+                        <h3 class="text-lg font-semibold text-white mb-1">Beginner</h3>
+                        <p class="text-sm text-zinc-400 mb-3">Starting from scratch or with minimal exposure</p>
+                        <div class="flex flex-wrap gap-1">
+                            <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300">Communist Manifesto</span>
+                            <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300">Basic concepts</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Intermediate -->
+                    <button onclick="selectLevel('intermediate')" class="level-card glass-card rounded-2xl p-6 text-left border-2 border-transparent hover:border-red-900/50 cursor-pointer" id="level-intermediate">
+                        <div class="text-4xl mb-4">📚</div>
+                        <h3 class="text-lg font-semibold text-white mb-1">Intermediate</h3>
+                        <p class="text-sm text-zinc-400 mb-3">Some reading experience with foundational texts</p>
+                        <div class="flex flex-wrap gap-1">
+                            <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300">Capital</span>
+                            <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300">Dialectics</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Advanced -->
+                    <button onclick="selectLevel('advanced')" class="level-card glass-card rounded-2xl p-6 text-left border-2 border-transparent hover:border-red-900/50 cursor-pointer" id="level-advanced">
+                        <div class="text-4xl mb-4">🎓</div>
+                        <h3 class="text-lg font-semibold text-white mb-1">Advanced</h3>
+                        <p class="text-sm text-zinc-400 mb-3">Deep engagement with theory and practice</p>
+                        <div class="flex flex-wrap gap-1">
+                            <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300">Imperialism</span>
+                            <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-300">Strategy</span>
+                        </div>
+                    </button>
+                </div>
+                
+                <div class="flex justify-center mt-10">
+                    <button onclick="goToStep(2)" id="nextBtn1" class="px-8 py-3 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 rounded-full font-medium flex items-center gap-2 transition-all opacity-50 pointer-events-none" id="next1">
+                        Next: Select Interests
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+<!-- Step 2: Interests -->
+            <div id="step2" class="step-content hidden">
+                <h2 class="text-2xl font-semibold text-center mb-2">What areas interest you?</h2>
+                <p class="text-zinc-400 text-center mb-6">Choose your specialization (optional) or skip for a general path</p>
+                
+                <!-- Quick Presets -->
+                <div class="flex flex-wrap justify-center gap-3 mb-8">
+                    <button onclick="selectPreset('full')" class="preset-btn px-4 py-2 rounded-full border border-red-900/50 bg-red-950/30 text-red-300 text-sm hover:bg-red-900/50 transition-all" id="preset-full">
+                        🔴 Full Marxist Foundation
+                    </button>
+                    <button onclick="selectPreset('economy')" class="preset-btn px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm hover:bg-zinc-800/50 transition-all" id="preset-economy">
+                        📊 Political Economy Focus
+                    </button>
+                    <button onclick="selectPreset('philosophy')" class="preset-btn px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm hover:bg-zinc-800/50 transition-all" id="preset-philosophy">
+                        🔄 Philosophy Focus
+                    </button>
+                </div>
+                
+                <div class="text-center text-zinc-500 text-sm mb-4">— or customize your interests —</div>
+                
+                <!-- Interest Pills -->
+                <div class="flex flex-wrap justify-center gap-3 max-w-2xl mx-auto" id="interests-grid">
+                    <button onclick="toggleInterest(this, 'political_economy')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="political_economy">
+                        📊 Political Economy
+                    </button>
+                    <button onclick="toggleInterest(this, 'dialectical_materialism')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="dialectical_materialism">
+                        🔄 Dialectical Materialism
+                    </button>
+                    <button onclick="toggleInterest(this, 'historical_materialism')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="historical_materialism">
+                        📜 Historical Materialism
+                    </button>
+                    <button onclick="toggleInterest(this, 'scientific_socialism')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="scientific_socialism">
+                        🔬 Scientific Socialism
+                    </button>
+                    <button onclick="toggleInterest(this, 'revolutionary_strategy')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="revolutionary_strategy">
+                        ⚔️ Revolutionary Strategy
+                    </button>
+                    <button onclick="toggleInterest(this, 'imperialism')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="imperialism">
+                        🌍 Imperialism & Colonialism
+                    </button>
+                    <button onclick="toggleInterest(this, 'cultural_revolution')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="cultural_revolution">
+                        🎭 Cultural & Ideological Work
+                    </button>
+                    <button onclick="toggleInterest(this, 'party_building')" class="interest-pill px-4 py-2 rounded-full border border-zinc-700 bg-zinc-900/50 text-zinc-300 text-sm cursor-pointer" data-interest="party_building">
+                        🏛️ Party Building
+                    </button>
+                </div>
+                
+                <div class="flex justify-center gap-4 mt-10">
+                    <button onclick="goToStep(1)" class="px-6 py-3 border border-zinc-700 hover:border-zinc-600 rounded-full font-medium flex items-center gap-2 transition-all text-zinc-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Back
+                    </button>
+                    <button onclick="goToStep(3)" class="px-8 py-3 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 rounded-full font-medium flex items-center gap-2 transition-all">
+                        Next: Time Commitment
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Time & Generate -->
+            <div id="step3" class="step-content hidden">
+                <h2 class="text-2xl font-semibold text-center mb-2">How much time can you dedicate?</h2>
+                <p class="text-zinc-400 text-center mb-8">This helps us estimate your learning timeline</p>
+                
+                <!-- Path Preview -->
+                <div class="glass-card rounded-xl p-4 mb-8 max-w-2xl mx-auto">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-zinc-400">Your Path Preview</span>
+                        <span class="text-sm font-medium text-red-400" id="total-weeks">~12 weeks</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-zinc-500 overflow-x-auto pb-2">
+                        <span>📜 Manifesto</span>
+                        <span class="text-zinc-600">→</span>
+                        <span>📕 Capital</span>
+                        <span class="text-zinc-600">→</span>
+                        <span>⚔️ Imperialism</span>
+                        <span class="text-zinc-600">→</span>
+                        <span>🎯 Strategy</span>
+                    </div>
+                    <div class="h-2 bg-zinc-800 rounded-full mt-3 overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-red-700 to-red-500 rounded-full w-1/4"></div>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
+                    <!-- Casual -->
+                    <button onclick="selectTime('casual')" class="time-card glass-card rounded-xl p-5 text-center border-2 border-transparent hover:border-red-900/50 cursor-pointer" id="time-casual">
+                        <div class="text-2xl mb-2">☕</div>
+                        <h3 class="font-medium text-white">Casual</h3>
+                        <p class="text-sm text-zinc-400">1-2 hours/week</p>
+                        <p class="text-xs text-zinc-500 mt-1">~24 weeks total</p>
+                    </button>
+                    
+                    <!-- Regular -->
+                    <button onclick="selectTime('regular')" class="time-card glass-card rounded-xl p-5 text-center border-2 border-red-600 bg-red-950/30 cursor-pointer" id="time-regular">
+                        <div class="text-2xl mb-2">📖</div>
+                        <h3 class="font-medium text-white">Regular</h3>
+                        <p class="text-sm text-zinc-400">3-5 hours/week</p>
+                        <p class="text-xs text-red-400 mt-1">~12 weeks total</p>
+                    </button>
+                    
+                    <!-- Dedicated -->
+                    <button onclick="selectTime('dedicated')" class="time-card glass-card rounded-xl p-5 text-center border-2 border-transparent hover:border-red-900/50 cursor-pointer" id="time-dedicated">
+                        <div class="text-2xl mb-2">🔥</div>
+                        <h3 class="font-medium text-white">Dedicated</h3>
+                        <p class="text-sm text-zinc-400">6-10 hours/week</p>
+                        <p class="text-xs text-zinc-500 mt-1">~6 weeks total</p>
+                    </button>
+                </div>
+                
+                <div class="flex justify-center gap-4 mt-8">
+                    <button onclick="goToStep(2)" class="px-6 py-3 border border-zinc-700 hover:border-zinc-600 rounded-full font-medium flex items-center gap-2 transition-all text-zinc-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Back
+                    </button>
+                    <button onclick="generatePath()" class="px-8 py-3 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-red-900/30">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Generate My Path
+                    </button>
+                </div>
+            </div>
+
+            <!-- Generating Animation -->
+            <div id="generating" class="step-content hidden">
+                <div class="text-center py-12">
+                    <div class="relative inline-block mb-8">
+                        <div class="text-6xl animate-float">⚡</div>
+                        <div class="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-ping"></div>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-2">Crafting Your Learning Path</h2>
+                    <p class="text-zinc-400 mb-8">Our AI is analyzing your preferences...</p>
+                    
+                    <div class="max-w-md mx-auto space-y-3 text-left">
+                        <div class="flex items-center gap-3 text-sm" id="gen-step-1">
+                            <div class="w-6 h-6 rounded-full bg-red-600 flex items-center justify-center">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="text-zinc-300">Analyzing your knowledge level and interests</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm" id="gen-step-2">
+                            <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center">
+                                <span class="text-xs">2</span>
+                            </div>
+                            <span class="text-zinc-500">Comparing with archive materials</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm" id="gen-step-3">
+                            <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center">
+                                <span class="text-xs">3</span>
+                            </div>
+                            <span class="text-zinc-500">Building personalized milestones</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm" id="gen-step-4">
+                            <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center">
+                                <span class="text-xs">4</span>
+                            </div>
+                            <span class="text-zinc-500">Finalizing study recommendations</span>
+                        </div>
+                    </div>
+                    
+                    <div class="max-w-md mx-auto mt-8">
+                        <div class="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-red-700 to-red-500 rounded-full progress-fill" id="progress-bar"></div>
+                        </div>
+                        <p class="text-xs text-zinc-500 mt-2" id="progress-text">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="results" class="step-content hidden">
+                <!-- Success Header -->
+                <div class="text-center mb-8 animate-bounce-in">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-900/30 border border-green-700 mb-4">
+                        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold mb-2">Your Study Path is Ready!</h2>
+                    <p class="text-zinc-400">Personalized for your goals and schedule</p>
+                </div>
+                
+                <!-- Stats Row -->
+                <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-8">
+                    <div class="glass-card rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-red-400">12</div>
+                        <div class="text-xs text-zinc-400">Weeks</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-red-400">6</div>
+                        <div class="text-xs text-zinc-400">Milestones</div>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 text-center">
+                        <div class="text-2xl font-bold text-red-400">8</div>
+                        <div class="text-xs text-zinc-400">Concepts</div>
+                    </div>
+                </div>
+                
+                <!-- Path Title -->
+                <div class="glass-card rounded-xl p-5 mb-6 max-w-2xl mx-auto">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">Complete Marxist Foundation Path</h3>
+                            <p class="text-sm text-zinc-400 mt-1">From basics to revolutionary strategy</p>
+                        </div>
+                        <button class="text-xs text-zinc-500 hover:text-white transition-colors">Regenerate</button>
+                    </div>
+                    <div class="flex flex-wrap gap-4 mt-4 pt-4 border-t border-zinc-800 text-xs text-zinc-400">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            ~12 weeks
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                            Beginner to Intermediate
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            AI-generated
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Milestones Timeline -->
+                <div class="relative max-w-2xl mx-auto">
+                    <div class="absolute left-4 top-0 bottom-0 w-0.5 timeline-connector"></div>
+                    
+                    <div class="space-y-4">
+                        <!-- Milestone 1 -->
+                        <div class="milestone-card relative flex gap-4 pl-10 transition-all duration-300 animate-slide-up" style="animation-delay: 0.1s;">
+                            <div class="absolute left-2.5 w-3 h-3 rounded-full bg-red-500 border-2 border-red-400 shadow-lg glow-red"></div>
+                            <div class="flex-1 glass-card rounded-xl p-4 border-l-4 border-red-600">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h4 class="font-medium text-white">1. Foundations: The Communist Manifesto</h4>
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-green-900/40 text-green-300 border border-green-800">Beginner</span>
+                                </div>
+                                <p class="text-sm text-zinc-400 mb-3">Understand the critique of capitalism and class struggle through Marx and Engels' foundational document.</p>
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">class struggle</span>
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">bourgeoisie</span>
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">proletariat</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-zinc-500">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        ~2 weeks
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                        </svg>
+                                        The Communist Manifesto
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Milestone 2 -->
+                        <div class="milestone-card relative flex gap-4 pl-10 transition-all duration-300 animate-slide-up opacity-80" style="animation-delay: 0.2s;">
+                            <div class="absolute left-2.5 w-3 h-3 rounded-full bg-zinc-700 border-2 border-zinc-600"></div>
+                            <div class="flex-1 glass-card rounded-xl p-4">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h4 class="font-medium text-white">2. Dialectical Materialism</h4>
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-900/40 text-yellow-300 border border-yellow-800">Intermediate</span>
+                                </div>
+                                <p class="text-sm text-zinc-400 mb-3">Study the philosophical foundation of Marxist worldview - contradiction, negation, and transformation.</p>
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">dialectics</span>
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">contradiction</span>
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">materialism</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-zinc-500">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        ~3 weeks
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Milestone 3 -->
+                        <div class="milestone-card relative flex gap-4 pl-10 transition-all duration-300 animate-slide-up opacity-60" style="animation-delay: 0.3s;">
+                            <div class="absolute left-2.5 w-3 h-3 rounded-full bg-zinc-700 border-2 border-zinc-600"></div>
+                            <div class="flex-1 glass-card rounded-xl p-4">
+                                <div class="flex items-start justify-between mb-2">
+                                    <h4 class="font-medium text-white">3. Capital Volume I</h4>
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-900/40 text-yellow-300 border border-yellow-800">Intermediate</span>
+                                </div>
+                                <p class="text-sm text-zinc-400 mb-3">Engage with Marx's masterwork on political economy. Focus on surplus value and exploitation.</p>
+                                <div class="flex flex-wrap gap-2 mb-3">
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">surplus value</span>
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">commodity</span>
+                                    <span class="text-xs px-2 py-1 rounded bg-zinc-800 text-zinc-400">exploitation</span>
+                                </div>
+                                <div class="flex items-center justify-between text-xs text-zinc-500">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        ~4 weeks
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-6 text-zinc-500 text-sm">
+                        + 3 more milestones
+                    </div>
+                </div>
+                
+                <!-- Study Tips -->
+                <div class="glass-card rounded-xl p-5 mt-8 max-w-2xl mx-auto border border-amber-900/30 bg-amber-950/20">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                        <h4 class="text-sm font-medium text-amber-200">Study Tips</h4>
+                    </div>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2 text-sm text-amber-100/80">
+                            <svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Take notes on key concepts and how they relate to each other
+                        </li>
+                        <li class="flex items-start gap-2 text-sm text-amber-100/80">
+                            <svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Discuss ideas with fellow students to deepen understanding
+                        </li>
+                        <li class="flex items-start gap-2 text-sm text-amber-100/80">
+                            <svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Apply theoretical concepts to analyze current events
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex gap-4 justify-center mt-8">
+                    <button class="px-6 py-3 border border-zinc-700 hover:border-zinc-600 rounded-full font-medium transition-all text-zinc-400">
+                        Customize Again
+                    </button>
+                    <button class="px-8 py-3 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 rounded-full font-semibold flex items-center gap-2 transition-all shadow-lg shadow-red-900/30">
+                        Save to My Progress
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Footer Note -->
+        <div class="text-center mt-8 text-zinc-500 text-sm">
+            This is a UI design demo. Interactive elements are simulated.
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedLevel = null;
+        let selectedTime = 'regular';
+        let selectedInterests = [];
+        
+        function selectLevel(level) {
+            selectedLevel = level;
+            
+            // Update UI
+            document.querySelectorAll('.level-card').forEach(card => {
+                card.classList.remove('selected', 'border-red-600', 'bg-red-950/30');
+                card.classList.add('border-transparent');
+            });
+            
+            const selectedCard = document.getElementById('level-' + level);
+            selectedCard.classList.add('selected', 'border-red-600', 'bg-red-950/30');
+            
+            // Enable next button
+            const nextBtn = document.getElementById('nextBtn1');
+            nextBtn.classList.remove('opacity-50', 'pointer-events-none');
+        }
+        
+        function selectTime(time) {
+            selectedTime = time;
+            
+            // Update weeks preview
+            const weeksMap = { casual: 24, regular: 12, dedicated: 6 };
+            document.getElementById('total-weeks').textContent = '~' + weeksMap[time] + ' weeks';
+            
+            // Update UI
+            document.querySelectorAll('.time-card').forEach(card => {
+                card.classList.remove('border-red-600', 'bg-red-950/30');
+                card.classList.add('border-transparent');
+            });
+            
+            const selectedCard = document.getElementById('time-' + time);
+            selectedCard.classList.add('border-red-600', 'bg-red-950/30');
+        }
+        
+        function selectPreset(preset) {
+            const presets = {
+                'full': ['political_economy', 'dialectical_materialism', 'historical_materialism', 'scientific_socialism', 'revolutionary_strategy', 'imperialism', 'cultural_revolution', 'party_building'],
+                'economy': ['political_economy', 'historical_materialism', 'imperialism'],
+                'philosophy': ['dialectical_materialism', 'historical_materialism', 'scientific_socialism']
+            };
+            
+            // Clear all selections
+            document.querySelectorAll('.interest-pill').forEach(pill => {
+                pill.classList.remove('selected', 'border-red-500', 'bg-red-900/50', 'text-red-300');
+                pill.classList.add('border-zinc-700', 'bg-zinc-900/50', 'text-zinc-300');
+            });
+            
+            // Apply preset
+            presets[preset].forEach(interest => {
+                const pill = document.querySelector(`[data-interest="${interest}"]`);
+                if (pill) {
+                    pill.click();
+                }
+            });
+            
+            // Highlight active preset
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('border-red-900/50', 'bg-red-950/30', 'text-red-300');
+                btn.classList.add('border-zinc-700', 'bg-zinc-900/50', 'text-zinc-300');
+            });
+            document.getElementById('preset-' + preset).classList.add('border-red-900/50', 'bg-red-950/30', 'text-red-300');
+            document.getElementById('preset-' + preset).classList.remove('border-zinc-700', 'bg-zinc-900/50', 'text-zinc-300');
+        }
+        
+        function toggleInterest(element, interest) {
+            element.classList.toggle('selected');
+            element.classList.toggle('border-red-500');
+            element.classList.toggle('bg-red-900/50');
+            element.classList.toggle('text-red-300');
+            element.classList.toggle('border-zinc-700');
+            element.classList.toggle('bg-zinc-900/50');
+            element.classList.toggle('text-zinc-300');
+            
+            if (selectedInterests.includes(interest)) {
+                selectedInterests = selectedInterests.filter(i => i !== interest);
+            } else {
+                selectedInterests.push(interest);
+            }
+        }
+        
+        function goToStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Show target step
+            document.getElementById('step' + step).classList.remove('hidden');
+            
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('step' + i + '-dot');
+                const label = document.getElementById('step' + i + '-label');
+                
+                if (i < step) {
+                    dot.className = 'w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-sm font-bold';
+                    dot.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+                    label.className = 'text-sm text-green-400 font-medium';
+                } else if (i === step) {
+                    dot.className = 'w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-sm font-bold animate-pulse-glow';
+                    dot.textContent = i;
+                    label.className = 'text-sm text-red-400 font-medium';
+                } else {
+                    dot.className = 'w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-600 flex items-center justify-center text-sm font-medium text-zinc-400';
+                    dot.textContent = i;
+                    label.className = 'text-sm text-zinc-500';
+                }
+            }
+            
+            currentStep = step;
+        }
+        
+        function generatePath() {
+            // Show generating screen
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById('generating').classList.remove('hidden');
+            
+            // Reset progress
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('progress-text').textContent = '0%';
+            
+            // Animate steps
+            const steps = ['gen-step-1', 'gen-step-2', 'gen-step-3', 'gen-step-4'];
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += 2;
+                document.getElementById('progress-bar').style.width = progress + '%';
+                document.getElementById('progress-text').textContent = progress + '%';
+                
+                if (progress >= 25 && progress < 50) {
+                    document.getElementById('gen-step-1').innerHTML = '<div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span class="text-green-400">Analyzing your knowledge level and interests</span>';
+                    document.getElementById('gen-step-2').innerHTML = '<div class="w-6 h-6 rounded-full bg-yellow-600 flex items-center justify-center"><span class="text-xs">2</span></div><span class="text-yellow-400">Comparing with archive materials</span>';
+                } else if (progress >= 50 && progress < 75) {
+                    document.getElementById('gen-step-2').innerHTML = '<div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span class="text-green-400">Comparing with archive materials</span>';
+                    document.getElementById('gen-step-3').innerHTML = '<div class="w-6 h-6 rounded-full bg-yellow-600 flex items-center justify-center"><span class="text-xs">3</span></div><span class="text-yellow-400">Building personalized milestones</span>';
+                } else if (progress >= 75) {
+                    document.getElementById('gen-step-3').innerHTML = '<div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span class="text-green-400">Building personalized milestones</span>';
+                    document.getElementById('gen-step-4').innerHTML = '<div class="w-6 h-6 rounded-full bg-yellow-600 flex items-center justify-center"><span class="text-xs">4</span></div><span class="text-yellow-400">Finalizing study recommendations</span>';
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('gen-step-4').innerHTML = '<div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div><span class="text-green-400">Finalizing study recommendations</span>';
+                        
+                        setTimeout(() => {
+                            document.querySelectorAll('.step-content').forEach(content => {
+                                content.classList.add('hidden');
+                            });
+                            document.getElementById('results').classList.remove('hidden');
+                        }, 500);
+                    }, 300);
+                }
+            }, 40);
+        }
+        
+        // Initialize
+        selectLevel('beginner');
+        selectTime('regular');
+    </script>
+</body>
+</html>

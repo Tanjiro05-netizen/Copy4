@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Timeline - Marxist Theory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #050505;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+        
+        .display-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* 3D Scene Container */
+        .scene-3d {
+            perspective: 2000px;
+            perspective-origin: 50% 50%;
+            transform-style: preserve-3d;
+        }
+        
+        /* Timeline Track - 3D Cylinder Effect */
+        .timeline-track {
+            position: relative;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                rgba(220, 38, 38, 0.1) 0%, 
+                rgba(220, 38, 38, 0.6) 20%, 
+                rgba(220, 38, 38, 1) 50%, 
+                rgba(220, 38, 38, 0.6) 80%, 
+                rgba(220, 38, 38, 0.1) 100%
+            );
+            transform: rotateX(60deg);
+            transform-origin: center center;
+            box-shadow: 
+                0 0 20px rgba(220, 38, 38, 0.5),
+                0 0 40px rgba(220, 38, 38, 0.3),
+                0 0 60px rgba(220, 38, 38, 0.1);
+        }
+        
+        .timeline-track::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255,255,255,0.3) 50%, 
+                transparent 100%
+            );
+            animation: trackShine 3s ease-in-out infinite;
+        }
+        
+        @keyframes trackShine {
+            0%, 100% { opacity: 0.3; transform: translateX(-100%); }
+            50% { opacity: 1; transform: translateX(100%); }
+        }
+        
+        /* 3D Event Card */
+        .event-card-3d {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+        
+        .event-card-3d:hover {
+            transform: translateZ(60px) rotateY(5deg) scale(1.05);
+        }
+        
+        .event-card-3d::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.1) 0%, 
+                transparent 50%, 
+                rgba(0,0,0,0.3) 100%
+            );
+            transform: translateZ(1px);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        
+        /* Card Glow Effect */
+        .card-glow {
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #dc2626, #991b1b, #dc2626);
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            filter: blur(15px);
+            z-index: -1;
+        }
+        
+        .event-card-3d:hover .card-glow {
+            opacity: 0.6;
+        }
+        
+        /* Floating Year Labels */
+        .year-float {
+            position: absolute;
+            transform-style: preserve-3d;
+            animation: yearFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes yearFloat {
+            0%, 100% { transform: translateY(0) rotateX(0deg); }
+            50% { transform: translateY(-10px) rotateX(5deg); }
+        }
+        
+        /* 3D Node/Marker */
+        .timeline-node {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            transform-style: preserve-3d;
+            animation: nodeFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes nodeFloat {
+            0%, 100% { transform: translateZ(0) rotateY(0deg); }
+            50% { transform: translateZ(10px) rotateY(180deg); }
+        }
+        
+        .node-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #dc2626;
+            border-radius: 50%;
+            background: rgba(220, 38, 38, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .node-face.front { transform: translateZ(30px); }
+        .node-face.back { transform: rotateY(180deg) translateZ(30px); }
+        .node-face.left { transform: rotateY(-90deg) translateZ(30px); }
+        .node-face.right { transform: rotateY(90deg) translateZ(30px); }
+        .node-face.top { transform: rotateX(90deg) translateZ(30px); }
+        .node-face.bottom { transform: rotateX(-90deg) translateZ(30px); }
+        
+        .node-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: #dc2626;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 20px #dc2626,
+                0 0 40px rgba(220, 38, 38, 0.5),
+                inset 0 0 10px rgba(255,255,255,0.3);
+            animation: nodePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes nodePulse {
+            0%, 100% { box-shadow: 0 0 20px #dc2626, 0 0 40px rgba(220, 38, 38, 0.5); }
+            50% { box-shadow: 0 0 40px #dc2626, 0 0 80px rgba(220, 38, 38, 0.8); }
+        }
+        
+        /* Connector Lines */
+        .connector {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #dc2626, transparent);
+            transform-origin: left center;
+            animation: connectorPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes connectorPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* Perspective Container */
+        .perspective-container {
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+        
+        /* Card Stack Effect */
+        .card-stack {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .card-stack::before,
+        .card-stack::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            transform: translateZ(-20px) rotateX(5deg);
+            transition: all 0.3s ease;
+        }
+        
+        .card-stack::after {
+            transform: translateZ(-40px) rotateX(10deg);
+            opacity: 0.5;
+        }
+        
+        .event-card-3d:hover .card-stack::before {
+            transform: translateZ(-30px) rotateX(8deg);
+        }
+        
+        .event-card-3d:hover .card-stack::after {
+            transform: translateZ(-50px) rotateX(12deg);
+        }
+        
+        /* Glass Effect */
+        .glass-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Category Badge */
+        .category-badge {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(220, 38, 38, 0.1));
+            border: 1px solid rgba(220, 38, 38, 0.4);
+        }
+        
+        /* Scroll Animation */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(100px) rotateX(-20deg);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0) rotateX(0);
+        }
+        
+        /* Holographic Effect */
+        .holographic {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .holographic::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 40%,
+                rgba(220, 38, 38, 0.1) 45%,
+                rgba(220, 38, 38, 0.2) 50%,
+                rgba(220, 38, 38, 0.1) 55%,
+                transparent 60%
+            );
+            animation: holographic 3s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes holographic {
+            0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
+        }
+        
+        /* 3D Navigation */
+        .nav-3d {
+            transform-style: preserve-3d;
+            perspective: 800px;
+        }
+        
+        .nav-item {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            transform: translateY(-5px) translateZ(20px);
+        }
+        
+        .nav-item::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%) rotateX(-90deg);
+            transform-origin: top center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 10px;
+            color: #dc2626;
+        }
+        
+        .nav-item:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) rotateX(0deg);
+        }
+        
+        /* Hero 3D Text */
+        .hero-text-3d {
+            transform-style: preserve-3d;
+            text-shadow: 
+                0 1px 0 rgba(255,255,255,0.1),
+                0 2px 0 rgba(0,0,0,0.5),
+                0 4px 0 rgba(0,0,0,0.3),
+                0 8px 20px rgba(0,0,0,0.5),
+                0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        /* Ambient Particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #dc2626;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: particleFloat 10s linear infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #dc2626, #991b1b);
+            border-radius: 4px;
+        }
+        
+        /* Filter Pills */
+        .filter-pill {
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+        
+        .filter-pill:hover {
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        .filter-pill.active {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.5);
+            transform: scale(1.1);
+        }
+        
+        /* Modal 3D */
+        .modal-3d {
+            transform-style: preserve-3d;
+            animation: modalIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        @keyframes modalIn {
+            0% { opacity: 0; transform: translateZ(-100px) scale(0.9); }
+            100% { opacity: 1; transform: translateZ(0) scale(1); }
+        }
+        
+        /* Rotating Background */
+        .bg-pattern {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 200vmax;
+            height: 200vmax;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 100px,
+                    rgba(220, 38, 38, 0.03) 100px,
+                    rgba(220, 38, 38, 0.03) 101px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 100px,
+                    rgba(220, 38, 38, 0.03) 100px,
+                    rgba(220, 38, 38, 0.03) 101px
+                );
+            animation: bgRotate 60s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        @keyframes bgRotate {
+            0% { transform: translate(-50%, -50%) rotateX(75deg) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(75deg) rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Animated Background Pattern -->
+    <div class="bg-pattern"></div>
+    
+    <!-- Floating Particles -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-0 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-2xl font-bold display-font text-white">
+                    <span class="text-red-600">☭</span> Marxist Archive
+                </div>
+            </div>
+            <div class="flex items-center gap-8 nav-3d">
+                <button class="nav-item text-sm text-zinc-400 hover:text-white transition-colors" data-label="Timeline">
+                    Timeline
+                </button>
+                <button class="nav-item text-sm text-zinc-400 hover:text-white transition-colors" data-label="Theory">
+                    Theory
+                </button>
+                <button class="nav-item text-sm text-zinc-400 hover:text-white transition-colors" data-label="Study">
+                    Study
+                </button>
+                <button class="nav-item text-sm text-zinc-400 hover:text-white transition-colors" data-label="Library">
+                    Library
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[80vh] flex items-center justify-center pt-20 perspective-container">
+        <div class="text-center z-10 px-6">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-red-900/50 bg-red-950/30 text-red-300 text-sm mb-8">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                3D Interactive Timeline
+            </div>
+            
+            <h1 class="display-font text-6xl md:text-8xl font-bold text-white mb-6 hero-text-3d">
+                History of the<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-400 to-red-600">
+                    Communist Movement
+                </span>
+            </h1>
+            
+            <p class="text-xl text-zinc-400 max-w-2xl mx-auto mb-12">
+                Explore 200 years of revolutionary theory, organized chronologically with immersive 3D visualizations.
+            </p>
+            
+            <div class="flex items-center justify-center gap-4">
+                <button onclick="document.getElementById('timeline').scrollIntoView({behavior: 'smooth'})" 
+                    class="px-8 py-4 bg-gradient-to-r from-red-700 to-red-600 rounded-full font-medium flex items-center gap-2 hover:from-red-600 hover:to-red-500 transition-all shadow-lg shadow-red-900/30">
+                    Explore Timeline
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </button>
+</div>
+            
+            <!-- 3D Year Counter -->
+            <div class="mt-16 flex items-center justify-center gap-8 perspective-container">
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-white transform" style="transform: rotateX(20deg);">1818</div>
+                    <div class="text-xs text-zinc-500 mt-1 tracking-widest uppercase">Karl Marx Born</div>
+                </div>
+                <div class="w-24 h-px bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+                <div class="text-center">
+                    <div class="text-5xl font-bold text-red-500 transform" style="transform: rotateX(20deg);">1949</div>
+                    <div class="text-xs text-zinc-500 mt-1 tracking-widest uppercase">PRC Founded</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Timeline Section -->
+    <section id="timeline" class="relative py-32">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Section Header -->
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="display-font text-4xl md:text-5xl font-bold text-white mb-4">
+                    Navigate Through History
+                </h2>
+                <p class="text-zinc-400">Hover over events to explore in 3D space</p>
+            </div>
+            
+            <!-- Filter Bar -->
+            <div class="flex flex-wrap justify-center gap-3 mb-16 scroll-reveal">
+                <button class="filter-pill active px-5 py-2 rounded-full border border-red-900/50 text-sm" onclick="filterTimeline('all')">
+                    All Events
+                </button>
+                <button class="filter-pill px-5 py-2 rounded-full border border-zinc-800 text-zinc-400" onclick="filterTimeline('biography')">
+                    Biography
+                </button>
+                <button class="filter-pill px-5 py-2 rounded-full border border-zinc-800 text-zinc-400" onclick="filterTimeline('publication')">
+                    Publications
+                </button>
+                <button class="filter-pill px-5 py-2 rounded-full border border-zinc-800 text-zinc-400" onclick="filterTimeline('organization')">
+                    Organizations
+                </button>
+                <button class="filter-pill px-5 py-2 rounded-full border border-zinc-800 text-zinc-400" onclick="filterTimeline('revolution')">
+                    Revolutions
+                </button>
+            </div>
+            
+            <!-- 3D Timeline Track -->
+            <div class="relative h-4 mb-24 scene-3d">
+                <div class="timeline-track w-full absolute top-0"></div>
+            </div>
+            
+            <!-- Timeline Events -->
+            <div class="relative space-y-32" id="timeline-events">
+                
+                <!-- Event 1: Marx Born -->
+                <div class="event-item scroll-reveal" data-category="biography">
+                    <div class="flex items-center gap-8">
+                        <!-- Left Side Content -->
+                        <div class="flex-1 text-right pr-12">
+                            <div class="event-card-3d glass-card rounded-2xl p-6 holographic" onclick="openModal(1)">
+                                <div class="card-glow rounded-2xl"></div>
+                                <div class="card-stack">
+                                    <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-3">
+                                        Biography
+                                    </span>
+                                    <h3 class="display-font text-2xl font-semibold text-white mb-2">
+                                        Karl Marx Born
+                                    </h3>
+                                    <p class="text-zinc-400 text-sm mb-4">
+                                        Friedrich Engels meets Marx in Paris, beginning their lifelong collaboration and revolutionary partnership.
+                                    </p>
+                                    <div class="flex items-center justify-end gap-2 text-xs text-zinc-500">
+                                        <span>Trier, Prussia</span>
+                                        <span class="text-red-500">|</span>
+                                        <span>Historical Materialism Begins</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Center Node -->
+                        <div class="relative flex-shrink-0">
+                            <div class="timeline-node">
+                                <div class="node-face front"></div>
+                                <div class="node-face back"></div>
+                                <div class="node-face left"></div>
+                                <div class="node-face right"></div>
+                                <div class="node-face top"></div>
+                                <div class="node-face bottom"></div>
+                                <div class="node-inner"></div>
+                            </div>
+                            <div class="year-float absolute -top-12 left-1/2 -translate-x-1/2">
+                                <span class="text-3xl font-bold text-red-500" style="text-shadow: 0 0 20px rgba(220,38,38,0.5);">1818</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side Empty -->
+                        <div class="flex-1"></div>
+                    </div>
+                </div>
+                
+                <!-- Event 2: Communist Manifesto -->
+                <div class="event-item scroll-reveal" data-category="publication">
+                    <div class="flex items-center gap-8">
+                        <div class="flex-1"></div>
+                        
+                        <!-- Center Node -->
+                        <div class="relative flex-shrink-0">
+                            <div class="timeline-node" style="animation-delay: 0.5s;">
+                                <div class="node-face front"></div>
+                                <div class="node-face back"></div>
+                                <div class="node-face left"></div>
+                                <div class="node-face right"></div>
+                                <div class="node-face top"></div>
+                                <div class="node-face bottom"></div>
+                                <div class="node-inner"></div>
+                            </div>
+                            <div class="year-float absolute -top-12 left-1/2 -translate-x-1/2" style="animation-delay: 0.3s;">
+                                <span class="text-3xl font-bold text-red-500" style="text-shadow: 0 0 20px rgba(220,38,38,0.5);">1848</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side Content -->
+                        <div class="flex-1 pl-12">
+                            <div class="event-card-3d glass-card rounded-2xl p-6 holographic" onclick="openModal(2)">
+                                <div class="card-glow rounded-2xl"></div>
+                                <div class="card-stack">
+                                    <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-3">
+                                        Publication
+                                    </span>
+                                    <h3 class="display-font text-2xl font-semibold text-white mb-2">
+                                        The Communist Manifesto
+                                    </h3>
+                                    <p class="text-zinc-400 text-sm mb-4">
+                                        "A specter is haunting Europe—the specter of communism." The most influential political document in history.
+                                    </p>
+                                    <div class="flex items-center gap-2 text-xs text-zinc-500">
+                                        <span>London</span>
+                                        <span class="text-red-500">|</span>
+                                        <span>Marx & Engels</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event 3: Paris Commune -->
+                <div class="event-item scroll-reveal" data-category="revolution">
+                    <div class="flex items-center gap-8">
+                        <!-- Left Side Content -->
+                        <div class="flex-1 text-right pr-12">
+                            <div class="event-card-3d glass-card rounded-2xl p-6 holographic" onclick="openModal(3)">
+                                <div class="card-glow rounded-2xl"></div>
+                                <div class="card-stack">
+                                    <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-3">
+                                        Revolution
+                                    </span>
+                                    <h3 class="display-font text-2xl font-semibold text-white mb-2">
+                                        The Paris Commune
+                                    </h3>
+                                    <p class="text-zinc-400 text-sm mb-4">
+                                        The first workers' government in history. Marx called it "the glorious harbinger of a new society."
+                                    </p>
+                                    <div class="flex items-center justify-end gap-2 text-xs text-zinc-500">
+                                        <span>Paris, France</span>
+                                        <span class="text-red-500">|</span>
+                                        <span>72 Days</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Center Node -->
+                        <div class="relative flex-shrink-0">
+                            <div class="timeline-node" style="animation-delay: 1s;">
+                                <div class="node-face front"></div>
+                                <div class="node-face back"></div>
+                                <div class="node-face left"></div>
+                                <div class="node-face right"></div>
+                                <div class="node-face top"></div>
+                                <div class="node-face bottom"></div>
+                                <div class="node-inner"></div>
+                            </div>
+                            <div class="year-float absolute -top-12 left-1/2 -translate-x-1/2" style="animation-delay: 0.6s;">
+                                <span class="text-3xl font-bold text-red-500" style="text-shadow: 0 0 20px rgba(220,38,38,0.5);">1871</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1"></div>
+                    </div>
+                </div>
+                
+                <!-- Event 4: Capital Published -->
+                <div class="event-item scroll-reveal" data-category="publication">
+                    <div class="flex items-center gap-8">
+                        <div class="flex-1"></div>
+                        
+                        <div class="relative flex-shrink-0">
+                            <div class="timeline-node" style="animation-delay: 1.5s;">
+                                <div class="node-face front"></div>
+                                <div class="node-face back"></div>
+                                <div class="node-face left"></div>
+                                <div class="node-face right"></div>
+                                <div class="node-face top"></div>
+                                <div class="node-face bottom"></div>
+                                <div class="node-inner"></div>
+                            </div>
+                            <div class="year-float absolute -top-12 left-1/2 -translate-x-1/2" style="animation-delay: 0.9s;">
+                                <span class="text-3xl font-bold text-red-500" style="text-shadow: 0 0 20px rgba(220,38,38,0.5);">1867</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 pl-12">
+                            <div class="event-card-3d glass-card rounded-2xl p-6 holographic" onclick="openModal(4)">
+                                <div class="card-glow rounded-2xl"></div>
+                                <div class="card-stack">
+                                    <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-3">
+                                        Publication
+                                    </span>
+                                    <h3 class="display-font text-2xl font-semibold text-white mb-2">
+                                        Capital Volume I
+                                    </h3>
+                                    <p class="text-zinc-400 text-sm mb-4">
+                                        The magnum opus of political economy. "The analysis of the capitalist mode of production."
+                                    </p>
+                                    <div class="flex items-center gap-2 text-xs text-zinc-500">
+                                        <span>Hamburg</span>
+                                        <span class="text-red-500">|</span>
+                                        <span>Surplus Value Theory</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event 5: Russian Revolution -->
+                <div class="event-item scroll-reveal" data-category="revolution">
+                    <div class="flex items-center gap-8">
+                        <div class="flex-1 text-right pr-12">
+                            <div class="event-card-3d glass-card rounded-2xl p-6 holographic" onclick="openModal(5)">
+                                <div class="card-glow rounded-2xl"></div>
+                                <div class="card-stack">
+                                    <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-3">
+                                        Revolution
+                                    </span>
+                                    <h3 class="display-font text-2xl font-semibold text-white mb-2">
+                                        October Revolution
+                                    </h3>
+                                    <p class="text-zinc-400 text-sm mb-4">
+                                        The Bolsheviks seize power. Lenin establishes the world's first socialist state.
+                                    </p>
+                                    <div class="flex items-center justify-end gap-2 text-xs text-zinc-500">
+                                        <span>Petrograd</span>
+                                        <span class="text-red-500">|</span>
+                                        <span>Lenin Leads</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="relative flex-shrink-0">
+                            <div class="timeline-node" style="animation-delay: 2s;">
+                                <div class="node-face front"></div>
+                                <div class="node-face back"></div>
+                                <div class="node-face left"></div>
+                                <div class="node-face right"></div>
+                                <div class="node-face top"></div>
+                                <div class="node-face bottom"></div>
+                                <div class="node-inner"></div>
+                            </div>
+                            <div class="year-float absolute -top-12 left-1/2 -translate-x-1/2" style="animation-delay: 1.2s;">
+                                <span class="text-3xl font-bold text-red-500" style="text-shadow: 0 0 20px rgba(220,38,38,0.5);">1917</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1"></div>
+                    </div>
+                </div>
+                
+                <!-- Event 6: PRC Founded -->
+                <div class="event-item scroll-reveal" data-category="revolution">
+                    <div class="flex items-center gap-8">
+                        <div class="flex-1"></div>
+                        
+<div class="relative flex-shrink-0">
+                            <div class="timeline-node" style="animation-delay: 2.5s;">
+                                <div class="node-face front"></div>
+                                <div class="node-face back"></div>
+                                <div class="node-face left"></div>
+                                <div class="node-face right"></div>
+                                <div class="node-face top"></div>
+                                <div class="node-face bottom"></div>
+                                <div class="node-inner"></div>
+                            </div>
+                            <div class="year-float absolute -top-12 left-1/2 -translate-x-1/2" style="animation-delay: 1.5s;">
+                                <span class="text-3xl font-bold text-red-500" style="text-shadow: 0 0 20px rgba(220,38,38,0.5);">1949</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 pl-12">
+                            <div class="event-card-3d glass-card rounded-2xl p-6 holographic" onclick="openModal(6)">
+                                <div class="card-glow rounded-2xl"></div>
+                                <div class="card-stack">
+                                    <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-3">
+                                        Organization
+                                    </span>
+                                    <h3 class="display-font text-2xl font-semibold text-white mb-2">
+                                        People's Republic of China
+                                    </h3>
+                                    <p class="text-zinc-400 text-sm mb-4">
+                                        Mao Zedong declares the founding of the PRC. The largest socialist state in history.
+                                    </p>
+                                    <div class="flex items-center gap-2 text-xs text-zinc-500">
+                                        <span>Beijing</span>
+                                        <span class="text-red-500">|</span>
+                                        <span>Mao Zedong</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- View More -->
+            <div class="text-center mt-24">
+                <button class="px-8 py-4 border border-red-900/50 rounded-full text-zinc-400 hover:text-white hover:border-red-700 transition-all">
+                    Load More Events
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Modal -->
+    <div id="modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="modal-3d absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-2xl max-h-[85vh] overflow-auto glass-card rounded-3xl p-8">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <div id="modal-content">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll Reveal Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        
+        document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+        
+        // Filter Timeline
+        function filterTimeline(category) {
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+                pill.classList.add('border-zinc-800', 'text-zinc-400');
+            });
+            
+            event.target.classList.add('active');
+            event.target.classList.remove('border-zinc-800', 'text-zinc-400');
+            
+            document.querySelectorAll('.event-item').forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                    item.classList.add('visible');
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // Modal Data
+        const modalData = {
+            1: {
+                title: 'Karl Marx Born',
+                year: '1818',
+                location: 'Trier, Prussia',
+                category: 'Biography',
+                content: 'Karl Marx was born into a middle-class family in Trier, Prussia. His philosophy would go on to fundamentally transform our understanding of history, economics, and politics. From his early writings on Hegel to his later economic analyses, Marx developed a comprehensive critique of capitalism and a vision for a new social order.',
+                people: ['Karl Marx', 'Heinrich Marx', 'Henriette Marx']
+            },
+            2: {
+                title: 'The Communist Manifesto',
+                year: '1848',
+                location: 'London',
+                category: 'Publication',
+                content: 'Commissioned by the Communist League, the Manifesto presented the first systematic exposition of communist doctrine. Its opening line—"A specter is haunting Europe, the specter of communism"—remains one of the most recognizable in political literature. The work outlined the class struggle and the eventual triumph of the proletariat over the bourgeoisie.',
+                people: ['Karl Marx', 'Friedrich Engels']
+            },
+            3: {
+                title: 'The Paris Commune',
+                year: '1871',
+                location: 'Paris, France',
+                category: 'Revolution',
+                content: 'For 72 days, the workers of Paris governed themselves in the first working-class revolution. The Commune abolished night work, established worker cooperatives, and separated church from state. Though crushed in Bloody Week, its legacy shaped revolutionary theory for decades.',
+                people: ['Louis Auguste Blanqui', 'Édouard Moreau']
+            },
+            4: {
+                title: 'Capital Volume I',
+                year: '1867',
+                location: 'Hamburg',
+                category: 'Publication',
+                content: 'The first volume of Marx\'s magnum opus analyzed the capitalist mode of production. It introduced the labor theory of value, the concept of surplus value, and the analysis of the commodity. This work became the foundation of Marxist political economy.',
+                people: ['Karl Marx']
+            },
+            5: {
+                title: 'October Revolution',
+                year: '1917',
+                location: 'Petrograd',
+                category: 'Revolution',
+                content: 'The Bolshevik Revolution overthrew the Provisional Government and established the world\'s first socialist state. Lenin\'s slogans—"Peace, Land, Bread" and "All Power to the Soviets"—mobilized millions of workers and peasants. This event reshaped global politics for the entire 20th century.',
+                people: ['Vladimir Lenin', 'Leon Trotsky', 'Alexander Kerensky']
+            },
+            6: {
+                title: 'People\'s Republic of China',
+                year: '1949',
+                location: 'Beijing',
+                category: 'Organization',
+                content: 'After decades of revolutionary struggle, Mao Zedong proclaimed the People\'s Republic of China from Tiananmen Gate. The CPC\'s victory represented the largest socialist state in history, with implications for the global balance of power and the anti-colonial movements across Asia, Africa, and Latin America.',
+                people: ['Mao Zedong', 'Zhou Enlai', 'Chiang Kai-shek']
+            }
+        };
+        
+        function openModal(id) {
+            const data = modalData[id];
+            const content = `
+                <span class="category-badge inline-block px-3 py-1 rounded-full text-xs text-red-300 mb-4">
+                    ${data.category}
+                </span>
+                <h2 class="display-font text-4xl font-bold text-white mb-2">${data.title}</h2>
+                <div class="flex items-center gap-4 text-sm text-zinc-400 mb-6">
+                    <span class="text-red-500 font-bold">${data.year}</span>
+                    <span>|</span>
+                    <span>${data.location}</span>
+                </div>
+                <div class="h-px bg-gradient-to-r from-transparent via-red-600 to-transparent mb-6"></div>
+                <p class="text-zinc-300 leading-relaxed mb-6">${data.content}</p>
+                <div class="flex flex-wrap gap-2">
+                    ${data.people.map(p => `<span class="px-3 py-1 bg-red-950/30 border border-red-900/50 rounded-full text-xs text-red-300">${p}</span>`).join('')}
+                </div>
+            `;
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // Escape key closes modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+        
+        // Parallax effect on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            document.querySelectorAll('.event-card-3d').forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+                if (isVisible) {
+                    const cardX = (rect.left + rect.width / 2) / window.innerWidth - 0.5;
+                    const cardY = (rect.top + rect.height / 2) / window.innerHeight - 0.5;
+                    card.style.transform = `perspective(1000px) rotateY(${cardX * 5}deg) rotateX(${-cardY * 5}deg)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import { supabase } from '../supabaseClient';
 import { 
   ArrowLeft, Clock, BookOpen, BarChart2, Check, Lock, 
@@ -8,6 +7,7 @@ import {
   Award, Zap
 } from 'lucide-react';
 import CertificateViewer from '../components/ScienceTech/CertificateViewer';
+import * as s from './CoursePage.css.ts';
 
 const difficultyConfig = {
   beginner: { label: 'Beginner', color: 'text-green-400', bg: 'bg-green-400/10' },
@@ -195,20 +195,18 @@ const CoursePage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <div className="pt-24 text-center text-gray-400">Loading course...</div>
+      <div className={s.page}>
+        <div className={s.loadingWrap}>Loading course...</div>
       </div>
     );
   }
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <div className="pt-24 text-center">
-          <p className="text-gray-400 text-lg">Course not found</p>
-          <Link to="/science-tech" className="text-red-400 hover:text-red-300 mt-4 inline-block">
+      <div className={s.page}>
+        <div className={s.notFoundWrap}>
+          <p className={s.notFoundText}>Course not found</p>
+          <Link to="/science-tech" className={s.notFoundLink}>
             ← Back to courses
           </Link>
         </div>
@@ -219,8 +217,7 @@ const CoursePage = () => {
   const difficulty = difficultyConfig[course.difficulty] || difficultyConfig.beginner;
 
   return (
-    <div className="min-h-screen bg-[#12131A]">
-      <Header />
+    <div className={s.page}>
       
       {/* Hero Section */}
       <div 

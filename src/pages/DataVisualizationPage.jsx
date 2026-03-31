@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 import { BarChart3, Users, TrendingUp, Map, BarChart, LineChart, PieChart, Sliders, SplitSquareVertical } from 'lucide-react';
 import EnhancedChart from '../components/visualizations/EnhancedChart';
 import WhatIfAnalysis from '../components/visualizations/WhatIfAnalysis';
@@ -8,6 +7,7 @@ import EconomicVisualization from '../components/visualizations/EconomicVisualiz
 import ClassVisualization from '../components/visualizations/ClassVisualization';
 import TrendsVisualization from '../components/visualizations/TrendsVisualization';
 import MovementsVisualization from '../components/visualizations/MovementsVisualization';
+import * as s from './DataVisualizationPage.css.ts';
 
 const DataVisualizationPage = () => {
     const [activeView, setActiveView] = useState('economic');
@@ -102,88 +102,61 @@ const DataVisualizationPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#12131A] relative overflow-hidden">
-            <Header />
+        <div className={s.page}>
             
-            <main className="container mx-auto px-4 py-16 relative z-10">
-                <h1 className="text-4xl font-bold text-white mb-8">Data Visualization</h1>
+            <main className={s.main}>
+                <h1 className={s.pageTitle}>Data Visualization</h1>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className={s.vizGrid}>
                     {visualizations.map((viz) => (
                         <button
                             key={viz.id}
                             onClick={() => handleViewChange(viz.id)}
-                            className={`p-4 rounded-lg border transition-all duration-300
-                                ${activeView === viz.id 
-                                    ? 'bg-red-900/30 border-red-500/50 transform scale-105' 
-                                    : 'bg-black/30 border-gray-800/50 hover:border-red-500/30 hover:transform hover:scale-102'}`}
+                            className={`${s.vizCard} ${activeView === viz.id ? s.vizCardActive : ''}`}
                         >
-                            <div className="flex items-center space-x-3">
-                                <viz.icon className={`w-6 h-6 ${
-                                    activeView === viz.id ? 'text-red-400' : 'text-gray-400'
-                                }`} />
-                                <span className={`font-medium ${
-                                    activeView === viz.id ? 'text-white' : 'text-gray-300'
-                                }`}>
+                            <div style={{display:'flex',alignItems:'center',gap:12}}>
+                                <viz.icon size={22} className={activeView === viz.id ? s.vizIconActive : s.vizIcon} />
+                                <span className={`${s.vizName} ${activeView === viz.id ? s.vizNameActive : ''}`}>
                                     {viz.name}
                                 </span>
                             </div>
-                            <p className="text-sm text-gray-400 mt-2">{viz.description}</p>
+                            <p className={s.vizDesc}>{viz.description}</p>
                         </button>
                     ))}
                 </div>
                 
                 {/* Control Bar */}
-                <div className="flex justify-between items-center mb-6">
-                    {/* Chart Type Selector */}
-                    <div className="bg-black/30 backdrop-blur-sm rounded-lg p-2 inline-flex space-x-2 border border-gray-800/50">
-                        <button
-                            onClick={() => setChartType('bar')}
-                            className={`p-2 rounded ${chartType === 'bar' ? 'bg-red-900/30 text-red-400' : 'text-gray-400 hover:text-white'}`}
-                            title="Bar Chart"
-                        >
-                            <BarChart className="w-5 h-5" />
+                <div className={s.toolbar}>
+                    <div className={s.toolbarGroup}>
+                        <button onClick={() => setChartType('bar')} className={`${s.toolBtn} ${chartType === 'bar' ? s.toolBtnActive : ''}`} title="Bar Chart">
+                            <BarChart size={18} />
                         </button>
-                        <button
-                            onClick={() => setChartType('line')}
-                            className={`p-2 rounded ${chartType === 'line' ? 'bg-red-900/30 text-red-400' : 'text-gray-400 hover:text-white'}`}
-                            title="Line Chart"
-                        >
-                            <LineChart className="w-5 h-5" />
+                        <button onClick={() => setChartType('line')} className={`${s.toolBtn} ${chartType === 'line' ? s.toolBtnActive : ''}`} title="Line Chart">
+                            <LineChart size={18} />
                         </button>
-                        <button
-                            onClick={() => setChartType('pie')}
-                            className={`p-2 rounded ${chartType === 'pie' ? 'bg-red-900/30 text-red-400' : 'text-gray-400 hover:text-white'}`}
-                            title="Pie Chart"
-                        >
-                            <PieChart className="w-5 h-5" />
+                        <button onClick={() => setChartType('pie')} className={`${s.toolBtn} ${chartType === 'pie' ? s.toolBtnActive : ''}`} title="Pie Chart">
+                            <PieChart size={18} />
                         </button>
                     </div>
                     
-                    <div className="flex gap-2">
-                        {/* View Mode Toggle */}
+                    <div className={s.toolbarGroup}>
                         <button
                             onClick={() => setViewMode(viewMode === 'standard' ? 'split' : 'standard')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all
-                                ${viewMode === 'split' 
-                                    ? 'bg-red-900/30 text-red-400 border border-red-500/50' 
-                                    : 'bg-black/30 text-gray-400 border border-gray-800/50 hover:border-red-500/30'}`}
+                            className={`${s.toolBtn} ${viewMode === 'split' ? s.toolBtnActive : ''}`}
                             title={viewMode === 'standard' ? 'Switch to Split View' : 'Switch to Standard View'}
+                            style={{width:'auto',padding:'0 12px',gap:8}}
                         >
-                            <SplitSquareVertical className="w-5 h-5" />
+                            <SplitSquareVertical size={18} />
                             <span>Split View</span>
                         </button>
                         
-                        {/* What-If Analysis Toggle Button - only show in standard view */}
                         {viewMode === 'standard' && (
                             <button
                                 onClick={() => setShowWhatIf(!showWhatIf)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all
-                                    ${showWhatIf 
-                                        ? 'bg-red-900/30 text-red-400 border border-red-500/50' 
-                                        : 'bg-black/30 text-gray-400 border border-gray-800/50 hover:border-red-500/30'}`}
+                                className={`${s.toolBtn} ${showWhatIf ? s.toolBtnActive : ''}`}
+                                style={{width:'auto',padding:'0 12px',gap:8}}
                             >
-                                <Sliders className="w-5 h-5" />
+                                <Sliders size={18} />
                                 <span>What-If Analysis</span>
                             </button>
                         )}
@@ -191,7 +164,7 @@ const DataVisualizationPage = () => {
                 </div>
 
                 {/* Visualization Content Area */}
-                <div className={`bg-black/30 backdrop-blur-sm rounded-lg p-6 min-h-[600px] border border-gray-800/50 relative transition-opacity duration-300 ${showTransition ? 'opacity-0' : 'opacity-100'}`}>
+                <div className={s.chartWrap} style={showTransition ? {opacity:0,transition:'opacity 300ms'} : {opacity:1,transition:'opacity 300ms'}}>
                     {/* Split View Mode */}
                     {viewMode === 'split' ? (
                         <SplitView 
@@ -204,7 +177,7 @@ const DataVisualizationPage = () => {
                         <>
                             {/* What-If Analysis Panel - Conditionally Rendered */}
                             {showWhatIf && (
-                                <div className="mb-6 p-4 bg-black/40 backdrop-blur-sm rounded-lg border border-gray-700/50">
+                                <div style={{marginBottom:24,padding:16,background:'rgba(0,0,0,0.4)',borderRadius:12,border:'1px solid rgba(255,255,255,0.06)'}}>
                                     <WhatIfAnalysis 
                                         dataType={activeView}
                                         onSentimentChange={setSentiment}
@@ -214,9 +187,9 @@ const DataVisualizationPage = () => {
                             
                             {/* Data Tooltip */}
                             {hoveredData && (
-                                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm p-3 rounded-lg border border-gray-700 z-50 transition-all duration-200">
-                                    <h4 className="text-white text-sm font-medium">{hoveredData.label}</h4>
-                                    <p className="text-gray-300 text-xs">{hoveredData.value} {hoveredData.unit || ''}</p>
+                                <div style={{position:'absolute',top:16,left:16,background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)',padding:12,borderRadius:12,border:'1px solid rgba(255,255,255,0.06)',zIndex:50}}>
+                                    <h4 style={{fontSize:13,fontWeight:500}}>{hoveredData.label}</h4>
+                                    <p style={{fontSize:12,color:'rgba(255,255,255,0.48)'}}>{hoveredData.value} {hoveredData.unit || ''}</p>
                                 </div>
                             )}
                             

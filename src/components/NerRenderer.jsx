@@ -91,6 +91,7 @@ const NerRenderer = ({ children, entities }) => {
                 return acc;
             }, []);
         } else if (React.isValidElement(node) && node.props.children) {
+            if (typeof node.type !== 'string') return node;
             return React.cloneElement(node, {
                 ...node.props,
                 children: React.Children.map(node.props.children, processNode)

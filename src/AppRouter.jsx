@@ -18,6 +18,7 @@ import DataVisualizationPage from './pages/DataVisualizationPage.jsx';
 import ArticleReaderPage from './pages/ArticleReaderPage.jsx';
 import BookReaderPage from './pages/BookReaderPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
+import AudiobooksPage from './pages/AudiobooksPage.jsx';
 import ScienceTechPage from './pages/ScienceTechPage.jsx';
 import CoursePage from './pages/CoursePage.jsx';
 import LessonPage from './pages/LessonPage.jsx';
@@ -47,6 +48,7 @@ import RoleManagementPage from './pages/admin/RoleManagementPage.jsx';
 import ScenarioAdminPage from './pages/admin/ScenarioAdminPage.jsx';
 import STEMAdminPage from './pages/admin/STEMAdminPage.jsx';
 import StudyAdminPage from './pages/admin/StudyAdminPage.jsx';
+import WaitlistAdminPage from './pages/admin/WaitlistAdminPage.jsx';
 import WorldSimPage from './pages/WorldSimPage.jsx';
 import MarxBotPage from './pages/MarxBotPage.jsx';
 import { TextBrowser } from './components/Analysis/AnalysisBrowser';
@@ -54,6 +56,7 @@ import { AnalysisReader } from './components/Analysis/AnalysisReader';
 import ErrorBoundary from './components/ErrorBoundary';
 import NotFoundPage from './pages/NotFoundPage';
 import MaintenancePage from './pages/MaintenancePage.jsx';
+import GlossaryTermPage from './pages/GlossaryTermPage.jsx';
 
 // ╔══════════════════════════════════════════════════════╗
 // ║  MAINTENANCE MODE — set to false to restore site    ║
@@ -95,12 +98,14 @@ const AppRouter = () => {
                         <Route path="/analysis/legacy" element={<ProtectedRoute><MainLayout><AnalysisPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/submit" element={<ProtectedRoute><MainLayout><SubmitPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/article/:articleId" element={<ProtectedRoute><MainLayout><ArticleReaderPage /></MainLayout></ProtectedRoute>} />
-                        <Route path="/book/:bookId" element={<ProtectedRoute><MainLayout><BookReaderPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/book/:bookId" element={<MainLayout><BookReaderPage /></MainLayout>} />
                         <Route path="/profile" element={<ProtectedRoute><MainLayout><ProfilePage /></MainLayout></ProtectedRoute>} />
 
                         {/* Previously Admin-only routes, now opened up */}
                         <Route path="/directory" element={<ProtectedRoute><MainLayout><DirectoryPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/glossary/:term" element={<ProtectedRoute><MainLayout><GlossaryTermPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/study" element={<ProtectedRoute><MainLayout><StudyPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/audiobooks" element={<ProtectedRoute><MainLayout><AudiobooksPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/science-tech" element={<ProtectedRoute><MainLayout><ScienceTechPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/science-tech/courses/:courseSlug" element={<ProtectedRoute><MainLayout><CoursePage /></MainLayout></ProtectedRoute>} />
                         <Route path="/science-tech/courses/:courseSlug/:chapterSlug/test" element={<ProtectedRoute><ChapterTestPage /></ProtectedRoute>} />
@@ -123,6 +128,7 @@ const AppRouter = () => {
                         <Route path="/admin/scenarios" element={<AdminRoute><MainLayout><ScenarioAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/stem" element={<AdminRoute><MainLayout><STEMAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/study" element={<RoleRoute allowedEditorialRoles={['Teacher']}><MainLayout><StudyAdminPage /></MainLayout></RoleRoute>} />
+                        <Route path="/admin/waitlist" element={<AdminRoute><MainLayout><WaitlistAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/world-sim" element={<AdminRoute><WorldSimPage /></AdminRoute>} />
                         
                         {/* Forum routes */}
