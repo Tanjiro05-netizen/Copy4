@@ -32,19 +32,20 @@ const Header = () => {
             label: t('nav.theory'),
             icon: BookMarked,
             guestAccessible: false,
+            featureKey: 'theory',
             children: [
                 { path: '/theory', label: t('nav.theoryRead'), description: t('nav.theoryReadDesc') },
                 { path: '/analysis', label: t('nav.theoryAnalyze'), description: t('nav.theoryAnalyzeDesc') },
             ],
         },
         { path: '/digital-library', label: t('nav.library'), icon: BookOpen, guestAccessible: true },
-        { path: '/study', label: t('nav.study'), icon: BarChart, guestAccessible: false },
-        { path: '/science-tech', label: t('nav.scienceTech'), icon: FileText, guestAccessible: false },
-        { path: '/politics', label: t('nav.politics'), icon: FileText, guestAccessible: false },
-        { path: '/visualizations', label: t('nav.data'), icon: LineChart, guestAccessible: false },
-        { path: '/directory', label: t('nav.directory'), icon: Users, guestAccessible: false },
-        { path: '/forum', label: t('nav.forum'), icon: MessageSquare, guestAccessible: false },
-        { path: '/knowledge', label: t('nav.knowledgeQA'), icon: HelpCircle, guestAccessible: false }
+        { path: '/study', label: t('nav.study'), icon: BarChart, guestAccessible: false, featureKey: 'study' },
+        { path: '/science-tech', label: t('nav.scienceTech'), icon: FileText, guestAccessible: false, featureKey: 'science-tech' },
+        { path: '/politics', label: t('nav.politics'), icon: FileText, guestAccessible: false, featureKey: 'politics' },
+        { path: '/visualizations', label: t('nav.data'), icon: LineChart, guestAccessible: false, featureKey: 'visualizations' },
+        { path: '/directory', label: t('nav.directory'), icon: Users, guestAccessible: false, featureKey: 'directory' },
+        { path: '/forum', label: t('nav.forum'), icon: MessageSquare, guestAccessible: false, featureKey: 'forum' },
+        { path: '/knowledge', label: t('nav.knowledgeQA'), icon: HelpCircle, guestAccessible: false, featureKey: 'knowledge' }
     ];
     
     // Show all nav items to everyone (guests see "Coming Soon" for restricted ones)
@@ -78,7 +79,7 @@ const Header = () => {
                                                 {item.children.map(child => (
                                                     <Link
                                                         key={child.path}
-                                                        to={isRestricted ? '/coming-soon' : child.path}
+                                                        to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
                                                         className={`${s.dropdownItem} ${isActive(child.path) ? s.dropdownItemActive : ''}`}
                                                     >
                                                         <span className={s.dropdownItemLabel}>{child.label}</span>
@@ -95,7 +96,7 @@ const Header = () => {
                             return (
                                 <Link 
                                     key={item.path}
-                                    to={isRestricted ? '/coming-soon' : item.path}
+                                    to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                     className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : ''}`}
                                     title={isRestricted ? 'Coming Soon' : ''}
                                 >
@@ -207,7 +208,7 @@ const Header = () => {
                                                 {item.children.map(child => (
                                                     <Link
                                                         key={child.path}
-                                                        to={isRestricted ? '/coming-soon' : child.path}
+                                                        to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
                                                         className={`${s.mobileSubLink} ${isActive(child.path) ? s.mobileLinkActive : ''}`}
                                                         onClick={() => setMobileMenuOpen(false)}
                                                     >
@@ -225,7 +226,7 @@ const Header = () => {
                                 return (
                                     <Link 
                                         key={item.path}
-                                        to={isRestricted ? '/coming-soon' : item.path}
+                                        to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                         className={`${s.mobileLink} ${isRestricted ? s.mobileLinkRestricted : isActive(item.path) ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >

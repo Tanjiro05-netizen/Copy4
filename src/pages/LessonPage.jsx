@@ -8,10 +8,11 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { 
-  ArrowLeft, ChevronLeft, ChevronRight, Check, Play, Pause,
-  Zap, BookOpen, Clock, Volume2, VolumeX, Maximize, Award
+  ArrowLeft, ChevronLeft, ChevronRight, Check, Play,
+  Zap, Award
 } from 'lucide-react';
 import ExerciseWidget from '../components/ScienceTech/ExerciseWidget';
+import BlockRenderer from '../components/ScienceTech/blocks/BlockRenderer';
 import CertificateViewer from '../components/ScienceTech/CertificateViewer';
 
 const LessonPage = () => {
@@ -30,7 +31,6 @@ const LessonPage = () => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [videoPlaying, setVideoPlaying] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
   const [certificate, setCertificate] = useState(null);
   const [showCertificate, setShowCertificate] = useState(false);
@@ -257,8 +257,6 @@ const LessonPage = () => {
           src={lesson.video_url}
           controls
           className="w-full h-full"
-          onPlay={() => setVideoPlaying(true)}
-          onPause={() => setVideoPlaying(false)}
         >
           Your browser does not support the video tag.
         </video>
@@ -336,9 +334,9 @@ const LessonPage = () => {
       {/* Main Content */}
       <div className="pt-32 pb-24 px-4">
         <div className="container mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Left Column - Reading Content */}
-            <div className="lg:col-span-3 space-y-6">
+          {/* Block-based layout (new) */}
+          {lesson.content_blocks && lesson.content_blocks.length > 0 ? (
+            <div className="max-w-3xl mx-auto space-y-6">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
                   {lesson.title}
@@ -347,64 +345,11 @@ const LessonPage = () => {
                   <p className="text-gray-400">{lesson.summary}</p>
                 )}
               </div>
+              <BlockRenderer blocks={lesson.content_blocks} />
 
-              {/* Lesson Content (Markdown) */}
-              {lesson.content && (
-                <div className="prose prose-invert prose-red max-w-none">
-                  <div className="bg-black/40 rounded-xl p-6 border border-red-900/30">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm, remarkMath]}
-                      rehypePlugins={[rehypeKatex]}
-                      components={{
-                        h1: ({children}) => <h1 className="text-2xl font-bold text-white mb-4">{children}</h1>,
-                        h2: ({children}) => <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>,
-                        h3: ({children}) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
-                        p: ({children}) => <p className="text-gray-300 mb-4 leading-relaxed">{children}</p>,
-                        ul: ({children}) => <ul className="list-disc list-inside text-gray-300 mb-4 space-y-1">{children}</ul>,
-                        ol: ({children}) => <ol className="list-decimal list-inside text-gray-300 mb-4 space-y-1">{children}</ol>,
-                        li: ({children}) => <li className="text-gray-300">{children}</li>,
-                        code: ({inline, children}) => inline 
-                          ? <code className="bg-red-900/30 px-1.5 py-0.5 rounded text-red-300 text-sm">{children}</code>
-                          : <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto"><code className="text-gray-300 text-sm">{children}</code></pre>,
-                        blockquote: ({children}) => <blockquote className="border-l-4 border-red-500 pl-4 italic text-gray-400">{children}</blockquote>,
-                        strong: ({children}) => <strong className="text-white font-semibold">{children}</strong>,
-                        em: ({children}) => <em className="text-gray-200">{children}</em>,
-                        table: ({children}) => <table className="w-full border-collapse my-4">{children}</table>,
-                        thead: ({children}) => <thead className="border-b border-gray-600">{children}</thead>,
-                        th: ({children}) => <th className="text-left text-white font-semibold px-3 py-2">{children}</th>,
-                        td: ({children}) => <td className="text-gray-300 px-3 py-2 border-t border-gray-700/50">{children}</td>,
-                      }}
-                    >
-                      {lesson.content}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Column - Video & Exercises */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Video Player */}
-              {lesson.video_url && (
-                <div className="bg-black/40 rounded-xl overflow-hidden border border-red-900/30">
-                  <div className="p-4 border-b border-gray-800">
-                    <h3 className="text-white font-semibold flex items-center gap-2">
-                      <Play className="w-4 h-4 text-red-400" />
-                      Video Lesson
-                      {lesson.video_duration && (
-                        <span className="text-gray-500 text-sm ml-auto">
-                          {Math.floor(lesson.video_duration / 60)}:{(lesson.video_duration % 60).toString().padStart(2, '0')}
-                        </span>
-                      )}
-                    </h3>
-                  </div>
-                  {renderVideo()}
-                </div>
-              )}
-
-              {/* Exercises */}
+              {/* Legacy sidebar exercises still shown at bottom for block-based lessons */}
               {exercises.length > 0 && (
-                <div className="bg-black/40 rounded-xl border border-red-900/30 overflow-hidden">
+                <div className="bg-black/40 rounded-xl border border-red-900/30 overflow-hidden mt-8">
                   <div className="p-4 border-b border-gray-800">
                     <h3 className="text-white font-semibold">Practice Exercises</h3>
                     <p className="text-gray-500 text-sm">{exercises.length} exercise{exercises.length !== 1 ? 's' : ''}</p>
@@ -417,7 +362,91 @@ const LessonPage = () => {
                 </div>
               )}
             </div>
-          </div>
+          ) : (
+            /* Legacy 3:2 split layout */
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+              {/* Left Column - Reading Content */}
+              <div className="lg:col-span-3 space-y-6">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                    {lesson.title}
+                  </h1>
+                  {lesson.summary && (
+                    <p className="text-gray-400">{lesson.summary}</p>
+                  )}
+                </div>
+
+                {/* Lesson Content (Markdown) */}
+                {lesson.content && (
+                  <div className="prose prose-invert prose-red max-w-none">
+                    <div className="bg-black/40 rounded-xl p-6 border border-red-900/30">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                        components={{
+                          h1: ({children}) => <h1 className="text-2xl font-bold text-white mb-4">{children}</h1>,
+                          h2: ({children}) => <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>,
+                          h3: ({children}) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
+                          p: ({children}) => <p className="text-gray-300 mb-4 leading-relaxed">{children}</p>,
+                          ul: ({children}) => <ul className="list-disc list-inside text-gray-300 mb-4 space-y-1">{children}</ul>,
+                          ol: ({children}) => <ol className="list-decimal list-inside text-gray-300 mb-4 space-y-1">{children}</ol>,
+                          li: ({children}) => <li className="text-gray-300">{children}</li>,
+                          code: ({inline, children}) => inline 
+                            ? <code className="bg-red-900/30 px-1.5 py-0.5 rounded text-red-300 text-sm">{children}</code>
+                            : <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto"><code className="text-gray-300 text-sm">{children}</code></pre>,
+                          blockquote: ({children}) => <blockquote className="border-l-4 border-red-500 pl-4 italic text-gray-400">{children}</blockquote>,
+                          strong: ({children}) => <strong className="text-white font-semibold">{children}</strong>,
+                          em: ({children}) => <em className="text-gray-200">{children}</em>,
+                          table: ({children}) => <table className="w-full border-collapse my-4">{children}</table>,
+                          thead: ({children}) => <thead className="border-b border-gray-600">{children}</thead>,
+                          th: ({children}) => <th className="text-left text-white font-semibold px-3 py-2">{children}</th>,
+                          td: ({children}) => <td className="text-gray-300 px-3 py-2 border-t border-gray-700/50">{children}</td>,
+                        }}
+                      >
+                        {lesson.content}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column - Video & Exercises */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Video Player */}
+                {lesson.video_url && (
+                  <div className="bg-black/40 rounded-xl overflow-hidden border border-red-900/30">
+                    <div className="p-4 border-b border-gray-800">
+                      <h3 className="text-white font-semibold flex items-center gap-2">
+                        <Play className="w-4 h-4 text-red-400" />
+                        Video Lesson
+                        {lesson.video_duration && (
+                          <span className="text-gray-500 text-sm ml-auto">
+                            {Math.floor(lesson.video_duration / 60)}:{(lesson.video_duration % 60).toString().padStart(2, '0')}
+                          </span>
+                        )}
+                      </h3>
+                    </div>
+                    {renderVideo()}
+                  </div>
+                )}
+
+                {/* Exercises */}
+                {exercises.length > 0 && (
+                  <div className="bg-black/40 rounded-xl border border-red-900/30 overflow-hidden">
+                    <div className="p-4 border-b border-gray-800">
+                      <h3 className="text-white font-semibold">Practice Exercises</h3>
+                      <p className="text-gray-500 text-sm">{exercises.length} exercise{exercises.length !== 1 ? 's' : ''}</p>
+                    </div>
+                    <div className="p-4 space-y-4">
+                      {exercises.map((exercise, idx) => (
+                        <ExerciseWidget key={exercise.id} exercise={exercise} index={idx} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

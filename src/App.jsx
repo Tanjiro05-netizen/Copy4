@@ -1,16 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Book, FileText, BookOpen,
     Newspaper, GraduationCap, HelpCircle, BookMarked, FlaskConical, LineChart,
     Users, Bot, Terminal, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useAuth } from './context/AuthContext';
+import { supabase } from './supabaseClient';
 import hammerAndSickleImage from './assets/hammerandsickle.png';
 import { Analytics } from '@vercel/analytics/react';
 import * as s from './App.css.ts';
 
 const App = () => {
     const { user } = useAuth();
+    const [stats, setStats] = useState(null);
+
+    useEffect(() => {
+        if (user) return;
+        const fetchStats = async () => {
+            try {
+                const [books, articles, glossary, members] = await Promise.all([
+                    supabase.from('digital_library_books').select('*', { count: 'exact', head: true }),
+                    supabase.from('theory_articles').select('*', { count: 'exact', head: true }),
+                    supabase.from('glossary').select('*', { count: 'exact', head: true }),
+                    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+                ]);
+                setStats({
+                    books: books.count ?? 0,
+                    articles: articles.count ?? 0,
+                    glossary: glossary.count ?? 0,
+                    members: members.count ?? 0,
+                });
+            } catch (e) {
+                // silently fail — stats are non-critical
+            }
+        };
+        fetchStats();
+    }, [user]);
 
     const primaryCta = user
         ? { to: '/theory', label: 'Explore Theory' }
@@ -91,6 +116,22 @@ const App = () => {
                                 Register to unlock the full platform. Here's what awaits inside.
                             </p>
                         </div>
+
+                        {stats && (
+                            <div className={s.statsRow}>
+                                {[
+                                    { value: stats.books, label: 'Books in Library' },
+                                    { value: stats.articles, label: 'Theory Articles' },
+                                    { value: stats.glossary, label: 'Glossary Terms' },
+                                    { value: stats.members, label: 'Members' },
+                                ].filter(s => s.value > 0).map((stat, i) => (
+                                    <div key={i} className={s.statCard}>
+                                        <div className={s.statNumber}>{stat.value}</div>
+                                        <div className={s.statLabel}>{stat.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         <div className={s.guestGrid}>
                             {[

@@ -201,13 +201,7 @@ const LandingPage = () => {
         setLoginLoading(true);
 
         try {
-            const timeout = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('timeout')), 10000)
-            );
-            const result = await Promise.race([
-                login({ email: loginEmail, password: loginPassword }),
-                timeout,
-            ]);
+            const result = await login({ email: loginEmail, password: loginPassword });
 
             if (result.error) {
                 setLoginError(result.error.message);
@@ -216,11 +210,7 @@ const LandingPage = () => {
                 navigate('/home');
             }
         } catch (err) {
-            setLoginError(
-                err.message === 'timeout'
-                    ? 'Server is not responding. Please try again later.'
-                    : 'Login failed. Please try again.'
-            );
+            setLoginError(err.message || 'Login failed. Please try again.');
         } finally {
             setLoginLoading(false);
         }

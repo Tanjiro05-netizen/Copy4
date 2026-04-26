@@ -7,10 +7,11 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { 
-  Plus, Edit, Trash2, Save, X, ChevronDown, ChevronRight, 
-  BookOpen, Video, FileText, HelpCircle, Upload, Eye, EyeOff,
-  GripVertical, Check
+  Plus, Edit, Trash2, X, ChevronDown, ChevronRight, 
+  BookOpen, Video, FileText, HelpCircle, Eye, EyeOff,
+  Layout, FileText as FileTextIcon
 } from 'lucide-react';
+import BlockBuilder from '../../components/Admin/BlockBuilder';
 
 const STEMAdminPage = () => {
   const [activeTab, setActiveTab] = useState('courses');
@@ -819,12 +820,15 @@ const ChapterModal = ({ chapter, courseId, onClose, onSave }) => {
 
 // Lesson Modal Component
 const LessonModal = ({ lesson, onClose, onSave }) => {
+  const hasBlocks = lesson?.content_blocks && lesson.content_blocks.length > 0;
+  const [mode, setMode] = useState(hasBlocks ? 'blocks' : 'markdown');
   const [formData, setFormData] = useState({
     title: lesson?.title || '',
     slug: lesson?.slug || '',
     lesson_type: lesson?.lesson_type || 'reading',
     summary: lesson?.summary || '',
     content: lesson?.content || '',
+    content_blocks: lesson?.content_blocks || [],
     video_url: lesson?.video_url || '',
     xp_reward: lesson?.xp_reward || 10,
   });
@@ -836,16 +840,26 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
     setIsSaving(true);
     try {
       const data = {
-        ...formData,
-        chapter_id: lesson.chapter_id,
+        title: formData.title,
         slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-'),
+        lesson_type: formData.lesson_type,
+        summary: formData.summary,
+        video_url: formData.video_url,
         xp_reward: parseInt(formData.xp_reward),
       };
+
+      if (mode === 'blocks') {
+        data.content_blocks = formData.content_blocks;
+        data.content = null; // clear legacy content when using blocks
+      } else {
+        data.content = formData.content;
+        data.content_blocks = null; // clear blocks when using legacy
+      }
 
       if (lesson?.id) {
         await supabase.from('stem_lessons').update(data).eq('id', lesson.id);
       } else {
-        await supabase.from('stem_lessons').insert(data);
+        await supabase.from('stem_lessons').insert({ ...data, chapter_id: lesson.chapter_id });
       }
       onSave();
     } catch (error) {
@@ -863,23 +877,48 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
             {lesson?.id ? 'Edit Lesson' : 'New Lesson'}
           </h3>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setShowPreview(!showPreview)}
-              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
-                showPreview ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400 hover:text-white'
-              }`}
-            >
-              {showPreview ? 'Hide Preview' : 'Show Preview'}
-            </button>
+            {/* Mode toggle */}
+            <div className="flex items-center bg-black/40 rounded-lg border border-gray-800 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setMode('markdown')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors ${
+                  mode === 'markdown' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <FileTextIcon className="w-3.5 h-3.5" />
+                Markdown
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('blocks')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors ${
+                  mode === 'blocks' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Layout className="w-3.5 h-3.5" />
+                Block Builder
+              </button>
+            </div>
+            {mode === 'markdown' && (
+              <button
+                type="button"
+                onClick={() => setShowPreview(!showPreview)}
+                className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                  showPreview ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400 hover:text-white'
+                }`}
+              >
+                {showPreview ? 'Hide Preview' : 'Show Preview'}
+              </button>
+            )}
             <button onClick={onClose} className="text-gray-400 hover:text-white">
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2">
               <label className="block text-sm text-gray-400 mb-1">Title</label>
               <input
                 type="text"
@@ -922,46 +961,62 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
               className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
             />
           </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Content (Markdown)</label>
-            <div className={showPreview ? 'grid grid-cols-2 gap-4' : ''}>
-              <textarea
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={16}
-                placeholder="## Lesson Title&#10;&#10;Your lesson content in Markdown..."
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none font-mono text-sm"
-              />
-              {showPreview && (
-                <div className="bg-black/40 rounded-lg p-4 border border-gray-700 overflow-y-auto max-h-[400px]">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkMath]}
-                    rehypePlugins={[rehypeKatex]}
-                    components={{
-                      h1: ({children}) => <h1 className="text-2xl font-bold text-white mb-4">{children}</h1>,
-                      h2: ({children}) => <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>,
-                      h3: ({children}) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
-                      p: ({children}) => <p className="text-gray-300 mb-4 leading-relaxed">{children}</p>,
-                      ul: ({children}) => <ul className="list-disc list-inside text-gray-300 mb-4 space-y-1">{children}</ul>,
-                      ol: ({children}) => <ol className="list-decimal list-inside text-gray-300 mb-4 space-y-1">{children}</ol>,
-                      li: ({children}) => <li className="text-gray-300">{children}</li>,
-                      code: ({inline, children}) => inline
-                        ? <code className="bg-red-900/30 px-1.5 py-0.5 rounded text-red-300 text-sm">{children}</code>
-                        : <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto"><code className="text-gray-300 text-sm">{children}</code></pre>,
-                      blockquote: ({children}) => <blockquote className="border-l-4 border-red-500 pl-4 italic text-gray-400">{children}</blockquote>,
-                      strong: ({children}) => <strong className="text-white font-semibold">{children}</strong>,
-                      em: ({children}) => <em className="text-gray-200">{children}</em>,
-                      table: ({children}) => <table className="w-full border-collapse mb-4">{children}</table>,
-                      th: ({children}) => <th className="border border-gray-700 px-3 py-2 text-white bg-black/30 text-left text-sm">{children}</th>,
-                      td: ({children}) => <td className="border border-gray-700 px-3 py-2 text-gray-300 text-sm">{children}</td>,
-                    }}
-                  >
-                    {formData.content || '*Start typing to see preview...*'}
-                  </ReactMarkdown>
-                </div>
-              )}
+
+          {/* Content area - Markdown mode */}
+          {mode === 'markdown' && (
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Content (Markdown)</label>
+              <div className={showPreview ? 'grid grid-cols-2 gap-4' : ''}>
+                <textarea
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  rows={16}
+                  placeholder="## Lesson Title&#10;&#10;Your lesson content in Markdown..."
+                  className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none font-mono text-sm"
+                />
+                {showPreview && (
+                  <div className="bg-black/40 rounded-lg p-4 border border-gray-700 overflow-y-auto max-h-[400px]">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                      components={{
+                        h1: ({children}) => <h1 className="text-2xl font-bold text-white mb-4">{children}</h1>,
+                        h2: ({children}) => <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>,
+                        h3: ({children}) => <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>,
+                        p: ({children}) => <p className="text-gray-300 mb-4 leading-relaxed">{children}</p>,
+                        ul: ({children}) => <ul className="list-disc list-inside text-gray-300 mb-4 space-y-1">{children}</ul>,
+                        ol: ({children}) => <ol className="list-decimal list-inside text-gray-300 mb-4 space-y-1">{children}</ol>,
+                        li: ({children}) => <li className="text-gray-300">{children}</li>,
+                        code: ({inline, children}) => inline
+                          ? <code className="bg-red-900/30 px-1.5 py-0.5 rounded text-red-300 text-sm">{children}</code>
+                          : <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto"><code className="text-gray-300 text-sm">{children}</code></pre>,
+                        blockquote: ({children}) => <blockquote className="border-l-4 border-red-500 pl-4 italic text-gray-400">{children}</blockquote>,
+                        strong: ({children}) => <strong className="text-white font-semibold">{children}</strong>,
+                        em: ({children}) => <em className="text-gray-200">{children}</em>,
+                        table: ({children}) => <table className="w-full border-collapse mb-4">{children}</table>,
+                        th: ({children}) => <th className="border border-gray-700 px-3 py-2 text-white bg-black/30 text-left text-sm">{children}</th>,
+                        td: ({children}) => <td className="border border-gray-700 px-3 py-2 text-gray-300 text-sm">{children}</td>,
+                      }}
+                    >
+                      {formData.content || '*Start typing to see preview...*'}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Content area - Block Builder mode */}
+          {mode === 'blocks' && (
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Content Blocks</label>
+              <BlockBuilder
+                blocks={formData.content_blocks || []}
+                onChange={(newBlocks) => setFormData({ ...formData, content_blocks: newBlocks })}
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-sm text-gray-400 mb-1">XP Reward</label>
             <input

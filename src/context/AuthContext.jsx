@@ -4,6 +4,48 @@ import { supabase } from '../supabaseClient';
 const AuthContext = createContext();
 
 const normalizeRoleToken = (value) => `${value || ''}`.trim().toLowerCase();
+const LOGIN_TIMEOUT_MS = 15000;
+const SESSION_TIMEOUT_MS = 8000;
+const DEV_ADMIN_USER = { id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' };
+const DEV_ADMIN_PROFILE = { id: 'dev-admin', username: 'DevAdmin', role: 'admin', is_admin: true };
+const DEV_ADMIN_PASSWORD = 'admin123';
+const DEV_AUTH_STORAGE_KEY = 'marxist_dev_auth';
+
+export const AUTH_TIMEOUT_MESSAGE = 'Supabase did not respond. Check your connection and try again.';
+
+export const isLocalDevelopmentHost = (hostname) => {
+    const currentHostname =
+        hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '');
+    const normalizedHostname = `${currentHostname || ''}`.trim().toLowerCase();
+    return (
+        normalizedHostname === 'localhost' ||
+        normalizedHostname === '127.0.0.1' ||
+        normalizedHostname === '0.0.0.0' ||
+        normalizedHostname === '::1' ||
+        normalizedHostname === '[::1]' ||
+        normalizedHostname.endsWith('.localhost')
+    );
+};
+
+const hasLocalDevAuth = () =>
+    isLocalDevelopmentHost() &&
+    typeof localStorage !== 'undefined' &&
+    localStorage.getItem(DEV_AUTH_STORAGE_KEY);
+
+const withTimeout = async (promise, ms, timeoutMessage) => {
+    let timeoutId;
+
+    try {
+        return await Promise.race([
+            promise,
+            new Promise((_, reject) => {
+                timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), ms);
+            }),
+        ]);
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
 
 export const isAdminProfile = (profile) =>
     profile?.is_admin === true || normalizeRoleToken(profile?.role) === 'admin';
@@ -57,27 +99,24 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const withTimeout = (promise, ms) =>
-            Promise.race([
-                promise,
-                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-            ]);
-
         const getSession = async () => {
             // Check for dev auth bypass
-            if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
-                const devUser = { id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' };
-                setUser(devUser);
-                setProfile({ id: 'dev-admin', username: 'DevAdmin', role: 'admin', is_admin: true });
+            if (hasLocalDevAuth()) {
+                setUser(DEV_ADMIN_USER);
+                setProfile(DEV_ADMIN_PROFILE);
                 setLoading(false);
                 return;
             }
 
             try {
-                const { data: { session } } = await withTimeout(supabase.auth.getSession(), 8000);
+                const { data: { session } } = await withTimeout(
+                    supabase.auth.getSession(),
+                    SESSION_TIMEOUT_MS,
+                    'Auth session check timed out.'
+                );
                 setUser(session?.user ?? null);
                 if (session?.user) {
-                    await withTimeout(fetchProfile(session.user.id), 8000);
+                    await withTimeout(fetchProfile(session.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
                 }
             } catch (error) {
                 console.error('Error getting session:', error);
@@ -90,7 +129,7 @@ export const AuthProvider = ({ children }) => {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             // Respect dev auth if present
-            if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+            if (hasLocalDevAuth()) {
                 return;
             }
             setUser(session?.user ?? null);
@@ -107,7 +146,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const isAdmin = () => {
-        if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+        if (hasLocalDevAuth()) {
             return true;
         }
         return isAdminProfile(profile);
@@ -118,14 +157,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const canManagePolitics = () => {
-        if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+        if (hasLocalDevAuth()) {
             return true;
         }
         return canProfileManagePolitics(profile);
     };
 
     const canManageStudy = () => {
-        if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
+        if (hasLocalDevAuth()) {
             return true;
         }
         return canProfileManageStudy(profile);
@@ -138,20 +177,38 @@ export const AuthProvider = ({ children }) => {
             options: { data: { user_name: username, invite_code: inviteCode, beta_reason: betaReason } }
         }),
         login: async (data) => {
-            if (window.location.hostname === 'localhost' && data.email === 'admin@localhost' && data.password === 'admin123') {
-                localStorage.setItem('marxist_dev_auth', 'true');
-                setUser({ id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' });
-                setProfile({ id: 'dev-admin', username: 'DevAdmin', role: 'admin', is_admin: true });
+            const credentials = {
+                email: `${data.email || ''}`.trim().toLowerCase(),
+                password: data.password || '',
+            };
+
+            if (
+                isLocalDevelopmentHost() &&
+                credentials.email === DEV_ADMIN_USER.email &&
+                credentials.password === DEV_ADMIN_PASSWORD
+            ) {
+                localStorage.setItem(DEV_AUTH_STORAGE_KEY, 'true');
+                setUser(DEV_ADMIN_USER);
+                setProfile(DEV_ADMIN_PROFILE);
                 return { error: null };
             }
-            const timeout = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Login timed out — server not responding.')), 10000)
+
+            const result = await withTimeout(
+                supabase.auth.signInWithPassword(credentials),
+                LOGIN_TIMEOUT_MS,
+                AUTH_TIMEOUT_MESSAGE
             );
-            return Promise.race([supabase.auth.signInWithPassword(data), timeout]);
+
+            if (result.data?.user) {
+                setUser(result.data.user);
+                await withTimeout(fetchProfile(result.data.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
+            }
+
+            return result;
         },
         logout: () => {
-            if (window.location.hostname === 'localhost') {
-                localStorage.removeItem('marxist_dev_auth');
+            if (isLocalDevelopmentHost()) {
+                localStorage.removeItem(DEV_AUTH_STORAGE_KEY);
             }
             setUser(null);
             setProfile(null);
