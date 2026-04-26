@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Image as ImageIcon, Loader, Newspaper, RefreshCw, Search } from 'lucide-react';
-import { fetchAllNews } from '../utils/newsFeed';
+import { ChevronRight, Image as ImageIcon, Newspaper, Search } from 'lucide-react';
 import * as s from './PoliticsPage.css.ts';
 
 const categories = [
@@ -24,8 +23,6 @@ const MOCK_ARTICLES = [
   { id: '9', slug: 'inflation-and-wages', title: 'Inflation, Wages, and the Profit Squeeze', excerpt: 'Behind the headlines on inflation lies a class struggle over distribution. We break down who really pays and who profits.', category: 'analysis', source: 'Economics Desk', date: '2025-04-17', imageUrl: null },
 ];
 
-const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
-
 const formatDate = (value) => {
   if (!value) return '';
   const parsed = new Date(value);
@@ -36,36 +33,9 @@ const formatDate = (value) => {
 const PoliticsPage = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [liveArticles, setLiveArticles] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [lastRefresh, setLastRefresh] = useState(null);
-
-  const loadNews = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const articles = await fetchAllNews({ query: 'politics', max: 15 });
-      if (articles.length > 0) {
-        setLiveArticles(articles);
-      }
-      setLastRefresh(new Date());
-    } catch (err) {
-      console.error('Failed to fetch news:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadNews();
-    const interval = setInterval(loadNews, REFRESH_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [loadNews]);
-
-  const articles = liveArticles.length > 0 ? liveArticles : MOCK_ARTICLES;
-  const isLive = liveArticles.length > 0;
 
   const filtered = useMemo(() => {
-    let list = articles;
+    let list = MOCK_ARTICLES;
     if (activeCategory !== 'all') {
       list = list.filter((a) => a.category === activeCategory);
     }
@@ -76,7 +46,7 @@ const PoliticsPage = () => {
       );
     }
     return list;
-  }, [articles, activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery]);
 
   const featured = filtered[0] || null;
   const rest = filtered.slice(1);
@@ -96,21 +66,7 @@ const PoliticsPage = () => {
                 Political analysis, movement reports, and international dispatches.
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {isLive && (
-                <button
-                  type="button"
-                  onClick={loadNews}
-                  disabled={isLoading}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontFamily: 'inherit' }}
-                  title={lastRefresh ? `Last updated ${lastRefresh.toLocaleTimeString()}` : 'Refresh'}
-                >
-                  {isLoading ? <Loader size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-                  {isLive ? 'Live' : 'Refresh'}
-                </button>
-              )}
-              <span className={s.countBadge}>{filtered.length} articles</span>
-            </div>
+            <span className={s.countBadge}>{filtered.length} articles</span>
           </div>
         </div>
 
@@ -144,83 +100,54 @@ const PoliticsPage = () => {
 
         {/* ── Featured article ── */}
         {featured && (
-          featured.externalUrl ? (
-            <a href={featured.externalUrl} target="_blank" rel="noopener noreferrer" className={s.featured}>
-              {featured.imageUrl ? (
-                <img src={featured.imageUrl} alt={featured.title} className={s.featuredImage} />
-              ) : (
-                <div className={s.featuredImageFallback}>
-                  <ImageIcon size={48} />
-                </div>
-              )}
-              <div className={s.featuredBody}>
-                <span className={s.featuredBadge}>{featured.category} · {featured.source}</span>
-                <h2 className={s.featuredTitle}>{featured.title}</h2>
-                <p className={s.featuredExcerpt}>{featured.excerpt}</p>
-                <div className={s.featuredMeta}>
-                  <span>{formatDate(featured.date)}</span>
-                </div>
-                <span className={s.featuredLink}>
-                  Read article <ChevronRight size={16} />
-                </span>
+          <Link to={`/politics/${featured.slug}`} className={s.featured}>
+            {featured.imageUrl ? (
+              <img src={featured.imageUrl} alt={featured.title} className={s.featuredImage} />
+            ) : (
+              <div className={s.featuredImageFallback}>
+                <ImageIcon size={48} />
               </div>
-            </a>
-          ) : (
-            <Link to={`/politics/${featured.slug}`} className={s.featured}>
-              {featured.imageUrl ? (
-                <img src={featured.imageUrl} alt={featured.title} className={s.featuredImage} />
-              ) : (
-                <div className={s.featuredImageFallback}>
-                  <ImageIcon size={48} />
-                </div>
-              )}
-              <div className={s.featuredBody}>
-                <span className={s.featuredBadge}>{featured.category}</span>
-                <h2 className={s.featuredTitle}>{featured.title}</h2>
-                <p className={s.featuredExcerpt}>{featured.excerpt}</p>
-                <div className={s.featuredMeta}>
-                  <span>{featured.source}</span>
-                  <span>{formatDate(featured.date)}</span>
-                </div>
-                <span className={s.featuredLink}>
-                  Read article <ChevronRight size={16} />
-                </span>
+            )}
+            <div className={s.featuredBody}>
+              <span className={s.featuredBadge}>{featured.category}</span>
+              <h2 className={s.featuredTitle}>{featured.title}</h2>
+              <p className={s.featuredExcerpt}>{featured.excerpt}</p>
+              <div className={s.featuredMeta}>
+                <span>{featured.source}</span>
+                <span>{formatDate(featured.date)}</span>
               </div>
-            </Link>
-          )
+              <span className={s.featuredLink}>
+                Read article <ChevronRight size={16} />
+              </span>
+            </div>
+          </Link>
         )}
 
         {/* ── Grid ── */}
         {rest.length > 0 ? (
           <div className={s.grid}>
-            {rest.map((article) => {
-              const CardTag = article.externalUrl ? 'a' : Link;
-              const linkProps = article.externalUrl
-                ? { href: article.externalUrl, target: '_blank', rel: 'noopener noreferrer' }
-                : { to: `/politics/${article.slug}` };
-              return (
-                <CardTag key={article.id} {...linkProps} className={s.card}>
-                  {article.imageUrl ? (
-                    <img src={article.imageUrl} alt={article.title} className={s.cardImage} />
-                  ) : (
-                    <div className={s.cardImageFallback}>
-                      <ImageIcon size={32} />
-                    </div>
-                  )}
-                  <div className={s.cardBody}>
-                    <span className={s.cardBadge}>{article.category}</span>
-                    <h3 className={s.cardTitle}>{article.title}</h3>
-                    <p className={s.cardExcerpt}>{article.excerpt}</p>
+            {rest.map((article) => (
+              <Link key={article.id} to={`/politics/${article.slug}`} className={s.card}>
+                {article.imageUrl ? (
+                  <img src={article.imageUrl} alt={article.title} className={s.cardImage} />
+                ) : (
+                  <div className={s.cardImageFallback}>
+                    <ImageIcon size={32} />
                   </div>
-                  <div className={s.cardFooter}>
-                    <span className={s.cardMeta}>{article.source} · {formatDate(article.date)}</span>
-                    <span className={s.cardLink}>
-                      Read <ChevronRight size={14} />
-                    </span>
-                  </div>
-                </CardTag>
-              );
-            })}
+                )}
+                <div className={s.cardBody}>
+                  <span className={s.cardBadge}>{article.category}</span>
+                  <h3 className={s.cardTitle}>{article.title}</h3>
+                  <p className={s.cardExcerpt}>{article.excerpt}</p>
+                </div>
+                <div className={s.cardFooter}>
+                  <span className={s.cardMeta}>{article.source} · {formatDate(article.date)}</span>
+                  <span className={s.cardLink}>
+                    Read <ChevronRight size={14} />
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         ) : !featured ? (
           <div className={s.emptyState}>
