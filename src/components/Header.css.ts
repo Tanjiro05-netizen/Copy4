@@ -5,10 +5,11 @@ export const header = style({
   position: 'fixed',
   top: 0,
   width: '100%',
+  height: '64px',
   zIndex: 50,
   background: vars.color.background,
   borderBottom: vars.border.subtle,
-  padding: `${vars.space.sm} 0`,
+  padding: `0`,
 });
 
 export const headerInner = style({
@@ -17,6 +18,7 @@ export const headerInner = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
+  height: '100%',
   padding: `0 ${vars.space.md}`,
 });
 
@@ -47,6 +49,15 @@ export const desktopNav = style({
 export const navRow = style({
   display: 'flex',
   alignItems: 'center',
+  overflowX: 'visible',
+  overflowY: 'visible',
+  flexWrap: 'nowrap',
+  scrollbarWidth: 'none',
+  selectors: {
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
+  },
 });
 
 export const navLink = style({

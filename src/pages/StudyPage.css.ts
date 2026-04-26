@@ -425,6 +425,7 @@ export const audioTeaserPanel = style([panelBase, {
 export const teaserList = style({
   display: 'grid',
   gap: vars.space.sm,
+  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
 });
 
 export const teaserItem = style([panelInset, {
@@ -433,6 +434,12 @@ export const teaserItem = style([panelInset, {
   gridTemplateColumns: '46px minmax(0, 1fr)',
   gap: vars.space.sm,
   alignItems: 'center',
+  cursor: 'pointer',
+  textAlign: 'left',
+  fontFamily: 'inherit',
+  fontSize: 'inherit',
+  color: 'inherit',
+  width: '100%',
   transition: 'border-color 180ms ease, transform 180ms ease, background 180ms ease',
   selectors: {
     '&:hover': {
@@ -580,4 +587,133 @@ export const lectureMeta = style({
   fontWeight: 300,
   lineHeight: 1.7,
   color: vars.color.textMuted,
+});
+
+export const playerPanel = style([panelBase, {
+  padding: vars.space.xl,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: vars.space.lg,
+  borderColor: vars.color.borderAccent,
+}]);
+
+export const playerHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: vars.space.md,
+});
+
+export const playerCover = style({
+  width: '64px',
+  height: '64px',
+  borderRadius: vars.radius.md,
+  objectFit: 'cover',
+  border: vars.border.subtle,
+  background: vars.color.surface,
+  flexShrink: 0,
+});
+
+export const playerCoverFallback = style({
+  width: '64px',
+  height: '64px',
+  borderRadius: vars.radius.md,
+  border: vars.border.subtle,
+  background: vars.color.surfaceSoft,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: vars.color.accent,
+  flexShrink: 0,
+});
+
+export const playerInfo = style({
+  minWidth: 0,
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: vars.space.xxs,
+});
+
+export const playerTitle = style({
+  margin: 0,
+  fontSize: '16px',
+  fontFamily: vars.font.display,
+  fontWeight: 400,
+  color: vars.color.text,
+});
+
+export const playerAuthor = style({
+  margin: 0,
+  fontSize: '12px',
+  fontWeight: 300,
+  color: vars.color.textMuted,
+});
+
+export const playerClose = style({
+  flexShrink: 0,
+  width: '32px',
+  height: '32px',
+  borderRadius: vars.radius.md,
+  border: vars.border.subtle,
+  background: vars.color.surfaceSoft,
+  color: vars.color.textMuted,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  transition: 'border-color 150ms ease, color 150ms ease',
+  selectors: {
+    '&:hover': {
+      borderColor: vars.color.borderAccent,
+      color: vars.color.text,
+    },
+  },
+});
+
+export const playerAudio = style({
+  width: '100%',
+  height: '40px',
+  borderRadius: vars.radius.md,
+  outline: 'none',
+});
+
+export const playerChapters = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: vars.space.xxs,
+});
+
+export const playerChaptersLabel = style({
+  margin: 0,
+  fontFamily: vars.font.mono,
+  fontSize: '10px',
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  color: vars.color.textFaint,
+  marginBottom: vars.space.xxs,
+});
+
+export const playerChapterBtn = style({
+  all: 'unset',
+  cursor: 'pointer',
+  padding: `${vars.space.xs} ${vars.space.sm}`,
+  fontSize: '12px',
+  fontWeight: 300,
+  color: vars.color.textMuted,
+  borderRadius: vars.radius.md,
+  transition: 'background 150ms ease, color 150ms ease',
+  display: 'flex',
+  alignItems: 'center',
+  gap: vars.space.xs,
+  selectors: {
+    '&:hover': {
+      background: vars.color.accentWash,
+      color: vars.color.text,
+    },
+  },
+});
+
+export const teaserItemActive = style({
+  borderColor: vars.color.borderAccent,
+  background: vars.color.accentWash,
 });

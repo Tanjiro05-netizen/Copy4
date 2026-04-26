@@ -201,7 +201,13 @@ const LandingPage = () => {
         setLoginLoading(true);
 
         try {
-            const result = await login({ email: loginEmail, password: loginPassword });
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), 10000)
+            );
+            const result = await Promise.race([
+                login({ email: loginEmail, password: loginPassword }),
+                timeout,
+            ]);
 
             if (result.error) {
                 setLoginError(result.error.message);
@@ -210,7 +216,11 @@ const LandingPage = () => {
                 navigate('/home');
             }
         } catch (err) {
-            setLoginError('Login failed. Please try again.');
+            setLoginError(
+                err.message === 'timeout'
+                    ? 'Server is not responding. Please try again later.'
+                    : 'Login failed. Please try again.'
+            );
         } finally {
             setLoginLoading(false);
         }
@@ -772,8 +782,8 @@ const LandingPage = () => {
                                 
                                 <h3 className="text-xl font-semibold text-white mt-6 mb-3">Guest Access</h3>
                                 <p className="text-gray-300 leading-relaxed">
-                                    You can browse the Home page, Digital Library, and Forum as a guest without an account.
-                                    Full features like Theory, Study tools, and Profile require registration with an invite code.
+                                    You can browse the Home page and Digital Library as a guest without an account.
+                                    Full features like Theory, Study tools, Forum, and Profile require registration with an invite code.
                                 </p>
                             </div>
                             
@@ -1236,8 +1246,8 @@ const LandingPage = () => {
                             
                             <h3 className="text-xl font-semibold text-white mt-6 mb-3">Guest Access</h3>
                             <p className="text-gray-300">
-                                You can browse the Home page, Digital Library, and Forum as a guest without an account.
-                                Full features like Theory, Study tools, and Profile require registration with an invite code.
+                                You can browse the Home page and Digital Library as a guest without an account.
+                                Full features like Theory, Study tools, Forum, and Profile require registration with an invite code.
                             </p>
                         </div>
                         

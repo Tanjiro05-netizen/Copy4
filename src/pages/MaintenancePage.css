@@ -266,6 +266,123 @@
     100% { transform: translateY(-10vh) translateX(var(--drift, 20px)); opacity: 0; }
 }
 
+/* Download button */
+.maintenance-download {
+    opacity: 0;
+    animation: messageReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
+    margin-top: 2rem;
+}
+
+.maintenance-download-link {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.maintenance-download-aura {
+    position: absolute;
+    inset: -3px;
+    background: #2a0505;
+    border-radius: 12px;
+    filter: blur(12px);
+    opacity: 0.6;
+    transition: opacity 2s ease;
+    animation: downloadAuraPulse 8s ease-in-out infinite;
+}
+
+.maintenance-download-link:hover .maintenance-download-aura {
+    opacity: 0.8;
+}
+
+@keyframes downloadAuraPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.7; }
+}
+
+.maintenance-download-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(to bottom, #130101, #080000);
+    border: 1px solid rgba(46, 8, 8, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.9s ease-out;
+}
+
+.maintenance-download-link:hover .maintenance-download-btn {
+    border-color: rgba(74, 21, 21, 0.8);
+    box-shadow: 0 4px 24px rgba(100, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+.maintenance-download-link:active .maintenance-download-btn {
+    transform: translateY(0);
+}
+
+.maintenance-download-edge-top {
+    position: absolute;
+    inset: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+
+.maintenance-download-edge-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+}
+
+.maintenance-download-hover-fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #0f0000, transparent, transparent);
+    opacity: 0;
+    transition: opacity 0.9s ease;
+}
+
+.maintenance-download-link:hover .maintenance-download-hover-fill {
+    opacity: 1;
+}
+
+.maintenance-download-icon {
+    position: relative;
+    z-index: 1;
+    color: #7a2a2a;
+    transition: color 0.9s ease;
+}
+
+.maintenance-download-link:hover .maintenance-download-icon {
+    color: #8f3535;
+}
+
+.maintenance-download-text {
+    position: relative;
+    z-index: 1;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: linear-gradient(to bottom, #c8c8c8, #6e6e6e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.9s ease;
+}
+
+.maintenance-download-link:hover .maintenance-download-text {
+    background: linear-gradient(to bottom, #dcdcdc, #8a7070);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
     .maintenance-glass {

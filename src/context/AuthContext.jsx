@@ -57,6 +57,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        const withTimeout = (promise, ms) =>
+            Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+            ]);
+
         const getSession = async () => {
             // Check for dev auth bypass
             if (window.location.hostname === 'localhost' && localStorage.getItem('marxist_dev_auth')) {
@@ -68,10 +74,10 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await withTimeout(supabase.auth.getSession(), 8000);
                 setUser(session?.user ?? null);
                 if (session?.user) {
-                    await fetchProfile(session.user.id);
+                    await withTimeout(fetchProfile(session.user.id), 8000);
                 }
             } catch (error) {
                 console.error('Error getting session:', error);
@@ -138,14 +144,18 @@ export const AuthProvider = ({ children }) => {
                 setProfile({ id: 'dev-admin', username: 'DevAdmin', role: 'admin', is_admin: true });
                 return { error: null };
             }
-            return supabase.auth.signInWithPassword(data);
+            const timeout = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Login timed out — server not responding.')), 10000)
+            );
+            return Promise.race([supabase.auth.signInWithPassword(data), timeout]);
         },
-        logout: async () => {
+        logout: () => {
             if (window.location.hostname === 'localhost') {
                 localStorage.removeItem('marxist_dev_auth');
             }
+            setUser(null);
             setProfile(null);
-            return supabase.auth.signOut();
+            supabase.auth.signOut().catch(e => console.error('signOut error:', e));
         },
         user,
         profile,

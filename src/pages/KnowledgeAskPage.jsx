@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { knowledgeApiService } from '../components/Knowledge/api';
 import { useTopics } from '../components/Knowledge/hooks/useTopics';
-import { ArrowLeft, HelpCircle, Send, Loader2, AlertCircle, CheckCircle, Info } from 'lucide-react';
-import * as s from './KnowledgeAskPage.css.ts';
+import { ArrowLeft, HelpCircle, Send, Loader2, AlertCircle, CheckCircle, Info, Edit3 } from 'lucide-react';
+
+const inputCls = "w-full bg-[#090909] border border-white/[0.06] rounded-xl px-4 py-3 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(200,30,30,0.4)] transition-all font-[Hanken_Grotesk,sans-serif]";
+const labelCls = "block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/35 mb-2";
 
 const KnowledgeAskPage = () => {
     const { user } = useAuth();
@@ -21,153 +23,168 @@ const KnowledgeAskPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-
-        if (title.length < 10) {
-            setError('Title must be at least 10 characters');
-            return;
-        }
-        if (title.length > 300) {
-            setError('Title must be less than 300 characters');
-            return;
-        }
-        if (content.length < 20) {
-            setError('Description must be at least 20 characters');
-            return;
-        }
+        if (title.length < 10) { setError('Title must be at least 10 characters'); return; }
+        if (title.length > 300) { setError('Title must be less than 300 characters'); return; }
+        if (content.length < 20) { setError('Description must be at least 20 characters'); return; }
 
         setSubmitting(true);
-
         const result = await knowledgeApiService.createQuestion({
-            title: title.trim(),
-            content: content.trim(),
-            topic_id: topicId || null,
+            title: title.trim(), content: content.trim(), topic_id: topicId || null,
         }, user.id);
 
-        if (result.success) {
-            setSuccess(true);
-        } else {
-            setError(result.error?.message || 'Failed to submit question');
-        }
+        if (result.success) { setSuccess(true); }
+        else { setError(result.error?.message || 'Failed to submit question'); }
         setSubmitting(false);
     };
 
     if (!user) {
         return (
-            <div className={s.page}>
-                <main className={s.main}>
-                    <div className={s.centerWrap}>
-                        <HelpCircle size={48} className={s.centerIcon} style={{color:'rgba(255,255,255,0.28)'}} />
-                        <h2 className={s.centerTitle}>Login Required</h2>
-                        <p className={s.centerText}>You need to be logged in to ask a question.</p>
-                        <Link to="/" className={s.centerLink}>Go to login</Link>
-                    </div>
-                </main>
+            <div className="min-h-screen bg-[#090909] text-white flex items-center justify-center px-4">
+                <div className="text-center">
+                    <HelpCircle size={40} className="mx-auto text-white/15 mb-4" />
+                    <h2 className="text-lg font-semibold text-white/60 mb-2 font-[Hanken_Grotesk,sans-serif]">Login Required</h2>
+                    <p className="text-white/30 text-sm mb-6">You need to be logged in to ask a question.</p>
+                    <Link to="/" className="text-[#c81e1e] text-sm hover:underline">Go to login</Link>
+                </div>
             </div>
         );
     }
 
     if (success) {
         return (
-            <div className={s.page}>
-                <main className={s.main}>
-                    <div className={s.centerWrap}>
-                        <CheckCircle size={48} className={s.centerIcon} style={{color:'#2d8a4e'}} />
-                        <h2 className={s.centerTitle}>Question Submitted!</h2>
-                        <p className={s.centerText}>
-                            Your question has been submitted and is awaiting admin approval.
-                            You'll be notified once it's approved.
-                        </p>
-                        <div className={s.btnRow}>
-                            <Link to="/knowledge" className={s.ghostBtn}>Back to Questions</Link>
-                            <button
-                                onClick={() => { setSuccess(false); setTitle(''); setContent(''); setTopicId(''); }}
-                                className={s.submitBtn}
-                            >
-                                Ask Another
-                            </button>
-                        </div>
+            <div className="min-h-screen bg-[#090909] text-white flex items-center justify-center px-4">
+                <div className="text-center max-w-sm">
+                    <CheckCircle size={40} className="mx-auto text-emerald-500 mb-4" />
+                    <h2 className="text-lg font-semibold text-white/80 mb-2 font-[Hanken_Grotesk,sans-serif]">Question Submitted!</h2>
+                    <p className="text-white/40 text-sm mb-8 leading-relaxed">
+                        Your question is awaiting admin approval. It will appear in the feed once approved.
+                    </p>
+                    <div className="flex items-center justify-center gap-3">
+                        <Link to="/knowledge" className="px-5 py-2 border border-white/[0.1] text-white/50 hover:text-white/80 hover:border-white/[0.2] rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all">
+                            Back to Feed
+                        </Link>
+                        <button
+                            onClick={() => { setSuccess(false); setTitle(''); setContent(''); setTopicId(''); }}
+                            className="px-5 py-2 bg-[#c81e1e] hover:bg-[#e02424] text-white rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
+                        >
+                            Ask Another
+                        </button>
                     </div>
-                </main>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className={s.page}>
-            <main className={s.main}>
-                <Link to="/knowledge" className={s.backLink}>
-                    <ArrowLeft size={18} /> Back to Questions
+        <div className="min-h-screen bg-[#090909] text-white font-[Hanken_Grotesk,sans-serif]">
+            <div className="max-w-2xl mx-auto px-4 py-8">
+
+                <Link to="/knowledge" className="inline-flex items-center gap-2 text-white/30 hover:text-white/70 text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-colors mb-8">
+                    <ArrowLeft size={14} /> Back to Questions
                 </Link>
 
-                <div className={s.card}>
-                    <h1 className={s.cardTitle} style={{display:'flex',alignItems:'center',gap:12}}>
-                        <HelpCircle size={24} style={{color:'#c81e1e'}} />
+                {/* Header */}
+                <div className="mb-6">
+                    <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#c81e1e] opacity-70 mb-2">
+                        Knowledge Q&amp;A
+                    </p>
+                    <h1 className="font-[Cormorant_Garamond,Georgia,serif] text-[36px] font-[500] leading-none text-white mb-2 tracking-[-0.02em]">
                         Ask a Question
                     </h1>
-                    <p className={s.hint} style={{marginBottom:24}}>
-                        Get answers from certified comrades with expertise in Marxist theory
-                    </p>
+                    <p className="text-white/35 text-[13px]">Get answers from certified comrades with expertise in Marxist theory.</p>
+                </div>
 
-                    {/* Guidelines */}
-                    <div style={{background:'rgba(74,127,181,0.1)',border:'1px solid rgba(74,127,181,0.25)',borderRadius:12,padding:16,marginBottom:24}}>
-                        <div style={{display:'flex',alignItems:'flex-start',gap:12}}>
-                            <Info size={20} style={{color:'#4a7fb5',marginTop:2}} />
-                            <div style={{fontSize:13}}>
-                                <p style={{fontWeight:500,color:'#4a7fb5',marginBottom:8}}>Before you ask:</p>
-                                <ul style={{listStyle:'disc inside',display:'flex',flexDirection:'column',gap:4,color:'rgba(255,255,255,0.48)'}}>
-                                    <li>Search existing questions to avoid duplicates</li>
-                                    <li>Be specific and clear in your question</li>
-                                    <li>Provide context to help others understand</li>
-                                    <li>Questions are reviewed by admins before publishing</li>
-                                </ul>
-                            </div>
-                        </div>
+                {/* Guidelines */}
+                <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 mb-6 flex items-start gap-3">
+                    <Info size={15} className="text-white/30 mt-0.5 shrink-0" />
+                    <div>
+                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/30 mb-2">Before you ask</p>
+                        <ul className="space-y-1.5 text-[12px] text-white/35 leading-relaxed">
+                            <li>Search existing questions to avoid duplicates</li>
+                            <li>Be specific and clear in your question</li>
+                            <li>Provide context to help others understand</li>
+                            <li>Questions are reviewed by admins before publishing</li>
+                        </ul>
                     </div>
+                </div>
+
+                {/* Form card */}
+                <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
 
                     {error && (
-                        <div className={s.errorBox} style={{marginBottom:16}}>
-                            <AlertCircle size={18} style={{flexShrink:0}} />
-                            <span>{error}</span>
+                        <div className="flex items-center gap-2 bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.25)] text-[#c81e1e] px-4 py-3 rounded-xl text-[12px] mb-5">
+                            <AlertCircle size={14} className="shrink-0" /> {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className={s.form}>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Topic */}
                         <div>
-                            <label className={s.fieldLabel}>Topic (optional)</label>
-                            <select value={topicId} onChange={(e) => setTopicId(e.target.value)} className={s.selectInput} disabled={topicsLoading}>
-                                <option value="">Select a topic...</option>
-                                {topics.map(topic => (<option key={topic.id} value={topic.id}>{topic.name}</option>))}
+                            <label className={labelCls}>Topic <span className="text-white/20 normal-case tracking-normal">— optional</span></label>
+                            <select
+                                value={topicId}
+                                onChange={e => setTopicId(e.target.value)}
+                                disabled={topicsLoading}
+                                className={`${inputCls} appearance-none cursor-pointer`}
+                            >
+                                <option value="">Select a topic…</option>
+                                {topics.map(topic => (
+                                    <option key={topic.id} value={topic.id}>{topic.name}</option>
+                                ))}
                             </select>
                         </div>
 
+                        {/* Title */}
                         <div>
-                            <label className={s.fieldLabel}>Question Title *</label>
-                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What do you want to know?" className={s.textInput} maxLength={300} disabled={submitting} />
-                            <div className={s.hint} style={{display:'flex',justifyContent:'space-between',marginTop:4}}>
-                                <span>Be specific and imagine you're asking a person</span>
-                                <span>{title.length}/300</span>
+                            <label className={labelCls}>Question Title <span className="text-[#c81e1e]">*</span></label>
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={e => setTitle(e.target.value)}
+                                placeholder="What do you want to know?"
+                                className={inputCls}
+                                maxLength={300}
+                                disabled={submitting}
+                            />
+                            <div className="flex items-center justify-between mt-1.5 px-0.5">
+                                <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">Be specific — imagine you're asking a person</span>
+                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 280 ? 'text-[#c81e1e]' : 'text-white/20'}`}>{title.length}/300</span>
                             </div>
                         </div>
 
+                        {/* Description */}
                         <div>
-                            <label className={s.fieldLabel}>Description *</label>
-                            <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Provide more details about your question..." className={s.textArea} disabled={submitting} />
-                            <div className={s.hint} style={{display:'flex',justifyContent:'space-between',marginTop:4}}>
-                                <span>Minimum 20 characters</span>
-                                <span style={content.length < 20 ? {color:'#c81e1e'} : {}}>{content.length}/20 minimum</span>
+                            <label className={labelCls}>Description <span className="text-[#c81e1e]">*</span></label>
+                            <textarea
+                                value={content}
+                                onChange={e => setContent(e.target.value)}
+                                placeholder="Provide more details about your question… Markdown is supported."
+                                className={`${inputCls} min-h-[180px] resize-y`}
+                                disabled={submitting}
+                            />
+                            <div className="flex items-center justify-between mt-1.5 px-0.5">
+                                <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">Minimum 20 characters</span>
+                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length < 20 && content.length > 0 ? 'text-[#c81e1e]' : 'text-white/20'}`}>
+                                    {content.length}/20 min
+                                </span>
                             </div>
                         </div>
 
-                        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:16,borderTop:'1px solid rgba(255,255,255,0.06)'}}>
-                            <p className={s.hint}>Your question will be reviewed before publishing</p>
-                            <button type="submit" disabled={submitting || title.length < 10 || content.length < 20} className={s.submitBtn}>
-                                {submitting ? <Loader2 size={18} /> : <Send size={18} />}
+                        {/* Submit row */}
+                        <div className="flex items-center justify-between pt-4 border-t border-white/[0.05]">
+                            <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 uppercase tracking-wider">Reviewed before publishing</span>
+                            <button
+                                type="submit"
+                                disabled={submitting || title.length < 10 || content.length < 20}
+                                className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-5 py-2.5 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(200,30,30,0.2)] hover:shadow-[0_0_28px_rgba(200,30,30,0.35)]"
+                            >
+                                {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                                 Submit Question
                             </button>
                         </div>
                     </form>
                 </div>
-            </main>
+            </div>
         </div>
     );
 };

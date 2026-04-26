@@ -6,10 +6,11 @@ import { useQuestion } from '../components/Knowledge/hooks/useQuestions';
 import { useAnswers } from '../components/Knowledge/hooks/useAnswers';
 import { useVotes } from '../components/Knowledge/hooks/useVotes';
 import { 
-    ArrowLeft, ThumbsUp, ThumbsDown, Eye, Clock, CheckCircle, 
-    User, Award, MessageSquare, Loader2, AlertCircle, Send
+    ArrowLeft, ChevronUp, ChevronDown, Eye, Clock, CheckCircle, 
+    User, Award, MessageSquare, Loader2, AlertCircle, Send, Star
 } from 'lucide-react';
-import * as s from './KnowledgeQuestionPage.css.ts';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const KnowledgeQuestionPage = () => {
     const { questionId } = useParams();
@@ -67,30 +68,44 @@ const KnowledgeQuestionPage = () => {
         await voteAnswer(answerId, voteType);
     };
 
+    const mdComponents = {
+        p: ({ children }) => <p className="text-[14px] text-white/70 leading-relaxed mb-3 font-[Hanken_Grotesk,sans-serif]">{children}</p>,
+        h1: ({ children }) => <h1 className="text-lg font-bold text-white/90 mb-2 mt-4 font-[Hanken_Grotesk,sans-serif]">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-base font-semibold text-white/80 mb-2 mt-3 font-[Hanken_Grotesk,sans-serif]">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-sm font-semibold text-white/70 mb-1.5 mt-2 font-[Hanken_Grotesk,sans-serif]">{children}</h3>,
+        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-3 text-white/60 text-[13px]">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-3 text-white/60 text-[13px]">{children}</ol>,
+        li: ({ children }) => <li className="text-[13px] text-white/65">{children}</li>,
+        code: ({ inline, children }) => inline
+            ? <code className="font-[JetBrains_Mono,monospace] text-[11px] bg-white/[0.06] px-1.5 py-0.5 rounded text-[#c81e1e]">{children}</code>
+            : <pre className="bg-[#0a0a0a] border border-white/[0.06] rounded-xl p-4 overflow-x-auto mb-3"><code className="font-[JetBrains_Mono,monospace] text-[11px] text-white/60">{children}</code></pre>,
+        blockquote: ({ children }) => <blockquote className="border-l-2 border-[#c81e1e] pl-4 my-3 text-white/40 italic">{children}</blockquote>,
+        a: ({ href, children }) => <a href={href} className="text-[#c81e1e] hover:underline">{children}</a>,
+        strong: ({ children }) => <strong className="font-semibold text-white/85">{children}</strong>,
+        em: ({ children }) => <em className="italic text-white/65">{children}</em>,
+        hr: () => <hr className="border-white/[0.06] my-4" />,
+    };
+
     if (questionLoading) {
         return (
-            <div className={s.page}>
-                <main className={s.main}>
-                    <div className={s.loadingWrap}>
-                        <Loader2 size={24} style={{marginRight:8}} />
-                        <span style={{color:'rgba(255,255,255,0.48)'}}>Loading question...</span>
-                    </div>
-                </main>
+            <div className="min-h-screen bg-[#090909] text-white">
+                <div className="max-w-3xl mx-auto px-4 py-12 flex items-center justify-center gap-3">
+                    <div className="w-5 h-5 rounded-full border-2 border-white/[0.12] border-t-[#c81e1e] animate-spin" />
+                    <span className="text-white/40 text-sm font-[Hanken_Grotesk,sans-serif]">Loading question…</span>
+                </div>
             </div>
         );
     }
 
     if (!question) {
         return (
-            <div className={s.page}>
-                <main className={s.main}>
-                    <div className={s.errorWrap}>
-                        <AlertCircle size={48} className={s.errorIcon} />
-                        <h2 className={s.errorTitle}>Question not found</h2>
-                        <p className={s.errorText}>This question may have been removed or is pending approval.</p>
-                        <Link to="/knowledge" className={s.errorLink}>← Back to Knowledge Q&A</Link>
-                    </div>
-                </main>
+            <div className="min-h-screen bg-[#090909] text-white">
+                <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+                    <AlertCircle size={40} className="mx-auto text-white/20 mb-4" />
+                    <h2 className="text-lg font-semibold text-white/60 mb-2 font-[Hanken_Grotesk,sans-serif]">Question not found</h2>
+                    <p className="text-white/30 text-sm mb-6">This question may have been removed or is pending approval.</p>
+                    <Link to="/knowledge" className="text-[#c81e1e] text-sm hover:underline">← Back to Knowledge Q&amp;A</Link>
+                </div>
             </div>
         );
     }
@@ -98,281 +113,276 @@ const KnowledgeQuestionPage = () => {
     const questionVote = getQuestionVote(questionId);
 
     return (
-        <div className={s.page}>
-            <main className={s.main}>
-                <Link to="/knowledge" className={s.backLink}>
-                    <ArrowLeft size={18} /> Back to Questions
+        <div className="min-h-screen bg-[#090909] text-white font-[Hanken_Grotesk,sans-serif]">
+            <div className="max-w-3xl mx-auto px-4 py-8">
+
+                {/* Back link */}
+                <Link to="/knowledge" className="inline-flex items-center gap-2 text-white/30 hover:text-white/70 text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-colors mb-6">
+                    <ArrowLeft size={14} /> Back to Questions
                 </Link>
 
-                {/* Question */}
-                <div className="bg-gray-800/50 rounded-lg p-6 mb-8">
-                    {/* Status banner for pending */}
+                {/* ── Question card ── */}
+                <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 mb-4 shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
+
                     {question.status === 'pending' && (
-                        <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-3 mb-4 flex items-center gap-2">
-                            <Clock size={18} className="text-yellow-500" />
-                            <span className="text-yellow-400">This question is awaiting approval</span>
+                        <div className="flex items-center gap-2 bg-amber-900/20 border border-amber-800/30 text-amber-400 px-3 py-2 rounded-xl text-xs font-[JetBrains_Mono,monospace] mb-4">
+                            <Clock size={13} /> Awaiting admin approval
                         </div>
                     )}
 
-                    <div className="flex gap-6">
-                        {/* Vote buttons */}
-                        <div className="flex flex-col items-center gap-2">
+                    {/* Topic + answered badge */}
+                    <div className="flex items-center gap-2 mb-4 flex-wrap">
+                        <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full border text-[#c81e1e] border-[rgba(200,30,30,0.28)] bg-[rgba(200,30,30,0.08)]">Q</span>
+                        {question.is_answered && (
+                            <span className="flex items-center gap-1 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider text-emerald-400 border border-emerald-800/40 bg-emerald-900/20 px-2 py-0.5 rounded-full">
+                                <CheckCircle size={9} /> Answered
+                            </span>
+                        )}
+                        {question.topic && (
+                            <Link to={`/knowledge?topic=${question.topic.slug}`}
+                                className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider text-white/30 border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 rounded-full hover:text-[#c81e1e] hover:border-[rgba(200,30,30,0.2)] transition-colors">
+                                {question.topic.name}
+                            </Link>
+                        )}
+                    </div>
+
+                    <h1 className="text-xl md:text-2xl font-semibold text-white/90 leading-snug mb-4">
+                        {question.title}
+                    </h1>
+
+                    <div className="mb-6">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                            {question.content}
+                        </ReactMarkdown>
+                    </div>
+
+                    {/* Meta + vote row */}
+                    <div className="flex items-center justify-between pt-4 border-t border-white/[0.05] flex-wrap gap-3">
+                        {/* Author */}
+                        <div className="flex items-center gap-2">
+                            {question.author?.avatar_url ? (
+                                <img src={question.author.avatar_url} alt="" className="w-6 h-6 rounded-full" />
+                            ) : (
+                                <div className="w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center">
+                                    <User size={11} className="text-white/30" />
+                                </div>
+                            )}
+                            <Link to={`/profile/${question.author?.username}`} className="text-[12px] text-white/50 hover:text-[#c81e1e] transition-colors">
+                                {question.author?.username || 'Anonymous'}
+                            </Link>
+                            {question.author?.is_certified && (
+                                <span className="font-[JetBrains_Mono,monospace] text-[9px] bg-[rgba(200,30,30,0.1)] text-[#c81e1e] px-1.5 py-0.5 rounded-full border border-[rgba(200,30,30,0.2)] flex items-center gap-0.5">
+                                    <Award size={8} /> Certified
+                                </span>
+                            )}
+                            <span className="text-white/20 font-[JetBrains_Mono,monospace] text-[9px]">
+                                {new Date(question.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}
+                            </span>
+                        </div>
+
+                        {/* Vote + stats */}
+                        <div className="flex items-center gap-3">
+                            <span className="flex items-center gap-1 text-white/20 font-[JetBrains_Mono,monospace] text-[10px]">
+                                <Eye size={12} /> {question.view_count || 0}
+                            </span>
                             <button
                                 onClick={() => handleVoteQuestion('up')}
                                 disabled={!user}
-                                className={`p-2 rounded-lg transition-colors ${
-                                    questionVote === 'up' 
-                                        ? 'bg-green-600 text-white' 
-                                        : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-[JetBrains_Mono,monospace] border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                                    questionVote === 'up'
+                                        ? 'bg-[rgba(200,30,30,0.2)] text-[#c81e1e] border-[rgba(200,30,30,0.4)]'
+                                        : 'bg-[rgba(200,30,30,0.08)] text-[#c81e1e] border-[rgba(200,30,30,0.2)] hover:bg-[rgba(200,30,30,0.16)]'
+                                }`}
                             >
-                                <ThumbsUp size={20} />
+                                <ChevronUp size={13} /> {question.upvote_count || 0}
                             </button>
-                            <span className="text-xl font-bold">{question.upvote_count || 0}</span>
-                        </div>
-
-                        {/* Question content */}
-                        <div className="flex-1">
-                            <h1 className="text-2xl font-bold mb-4">
-                                {question.is_answered && (
-                                    <CheckCircle size={24} className="inline mr-2 text-green-500" />
-                                )}
-                                {question.title}
-                            </h1>
-
-                            <div className="prose prose-invert max-w-none mb-6">
-                                <p className="text-gray-300 whitespace-pre-wrap">{question.content}</p>
-                            </div>
-
-                            {/* Meta info */}
-                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 border-t border-gray-700 pt-4">
-                                {question.topic && (
-                                    <Link 
-                                        to={`/knowledge?topic=${question.topic.slug}`}
-                                        className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 transition-colors"
-                                    >
-                                        {question.topic.name}
-                                    </Link>
-                                )}
-                                <div className="flex items-center gap-1">
-                                    <Eye size={14} />
-                                    {question.view_count} views
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Clock size={14} />
-                                    {new Date(question.created_at).toLocaleDateString()}
-                                </div>
-                                <div className="flex items-center gap-2 ml-auto">
-                                    <span>Asked by</span>
-                                    <div className="flex items-center gap-1">
-                                        {question.author?.avatar_url ? (
-                                            <img src={question.author.avatar_url} alt="" className="w-6 h-6 rounded-full" />
-                                        ) : (
-                                            <User size={16} />
-                                        )}
-                                        <Link 
-                                            to={`/profile/${question.author?.username}`}
-                                            className="text-red-400 hover:underline"
-                                        >
-                                            {question.author?.username || 'Anonymous'}
-                                        </Link>
-                                        {question.author?.is_certified && (
-                                            <Award size={14} className="text-blue-400" />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Answers section */}
-                <div className="mb-8">
-                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                        <MessageSquare size={20} />
+                {/* ── Answers header ── */}
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.12em] text-white/40 flex items-center gap-2">
+                        <MessageSquare size={13} className="text-[#c81e1e]" />
                         {answers.length} {answers.length === 1 ? 'Answer' : 'Answers'}
                     </h2>
-
-                    {answersLoading ? (
-                        <div className="flex items-center justify-center py-8">
-                            <Loader2 className="animate-spin mr-2" size={20} />
-                            <span className="text-gray-400">Loading answers...</span>
-                        </div>
-                    ) : answers.length === 0 ? (
-                        <div className="text-center py-8 bg-gray-800/30 rounded-lg">
-                            <MessageSquare size={32} className="mx-auto text-gray-600 mb-2" />
-                            <p className="text-gray-400">No answers yet. Be the first to answer!</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {answers.map(answer => (
-                                <AnswerCard
-                                    key={answer.id}
-                                    answer={answer}
-                                    vote={getAnswerVote(answer.id)}
-                                    onVote={(voteType) => handleVoteAnswer(answer.id, voteType)}
-                                    canAccept={isQuestionAuthor && !answer.is_accepted}
-                                    onAccept={() => handleAcceptAnswer(answer.id)}
-                                    isLoggedIn={!!user}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    <Link
+                        to="/t"
+                        className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/25 hover:text-white/50 border border-white/[0.06] hover:border-white/[0.12] px-2.5 py-1 rounded-full transition-colors"
+                    >
+                        Discuss on /t/ →
+                    </Link>
                 </div>
 
-                {/* Answer form */}
+                {/* ── Answers list ── */}
+                {answersLoading ? (
+                    <div className="py-10 flex justify-center">
+                        <div className="w-5 h-5 rounded-full border-2 border-white/[0.12] border-t-[#c81e1e] animate-spin" />
+                    </div>
+                ) : answers.length === 0 ? (
+                    <div className="py-10 text-center bg-[#0f0f0f] border border-white/[0.06] rounded-2xl mb-4">
+                        <MessageSquare size={28} className="mx-auto text-white/15 mb-3" />
+                        <p className="text-white/30 text-sm">No answers yet. Be the first to answer!</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3 mb-4">
+                        {answers.map(answer => (
+                            <AnswerCard
+                                key={answer.id}
+                                answer={answer}
+                                vote={getAnswerVote(answer.id)}
+                                onVote={(voteType) => handleVoteAnswer(answer.id, voteType)}
+                                canAccept={isQuestionAuthor && !answer.is_accepted}
+                                onAccept={() => handleAcceptAnswer(answer.id)}
+                                isLoggedIn={!!user}
+                                mdComponents={mdComponents}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* ── Answer form ── */}
                 {user && isCertified ? (
-                    <div className="bg-gray-800/50 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold mb-4">Your Answer</h3>
-                        
+                    <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-5">
+                        <h3 className="font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.12em] text-white/40 mb-4 flex items-center gap-2">
+                            <Send size={12} className="text-[#c81e1e]" /> Your Answer
+                        </h3>
+
                         {submitSuccess && (
-                            <div className="bg-green-900/30 border border-green-700 rounded-lg p-3 mb-4 flex items-center gap-2">
-                                <CheckCircle size={18} className="text-green-500" />
-                                <span className="text-green-400">Answer submitted! It will appear after admin approval.</span>
+                            <div className="flex items-center gap-2 bg-emerald-900/20 border border-emerald-800/30 text-emerald-400 px-3 py-2 rounded-xl text-xs font-[JetBrains_Mono,monospace] mb-4">
+                                <CheckCircle size={13} /> Submitted — will appear after admin approval.
                             </div>
                         )}
-
                         {submitError && (
-                            <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 mb-4 flex items-center gap-2">
-                                <AlertCircle size={18} className="text-red-500" />
-                                <span className="text-red-400">{submitError}</span>
+                            <div className="flex items-center gap-2 bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.25)] text-[#c81e1e] px-3 py-2 rounded-xl text-xs mb-4">
+                                <AlertCircle size={13} /> {submitError}
                             </div>
                         )}
 
                         <form onSubmit={handleSubmitAnswer}>
                             <textarea
                                 value={answerContent}
-                                onChange={(e) => setAnswerContent(e.target.value)}
-                                placeholder="Write your answer here... (minimum 50 characters)"
-                                className="w-full p-4 bg-gray-900 border border-gray-700 rounded-lg text-white min-h-[200px] mb-2 focus:border-red-500 focus:outline-none"
+                                onChange={e => setAnswerContent(e.target.value)}
+                                placeholder="Write your answer… Markdown is supported."
+                                className="w-full bg-[#090909] border border-white/[0.06] rounded-xl px-4 py-3 text-[13px] text-white/80 placeholder-white/20 min-h-[180px] mb-3 focus:outline-none focus:border-[rgba(200,30,30,0.4)] transition-all resize-y font-[Hanken_Grotesk,sans-serif]"
                                 disabled={submitting}
                             />
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-500">
-                                    {answerContent.length}/50 characters minimum
+                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${answerContent.length < 50 ? 'text-[#c81e1e]' : 'text-white/20'}`}>
+                                    {answerContent.length}/50 min
                                 </span>
                                 <button
                                     type="submit"
                                     disabled={submitting || answerContent.length < 50}
-                                    className="flex items-center gap-2 px-6 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-5 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
-                                    {submitting ? (
-                                        <Loader2 className="animate-spin" size={18} />
-                                    ) : (
-                                        <Send size={18} />
-                                    )}
+                                    {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                                     Submit Answer
                                 </button>
                             </div>
                         </form>
                     </div>
                 ) : user ? (
-                    <div className="bg-gray-800/30 rounded-lg p-6 text-center">
-                        <Award size={32} className="mx-auto text-gray-600 mb-2" />
-                        <p className="text-gray-400">Only certified users can answer questions.</p>
-                        <p className="text-sm text-gray-500 mt-1">Contact an admin to get certified.</p>
+                    <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 text-center">
+                        <Award size={28} className="mx-auto text-white/15 mb-3" />
+                        <p className="text-white/40 text-sm mb-1">Only certified users can answer questions.</p>
+                        <p className="text-white/20 text-xs">Contact an admin to get certified.</p>
                     </div>
                 ) : (
-                    <div className="bg-gray-800/30 rounded-lg p-6 text-center">
-                        <User size={32} className="mx-auto text-gray-600 mb-2" />
-                        <p className="text-gray-400">Log in to answer this question.</p>
+                    <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 text-center">
+                        <User size={28} className="mx-auto text-white/15 mb-3" />
+                        <p className="text-white/40 text-sm">Log in to answer this question.</p>
                     </div>
                 )}
-            </main>
-        </div>
-    );
-};
-
-const AnswerCard = ({ answer, vote, onVote, canAccept, onAccept, isLoggedIn }) => {
-    return (
-        <div className={`bg-gray-800/50 rounded-lg p-5 ${answer.is_accepted ? 'border-2 border-green-600' : ''}`}>
-            {answer.is_accepted && (
-                <div className="flex items-center gap-2 text-green-500 mb-3 pb-3 border-b border-gray-700">
-                    <CheckCircle size={18} />
-                    <span className="font-medium">Accepted Answer</span>
-                </div>
-            )}
-
-            {answer.status === 'pending' && (
-                <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-2 mb-3 text-sm flex items-center gap-2">
-                    <Clock size={14} className="text-yellow-500" />
-                    <span className="text-yellow-400">Awaiting approval</span>
-                </div>
-            )}
-
-            <div className="flex gap-4">
-                {/* Vote buttons */}
-                <div className="flex flex-col items-center gap-1">
-                    <button
-                        onClick={() => onVote('up')}
-                        disabled={!isLoggedIn}
-                        className={`p-1.5 rounded transition-colors ${
-                            vote === 'up' 
-                                ? 'bg-green-600 text-white' 
-                                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                        <ThumbsUp size={16} />
-                    </button>
-                    <span className="text-sm font-medium">
-                        {(answer.upvote_count || 0) - (answer.downvote_count || 0)}
-                    </span>
-                    <button
-                        onClick={() => onVote('down')}
-                        disabled={!isLoggedIn}
-                        className={`p-1.5 rounded transition-colors ${
-                            vote === 'down' 
-                                ? 'bg-red-600 text-white' 
-                                : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                        <ThumbsDown size={16} />
-                    </button>
-                </div>
-
-                {/* Answer content */}
-                <div className="flex-1">
-                    <div className="prose prose-invert max-w-none mb-4">
-                        <p className="text-gray-300 whitespace-pre-wrap">{answer.content}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-500 border-t border-gray-700 pt-3">
-                        <div className="flex items-center gap-2">
-                            {answer.author?.avatar_url ? (
-                                <img src={answer.author.avatar_url} alt="" className="w-6 h-6 rounded-full" />
-                            ) : (
-                                <User size={16} />
-                            )}
-                            <Link 
-                                to={`/profile/${answer.author?.username}`}
-                                className="text-red-400 hover:underline"
-                            >
-                                {answer.author?.username || 'Anonymous'}
-                            </Link>
-                            {answer.is_expert_answer && (
-                                <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-900/50 text-blue-400 text-xs rounded-full">
-                                    <Award size={12} />
-                                    Certified
-                                </span>
-                            )}
-                            <span>•</span>
-                            <span>{new Date(answer.created_at).toLocaleDateString()}</span>
-                        </div>
-
-                        {canAccept && (
-                            <button
-                                onClick={onAccept}
-                                className="flex items-center gap-1 px-3 py-1 bg-green-600 hover:bg-green-700 rounded transition-colors text-white text-xs"
-                            >
-                                <CheckCircle size={14} />
-                                Accept
-                            </button>
-                        )}
-                    </div>
-                </div>
             </div>
         </div>
     );
 };
+
+const AnswerCard = ({ answer, vote, onVote, canAccept, onAccept, isLoggedIn, mdComponents }) => (
+    <div className={`bg-[#0f0f0f] border rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.2)] ${
+        answer.is_accepted
+            ? 'border-emerald-800/40 shadow-[0_0_20px_rgba(16,185,129,0.06)]'
+            : 'border-white/[0.06]'
+    }`}>
+        {answer.is_accepted && (
+            <div className="flex items-center gap-2 text-emerald-400 font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider mb-3 pb-3 border-b border-emerald-900/30">
+                <CheckCircle size={12} /> Accepted Answer
+            </div>
+        )}
+        {answer.status === 'pending' && (
+            <div className="flex items-center gap-2 bg-amber-900/20 border border-amber-800/30 text-amber-400 px-3 py-1.5 rounded-xl text-[10px] font-[JetBrains_Mono,monospace] mb-3">
+                <Clock size={11} /> Awaiting approval
+            </div>
+        )}
+
+        <div className="flex gap-4">
+            {/* Vote column */}
+            <div className="flex flex-col items-center gap-1 pt-1 shrink-0">
+                <button
+                    onClick={() => onVote('up')}
+                    disabled={!isLoggedIn}
+                    className={`p-1.5 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                        vote === 'up' ? 'bg-[rgba(200,30,30,0.2)] text-[#c81e1e]' : 'text-white/25 hover:text-[#c81e1e] hover:bg-[rgba(200,30,30,0.08)]'
+                    }`}
+                >
+                    <ChevronUp size={16} />
+                </button>
+                <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/50 font-medium">
+                    {(answer.upvote_count || 0) - (answer.downvote_count || 0)}
+                </span>
+                <button
+                    onClick={() => onVote('down')}
+                    disabled={!isLoggedIn}
+                    className={`p-1.5 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                        vote === 'down' ? 'bg-[rgba(200,30,30,0.2)] text-[#c81e1e]' : 'text-white/25 hover:text-white/60 hover:bg-white/[0.04]'
+                    }`}
+                >
+                    <ChevronDown size={16} />
+                </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+                <div className="mb-4">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
+                        {answer.content}
+                    </ReactMarkdown>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/[0.05] flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                        {answer.author?.avatar_url ? (
+                            <img src={answer.author.avatar_url} alt="" className="w-5 h-5 rounded-full" />
+                        ) : (
+                            <div className="w-5 h-5 rounded-full bg-white/[0.06] flex items-center justify-center">
+                                <User size={9} className="text-white/30" />
+                            </div>
+                        )}
+                        <Link to={`/profile/${answer.author?.username}`} className="text-[12px] text-white/50 hover:text-[#c81e1e] transition-colors">
+                            {answer.author?.username || 'Anonymous'}
+                        </Link>
+                        {answer.is_expert_answer && (
+                            <span className="flex items-center gap-0.5 font-[JetBrains_Mono,monospace] text-[9px] bg-[rgba(200,30,30,0.1)] text-[#c81e1e] px-1.5 py-0.5 rounded-full border border-[rgba(200,30,30,0.2)]">
+                                <Award size={8} /> Certified
+                            </span>
+                        )}
+                        <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">
+                            {new Date(answer.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}
+                        </span>
+                    </div>
+                    {canAccept && (
+                        <button
+                            onClick={onAccept}
+                            className="flex items-center gap-1 px-3 py-1 bg-emerald-900/30 hover:bg-emerald-900/50 border border-emerald-800/40 text-emerald-400 rounded-xl text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors"
+                        >
+                            <CheckCircle size={11} /> Accept
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 export default KnowledgeQuestionPage;

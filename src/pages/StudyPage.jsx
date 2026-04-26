@@ -1,14 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   BookOpen,
   FileText,
   Headphones,
   Library,
+  Play,
   Search,
   Settings,
   Sparkles,
   Video,
+  X,
 } from "lucide-react";
 import StudyResources from "../components/StudyPage/StudyResources";
 import StudyMilestones from "../components/StudyPage/StudyMilestones";
@@ -40,7 +42,6 @@ const NAV_ITEMS = [
   { label: "Resources", icon: BookOpen },
   { label: "Texts", icon: FileText },
   { label: "Lectures", icon: Video },
-  { label: "Audio", icon: Headphones },
 ];
 
 const StudyPage = () => {
@@ -57,32 +58,11 @@ const StudyPage = () => {
   const [loadingMilestones, setLoadingMilestones] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeNavTab, setActiveNavTab] = useState("Resources");
-  const [audiobooks, setAudiobooks] = useState([]);
-  const [loadingAudiobooks, setLoadingAudiobooks] = useState(true);
 
   const handlePathGenerated = useCallback((path) => {
     setGeneratedPath(path);
   }, []);
 
-  useEffect(() => {
-    const fetchAudiobooks = async () => {
-      setLoadingAudiobooks(true);
-      try {
-        const { data, error } = await supabase
-          .from("audiobooks")
-          .select("*")
-          .order("sort_order");
-        if (error) throw error;
-        setAudiobooks(data || []);
-      } catch (err) {
-        console.error("Error fetching audiobooks:", err);
-      } finally {
-        setLoadingAudiobooks(false);
-      }
-    };
-
-    fetchAudiobooks();
-  }, []);
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -209,8 +189,6 @@ const StudyPage = () => {
       filtered = filtered.filter((resource) => resource.type === "text");
     } else if (activeNavTab === "Lectures") {
       filtered = filtered.filter((resource) => resource.type === "video" || resource.type === "lecture");
-    } else if (activeNavTab === "Audio") {
-      filtered = filtered.filter((resource) => resource.type === "audio");
     }
 
     if (searchQuery.trim()) {
@@ -246,11 +224,6 @@ const StudyPage = () => {
     return resources.find((resource) => resource.is_featured) || resources[0] || null;
   }, [nextMilestone, resources]);
 
-  const featuredAudiobooks = useMemo(() => {
-    const featured = audiobooks.filter((book) => book.is_featured);
-    const remainder = audiobooks.filter((book) => !book.is_featured);
-    return [...featured, ...remainder].slice(0, 3);
-  }, [audiobooks]);
 
   const progressPercent = milestones.length > 0 ? Math.round((completedCount / milestones.length) * 100) : 0;
 
@@ -358,7 +331,7 @@ const StudyPage = () => {
                   <div>
                     <p className={sectionEyebrow}>Current line of study</p>
                     <h2 className={styles.featureTitle}>
-                      {nextMilestone ? (nextMilestone.chinese_title || nextMilestone.title) : "Archive complete"}
+                      {nextMilestone ? nextMilestone.title : "Archive complete"}
                     </h2>
                   </div>
                   <div className={iconFrame}>
@@ -409,14 +382,7 @@ const StudyPage = () => {
                         : "Milestones will appear here as the editorial archive expands."}
                     </p>
                   </div>
-                  <div className={styles.featureListItem}>
-                    <p className={styles.featureItemLabel}>Listening archive</p>
-                    <p className={styles.featureItemValue}>
-                      {audiobooks.length > 0
-                        ? `${audiobooks.length} audiobook editions are available on the dedicated listening page.`
-                        : "Audiobook entries can be published separately without embedding playback into this page."}
-                    </p>
-                  </div>
+
                 </div>
               </div>
             </aside>
@@ -453,10 +419,6 @@ const StudyPage = () => {
             <Link to="/digital-library" className={actionButton({ tone: "ghost", size: "sm" })}>
               <Library size={14} />
               Digital Library
-            </Link>
-            <Link to="/audiobooks" className={actionButton({ tone: "ghost", size: "sm" })}>
-              <Headphones size={14} />
-              Audiobooks
             </Link>
             {showAdminLink && (
               <Link to="/admin/study" className={actionButton({ tone: "subtle", size: "sm" })}>
@@ -502,42 +464,7 @@ const StudyPage = () => {
               />
             </div>
 
-            {!loadingAudiobooks && featuredAudiobooks.length > 0 && (
-              <div className={styles.audioTeaserPanel}>
-                <div className={sectionHeader}>
-                  <div className={sectionHeaderStack}>
-                    <p className={sectionEyebrow}>Listening archive</p>
-                    <h2 className={panelTitle}>Audiobooks</h2>
-                    <p className={panelDescription}>
-                      Playback has been removed from the Study page, but the listening archive remains one click away.
-                    </p>
-                  </div>
-                </div>
 
-                <div className={styles.teaserList}>
-                  {featuredAudiobooks.map((book) => (
-                    <Link key={book.id} to="/audiobooks" className={styles.teaserItem}>
-                      {book.cover_url ? (
-                        <img src={book.cover_url} alt={book.title} className={styles.teaserCover} />
-                      ) : (
-                        <div className={styles.teaserCoverFallback}>
-                          <Headphones size={18} />
-                        </div>
-                      )}
-                      <div className={styles.teaserText}>
-                        <p className={styles.teaserTitle}>{book.title}</p>
-                        <p className={styles.teaserMeta}>{book.author || "Study Center listening archive"}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-
-                <Link to="/audiobooks" className={actionButton({ tone: "accent", size: "sm" })}>
-                  <Headphones size={14} />
-                  Open audiobooks
-                </Link>
-              </div>
-            )}
           </aside>
 
           <div className={styles.main}>
@@ -555,7 +482,11 @@ const StudyPage = () => {
                   Browse library
                 </Link>
               </div>
-              <StudyResources resources={filteredResources} loading={loadingResources} />
+              <StudyResources
+                resources={filteredResources}
+                loading={loadingResources}
+                hideFilter={activeNavTab !== "Resources"}
+              />
             </div>
 
             <div className={styles.mainPanel}>
@@ -571,7 +502,7 @@ const StudyPage = () => {
               <ConceptAnalysis concepts={concepts} loading={loadingConcepts} />
             </div>
 
-            {lectureResources.length > 0 && (
+            {lectureResources.length > 0 && activeNavTab !== "Lectures" && (
               <div className={styles.mainPanel}>
                 <div className={sectionHeader}>
                   <div className={sectionHeaderStack}>

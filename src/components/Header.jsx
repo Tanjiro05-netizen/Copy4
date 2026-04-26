@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, MessageSquare, HelpCircle, ChevronDown } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import LanguageSwitcher from './LanguageSwitcher';
 import * as s from './Header.css.ts';
 
 const Header = () => {
     const { user, logout, isAdmin, canManagePolitics } = useAuth();
     const { theme } = useTheme();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,31 +20,31 @@ const Header = () => {
 
     const isActive = (path) => location.pathname === path;
 
-    const handleLogout = async () => {
-        await logout();
+    const handleLogout = () => {
+        logout();
         navigate('/login');
     };
     
     // All nav items - some are guest-accessible, others require login
     const allNavItems = [
-        { path: '/home', label: 'Home', icon: Home, guestAccessible: true },
+        { path: '/home', label: t('nav.home'), icon: Home, guestAccessible: true },
         {
-            label: 'Revolutionary Theory',
+            label: t('nav.theory'),
             icon: BookMarked,
             guestAccessible: false,
             children: [
-                { path: '/theory', label: 'Read', description: 'Browse & read theory articles' },
-                { path: '/analysis', label: 'Analyze', description: 'Deep analysis tools & texts' },
+                { path: '/theory', label: t('nav.theoryRead'), description: t('nav.theoryReadDesc') },
+                { path: '/analysis', label: t('nav.theoryAnalyze'), description: t('nav.theoryAnalyzeDesc') },
             ],
         },
-        { path: '/digital-library', label: 'Digital Library', icon: BookOpen, guestAccessible: true },
-        { path: '/study', label: 'Study Center', icon: BarChart, guestAccessible: false },
-        { path: '/science-tech', label: 'Science & Tech', icon: FileText, guestAccessible: false },
-        { path: '/politics', label: 'Politics', icon: FileText, guestAccessible: false },
-        { path: '/visualizations', label: 'Data', icon: LineChart, guestAccessible: false },
-        { path: '/directory', label: 'Directory', icon: Users, guestAccessible: false },
-        { path: '/forum', label: 'Forum', icon: MessageSquare, guestAccessible: true },
-        { path: '/knowledge', label: 'Knowledge Q&A', icon: HelpCircle, guestAccessible: false }
+        { path: '/digital-library', label: t('nav.library'), icon: BookOpen, guestAccessible: true },
+        { path: '/study', label: t('nav.study'), icon: BarChart, guestAccessible: false },
+        { path: '/science-tech', label: t('nav.scienceTech'), icon: FileText, guestAccessible: false },
+        { path: '/politics', label: t('nav.politics'), icon: FileText, guestAccessible: false },
+        { path: '/visualizations', label: t('nav.data'), icon: LineChart, guestAccessible: false },
+        { path: '/directory', label: t('nav.directory'), icon: Users, guestAccessible: false },
+        { path: '/forum', label: t('nav.forum'), icon: MessageSquare, guestAccessible: false },
+        { path: '/knowledge', label: t('nav.knowledgeQA'), icon: HelpCircle, guestAccessible: false }
     ];
     
     // Show all nav items to everyone (guests see "Coming Soon" for restricted ones)
@@ -151,12 +154,13 @@ const Header = () => {
                         )}
                         {user && (
                             <Link to="/profile" className={s.navLink}>
-                                My Profile
+                                {t('nav.profile')}
                             </Link>
                         )}
                     </nav>
                     
                     <div className={s.actionsRow}>
+                        <LanguageSwitcher />
                         {user ? (
                             <button
                                 onClick={handleLogout}
@@ -166,8 +170,8 @@ const Header = () => {
                                 <LogOut size={18} />
                             </button>
                         ) : (
-                            <Link to="/" className={s.loginButton}>
-                                Log In
+                            <Link to="/login" className={s.loginButton}>
+                                {t('nav.login')}
                             </Link>
                         )}
                     </div>
@@ -226,7 +230,7 @@ const Header = () => {
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <span>{item.label}</span>
-                                        {isRestricted && <span className={s.mobileComingSoon}>Coming Soon</span>}
+                                        {isRestricted && <span className={s.mobileComingSoon}>{t('common.comingSoon')}</span>}
                                     </Link>
                                 );
                             })}
@@ -283,11 +287,11 @@ const Header = () => {
                                     className={s.mobileLogout}
                                 >
                                     <LogOut size={18} />
-                                    <span>Logout</span>
+                                    <span>{t('nav.logout')}</span>
                                 </button>
                             ) : (
-                                <Link to="/" onClick={() => setMobileMenuOpen(false)} className={s.loginButton}>
-                                    Log In
+                                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className={s.loginButton}>
+                                    {t('nav.login')}
                                 </Link>
                             )}
                         </div>

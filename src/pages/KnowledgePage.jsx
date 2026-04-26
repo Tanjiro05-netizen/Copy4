@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { knowledgeApiService } from '../components/Knowledge/api';
-import { useQuestions } from '../components/Knowledge/hooks/useQuestions';
+import { useTopicFollows } from '../components/Knowledge/hooks/useTopics';
 
 // Zhihu Future UI Components
 import KnowledgeLayout from '../components/Knowledge/FutureUI/KnowledgeLayout';
@@ -10,40 +10,164 @@ import DenseSidebar from '../components/Knowledge/FutureUI/DenseSidebar';
 import FeedStream from '../components/Knowledge/FutureUI/FeedStream';
 import { Widgets } from '../components/Knowledge/FutureUI/Widgets';
 import DailyChallenge from '../components/Knowledge/Study/DailyChallenge';
-import * as s from './KnowledgePage.css.ts';
+
+const PAGE_SIZE = 20;
 
 const KnowledgePage = () => {
     const { user, profile } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [viewMode, setViewMode] = useState('feed'); // feed, hot, favorites
+    const [viewMode, setViewMode] = useState('feed');
+
+    // ── Search ──────────────────────────────────────────────
+    const [searchQuery, setSearchQuery] = useState('');
+    const searchTimeout = useRef(null);
+
+    // ── Feed questions (append-paginated) ───────────────────
+    const [questions, setQuestions] = useState([]);
+    const [feedLoading, setFeedLoading] = useState(false);
+    const [feedPage, setFeedPage] = useState(1);
+    const [feedHasMore, setFeedHasMore] = useState(false);
+
+    // ── Following feed ──────────────────────────────────────
+    const [followingQuestions, setFollowingQuestions] = useState([]);
+    const [followingLoading, setFollowingLoading] = useState(false);
+    const [followingPage, setFollowingPage] = useState(1);
+    const [followingHasMore, setFollowingHasMore] = useState(false);
+
+    // ── Favorites ───────────────────────────────────────────
     const [favorites, setFavorites] = useState([]);
-    
+    const [favoriteIds, setFavoriteIds] = useState(new Set());
+
+    const { isFollowing, toggleFollow } = useTopicFollows(knowledgeApiService, user?.id);
+
     const topicSlug = searchParams.get('topic');
     const sortBy = searchParams.get('sort') || 'recent';
-    const page = parseInt(searchParams.get('page') || '1', 10);
 
-    // Map URL sort to UI tab
     const activeTab = useMemo(() => {
-        if (sortBy === 'popular') return 'hot';
-        if (sortBy === 'following') return 'follow';
+        if (viewMode === 'hot') return 'hot';
+        if (viewMode === 'following') return 'follow';
         return 'recommend';
-    }, [sortBy]);
+    }, [viewMode]);
 
-    // Fetch favorites when in favorites view
+    // ── Load main feed ──────────────────────────────────────
+    const loadFeed = useCallback(async (page, append = false, search = searchQuery) => {
+        setFeedLoading(true);
+        const result = await knowledgeApiService.getQuestions({
+            topicSlug,
+            page,
+            limit: PAGE_SIZE,
+            sortBy: viewMode === 'hot' ? 'popular' : sortBy,
+            status: 'approved',
+            search,
+        });
+        setQuestions(prev => append ? [...prev, ...result.data] : result.data);
+        setFeedHasMore(page < result.totalPages);
+        setFeedLoading(false);
+    }, [topicSlug, sortBy, viewMode, searchQuery]);
+
+    // Reset and reload when mode/sort/topic changes
+    useEffect(() => {
+        if (viewMode === 'following' || viewMode === 'favorites') return;
+        setFeedPage(1);
+        loadFeed(1, false);
+    }, [viewMode, topicSlug, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Search debounce
+    const handleSearchChange = useCallback((val) => {
+        setSearchQuery(val);
+        clearTimeout(searchTimeout.current);
+        searchTimeout.current = setTimeout(() => {
+            setFeedPage(1);
+            loadFeed(1, false, val);
+        }, 350);
+    }, [loadFeed]);
+
+    const handleLoadMore = () => {
+        const next = feedPage + 1;
+        setFeedPage(next);
+        loadFeed(next, true);
+    };
+
+    // ── Load following feed ─────────────────────────────────
+    const loadFollowing = useCallback(async (page, append = false) => {
+        if (!user?.id) return;
+        setFollowingLoading(true);
+        const result = await knowledgeApiService.getQuestionsFromFollowedTopics(user.id, { page, limit: PAGE_SIZE });
+        setFollowingQuestions(prev => append ? [...prev, ...result.data] : result.data);
+        setFollowingHasMore(page < result.totalPages);
+        setFollowingLoading(false);
+    }, [user?.id]);
+
+    useEffect(() => {
+        if (viewMode === 'following') {
+            setFollowingPage(1);
+            loadFollowing(1, false);
+        }
+    }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const handleLoadMoreFollowing = () => {
+        const next = followingPage + 1;
+        setFollowingPage(next);
+        loadFollowing(next, true);
+    };
+
+    // ── Load favorites ──────────────────────────────────────
     useEffect(() => {
         if (viewMode === 'favorites' && user?.id) {
             knowledgeApiService.getFavorites(user.id).then(setFavorites);
         }
     }, [viewMode, user?.id]);
 
-    const handleTabChange = (tab) => {
-        let newSort = 'recent';
-        if (tab === 'hot') newSort = 'popular';
-        if (tab === 'follow') newSort = 'recent'; // Fallback until following is implemented
+    // Load favorite IDs for the save button indicator
+    useEffect(() => {
+        if (user?.id) {
+            knowledgeApiService.getUserFavoriteIds(user.id).then(ids => {
+                setFavoriteIds(new Set(ids));
+            });
+        }
+    }, [user?.id]);
 
+    // ── Vote handler ────────────────────────────────────────
+    const handleVote = useCallback(async (questionId) => {
+        if (!user) return;
+        const result = await knowledgeApiService.vote('question', questionId, 'up');
+        if (result.success) {
+            const delta = result.action === 'added' ? 1 : result.action === 'removed' ? -1 : 0;
+            const applyDelta = list => list.map(q =>
+                q.id === questionId ? { ...q, upvote_count: (q.upvote_count || 0) + delta } : q
+            );
+            setQuestions(applyDelta);
+            setFollowingQuestions(applyDelta);
+            setFavorites(applyDelta);
+        }
+    }, [user]);
+
+    // ── Favorite toggle handler ─────────────────────────────
+    const handleToggleFavorite = useCallback(async (questionId) => {
+        if (!user) return;
+        const result = await knowledgeApiService.toggleFavorite(questionId);
+        if (result.success) {
+            setFavoriteIds(prev => {
+                const next = new Set(prev);
+                result.action === 'added' ? next.add(questionId) : next.delete(questionId);
+                return next;
+            });
+            if (viewMode === 'favorites') {
+                knowledgeApiService.getFavorites(user.id).then(setFavorites);
+            }
+        }
+    }, [user, viewMode]);
+
+    const isFavorited = useCallback((questionId) => favoriteIds.has(questionId), [favoriteIds]);
+
+    // ── Navigation ──────────────────────────────────────────
+    const handleTabChange = (tab) => {
+        if (tab === 'follow') { setViewMode('following'); return; }
+        const newMode = tab === 'hot' ? 'hot' : 'feed';
+        setViewMode(newMode);
         setSearchParams(prev => {
             const params = new URLSearchParams(prev);
-            params.set('sort', newSort);
+            params.set('sort', tab === 'hot' ? 'popular' : 'recent');
             params.delete('page');
             return params;
         });
@@ -51,39 +175,43 @@ const KnowledgePage = () => {
 
     const handleSidebarNavigate = (key) => {
         setViewMode(key);
-        if (key === 'feed') {
+        if (key === 'feed' || key === 'hot') {
             setSearchParams(prev => {
                 const params = new URLSearchParams(prev);
-                params.set('sort', 'recent');
-                params.delete('page');
-                return params;
-            });
-        } else if (key === 'hot') {
-            setSearchParams(prev => {
-                const params = new URLSearchParams(prev);
-                params.set('sort', 'popular');
+                params.set('sort', key === 'hot' ? 'popular' : 'recent');
                 params.delete('page');
                 return params;
             });
         }
     };
 
-    const { questions, loading } = useQuestions(knowledgeApiService, {
-        topicSlug,
-        page,
-        sortBy: viewMode === 'hot' ? 'popular' : sortBy,
-        status: 'approved',
-    });
+    // ── Derived display state ───────────────────────────────
+    const displayQuestions =
+        viewMode === 'favorites'  ? favorites :
+        viewMode === 'following'  ? followingQuestions :
+        questions;
 
-    // Use favorites list when in favorites view
-    const displayQuestions = viewMode === 'favorites' ? favorites : questions;
+    const loading =
+        viewMode === 'following' ? followingLoading :
+        viewMode === 'favorites' ? false :
+        feedLoading;
+
+    const hasMore =
+        viewMode === 'following' ? followingHasMore :
+        viewMode === 'favorites' ? false :
+        feedHasMore;
+
+    const handleLoadMoreCombined =
+        viewMode === 'following' ? handleLoadMoreFollowing : handleLoadMore;
 
     return (
         <KnowledgeLayout
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
             sidebar={
                 <>
-                    <DenseSidebar 
-                        activeItem={viewMode} 
+                    <DenseSidebar
+                        activeItem={viewMode}
                         onNavigate={handleSidebarNavigate}
                         userId={user?.id}
                     />
@@ -94,14 +222,21 @@ const KnowledgePage = () => {
             }
             widgets={<Widgets userId={user?.id} />}
         >
-            <FeedStream 
+            <FeedStream
                 questions={displayQuestions}
-                loading={loading && viewMode !== 'favorites'}
+                loading={loading}
                 user={user}
                 profile={profile}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
                 viewMode={viewMode}
+                isFollowing={isFollowing}
+                onToggleFollow={toggleFollow}
+                onVote={handleVote}
+                isFavorited={isFavorited}
+                onToggleFavorite={handleToggleFavorite}
+                hasMore={hasMore}
+                onLoadMore={handleLoadMoreCombined}
             />
         </KnowledgeLayout>
     );

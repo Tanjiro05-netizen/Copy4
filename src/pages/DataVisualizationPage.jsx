@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart3, Users, TrendingUp, Map, BarChart, LineChart, PieChart, Sliders, SplitSquareVertical } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { BarChart3, Users, TrendingUp, Map, BarChart, LineChart, PieChart, Sliders, SplitSquareVertical, Download, FileDown } from 'lucide-react';
+import { exportToCSV, exportToPNG } from '../utils/exportData';
 import EnhancedChart from '../components/visualizations/EnhancedChart';
 import WhatIfAnalysis from '../components/visualizations/WhatIfAnalysis';
 import SplitView from '../components/visualizations/SplitView';
@@ -7,9 +8,11 @@ import EconomicVisualization from '../components/visualizations/EconomicVisualiz
 import ClassVisualization from '../components/visualizations/ClassVisualization';
 import TrendsVisualization from '../components/visualizations/TrendsVisualization';
 import MovementsVisualization from '../components/visualizations/MovementsVisualization';
+import { useTranslation } from 'react-i18next';
 import * as s from './DataVisualizationPage.css.ts';
 
 const DataVisualizationPage = () => {
+    const { t } = useTranslation();
     const [activeView, setActiveView] = useState('economic');
     const [chartType, setChartType] = useState('bar');
     const [sentiment, setSentiment] = useState('neutral');
@@ -17,6 +20,44 @@ const DataVisualizationPage = () => {
     const [showTransition, setShowTransition] = useState(false);
     const [showWhatIf, setShowWhatIf] = useState(false);
     const [viewMode, setViewMode] = useState('standard'); // 'standard', 'split'
+    const chartRef = useRef(null);
+
+    const handleExportPNG = useCallback(() => {
+        if (chartRef.current) {
+            const vizName = visualizations.find(v => v.id === activeView)?.name || 'chart';
+            exportToPNG(chartRef.current, vizName.replace(/\s+/g, '-').toLowerCase());
+        }
+    }, [activeView]);
+
+    const handleExportCSV = useCallback(() => {
+        const sampleData = {
+            economic: [
+                { year: 2020, gdp_growth: 2.3, inflation: 1.2, unemployment: 5.4 },
+                { year: 2021, gdp_growth: 5.7, inflation: 4.7, unemployment: 5.3 },
+                { year: 2022, gdp_growth: 2.1, inflation: 8.0, unemployment: 3.6 },
+                { year: 2023, gdp_growth: 2.5, inflation: 4.1, unemployment: 3.7 },
+            ],
+            class: [
+                { class: 'Working Class', percentage: 60, trend: 'declining' },
+                { class: 'Middle Class', percentage: 30, trend: 'shrinking' },
+                { class: 'Capitalist Class', percentage: 10, trend: 'growing' },
+            ],
+            trends: [
+                { decade: '1980s', inequality_index: 0.35, union_membership: 20.1 },
+                { decade: '1990s', inequality_index: 0.40, union_membership: 15.5 },
+                { decade: '2000s', inequality_index: 0.45, union_membership: 12.5 },
+                { decade: '2010s', inequality_index: 0.49, union_membership: 10.5 },
+            ],
+            movements: [
+                { region: 'Latin America', movements: 12, period: '2000-2024' },
+                { region: 'Europe', movements: 8, period: '2000-2024' },
+                { region: 'Asia', movements: 15, period: '2000-2024' },
+                { region: 'Africa', movements: 10, period: '2000-2024' },
+            ],
+        };
+        const vizName = visualizations.find(v => v.id === activeView)?.name || 'data';
+        exportToCSV(sampleData[activeView] || [], vizName.replace(/\s+/g, '-').toLowerCase());
+    }, [activeView]);
 
     // Handle view change with transition animation
     const handleViewChange = (viewId) => {
@@ -46,27 +87,27 @@ const DataVisualizationPage = () => {
     const visualizations = [
         {
             id: 'economic',
-            name: 'Economic Analysis',
+            name: t('data.economic'),
             icon: BarChart3,
-            description: 'Historical economic data and trends'
+            description: t('data.economicDesc')
         },
         {
             id: 'class',
-            name: 'Class Structure',
+            name: t('data.class'),
             icon: Users,
-            description: 'Interactive class relation visualizations'
+            description: t('data.classDesc')
         },
         {
             id: 'trends',
-            name: 'Historical Trends',
+            name: t('data.trends'),
             icon: TrendingUp,
-            description: 'Long-term social and economic patterns'
+            description: t('data.trendsDesc')
         },
         {
             id: 'movements',
-            name: 'Revolutionary Movements',
+            name: t('data.movements'),
             icon: Map,
-            description: 'Global mapping of revolutionary activities'
+            description: t('data.movementsDesc')
         }
     ];
 
@@ -105,7 +146,7 @@ const DataVisualizationPage = () => {
         <div className={s.page}>
             
             <main className={s.main}>
-                <h1 className={s.pageTitle}>Data Visualization</h1>
+                <h1 className={s.pageTitle}>{t('data.title')}</h1>
                 
                 <div className={s.vizGrid}>
                     {visualizations.map((viz) => (
@@ -157,14 +198,35 @@ const DataVisualizationPage = () => {
                                 style={{width:'auto',padding:'0 12px',gap:8}}
                             >
                                 <Sliders size={18} />
-                                <span>What-If Analysis</span>
+                                <span>{t('data.whatIf')}</span>
                             </button>
                         )}
+                    </div>
+
+                    <div className={s.toolbarGroup}>
+                        <button
+                            onClick={handleExportCSV}
+                            className={s.toolBtn}
+                            style={{width:'auto',padding:'0 12px',gap:8}}
+                            title={t('common.exportCSV')}
+                        >
+                            <FileDown size={18} />
+                            <span>{t('common.exportCSV')}</span>
+                        </button>
+                        <button
+                            onClick={handleExportPNG}
+                            className={s.toolBtn}
+                            style={{width:'auto',padding:'0 12px',gap:8}}
+                            title={t('common.exportPNG')}
+                        >
+                            <Download size={18} />
+                            <span>{t('common.exportPNG')}</span>
+                        </button>
                     </div>
                 </div>
 
                 {/* Visualization Content Area */}
-                <div className={s.chartWrap} style={showTransition ? {opacity:0,transition:'opacity 300ms'} : {opacity:1,transition:'opacity 300ms'}}>
+                <div ref={chartRef} className={s.chartWrap} style={showTransition ? {opacity:0,transition:'opacity 300ms'} : {opacity:1,transition:'opacity 300ms'}}>
                     {/* Split View Mode */}
                     {viewMode === 'split' ? (
                         <SplitView 

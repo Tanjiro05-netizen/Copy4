@@ -3,6 +3,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
+import { AudioPlayerProvider } from './context/AudioPlayerContext.jsx';
+import FloatingMiniPlayer from './components/Library/FloatingMiniPlayer.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminRoute from './components/AdminRoute.jsx';
 import RoleRoute from './components/RoleRoute.jsx';
@@ -18,7 +20,6 @@ import DataVisualizationPage from './pages/DataVisualizationPage.jsx';
 import ArticleReaderPage from './pages/ArticleReaderPage.jsx';
 import BookReaderPage from './pages/BookReaderPage.jsx';
 import StudyPage from './pages/StudyPage.jsx';
-import AudiobooksPage from './pages/AudiobooksPage.jsx';
 import ScienceTechPage from './pages/ScienceTechPage.jsx';
 import CoursePage from './pages/CoursePage.jsx';
 import LessonPage from './pages/LessonPage.jsx';
@@ -30,6 +31,7 @@ import PoliticsArticleReader from './pages/PoliticsArticleReader.jsx';
 import MainLayout from './components/MainLayout.jsx';
 import ArticleCollectionPage from './pages/ArticleCollectionPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import PublicProfilePage from './pages/PublicProfilePage.jsx';
 import TagManagementPage from './pages/admin/TagManagementPage.jsx';
 import AdminSubmissionsPage from './pages/AdminSubmissionsPage.jsx';
 import ComingSoonPage from './pages/ComingSoonPage.jsx';
@@ -40,6 +42,7 @@ import KnowledgeAskPage from './pages/KnowledgeAskPage.jsx';
 import KnowledgeQuestionPage from './pages/KnowledgeQuestionPage.jsx';
 import KnowledgeStudyPage from './pages/KnowledgeStudyPage.jsx';
 import KnowledgeModerationPage from './pages/admin/KnowledgeModerationPage.jsx';
+import KnowledgeTopicAdminPage from './pages/admin/KnowledgeTopicAdminPage.jsx';
 import AnalysisUploadPage from './pages/admin/AnalysisUploadPage.jsx';
 import LibraryUploadPage from './pages/admin/LibraryUploadPage.jsx';
 import PoliticsUploadPage from './pages/admin/PoliticsUploadPage.jsx';
@@ -80,6 +83,7 @@ const AppRouter = () => {
     return (
         <ErrorBoundary>
         <AuthProvider>
+            <AudioPlayerProvider>
             <ThemeProvider>
                 <Router>
                     <Routes>
@@ -100,12 +104,12 @@ const AppRouter = () => {
                         <Route path="/article/:articleId" element={<ProtectedRoute><MainLayout><ArticleReaderPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/book/:bookId" element={<MainLayout><BookReaderPage /></MainLayout>} />
                         <Route path="/profile" element={<ProtectedRoute><MainLayout><ProfilePage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/profile/:username" element={<ProtectedRoute><MainLayout><PublicProfilePage /></MainLayout></ProtectedRoute>} />
 
                         {/* Previously Admin-only routes, now opened up */}
                         <Route path="/directory" element={<ProtectedRoute><MainLayout><DirectoryPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/glossary/:term" element={<ProtectedRoute><MainLayout><GlossaryTermPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/study" element={<ProtectedRoute><MainLayout><StudyPage /></MainLayout></ProtectedRoute>} />
-                        <Route path="/audiobooks" element={<ProtectedRoute><MainLayout><AudiobooksPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/science-tech" element={<ProtectedRoute><MainLayout><ScienceTechPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/science-tech/courses/:courseSlug" element={<ProtectedRoute><MainLayout><CoursePage /></MainLayout></ProtectedRoute>} />
                         <Route path="/science-tech/courses/:courseSlug/:chapterSlug/test" element={<ProtectedRoute><ChapterTestPage /></ProtectedRoute>} />
@@ -121,6 +125,7 @@ const AppRouter = () => {
                         <Route path="/admin/roles" element={<AdminRoute><MainLayout><RoleManagementPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/submissions" element={<AdminRoute><MainLayout><AdminSubmissionsPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/knowledge" element={<AdminRoute><MainLayout><KnowledgeModerationPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/knowledge/topics" element={<AdminRoute><MainLayout><KnowledgeTopicAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/analysis/upload" element={<AdminRoute><MainLayout><AnalysisUploadPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/library/upload" element={<AdminRoute><MainLayout><LibraryUploadPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/politics/upload" element={<RoleRoute allowedEditorialRoles={['News']}><MainLayout><PoliticsUploadPage /></MainLayout></RoleRoute>} />
@@ -132,8 +137,8 @@ const AppRouter = () => {
                         <Route path="/admin/world-sim" element={<AdminRoute><WorldSimPage /></AdminRoute>} />
                         
                         {/* Forum routes */}
-                        <Route path="/forum" element={<MainLayout><ForumPage /></MainLayout>} />
-                        <Route path="/forum/*" element={<MainLayout><ForumPage /></MainLayout>} />
+                        <Route path="/forum" element={<ProtectedRoute><MainLayout><ForumPage /></MainLayout></ProtectedRoute>} />
+                        <Route path="/forum/*" element={<ProtectedRoute><MainLayout><ForumPage /></MainLayout></ProtectedRoute>} />
                         
                         {/* Knowledge Q&A routes */}
                         <Route path="/knowledge" element={<ProtectedRoute><MainLayout><KnowledgePage /></MainLayout></ProtectedRoute>} />
@@ -155,6 +160,8 @@ const AppRouter = () => {
                     </Routes>
                 </Router>
             </ThemeProvider>
+            <FloatingMiniPlayer />
+            </AudioPlayerProvider>
         </AuthProvider>
         </ErrorBoundary>
     );

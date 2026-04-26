@@ -33,8 +33,8 @@ const StudyPathAI = ({ milestones = [], resources = [], userProgress = {} }) => 
 
       return {
         step: index + 1,
-        title: milestone.chinese_title || milestone.title,
-        subtitle: milestone.chinese_title ? milestone.title : (milestone.description || ""),
+        title: milestone.title,
+        subtitle: milestone.description || "",
         suggestion: linkedResource
           ? `Suggested resource: ${linkedResource.title}`
           : (milestone.description || "Complete this milestone to continue your reading line."),

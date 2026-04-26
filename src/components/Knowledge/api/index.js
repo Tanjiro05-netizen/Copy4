@@ -36,12 +36,39 @@ class KnowledgeApiService {
     }
   }
 
+  async createTopic({ name, slug, description }) {
+    const { data, error } = await supabase
+      .from('knowledge_topics')
+      .insert({ name, slug, description })
+      .select()
+      .single()
+    return { data, error }
+  }
+
+  async updateTopic(topicId, { name, slug, description }) {
+    const { data, error } = await supabase
+      .from('knowledge_topics')
+      .update({ name, slug, description })
+      .eq('id', topicId)
+      .select()
+      .single()
+    return { data, error }
+  }
+
+  async deleteTopic(topicId) {
+    const { error } = await supabase
+      .from('knowledge_topics')
+      .delete()
+      .eq('id', topicId)
+    return { error }
+  }
+
   // ============================================
   // QUESTIONS
   // ============================================
 
   async getQuestions(options = {}) {
-    const { topicSlug, page = 1, limit = 20, sortBy = 'recent', status = 'approved' } = options
+    const { topicSlug, page = 1, limit = 20, sortBy = 'recent', status = 'approved', search = '' } = options
     
     try {
       let query = supabase
@@ -52,6 +79,10 @@ class KnowledgeApiService {
           topic:knowledge_topics(id, name, slug)
         `, { count: 'exact' })
         .eq('status', status)
+      
+      if (search && search.trim()) {
+        query = query.ilike('title', `%${search.trim()}%`)
+      }
       
       if (topicSlug) {
         const topic = await this.getTopic(topicSlug)
@@ -573,8 +604,9 @@ class KnowledgeApiService {
           question_id,
           created_at,
           question:knowledge_questions(
-            id, title, view_count, upvote_count, answer_count, created_at,
-            topic:knowledge_topics(name, slug)
+            id, title, content, view_count, upvote_count, answer_count, created_at, is_answered,
+            author:profiles(id, username, avatar_url, is_certified),
+            topic:knowledge_topics(id, name, slug)
           )
         `)
         .eq('user_id', userId)
@@ -768,6 +800,42 @@ class KnowledgeApiService {
     } catch (err) {
       console.error('Error fetching sidebar counts:', err)
       return { hotList: 0, favorites: 0 }
+    }
+  }
+
+  // ============================================
+  // FOLLOWING FEED
+  // ============================================
+
+  async getQuestionsFromFollowedTopics(userId, options = {}) {
+    const { page = 1, limit = 20 } = options
+    try {
+      const topicIds = await this.getUserFollowedTopics(userId)
+      if (!topicIds.length) return { data: [], page, totalPages: 0, total: 0 }
+
+      const start = (page - 1) * limit
+      const { data, error, count } = await supabase
+        .from('knowledge_questions')
+        .select(`
+          *,
+          author:profiles(id, username, avatar_url, is_certified),
+          topic:knowledge_topics(id, name, slug)
+        `, { count: 'exact' })
+        .eq('status', 'approved')
+        .in('topic_id', topicIds)
+        .order('created_at', { ascending: false })
+        .range(start, start + limit - 1)
+
+      if (error) throw error
+      return {
+        data: data || [],
+        page,
+        totalPages: Math.ceil((count || 0) / limit),
+        total: count || 0,
+      }
+    } catch (err) {
+      console.error('Error fetching following feed:', err)
+      return { data: [], page, totalPages: 0, total: 0 }
     }
   }
 

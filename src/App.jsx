@@ -18,7 +18,7 @@ const App = () => {
 
     const secondaryCta = user
         ? { to: '/submit', label: 'Submit Work' }
-        : { to: '/forum', label: 'Enter Forum' };
+        : { to: '/digital-library', label: 'Browse Library' };
 
     return (
         <div className={s.page}>

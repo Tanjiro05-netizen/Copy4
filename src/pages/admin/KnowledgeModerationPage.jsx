@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Header from '../../components/Header';
 import { knowledgeApiService } from '../../components/Knowledge/api';
-import { CheckCircle, XCircle, Clock, MessageSquare, HelpCircle, User, Loader2, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, MessageSquare, HelpCircle, User, Loader2, AlertTriangle, Tag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const KnowledgeModerationPage = () => {
     const { user } = useAuth();
@@ -80,12 +81,20 @@ const KnowledgeModerationPage = () => {
                         <h1 className="text-3xl font-bold">Knowledge Moderation</h1>
                         <p className="text-gray-400 mt-1">Review and approve questions and answers</p>
                     </div>
-                    <button
-                        onClick={fetchPending}
-                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                        Refresh
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <Link
+                            to="/admin/knowledge/topics"
+                            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                        >
+                            <Tag size={16} /> Manage Topics
+                        </Link>
+                        <button
+                            onClick={fetchPending}
+                            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                        >
+                            Refresh
+                        </button>
+                    </div>
                 </div>
 
                 {/* Tab Navigation */}
