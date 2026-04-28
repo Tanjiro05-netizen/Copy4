@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 import { 
-    Search, List, Grid, ExternalLink, FileText, Download,
+    Search, List, Grid, ExternalLink, FileText,
     Database, BookOpen, Landmark, Users, Target, BookmarkPlus,
     Trash2, Headphones, Pencil
 } from 'lucide-react';
@@ -202,7 +202,6 @@ const DigitalLibraryPage = () => {
     const [activeLanguage, setActiveLanguage] = useState('all');
     const [books, setBooks] = useState([]);
     const [allBooks, setAllBooks] = useState([]); // Store all books for stats
-    const [audiobooks, setAudiobooks] = useState([]);
     const { playAudiobook } = useAudioPlayer();
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -229,7 +228,6 @@ const DigitalLibraryPage = () => {
                 setAllBooks(allData);
                 
                 const allAudiobooks = (audiobooksResponse.data || []).map(ab => ({...ab, isAudiobook: true, category: 'Audiobooks'}));
-                setAudiobooks(allAudiobooks);
 
                 // Generate dynamic categories
                 const distinctCategories = [...new Set(categoriesResponse.data.map(item => item.category).filter(Boolean))];
@@ -287,7 +285,6 @@ const DigitalLibraryPage = () => {
             if (error) throw error;
             
             if (isAudiobook) {
-                setAudiobooks(prev => prev.filter(b => b.id !== id));
                 if (activeCategory === 'Audiobooks') {
                     setBooks(prev => prev.filter(b => b.id !== id));
                 }

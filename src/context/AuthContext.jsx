@@ -17,6 +17,7 @@ export const isLocalDevelopmentHost = (hostname) => {
     const currentHostname =
         hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '');
     const normalizedHostname = `${currentHostname || ''}`.trim().toLowerCase();
+
     return (
         normalizedHostname === 'localhost' ||
         normalizedHostname === '127.0.0.1' ||
@@ -201,18 +202,19 @@ export const AuthProvider = ({ children }) => {
 
             if (result.data?.user) {
                 setUser(result.data.user);
-                await withTimeout(fetchProfile(result.data.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
+                await withTimeout(fetchProfile(result.data.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.')
+                    .catch((error) => console.error('Error fetching profile after login:', error));
             }
 
             return result;
         },
-        logout: () => {
+        logout: async () => {
             if (isLocalDevelopmentHost()) {
                 localStorage.removeItem(DEV_AUTH_STORAGE_KEY);
             }
             setUser(null);
             setProfile(null);
-            supabase.auth.signOut().catch(e => console.error('signOut error:', e));
+            return supabase.auth.signOut();
         },
         user,
         profile,

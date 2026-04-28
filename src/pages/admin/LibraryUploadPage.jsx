@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
-import { useAuth } from '../../context/AuthContext';
 import { 
     Upload, FileText, Image, Check, AlertTriangle, 
     ArrowLeft, Save, X, Loader2, BookOpen, Download
@@ -35,7 +34,6 @@ const LANGUAGES = [
 const LibraryUploadPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { user } = useAuth();
     const editId = searchParams.get('id');
     const editType = searchParams.get('edit');
     const [uploadType, setUploadType] = useState(editType === 'audiobook' ? 'audiobook' : 'book'); // 'book' | 'audiobook'

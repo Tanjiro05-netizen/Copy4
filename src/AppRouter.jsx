@@ -49,6 +49,7 @@ import PoliticsUploadPage from './pages/admin/PoliticsUploadPage.jsx';
 import QuizAdminPage from './pages/admin/QuizAdminPage.jsx';
 import RoleManagementPage from './pages/admin/RoleManagementPage.jsx';
 import ScenarioAdminPage from './pages/admin/ScenarioAdminPage.jsx';
+import ScienceAdminPage from './pages/admin/ScienceAdminPage.jsx';
 import STEMAdminPage from './pages/admin/STEMAdminPage.jsx';
 import StudyAdminPage from './pages/admin/StudyAdminPage.jsx';
 import WaitlistAdminPage from './pages/admin/WaitlistAdminPage.jsx';
@@ -131,7 +132,9 @@ const AppRouter = () => {
                         <Route path="/admin/politics/upload" element={<RoleRoute allowedEditorialRoles={['News']}><MainLayout><PoliticsUploadPage /></MainLayout></RoleRoute>} />
                         <Route path="/admin/quizzes" element={<AdminRoute><MainLayout><QuizAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/scenarios" element={<AdminRoute><MainLayout><ScenarioAdminPage /></MainLayout></AdminRoute>} />
-                        <Route path="/admin/stem" element={<AdminRoute><MainLayout><STEMAdminPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/science" element={<AdminRoute><MainLayout><ScienceAdminPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/stem" element={<AdminRoute><MainLayout><ScienceAdminPage /></MainLayout></AdminRoute>} />
+                        <Route path="/admin/stem-legacy" element={<AdminRoute><MainLayout><STEMAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/study" element={<RoleRoute allowedEditorialRoles={['Teacher']}><MainLayout><StudyAdminPage /></MainLayout></RoleRoute>} />
                         <Route path="/admin/waitlist" element={<AdminRoute><MainLayout><WaitlistAdminPage /></MainLayout></AdminRoute>} />
                         <Route path="/admin/world-sim" element={<AdminRoute><WorldSimPage /></AdminRoute>} />

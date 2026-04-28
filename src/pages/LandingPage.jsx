@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { 
-    BookOpen, Users, MessageSquare, LogIn, UserPlus, 
+    BookOpen, MessageSquare, LogIn, UserPlus, 
     Mail, ArrowRight, CheckCircle, AlertTriangle, Loader2,
-    X, Eye, Shield, Sparkles, ExternalLink, Heart,
+    X, Eye, Sparkles, ExternalLink, Heart,
     GraduationCap, FlaskConical, BarChart3, PenTool,
     Layers
 } from 'lucide-react';
@@ -16,7 +16,7 @@ import './LandingPage.css';
 const LandingPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user, login, signUp } = useAuth();
+    const { login, signUp } = useAuth();
     
     // Modal states
     const [showLoginModal, setShowLoginModal] = useState(false);
