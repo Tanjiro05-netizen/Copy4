@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies';
+import { StaleWhileRevalidate, CacheFirst, NetworkOnly } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
@@ -26,9 +26,15 @@ registerRoute(
   })
 );
 
-// Cache API calls with stale-while-revalidate
+// Supabase auth endpoints must NEVER be cached — always hit the network
 registerRoute(
-  ({ url }) => url.origin.includes('supabase'),
+  ({ url }) => url.origin.includes('supabase') && url.pathname.startsWith('/auth/'),
+  new NetworkOnly()
+);
+
+// Cache non-auth Supabase data with stale-while-revalidate
+registerRoute(
+  ({ url }) => url.origin.includes('supabase') && !url.pathname.startsWith('/auth/'),
   new StaleWhileRevalidate({
     cacheName: 'api-cache',
     plugins: [

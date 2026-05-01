@@ -4,14 +4,15 @@ import { supabase } from '../supabaseClient';
 const AuthContext = createContext();
 
 const normalizeRoleToken = (value) => `${value || ''}`.trim().toLowerCase();
-const LOGIN_TIMEOUT_MS = 15000;
-const SESSION_TIMEOUT_MS = 8000;
+const LOGIN_TIMEOUT_MS = 30000;
+const SESSION_TIMEOUT_MS = 20000;
+const SESSION_RETRY_DELAY_MS = 1200;
 const DEV_ADMIN_USER = { id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' };
 const DEV_ADMIN_PROFILE = { id: 'dev-admin', username: 'DevAdmin', role: 'admin', is_admin: true };
 const DEV_ADMIN_PASSWORD = 'admin123';
 const DEV_AUTH_STORAGE_KEY = 'marxist_dev_auth';
 
-export const AUTH_TIMEOUT_MESSAGE = 'Supabase did not respond. Check your connection and try again.';
+export const AUTH_TIMEOUT_MESSAGE = 'Connection is slow — Supabase may be waking up. Please try again in a few seconds.';
 
 export const isLocalDevelopmentHost = (hostname) => {
     const currentHostname =
@@ -45,6 +46,29 @@ const withTimeout = async (promise, ms, timeoutMessage) => {
         ]);
     } finally {
         clearTimeout(timeoutId);
+    }
+};
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const getSessionWithRetry = async () => {
+    const getSessionOnce = () =>
+        withTimeout(
+            supabase.auth.getSession(),
+            SESSION_TIMEOUT_MS,
+            'Auth session check timed out.'
+        );
+
+    try {
+        return await getSessionOnce();
+    } catch (firstError) {
+        await delay(SESSION_RETRY_DELAY_MS);
+        try {
+            return await getSessionOnce();
+        } catch (finalError) {
+            finalError.cause = firstError;
+            throw finalError;
+        }
     }
 };
 
@@ -110,17 +134,15 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const { data: { session } } = await withTimeout(
-                    supabase.auth.getSession(),
-                    SESSION_TIMEOUT_MS,
-                    'Auth session check timed out.'
-                );
+                const { data: { session } } = await getSessionWithRetry();
                 setUser(session?.user ?? null);
                 if (session?.user) {
                     await withTimeout(fetchProfile(session.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
                 }
             } catch (error) {
-                console.error('Error getting session:', error);
+                console.warn('Auth session unavailable; continuing without a saved session.', error);
+                setUser(null);
+                setProfile(null);
             } finally {
                 setLoading(false);
             }
@@ -214,6 +236,10 @@ export const AuthProvider = ({ children }) => {
             }
             setUser(null);
             setProfile(null);
+            // Clear service-worker api-cache to prevent stale session data
+            if ('caches' in window) {
+                caches.delete('api-cache').catch(() => {});
+            }
             return supabase.auth.signOut();
         },
         user,

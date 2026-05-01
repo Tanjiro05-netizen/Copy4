@@ -56,6 +56,8 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -78,6 +80,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "@playwright/test": "^1.59.1",
     "@vanilla-extract/jest-transform": "^1.1.17",
     "@vanilla-extract/webpack-plugin": "^2.1.9",
     "autoprefixer": "^10.4.20",

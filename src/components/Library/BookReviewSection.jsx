@@ -18,7 +18,7 @@ const StarRating = ({ rating, onRate, interactive = false, size = 16 }) => (
   </div>
 );
 
-const BookReviewSection = ({ bookId }) => {
+const BookReviewSection = ({ bookId, canWrite = false }) => {
   const { t } = useTranslation();
   const { reviews, addReview, deleteReview, averageRating, reviewCount } = useLocalReviews(bookId);
   const [newRating, setNewRating] = useState(0);
@@ -32,6 +32,10 @@ const BookReviewSection = ({ bookId }) => {
     setNewText('');
     setShowForm(false);
   };
+
+  const visibleReviews = canWrite ? reviews : [];
+  const visibleReviewCount = canWrite ? reviewCount : 0;
+  const visibleAverageRating = canWrite ? averageRating : 0;
 
   return (
     <div style={{
@@ -47,29 +51,31 @@ const BookReviewSection = ({ bookId }) => {
           <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', margin: 0 }}>
             {t('library.reviews')}
           </h3>
-          {reviewCount > 0 && (
+          {visibleReviewCount > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <StarRating rating={Math.round(averageRating)} size={12} />
+              <StarRating rating={Math.round(visibleAverageRating)} size={12} />
               <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)' }}>
-                {averageRating.toFixed(1)} ({reviewCount})
+                {visibleAverageRating.toFixed(1)} ({visibleReviewCount})
               </span>
             </div>
           )}
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          style={{
-            padding: '4px 10px', fontSize: '11px',
-            background: 'rgba(200,30,30,0.15)', border: '1px solid rgba(200,30,30,0.3)',
-            borderRadius: '6px', color: '#f87171', cursor: 'pointer',
-          }}
-        >
-          {t('library.writeReview')}
-        </button>
+        {canWrite && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            style={{
+              padding: '4px 10px', fontSize: '11px',
+              background: 'rgba(200,30,30,0.15)', border: '1px solid rgba(200,30,30,0.3)',
+              borderRadius: '6px', color: '#f87171', cursor: 'pointer',
+            }}
+          >
+            {t('library.writeReview')}
+          </button>
+        )}
       </div>
 
       {/* New review form */}
-      {showForm && (
+      {canWrite && showForm && (
         <div style={{
           background: 'rgba(0,0,0,0.3)', borderRadius: '8px',
           padding: '12px', marginBottom: '12px',
@@ -118,13 +124,13 @@ const BookReviewSection = ({ bookId }) => {
       )}
 
       {/* Review list */}
-      {reviews.length === 0 ? (
+      {visibleReviews.length === 0 ? (
         <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', margin: 0 }}>
-          {t('common.noResults')}
+          {t('library.noReviews')}
         </p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {reviews.map(review => (
+          {visibleReviews.map(review => (
             <div key={review.id} style={{
               padding: '8px 10px', background: 'rgba(255,255,255,0.02)',
               borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)',

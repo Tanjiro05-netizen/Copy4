@@ -12,6 +12,8 @@ yarn-error.log*
 # Cache files
 node_modules/.cache
 .eslintcache
+playwright-report/
+test-results/
 
 # Windsurf plans, workflows, and guides
 .windsurf/plans/

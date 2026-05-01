@@ -40,6 +40,7 @@ const AddToListButton = ({ bookId }) => {
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <button
         onClick={() => setOpen(!open)}
+        aria-label={t('library.addToList')}
         style={{
           display: 'flex', alignItems: 'center', gap: '4px',
           padding: '4px 8px', fontSize: '11px',
@@ -63,6 +64,9 @@ const AddToListButton = ({ bookId }) => {
         }}>
           <div style={{ padding: '4px 8px 6px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>
             {t('library.addToList')}
+            <div style={{ marginTop: '2px', fontSize: '10px', fontWeight: 400, color: 'rgba(255,255,255,0.28)' }}>
+              {t('library.localListsNote')}
+            </div>
           </div>
 
           {lists.length === 0 && (
@@ -111,6 +115,7 @@ const AddToListButton = ({ bookId }) => {
             <button
               onClick={handleCreate}
               disabled={!newName.trim()}
+              aria-label={t('library.createAndAddToList')}
               style={{
                 padding: '4px', background: newName.trim() ? 'rgba(200,30,30,0.2)' : 'rgba(255,255,255,0.04)',
                 border: 'none', borderRadius: '4px',

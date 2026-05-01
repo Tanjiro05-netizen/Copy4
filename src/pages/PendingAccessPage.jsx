@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { ArrowLeft, Shield, Sparkles, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
@@ -7,7 +7,7 @@ import * as s from './PendingAccessPage.css.ts';
 
 const PendingAccessPage = () => {
     const navigate = useNavigate();
-    const { user, profile } = useAuth();
+    const { user } = useAuth();
     const [inviteCode, setInviteCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -54,7 +54,7 @@ const PendingAccessPage = () => {
 
                 <p className={s.subtitle}>
                     This section is currently available only to invited members.
-                    You can still browse the <span className={s.highlight}>Home</span>, <span className={s.highlight}>Digital Library</span>, and <span className={s.highlight}>Forum</span> pages.
+                    You can still browse the <span className={s.highlight}>Home</span>, <span className={s.highlight}>Digital Library</span>, and <span className={s.highlight}>MarxBot preview</span> pages.
                 </p>
 
                 <div className={s.card}>
@@ -63,7 +63,12 @@ const PendingAccessPage = () => {
                         Have an invite code?
                     </h2>
 
-                    {success ? (
+                    {!user ? (
+                        <div className={s.loginPrompt}>
+                            <p>Log in or register to redeem an invite code.</p>
+                            <Link to="/login" className={s.loginLink}>Go to login</Link>
+                        </div>
+                    ) : success ? (
                         <div className={s.successMsg}>
                             <CheckCircle size={20} />
                             <span>Access granted! Redirecting...</span>

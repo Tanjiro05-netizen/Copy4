@@ -90,6 +90,7 @@
     "averageRating": "Note Moyenne",
     "readingLists": "Listes de Lecture",
     "createList": "Creer une Liste",
+    "createAndAddToList": "Creer et ajouter a la liste",
     "listName": "Nom de la liste",
     "booksInList": "livres",
     "removeFromList": "Retirer de la liste",

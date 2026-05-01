@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, TrendingUp, Loader2 } from 'lucide-react';
+import { Cpu, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { knowledgeApiService } from '../api';
 
@@ -195,9 +195,9 @@ export const Widgets = ({ userId }) => {
 
       {/* ── Footer ── */}
       <div className="font-[JetBrains_Mono,monospace] text-[8px] uppercase tracking-wider text-white/15 px-1 leading-loose">
-        <a href="#" className="hover:text-white/40 transition-colors mr-3">Guidelines</a>
-        <a href="#" className="hover:text-white/40 transition-colors mr-3">Privacy</a>
-        <a href="#" className="hover:text-white/40 transition-colors mr-3">Terms</a>
+        <span className="mr-3">Guidelines</span>
+        <span className="mr-3">Privacy</span>
+        <span className="mr-3">Terms</span>
         <br />
         <span>© 2026 Marxist Platform</span>
       </div>

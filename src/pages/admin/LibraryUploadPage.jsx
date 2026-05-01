@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../supabaseClient';
 import { 
     Upload, FileText, Image, Check, AlertTriangle, 
-    ArrowLeft, Save, X, Loader2, BookOpen, Download
+    ArrowLeft, Save, X, Loader2, BookOpen, Download,
+    Trash2, Headphones, ChevronDown, ChevronUp, Pencil
 } from 'lucide-react';
 import AudiobookUploadForm from './AudiobookUploadForm';
 
@@ -31,16 +32,39 @@ const LANGUAGES = [
     'Chinese',
 ];
 
+const getFilenameFromStoragePath = (path) => {
+    if (!path) return '';
+    return decodeURIComponent(`${path}`.split('?')[0].split('/').pop() || path);
+};
+
+const getCoverStoragePath = (coverUrl) => {
+    if (!coverUrl) return null;
+    const cleanUrl = `${coverUrl}`.split('?')[0];
+
+    if (cleanUrl.includes('/covers/')) {
+        return decodeURIComponent(cleanUrl.split('/covers/').pop());
+    }
+
+    if (!cleanUrl.startsWith('http')) {
+        return getFilenameFromStoragePath(cleanUrl);
+    }
+
+    return null;
+};
+
 const LibraryUploadPage = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const editId = searchParams.get('id');
     const editType = searchParams.get('edit');
+    const isEditingBook = editType === 'book' && !!editId;
     const [uploadType, setUploadType] = useState(editType === 'audiobook' ? 'audiobook' : 'book'); // 'book' | 'audiobook'
 
     useEffect(() => {
         if (editType === 'audiobook' && editId) {
             setUploadType('audiobook');
+        } else if (editType === 'book' && editId) {
+            setUploadType('book');
         }
     }, [editType, editId]);
     
@@ -66,6 +90,130 @@ const LibraryUploadPage = () => {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [loadingBook, setLoadingBook] = useState(false);
+    const [existingBook, setExistingBook] = useState(null);
+    const [removeExistingPdf, setRemoveExistingPdf] = useState(false);
+    const [removeExistingCover, setRemoveExistingCover] = useState(false);
+    const hasPdfAttachment = !!pdfFile || (isEditingBook && !!existingBook?.pdf_filename && !removeExistingPdf);
+
+    // Manage existing books
+    const [existingBooks, setExistingBooks] = useState([]);
+    const [existingAudiobooks, setExistingAudiobooks] = useState([]);
+    const [loadingExisting, setLoadingExisting] = useState(false);
+    const [showManage, setShowManage] = useState(false);
+    const [deleting, setDeleting] = useState(null);
+
+    const fetchExistingItems = useCallback(async () => {
+        setLoadingExisting(true);
+        try {
+            const [booksRes, audiobooksRes] = await Promise.all([
+                supabase.from('digital_library_books').select('id, title, author, year, epub_filename, pdf_filename, cover_image_url').order('title'),
+                supabase.from('audiobooks').select('id, title, author, audio_url, cover_url').order('title'),
+            ]);
+            if (booksRes.error) throw booksRes.error;
+            if (audiobooksRes.error) throw audiobooksRes.error;
+            setExistingBooks(booksRes.data || []);
+            setExistingAudiobooks(audiobooksRes.data || []);
+        } catch (err) {
+            console.error('[Manage] Error fetching existing items:', err);
+        } finally {
+            setLoadingExisting(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (showManage) fetchExistingItems();
+    }, [showManage, fetchExistingItems]);
+
+    useEffect(() => {
+        if (!isEditingBook) return;
+
+        const fetchBookForEditing = async () => {
+            setLoadingBook(true);
+            setError(null);
+            try {
+                const { data, error: fetchError } = await supabase
+                    .from('digital_library_books')
+                    .select('id, title, author, year, description, category, era, language, pages, is_official, epub_filename, pdf_filename, cover_image_url')
+                    .eq('id', editId)
+                    .single();
+
+                if (fetchError) throw fetchError;
+                if (!data) throw new Error('Book not found.');
+
+                setExistingBook(data);
+                setFormData({
+                    title: data.title || '',
+                    author: data.author || '',
+                    year: data.year || '',
+                    description: data.description || '',
+                    category: data.category || '',
+                    era: data.era || '',
+                    language: data.language || 'English',
+                    pages: data.pages || '',
+                    is_official: data.is_official !== false,
+                });
+                setEpubPreview(data.epub_filename ? getFilenameFromStoragePath(data.epub_filename) : null);
+                setPdfPreview(data.pdf_filename ? getFilenameFromStoragePath(data.pdf_filename) : null);
+                setCoverPreview(data.cover_image_url || null);
+                setRemoveExistingPdf(false);
+                setRemoveExistingCover(false);
+            } catch (err) {
+                console.error('[Edit] Error fetching book:', err);
+                setError(err.message || 'Failed to load book for editing.');
+            } finally {
+                setLoadingBook(false);
+            }
+        };
+
+        fetchBookForEditing();
+    }, [isEditingBook, editId]);
+
+    const handleDeleteBook = async (book) => {
+        if (!window.confirm(`Delete "${book.title}"? This will remove the database entry and all associated files. This cannot be undone.`)) return;
+        setDeleting(book.id);
+        try {
+            const filesToRemove = [book.epub_filename, book.pdf_filename].filter(Boolean);
+            if (filesToRemove.length > 0) {
+                await supabase.storage.from('library').remove(filesToRemove);
+            }
+            if (book.cover_image_url) {
+                const coverPath = getCoverStoragePath(book.cover_image_url);
+                if (coverPath) await supabase.storage.from('covers').remove([coverPath]);
+            }
+            const { error: dbErr } = await supabase.from('digital_library_books').delete().eq('id', book.id);
+            if (dbErr) throw dbErr;
+            setExistingBooks(prev => prev.filter(b => b.id !== book.id));
+        } catch (err) {
+            console.error('[Manage] Delete error:', err);
+            setError(`Failed to delete "${book.title}": ${err.message}`);
+        } finally {
+            setDeleting(null);
+        }
+    };
+
+    const handleDeleteAudiobook = async (ab) => {
+        if (!window.confirm(`Delete audiobook "${ab.title}"? This cannot be undone.`)) return;
+        setDeleting(ab.id);
+        try {
+            if (ab.audio_url && ab.audio_url.includes('/audiobooks/')) {
+                const audioPath = ab.audio_url.split('/audiobooks/').pop();
+                if (audioPath) await supabase.storage.from('audiobooks').remove([decodeURIComponent(audioPath)]);
+            }
+            if (ab.cover_url && ab.cover_url.includes('/audiobooks/')) {
+                const coverPath = ab.cover_url.split('/audiobooks/').pop();
+                if (coverPath) await supabase.storage.from('audiobooks').remove([decodeURIComponent(coverPath)]);
+            }
+            const { error: dbErr } = await supabase.from('audiobooks').delete().eq('id', ab.id);
+            if (dbErr) throw dbErr;
+            setExistingAudiobooks(prev => prev.filter(a => a.id !== ab.id));
+        } catch (err) {
+            console.error('[Manage] Audiobook delete error:', err);
+            setError(`Failed to delete "${ab.title}": ${err.message}`);
+        } finally {
+            setDeleting(null);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -97,6 +245,7 @@ const LibraryUploadPage = () => {
         
         setPdfFile(file);
         setPdfPreview(file.name);
+        setRemoveExistingPdf(false);
         setError(null);
     }, []);
 
@@ -110,6 +259,7 @@ const LibraryUploadPage = () => {
         }
         
         setCoverFile(file);
+        setRemoveExistingCover(false);
         const reader = new FileReader();
         reader.onload = (event) => {
             setCoverPreview(event.target?.result);
@@ -119,16 +269,46 @@ const LibraryUploadPage = () => {
     }, []);
 
     const removeEpub = () => {
+        if (isEditingBook) return;
         setEpubFile(null);
         setEpubPreview(null);
     };
 
     const removePdf = () => {
+        if (pdfFile) {
+            setPdfFile(null);
+            setPdfPreview(existingBook?.pdf_filename && !removeExistingPdf ? getFilenameFromStoragePath(existingBook.pdf_filename) : null);
+            if (!existingBook?.pdf_filename || removeExistingPdf) {
+                setFormData(prev => ({ ...prev, pages: '' }));
+            }
+            return;
+        }
+
+        if (isEditingBook && existingBook?.pdf_filename && !removeExistingPdf) {
+            setRemoveExistingPdf(true);
+            setPdfPreview(null);
+            setFormData(prev => ({ ...prev, pages: '' }));
+            return;
+        }
+
         setPdfFile(null);
         setPdfPreview(null);
+        setFormData(prev => ({ ...prev, pages: '' }));
     };
 
     const removeCover = () => {
+        if (coverFile) {
+            setCoverFile(null);
+            setCoverPreview(existingBook?.cover_image_url && !removeExistingCover ? existingBook.cover_image_url : null);
+            return;
+        }
+
+        if (isEditingBook && existingBook?.cover_image_url && !removeExistingCover) {
+            setRemoveExistingCover(true);
+            setCoverPreview(null);
+            return;
+        }
+
         setCoverFile(null);
         setCoverPreview(null);
     };
@@ -151,7 +331,7 @@ const LibraryUploadPage = () => {
             return;
         }
         
-        if (!epubFile) {
+        if (!isEditingBook && !epubFile) {
             setError('EPUB file is required');
             return;
         }
@@ -168,37 +348,24 @@ const LibraryUploadPage = () => {
             ]);
 
         try {
-            // Step 1: Verify we have a real Supabase session (dev bypass won't have one)
-            console.log('[Upload] Checking Supabase session...');
-            const { data: { session }, error: sessionError } = await withTimeout(
-                supabase.auth.getSession(),
-                10000,
-                'Session check'
-            );
-            
-            if (sessionError) {
-                throw new Error(`Session error: ${sessionError.message}`);
-            }
-            
-            if (!session) {
-                throw new Error('No active Supabase session. The dev auth bypass cannot upload files — please log in with a real Supabase account, or check that Supabase is properly configured.');
-            }
-            console.log('[Upload] Session verified:', session.user?.id);
+            // Upload EPUB to library bucket for new books. Existing books keep their reader file.
+            let epubFilename = existingBook?.epub_filename || null;
+            if (!isEditingBook) {
+                console.log('[Upload] Starting EPUB upload...');
+                epubFilename = generateFilename(epubFile, 'epub');
+                const { error: epubError } = await withTimeout(
+                    supabase.storage.from('library').upload(epubFilename, epubFile, { cacheControl: '3600', upsert: false }),
+                    60000,
+                    'EPUB upload'
+                );
 
-            // Step 2: Upload EPUB to library bucket (required)
-            console.log('[Upload] Starting EPUB upload...');
-            const epubFilename = generateFilename(epubFile, 'epub');
-            const { error: epubError } = await withTimeout(
-                supabase.storage.from('library').upload(epubFilename, epubFile, { cacheControl: '3600', upsert: false }),
-                60000,
-                'EPUB upload'
-            );
-            
-            if (epubError) throw new Error(`EPUB upload failed: ${epubError.message}`);
-            console.log('[Upload] EPUB uploaded:', epubFilename);
+                if (epubError) throw new Error(`EPUB upload failed: ${epubError.message}`);
+                console.log('[Upload] EPUB uploaded:', epubFilename);
+            }
 
-            // Step 3: Upload PDF to library bucket (optional, download only)
-            let pdfFilename = null;
+            // Upload PDF to library bucket (optional, download only)
+            let pdfFilename = existingBook?.pdf_filename || null;
+            let oldPdfToRemove = null;
             if (pdfFile) {
                 console.log('[Upload] Starting PDF upload...');
                 pdfFilename = generateFilename(pdfFile, 'pdf');
@@ -210,10 +377,17 @@ const LibraryUploadPage = () => {
                 
                 if (pdfError) throw new Error(`PDF upload failed: ${pdfError.message}`);
                 console.log('[Upload] PDF uploaded:', pdfFilename);
+                if (isEditingBook && existingBook?.pdf_filename) {
+                    oldPdfToRemove = existingBook.pdf_filename;
+                }
+            } else if (isEditingBook && removeExistingPdf && existingBook?.pdf_filename) {
+                oldPdfToRemove = existingBook.pdf_filename;
+                pdfFilename = null;
             }
 
-            // Step 4: Upload cover image if provided
-            let coverImageUrl = null;
+            // Upload cover image if provided
+            let coverImageUrl = existingBook?.cover_image_url || null;
+            let oldCoverToRemove = null;
             if (coverFile) {
                 console.log('[Upload] Starting cover upload...');
                 const coverFilename = generateFilename(coverFile, 'cover');
@@ -231,31 +405,60 @@ const LibraryUploadPage = () => {
                     .getPublicUrl(coverFilename);
                 coverImageUrl = urlData?.publicUrl;
                 console.log('[Upload] Cover uploaded:', coverFilename);
+                if (isEditingBook && existingBook?.cover_image_url) {
+                    oldCoverToRemove = getCoverStoragePath(existingBook.cover_image_url);
+                }
+            } else if (isEditingBook && removeExistingCover && existingBook?.cover_image_url) {
+                oldCoverToRemove = getCoverStoragePath(existingBook.cover_image_url);
+                coverImageUrl = null;
             }
 
-            // Step 5: Insert book record into database
-            console.log('[Upload] Inserting database record...');
+            const payload = {
+                title: formData.title.trim(),
+                author: formData.author.trim() || null,
+                year: formData.year ? parseInt(formData.year) : null,
+                description: formData.description.trim() || null,
+                category: formData.category || null,
+                era: formData.era || null,
+                language: formData.language || null,
+                pages: hasPdfAttachment && formData.pages ? parseInt(formData.pages) : null,
+                pdf_filename: pdfFilename,
+                cover_image_url: coverImageUrl,
+                is_official: formData.is_official,
+            };
+
+            if (!isEditingBook) {
+                payload.epub_filename = epubFilename;
+            }
+
+            // Insert or update book record in database
+            console.log(isEditingBook ? '[Edit] Updating database record...' : '[Upload] Inserting database record...');
+            const dbPromise = isEditingBook
+                ? supabase.from('digital_library_books').update(payload).eq('id', editId)
+                : supabase.from('digital_library_books').insert(payload);
+
             const { error: dbError } = await withTimeout(
-                supabase.from('digital_library_books').insert({
-                    title: formData.title.trim(),
-                    author: formData.author.trim() || null,
-                    year: formData.year ? parseInt(formData.year) : null,
-                    description: formData.description.trim() || null,
-                    category: formData.category || null,
-                    era: formData.era || null,
-                    language: formData.language || null,
-                    pages: formData.pages ? parseInt(formData.pages) : null,
-                    epub_filename: epubFilename,
-                    pdf_filename: pdfFilename,
-                    cover_image_url: coverImageUrl,
-                    is_official: formData.is_official,
-                }),
+                dbPromise,
                 15000,
-                'Database insert'
+                isEditingBook ? 'Database update' : 'Database insert'
             );
 
-            if (dbError) throw new Error(`Database insert failed: ${dbError.message}`);
-            console.log('[Upload] Database record inserted successfully');
+            if (dbError) throw new Error(`Database ${isEditingBook ? 'update' : 'insert'} failed: ${dbError.message}`);
+            console.log(isEditingBook ? '[Edit] Database record updated successfully' : '[Upload] Database record inserted successfully');
+
+            const cleanupTasks = [];
+            if (oldPdfToRemove) cleanupTasks.push(supabase.storage.from('library').remove([oldPdfToRemove]));
+            if (oldCoverToRemove) cleanupTasks.push(supabase.storage.from('covers').remove([oldCoverToRemove]));
+            if (cleanupTasks.length > 0) {
+                const cleanupResults = await Promise.allSettled(cleanupTasks);
+                cleanupResults.forEach((result) => {
+                    if (result.status === 'rejected') {
+                        console.error('[Edit] Storage cleanup failed:', result.reason);
+                    } else if (result.value?.error) {
+                        console.error('[Edit] Storage cleanup failed:', result.value.error);
+                    }
+                });
+            }
 
             setSuccess(true);
             setTimeout(() => {
@@ -263,8 +466,8 @@ const LibraryUploadPage = () => {
             }, 1500);
 
         } catch (err) {
-            console.error('[Upload] Error:', err);
-            setError(err.message || 'Failed to upload book');
+            console.error(isEditingBook ? '[Edit] Error:' : '[Upload] Error:', err);
+            setError(err.message || (isEditingBook ? 'Failed to update book' : 'Failed to upload book'));
         } finally {
             setSaving(false);
         }
@@ -282,36 +485,47 @@ const LibraryUploadPage = () => {
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold">Upload to Digital Library</h1>
-                        <p className="text-gray-400 text-sm">Add a new book or audiobook to the library</p>
+                        <h1 className="text-2xl font-bold">{isEditingBook ? 'Edit Digital Book' : 'Upload to Digital Library'}</h1>
+                        <p className="text-gray-400 text-sm">
+                            {isEditingBook ? 'Update book information and optional download files' : 'Add a new book or audiobook to the library'}
+                        </p>
                     </div>
                 </div>
 
                 {/* Upload Type Toggle */}
-                <div className="flex bg-gray-900 rounded-lg p-1 mb-8 max-w-sm mx-auto md:mx-0">
-                    <button
-                        onClick={() => setUploadType('book')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${uploadType === 'book' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
-                    >
-                        Digital Book
-                    </button>
-                    <button
-                        onClick={() => setUploadType('audiobook')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${uploadType === 'audiobook' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
-                    >
-                        Audiobook
-                    </button>
-                </div>
+                {!editId && (
+                    <div className="flex bg-gray-900 rounded-lg p-1 mb-8 max-w-sm mx-auto md:mx-0">
+                        <button
+                            onClick={() => setUploadType('book')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${uploadType === 'book' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                        >
+                            Digital Book
+                        </button>
+                        <button
+                            onClick={() => setUploadType('audiobook')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${uploadType === 'audiobook' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                        >
+                            Audiobook
+                        </button>
+                    </div>
+                )}
 
                 {uploadType === 'audiobook' ? (
                     <AudiobookUploadForm editId={editId} />
                 ) : (
                     <>
+                        {loadingBook && (
+                            <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700/50 rounded-xl flex items-center gap-3 text-gray-300">
+                                <Loader2 className="animate-spin" size={18} />
+                                <span>Loading book data...</span>
+                            </div>
+                        )}
+
                         {/* Success Message */}
                         {success && (
                     <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-xl flex items-center gap-3">
                         <Check className="text-green-400" />
-                        <span className="text-green-300">Book uploaded successfully! Redirecting...</span>
+                        <span className="text-green-300">{isEditingBook ? 'Book updated successfully!' : 'Book uploaded successfully!'} Redirecting...</span>
                     </div>
                 )}
 
@@ -330,9 +544,11 @@ const LibraryUploadPage = () => {
                         <div className="bg-gray-900/50 rounded-xl p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <BookOpen className="text-red-500" size={20} />
-                                EPUB File *
+                                EPUB File {!isEditingBook && '*'}
                             </h3>
-                            <p className="text-xs text-gray-500 mb-3">Required — this is what readers see in the app</p>
+                            <p className="text-xs text-gray-500 mb-3">
+                                {isEditingBook ? 'Reader file is preserved when editing' : 'Required — this is what readers see in the app'}
+                            </p>
                             
                             {epubPreview ? (
                                 <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
@@ -343,7 +559,10 @@ const LibraryUploadPage = () => {
                                     <button
                                         type="button"
                                         onClick={removeEpub}
-                                        className="p-1 text-gray-400 hover:text-red-400"
+                                        disabled={isEditingBook}
+                                        className="p-1 text-gray-400 hover:text-red-400 disabled:opacity-40 disabled:hover:text-gray-400 disabled:cursor-not-allowed"
+                                        title={isEditingBook ? 'EPUB replacement is not supported in edit mode' : 'Remove EPUB'}
+                                        aria-label="Remove EPUB"
                                     >
                                         <X size={18} />
                                     </button>
@@ -383,6 +602,7 @@ const LibraryUploadPage = () => {
                                         type="button"
                                         onClick={removePdf}
                                         className="p-1 text-gray-400 hover:text-red-400"
+                                        aria-label="Remove PDF"
                                     >
                                         <X size={18} />
                                     </button>
@@ -422,6 +642,7 @@ const LibraryUploadPage = () => {
                                         type="button"
                                         onClick={removeCover}
                                         className="absolute top-2 right-2 p-1 bg-gray-900/80 rounded-full text-gray-400 hover:text-red-400"
+                                        aria-label="Remove cover"
                                     >
                                         <X size={18} />
                                     </button>
@@ -532,18 +753,20 @@ const LibraryUploadPage = () => {
                                 </select>
                             </div>
                             
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Pages</label>
-                                <input
-                                    type="number"
-                                    name="pages"
-                                    value={formData.pages}
-                                    onChange={handleInputChange}
-                                    min="1"
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                                    placeholder="e.g., 500"
-                                />
-                            </div>
+                            {hasPdfAttachment && (
+                                <div>
+                                    <label className="block text-sm text-gray-400 mb-1">PDF Pages</label>
+                                    <input
+                                        type="number"
+                                        name="pages"
+                                        value={formData.pages}
+                                        onChange={handleInputChange}
+                                        min="1"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                        placeholder="e.g., 500"
+                                    />
+                                </div>
+                            )}
                             
                             <div className="md:col-span-2 flex items-center gap-3">
                                 <label className="relative inline-flex items-center cursor-pointer">
@@ -577,24 +800,145 @@ const LibraryUploadPage = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={saving || !formData.title || !epubFile}
+                        disabled={saving || loadingBook || !formData.title || (!isEditingBook && !epubFile)}
                         className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                     >
                         {saving ? (
                             <>
                                 <Loader2 className="animate-spin" size={18} />
-                                Uploading...
+                                {isEditingBook ? 'Saving...' : 'Uploading...'}
                             </>
                         ) : (
                             <>
                                 <Save size={18} />
-                                Upload Book
+                                {isEditingBook ? 'Save Changes' : 'Upload Book'}
                             </>
                         )}
                     </button>
+                    {isEditingBook && (
+                        <button
+                            type="button"
+                            onClick={() => navigate('/digital-library')}
+                            className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-medium transition-colors text-gray-300"
+                        >
+                            Cancel
+                        </button>
+                    )}
                 </form>
                 </>
                 )}
+
+                {/* ===== Manage Existing Library Items ===== */}
+                <div className="mt-12 border-t border-gray-800 pt-8">
+                    <button
+                        onClick={() => setShowManage(prev => !prev)}
+                        className="flex items-center gap-3 text-lg font-semibold text-gray-300 hover:text-white transition-colors w-full"
+                    >
+                        <Trash2 size={20} className="text-red-500" />
+                        Manage Library
+                        {showManage ? <ChevronUp size={18} className="ml-auto" /> : <ChevronDown size={18} className="ml-auto" />}
+                    </button>
+
+                    {showManage && (
+                        <div className="mt-6 space-y-8">
+                            {loadingExisting && (
+                                <div className="flex items-center gap-3 text-gray-400 py-4">
+                                    <Loader2 className="animate-spin" size={18} />
+                                    Loading library items...
+                                </div>
+                            )}
+
+                            {/* Books */}
+                            {!loadingExisting && (
+                                <div>
+                                    <h3 className="text-md font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                        <BookOpen size={18} className="text-red-500" />
+                                        Digital Books ({existingBooks.length})
+                                    </h3>
+                                    {existingBooks.length === 0 ? (
+                                        <p className="text-sm text-gray-500 py-3">No books in library.</p>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {existingBooks.map(book => (
+                                                <div
+                                                    key={book.id}
+                                                    className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-lg px-4 py-3 group"
+                                                >
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-medium text-white truncate">{book.title}</p>
+                                                        <p className="text-xs text-gray-500 truncate">
+                                                            {book.author || 'Unknown author'}{book.year ? ` • ${book.year}` : ''}
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => navigate(`/admin/library/upload?edit=book&id=${book.id}`)}
+                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg text-gray-400 hover:text-blue-400 hover:bg-blue-900/20 transition-colors flex-shrink-0"
+                                                    >
+                                                        <Pencil size={16} />
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteBook(book)}
+                                                        disabled={deleting === book.id}
+                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors flex-shrink-0"
+                                                    >
+                                                        {deleting === book.id ? (
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                        ) : (
+                                                            <Trash2 size={16} />
+                                                        )}
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Audiobooks */}
+                            {!loadingExisting && (
+                                <div>
+                                    <h3 className="text-md font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                        <Headphones size={18} className="text-purple-400" />
+                                        Audiobooks ({existingAudiobooks.length})
+                                    </h3>
+                                    {existingAudiobooks.length === 0 ? (
+                                        <p className="text-sm text-gray-500 py-3">No audiobooks in library.</p>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {existingAudiobooks.map(ab => (
+                                                <div
+                                                    key={ab.id}
+                                                    className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-lg px-4 py-3 group"
+                                                >
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-medium text-white truncate">{ab.title}</p>
+                                                        <p className="text-xs text-gray-500 truncate">
+                                                            {ab.author || 'Unknown author'}
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDeleteAudiobook(ab)}
+                                                        disabled={deleting === ab.id}
+                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors flex-shrink-0"
+                                                    >
+                                                        {deleting === ab.id ? (
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                        ) : (
+                                                            <Trash2 size={16} />
+                                                        )}
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

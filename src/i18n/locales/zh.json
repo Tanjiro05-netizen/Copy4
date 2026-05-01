@@ -90,6 +90,7 @@
     "averageRating": "平均评分",
     "readingLists": "阅读列表",
     "createList": "创建列表",
+    "createAndAddToList": "创建并添加到列表",
     "listName": "列表名称",
     "booksInList": "本书",
     "removeFromList": "从列表移除",

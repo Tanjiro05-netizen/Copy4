@@ -39,6 +39,16 @@ const ReadingListPanel = ({ onClose, onNavigateToBook }) => {
         </button>
       </div>
 
+      <div style={{
+        padding: '10px 16px',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        color: 'rgba(255,255,255,0.36)',
+        fontSize: '11px',
+        lineHeight: 1.5,
+      }}>
+        {t('library.localListsNote')}
+      </div>
+
       {/* Create new list */}
       <div style={{
         display: 'flex', gap: '6px', padding: '12px 16px',

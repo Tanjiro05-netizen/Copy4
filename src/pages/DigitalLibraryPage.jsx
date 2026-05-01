@@ -28,7 +28,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     const isAudiobook = book.isAudiobook;
     
     // Get the public URL for the book's PDF file (if not audiobook)
-    const externalViewerUrl = !isAudiobook ? supabase
+    const externalViewerUrl = !isAudiobook && book.pdf_filename ? supabase
         .storage
         .from('library')
         .getPublicUrl(book.pdf_filename)?.data?.publicUrl : null;
@@ -57,12 +57,6 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
         }
     }, [book.cover_image_url, book.cover_url, isAudiobook]);
     
-    if (!isAudiobook && !externalViewerUrl) {
-        // Handle case where URL could not be generated
-        console.error('Could not generate PDF URL for:', book.title);
-        return null; 
-    }
-
     const handleImageError = () => {
         console.error('Image failed to load:', coverUrl);
         setImageError(true);
@@ -73,18 +67,19 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
             ${viewMode === 'grid' 
                 ? 'bg-black/30 rounded-lg p-4 border border-red-900/20 hover:border-red-900/40 transition-colors flex flex-col relative group'
                 : 'flex items-start space-x-4 bg-black/30 rounded-lg p-4 border border-red-900/20 relative group'}
-        `}>
+        `} data-testid={isAudiobook ? 'audiobook-card' : 'ebook-card'}>
             {isAdminUser && (
                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                    {isAudiobook && (
-                        <button
-                            onClick={(e) => { e.preventDefault(); navigate(`/admin/library/upload?edit=audiobook&id=${book.id}`); }}
-                            className="p-2 bg-black/60 text-gray-400 hover:text-blue-400 rounded-full"
-                            title="Edit audiobook"
-                        >
-                            <Pencil size={16} />
-                        </button>
-                    )}
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/admin/library/upload?edit=${isAudiobook ? 'audiobook' : 'book'}&id=${book.id}`);
+                        }}
+                        className="p-2 bg-black/60 text-gray-400 hover:text-blue-400 rounded-full"
+                        title={isAudiobook ? 'Edit audiobook' : 'Edit book'}
+                    >
+                        <Pencil size={16} />
+                    </button>
                     <button 
                         onClick={(e) => { e.preventDefault(); onDelete(book.id, isAudiobook); }}
                         className="p-2 bg-black/60 text-gray-400 hover:text-red-500 rounded-full"
@@ -152,16 +147,18 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                      ) : (
                          <Link 
                             to={`/book/${book.id}`}
+                            data-testid="ebook-read-link"
                             className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors text-sm font-bold"
                         >
                             Read Now
                         </Link>
                      )}
-                    {!isAudiobook && (
+                    {!isAudiobook && externalViewerUrl && (
                         <a 
                             href={externalViewerUrl} 
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-testid="ebook-external-pdf-link"
                             className="p-2 bg-black/50 text-gray-400 rounded hover:text-white"
                             title="Open in external viewer"
                         >

@@ -171,25 +171,6 @@ class KnowledgeApiService {
     }
   }
 
-  async getUserQuestions(userId) {
-    try {
-      const { data, error } = await supabase
-        .from('knowledge_questions')
-        .select(`
-          *,
-          topic:knowledge_topics(id, name, slug)
-        `)
-        .eq('author_id', userId)
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data || []
-    } catch (err) {
-      console.error('Error fetching user questions:', err)
-      return []
-    }
-  }
-
   // ============================================
   // ANSWERS
   // ============================================
@@ -277,25 +258,6 @@ class KnowledgeApiService {
     } catch (err) {
       console.error('Error accepting answer:', err)
       return { success: false, error: err }
-    }
-  }
-
-  async getUserAnswers(userId) {
-    try {
-      const { data, error } = await supabase
-        .from('knowledge_answers')
-        .select(`
-          *,
-          question:knowledge_questions(id, title)
-        `)
-        .eq('author_id', userId)
-        .order('created_at', { ascending: false })
-      
-      if (error) throw error
-      return data || []
-    } catch (err) {
-      console.error('Error fetching user answers:', err)
-      return []
     }
   }
 

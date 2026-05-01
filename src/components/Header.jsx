@@ -3,13 +3,11 @@ import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import * as s from './Header.css.ts';
 
 const Header = () => {
     const { user, logout, isAdmin, canManagePolitics } = useAuth();
-    const { theme } = useTheme();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
@@ -48,7 +46,7 @@ const Header = () => {
         { path: '/knowledge', label: t('nav.knowledgeQA'), icon: HelpCircle, guestAccessible: false, featureKey: 'knowledge' }
     ];
     
-    // Show all nav items to everyone (guests see "Coming Soon" for restricted ones)
+    // Show all nav items to everyone; guests see member-only gates for restricted ones.
     const navItems = allNavItems;
     
     return (
@@ -98,7 +96,7 @@ const Header = () => {
                                     key={item.path}
                                     to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                     className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : ''}`}
-                                    title={isRestricted ? 'Coming Soon' : ''}
+                                    title={isRestricted ? t('nav.membersOnly') : ''}
                                 >
                                     <span>{item.label}</span>
                                     {isRestricted && <span className={s.restrictedMark}>✦</span>}
@@ -231,7 +229,7 @@ const Header = () => {
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <span>{item.label}</span>
-                                        {isRestricted && <span className={s.mobileComingSoon}>{t('common.comingSoon')}</span>}
+                                        {isRestricted && <span className={s.mobileComingSoon}>{t('nav.membersOnly')}</span>}
                                     </Link>
                                 );
                             })}

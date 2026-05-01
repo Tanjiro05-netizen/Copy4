@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { Award, Check, X, Calendar, BookOpen, User } from 'lucide-react';
@@ -12,40 +12,39 @@ const CertificateVerifyPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    verifyCertificate();
-  }, [certificateNumber]);
-
-  const verifyCertificate = async () => {
+  const verifyCertificate = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('stem_certificates')
-        .select(`
-          *,
-          stem_courses(title, slug, stem_subjects(name, color)),
-          profiles:user_id(display_name, email)
-        `)
+        .select('id, user_id, course_id, certificate_number, issued_at, final_score')
         .eq('certificate_number', certificateNumber)
-        .single();
+        .limit(1);
 
       if (fetchError) {
-        if (fetchError.code === 'PGRST116') {
-          setError('Certificate not found');
-        } else {
-          throw fetchError;
-        }
-      } else {
-        setCertificate(data);
+        throw fetchError;
       }
+
+      const verifiedCertificate = data?.[0];
+      if (!verifiedCertificate) {
+        setCertificate(null);
+        setError('Certificate not found');
+        return;
+      }
+
+      setCertificate({ ...verifiedCertificate, profiles: null });
     } catch (err) {
       console.error('Error verifying certificate:', err);
       setError('Error verifying certificate');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [certificateNumber]);
+
+  useEffect(() => {
+    verifyCertificate();
+  }, [verifyCertificate]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {

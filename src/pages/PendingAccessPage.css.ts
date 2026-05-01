@@ -86,6 +86,33 @@ export const successMsg = style({
   padding: `${vars.space.md} 0`,
 });
 
+export const loginPrompt = style({
+  display: 'grid',
+  gap: vars.space.md,
+  color: vars.color.textSoft,
+  fontSize: '14px',
+  lineHeight: 1.6,
+});
+
+export const loginLink = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  padding: vars.space.sm,
+  background: vars.color.accent,
+  color: vars.color.text,
+  borderRadius: vars.radius.md,
+  fontWeight: 600,
+  fontSize: '14px',
+  transition: 'background 180ms ease',
+  selectors: {
+    '&:hover': {
+      background: vars.color.accentHover,
+    },
+  },
+});
+
 export const form = style({
   display: 'flex',
   flexDirection: 'column',

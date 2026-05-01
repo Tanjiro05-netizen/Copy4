@@ -51,6 +51,12 @@ module.exports = {
       ],
     },
     configure: (webpackConfig) => {
+      webpackConfig.plugins.forEach((plugin) => {
+        if (plugin?.constructor?.name === 'ESLintWebpackPlugin' && plugin.options) {
+          plugin.options.cache = false;
+        }
+      });
+
       const moduleScopePlugin = webpackConfig.resolve.plugins.find(
         (plugin) => plugin instanceof ModuleScopePlugin
       );

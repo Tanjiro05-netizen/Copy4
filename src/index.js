@@ -7,6 +7,41 @@ import './i18n';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import AppRouter from './AppRouter';
 
+const DEVELOPMENT_CACHE_NAMES = ['api-cache', 'google-fonts', 'images'];
+
+const isDevelopmentAppCache = (cacheName) =>
+    DEVELOPMENT_CACHE_NAMES.includes(cacheName) ||
+    cacheName.startsWith('workbox-precache') ||
+    cacheName.includes('precache');
+
+const clearDevelopmentServiceWorkersAndCaches = () => {
+    if (process.env.NODE_ENV === 'production') return;
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .getRegistrations()
+            .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+            .catch((error) => {
+                console.warn('Failed to unregister development service workers:', error);
+            });
+    }
+
+    if ('caches' in window) {
+        caches
+            .keys()
+            .then((cacheNames) =>
+                Promise.all(
+                    cacheNames
+                        .filter(isDevelopmentAppCache)
+                        .map((cacheName) => caches.delete(cacheName))
+                )
+            )
+            .catch((error) => {
+                console.warn('Failed to clear development caches:', error);
+            });
+    }
+};
+
 if (process.env.NODE_ENV === 'production') {
     console.log(
         '%cStop!',
@@ -23,6 +58,8 @@ window.addEventListener('error', (event) => {
     console.error('Global error:', event.error);
 });
 
+clearDevelopmentServiceWorkersAndCaches();
+
 // Wrap the root render in a try-catch to catch any initialization errors
 try {
     const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -35,4 +72,6 @@ try {
     console.error('Failed to render app:', error);
 }
 
-serviceWorkerRegistration.register();
+if (process.env.NODE_ENV === 'production') {
+    serviceWorkerRegistration.register();
+}

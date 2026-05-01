@@ -1,41 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Book, FileText, BookOpen,
     Newspaper, GraduationCap, HelpCircle, BookMarked, FlaskConical, LineChart,
     Users, Bot, Terminal, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useAuth } from './context/AuthContext';
-import { supabase } from './supabaseClient';
 import hammerAndSickleImage from './assets/hammerandsickle.png';
 import { Analytics } from '@vercel/analytics/react';
 import * as s from './App.css.ts';
 
 const App = () => {
     const { user } = useAuth();
-    const [stats, setStats] = useState(null);
-
-    useEffect(() => {
-        if (user) return;
-        const fetchStats = async () => {
-            try {
-                const [books, articles, glossary, members] = await Promise.all([
-                    supabase.from('digital_library_books').select('*', { count: 'exact', head: true }),
-                    supabase.from('theory_articles').select('*', { count: 'exact', head: true }),
-                    supabase.from('glossary').select('*', { count: 'exact', head: true }),
-                    supabase.from('profiles').select('*', { count: 'exact', head: true }),
-                ]);
-                setStats({
-                    books: books.count ?? 0,
-                    articles: articles.count ?? 0,
-                    glossary: glossary.count ?? 0,
-                    members: members.count ?? 0,
-                });
-            } catch (e) {
-                // silently fail — stats are non-critical
-            }
-        };
-        fetchStats();
-    }, [user]);
+    const stats = null;
 
     const primaryCta = user
         ? { to: '/theory', label: 'Explore Theory' }
@@ -43,7 +19,7 @@ const App = () => {
 
     const secondaryCta = user
         ? { to: '/submit', label: 'Submit Work' }
-        : { to: '/digital-library', label: 'Browse Library' };
+        : { to: '/login', label: 'Register to Unlock' };
 
     return (
         <div className={s.page}>
@@ -102,7 +78,7 @@ const App = () => {
                 </div>
             </section>
 
-            {/* Coming Soon — Members-Only Features (guest view only) */}
+            {/* Members-only features (guest view only) */}
             {!user && (
                 <section className={s.guestSection}>
                     <div className={s.guestInner}>
@@ -111,7 +87,7 @@ const App = () => {
                                 <Lock size={14} />
                                 Members Only
                             </span>
-                            <h2 className={s.guestTitle}>Coming Soon for Members</h2>
+                            <h2 className={s.guestTitle}>Members-Only Sections</h2>
                             <p className={s.guestSubtitle}>
                                 Register to unlock the full platform. Here's what awaits inside.
                             </p>
@@ -156,7 +132,7 @@ const App = () => {
                                             <div className={s.featureBody}>
                                                 <div className={s.featureHeader}>
                                                     <h3 className={s.featureTitle}>{feature.title}</h3>
-                                                    <span className={s.featureTag}>Coming Soon</span>
+                                                    <span className={s.featureTag}>Members Only</span>
                                                 </div>
                                                 <p className={s.featureDesc}>{feature.desc}</p>
                                             </div>

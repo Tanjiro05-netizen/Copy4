@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { 
@@ -15,7 +15,6 @@ import './LandingPage.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const { login, signUp } = useAuth();
     
     // Modal states
@@ -188,9 +187,9 @@ const LandingPage = () => {
     // Feature card data (cinematic view)
     const features = [
         { icon: GraduationCap, title: 'Study Page', desc: 'A structured learning environment featuring curated reading lists, study guides, and theoretical discussions to develop Marxist understanding systematically.' },
-        { icon: FlaskConical, title: 'Science Page', desc: 'As Lenin emphasized, communists should know everything mankind has to offer. Dedicated to ensuring Marxists are thoroughly educated in natural sciences and all fields of human knowledge.' },
+        { icon: FlaskConical, title: 'Science & Technology', desc: 'As Lenin emphasized, communists should know everything mankind has to offer. Dedicated to ensuring Marxists are thoroughly educated in natural sciences and all fields of human knowledge.' },
         { icon: BookOpen, title: 'Digital Library', desc: 'An expanding collection of essential Marxist texts, articles, and analyses, organized and annotated for accessibility and theoretical development.' },
-        { icon: BarChart3, title: 'Data Collection & Analysis', desc: 'Tools for tracking global economic developments and staying updated on the evolving conditions of capitalist production and class struggle.' },
+        { icon: BarChart3, title: 'Data & Visualizations', desc: 'Tools for tracking global economic developments and staying updated on the evolving conditions of capitalist production and class struggle.' },
         { icon: PenTool, title: "Writers' Collective", desc: 'A collaborative space for developing revolutionary thinkers and writers, emphasizing quality theoretical work that contributes to the Marxist tradition.' },
         { icon: MessageSquare, title: 'Discussion Forum', desc: 'Engage in theoretical discussions with fellow researchers, theorists, and activists building revolutionary understanding.' },
     ];
@@ -536,7 +535,7 @@ const LandingPage = () => {
                                         type="email"
                                         value={loginEmail}
                                         onChange={(e) => setLoginEmail(e.target.value)}
-                                        className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white"
+                                        className="w-full p-3"
                                         required
                                     />
                                 </div>
@@ -546,19 +545,29 @@ const LandingPage = () => {
                                         type="password"
                                         value={loginPassword}
                                         onChange={(e) => setLoginPassword(e.target.value)}
-                                        className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white"
+                                        className="w-full p-3"
                                         required
                                     />
                                 </div>
                                 {loginError && (
-                                    <p className="text-red-500 text-sm flex items-center gap-1">
-                                        <AlertTriangle size={14} /> {loginError}
-                                    </p>
+                                    <div className="flex flex-wrap items-center justify-between gap-2 text-red-500 text-sm">
+                                        <p className="flex min-w-0 flex-1 items-start gap-1">
+                                            <AlertTriangle className="mt-0.5 shrink-0" size={14} /> {loginError}
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={handleLogin}
+                                            disabled={loginLoading}
+                                            className="shrink-0 rounded border border-red-500/50 px-3 py-1 font-medium text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            Retry
+                                        </button>
+                                    </div>
                                 )}
                                 <button
                                     type="submit"
                                     disabled={loginLoading}
-                                    className="w-full p-3 btn-primary-red rounded-lg font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {loginLoading && <Loader2 className="animate-spin" size={20} />}
                                     {loginLoading ? 'Logging in...' : 'Log In'}
@@ -632,7 +641,8 @@ const LandingPage = () => {
                                                 type="text"
                                                 value={registerData.inviteCode}
                                                 onChange={(e) => setRegisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
-                                                className="w-full p-3 bg-black/50 border border-yellow-600/50 rounded-lg focus:border-yellow-500 focus:outline-none uppercase tracking-wider text-white"
+                                                className="w-full p-3 uppercase tracking-wider"
+                                                style={{ borderColor: 'rgba(202,138,4,0.5)' }}
                                                 placeholder="XXXX-XXXX"
                                                 required={hasInviteCode}
                                             />
@@ -645,7 +655,7 @@ const LandingPage = () => {
                                             type="text"
                                             value={registerData.username}
                                             onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
-                                            className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white"
+                                            className="w-full p-3"
                                             placeholder="Min. 3 characters"
                                             minLength={3}
                                             required
@@ -657,7 +667,7 @@ const LandingPage = () => {
                                             type="email"
                                             value={registerData.email}
                                             onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                                            className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white"
+                                            className="w-full p-3"
                                             required
                                         />
                                     </div>
@@ -667,7 +677,7 @@ const LandingPage = () => {
                                             type="password"
                                             value={registerData.password}
                                             onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
-                                            className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white"
+                                            className="w-full p-3"
                                             placeholder="Min. 6 characters"
                                             minLength={6}
                                             required
@@ -679,7 +689,7 @@ const LandingPage = () => {
                                             type="password"
                                             value={registerData.confirmPassword}
                                             onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
-                                            className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white"
+                                            className="w-full p-3"
                                             required
                                         />
                                     </div>
@@ -692,7 +702,7 @@ const LandingPage = () => {
                                             <textarea
                                                 value={registerData.betaReason}
                                                 onChange={(e) => setRegisterData({...registerData, betaReason: e.target.value})}
-                                                className="w-full p-3 bg-black/50 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white text-sm resize-none"
+                                                className="w-full p-3 text-sm resize-none"
                                                 rows={3}
                                                 maxLength={500}
                                                 placeholder="Tell us briefly about your interest in Marxist theory..."
@@ -709,7 +719,7 @@ const LandingPage = () => {
                                     <button
                                         type="submit"
                                         disabled={registerLoading}
-                                        className="w-full p-3 btn-primary-red rounded-lg font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                     >
                                         {registerLoading && <Loader2 className="animate-spin" size={20} />}
                                         {registerLoading ? 'Creating Account...' : hasInviteCode ? 'Register with Invite Code' : 'Join Waitlist'}
@@ -780,13 +790,13 @@ const LandingPage = () => {
                             <div className="mt-8 flex gap-4">
                                 <button
                                     onClick={() => { setShowAboutModal(false); setShowRegisterModal(true); }}
-                                    className="flex-1 p-3 btn-primary-red rounded-lg font-semibold text-white"
+                                    className="modal-btn-primary flex-1 p-3"
                                 >
                                     Register Now
                                 </button>
                                 <button
                                     onClick={() => setShowAboutModal(false)}
-                                    className="px-6 py-3 btn-secondary rounded-lg font-semibold text-white"
+                                    className="modal-btn-ghost px-6 py-3"
                                 >
                                     Close
                                 </button>
@@ -800,12 +810,12 @@ const LandingPage = () => {
 
     // ===== NORMAL VIEW (existing landing page) =====
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        <div className="min-h-screen text-white" style={{ background: '#090909' }}>
             {toggleButton}
             {/* Hero Section */}
             <div className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: `url(${MarxBg})` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/50 to-gray-900"></div>
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(9,9,9,0.5), #090909)' }}></div>
                 
                 <div className="relative max-w-6xl mx-auto px-4 py-20">
                     <div className="text-center mb-16">
@@ -820,21 +830,21 @@ const LandingPage = () => {
                         <div className="flex flex-wrap justify-center gap-4 mb-12">
                             <button
                                 onClick={handleGuestAccess}
-                                className="flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition"
+                                className="modal-btn-ghost flex items-center gap-2 px-6 py-3"
                             >
                                 <Eye size={20} />
                                 Browse as Guest
                             </button>
                             <button
                                 onClick={() => setShowLoginModal(true)}
-                                className="flex items-center gap-2 px-6 py-3 bg-red-800 hover:bg-red-900 rounded-lg font-semibold transition"
+                                className="modal-btn-primary flex items-center gap-2 px-6 py-3"
                             >
                                 <LogIn size={20} />
                                 Log In
                             </button>
                             <button
                                 onClick={() => setShowRegisterModal(true)}
-                                className="flex items-center gap-2 px-6 py-3 border-2 border-red-800 hover:bg-red-800/20 rounded-lg font-semibold transition"
+                                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition" style={{ border: '1px solid rgba(200,30,30,0.28)', background: 'transparent', color: '#fff' }}
                             >
                                 <UserPlus size={20} />
                                 Register
@@ -850,7 +860,7 @@ const LandingPage = () => {
 
                     {/* Introduction */}
                     <div className="max-w-4xl mx-auto mb-16">
-                        <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700">
+                        <div className="p-8 rounded-2xl" style={{ background: 'linear-gradient(180deg, #141414 0%, #0f0f0f 100%)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
                             <h2 className="text-2xl font-bold mb-4">The Vision</h2>
                             <p className="text-gray-300 mb-4">
                                 I am Leninistwarrior, as many know me across various platforms. Since November, I have been 
@@ -885,32 +895,32 @@ const LandingPage = () => {
                     <div className="mb-16">
                         <h2 className="text-3xl font-bold text-center mb-8">Platform Features</h2>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <GraduationCap className="text-red-800 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Study Page</h3>
                                 <p className="text-gray-400">A structured learning environment featuring curated reading lists, study guides, and theoretical discussions to develop Marxist understanding systematically.</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <FlaskConical className="text-red-800 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Science Page</h3>
+                                <h3 className="text-xl font-bold mb-2">Science & Technology</h3>
                                 <p className="text-gray-400">As Lenin emphasized, communists should know everything mankind has to offer. Dedicated to ensuring Marxists are thoroughly educated in natural sciences and all fields of human knowledge.</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <BookOpen className="text-red-800 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Digital Library</h3>
                                 <p className="text-gray-400">An expanding collection of essential Marxist texts, articles, and analyses, organized and annotated for accessibility and theoretical development.</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <BarChart3 className="text-red-800 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Data Collection & Analysis</h3>
+                                <h3 className="text-xl font-bold mb-2">Data & Visualizations</h3>
                                 <p className="text-gray-400">Tools for tracking global economic developments and staying updated on the evolving conditions of capitalist production and class struggle.</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <PenTool className="text-red-800 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Writers' Collective</h3>
                                 <p className="text-gray-400">A collaborative space for developing revolutionary thinkers and writers, emphasizing quality theoretical work that contributes to the Marxist tradition.</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-gray-700">
+                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <MessageSquare className="text-red-800 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Discussion Forum</h3>
                                 <p className="text-gray-400">Engage in theoretical discussions with fellow researchers, theorists, and activists building revolutionary understanding.</p>
@@ -919,7 +929,7 @@ const LandingPage = () => {
                     </div>
 
                     {/* Email Signup Section */}
-                    <div className="max-w-xl mx-auto bg-gray-800/70 backdrop-blur-sm p-8 rounded-2xl border border-gray-700">
+                    <div className="max-w-xl mx-auto p-8 rounded-2xl" style={{ background: 'linear-gradient(180deg, #141414 0%, #0f0f0f 100%)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
                         <div className="flex items-center gap-2 mb-4">
                             <Mail className="text-red-800" size={24} />
                             <h2 className="text-2xl font-bold">Stay Updated</h2>
@@ -941,7 +951,8 @@ const LandingPage = () => {
                                     value={waitlistEmail}
                                     onChange={(e) => setWaitlistEmail(e.target.value)}
                                     placeholder="Enter your email"
-                                    className="w-full p-3 bg-gray-900/70 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                    className="w-full p-3 rounded-xl focus:outline-none"
+                                    style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.06)', color: '#fff' }}
                                     required
                                 />
                                 <div className="flex flex-col gap-2 text-sm">
@@ -972,7 +983,7 @@ const LandingPage = () => {
                                 <button
                                     type="submit"
                                     disabled={waitlistLoading}
-                                    className="w-full p-3 bg-red-800 hover:bg-red-900 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {waitlistLoading ? <Loader2 className="animate-spin" size={20} /> : <ArrowRight size={20} />}
                                     {waitlistLoading ? 'Joining...' : 'Join Notification List'}
@@ -985,54 +996,64 @@ const LandingPage = () => {
 
             {/* Login Modal */}
             {showLoginModal && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700">
+                <div className="modal-backdrop">
+                    <div className="modal-panel">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold">Log In</h2>
-                            <button onClick={() => setShowLoginModal(false)} className="text-gray-400 hover:text-white">
+                            <h2 className="text-2xl font-bold text-white">Log In</h2>
+                            <button onClick={() => setShowLoginModal(false)} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
                         </div>
                         <form onSubmit={handleLogin} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-2">Email</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
                                 <input
                                     type="email"
                                     value={loginEmail}
                                     onChange={(e) => setLoginEmail(e.target.value)}
-                                    className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                    className="w-full p-3"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-2">Password</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
                                 <input
                                     type="password"
                                     value={loginPassword}
                                     onChange={(e) => setLoginPassword(e.target.value)}
-                                    className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                    className="w-full p-3"
                                     required
                                 />
                             </div>
                             {loginError && (
-                                <p className="text-red-600 text-sm flex items-center gap-1">
-                                    <AlertTriangle size={14} /> {loginError}
-                                </p>
+                                <div className="flex flex-wrap items-center justify-between gap-2 text-red-500 text-sm">
+                                    <p className="flex min-w-0 flex-1 items-start gap-1">
+                                        <AlertTriangle className="mt-0.5 shrink-0" size={14} /> {loginError}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={handleLogin}
+                                        disabled={loginLoading}
+                                        className="shrink-0 rounded border border-red-500/50 px-3 py-1 font-medium text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        Retry
+                                    </button>
+                                </div>
                             )}
                             <button
                                 type="submit"
                                 disabled={loginLoading}
-                                className="w-full p-3 bg-red-800 hover:bg-red-900 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                             >
                                 {loginLoading && <Loader2 className="animate-spin" size={20} />}
                                 {loginLoading ? 'Logging in...' : 'Log In'}
                             </button>
                         </form>
-                        <p className="text-center text-gray-400 mt-4 text-sm">
+                        <p className="text-center text-gray-500 mt-4 text-sm">
                             Don't have an account?{' '}
                             <button 
                                 onClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }}
-                                className="text-red-600 hover:underline"
+                                className="text-red-500 hover:underline"
                             >
                                 Register
                             </button>
@@ -1043,11 +1064,11 @@ const LandingPage = () => {
 
             {/* Register Modal */}
             {showRegisterModal && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-700 max-h-[90vh] overflow-y-auto">
+                <div className="modal-backdrop">
+                    <div className="modal-panel">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold">Create Account</h2>
-                            <button onClick={() => { setShowRegisterModal(false); setRegisterSuccess(false); }} className="text-gray-400 hover:text-white">
+                            <h2 className="text-2xl font-bold text-white">Create Account</h2>
+                            <button onClick={() => { setShowRegisterModal(false); setRegisterSuccess(false); }} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
                         </div>
@@ -1055,9 +1076,9 @@ const LandingPage = () => {
                         {registerSuccess ? (
                             <div className="text-center py-8">
                                 <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
-                                <h3 className="text-xl font-semibold mb-2">Check Your Email</h3>
+                                <h3 className="text-xl font-semibold mb-2 text-white">Check Your Email</h3>
                                 <p className="text-gray-300 mb-4">
-                                    We've sent a confirmation link to <span className="text-red-600">{registerData.email}</span>
+                                    We've sent a confirmation link to <span className="text-red-500">{registerData.email}</span>
                                 </p>
                                 {hasInviteCode ? (
                                     <p className="text-green-400 text-sm">
@@ -1072,7 +1093,7 @@ const LandingPage = () => {
                             </div>
                         ) : (
                             <form onSubmit={handleRegister} className="space-y-4">
-                                <div className="bg-gray-700/50 p-4 rounded-lg mb-4">
+                                <div className="bg-white/5 p-4 rounded-lg mb-4 border border-gray-700/50">
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
                                             type="checkbox"
@@ -1080,23 +1101,24 @@ const LandingPage = () => {
                                             onChange={(e) => setHasInviteCode(e.target.checked)}
                                             className="accent-red-800"
                                         />
-                                        <span className="font-medium">I have an invite code</span>
+                                        <span className="font-medium text-white">I have an invite code</span>
                                     </label>
-                                    <p className="text-gray-400 text-xs mt-1">
+                                    <p className="text-gray-500 text-xs mt-1">
                                         Invite codes grant immediate full access (limited to 50 spots)
                                     </p>
                                 </div>
 
                                 {hasInviteCode && (
                                     <div>
-                                        <label className="block text-sm font-medium mb-2 flex items-center gap-1">
+                                        <label className="block text-sm font-medium mb-2 text-gray-300 flex items-center gap-1">
                                             <Sparkles size={14} className="text-yellow-500" /> Invite Code
                                         </label>
                                         <input
                                             type="text"
                                             value={registerData.inviteCode}
                                             onChange={(e) => setRegisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
-                                            className="w-full p-3 bg-gray-900 border border-yellow-600/50 rounded-lg focus:border-yellow-500 focus:outline-none uppercase tracking-wider"
+                                            className="w-full p-3 uppercase tracking-wider"
+                                            style={{ borderColor: 'rgba(202,138,4,0.5)' }}
                                             placeholder="XXXX-XXXX"
                                             required={hasInviteCode}
                                         />
@@ -1104,59 +1126,59 @@ const LandingPage = () => {
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Username</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
                                     <input
                                         type="text"
                                         value={registerData.username}
                                         onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
-                                        className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                        className="w-full p-3"
                                         placeholder="Min. 3 characters"
                                         minLength={3}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Email</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
                                     <input
                                         type="email"
                                         value={registerData.email}
                                         onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                                        className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                        className="w-full p-3"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Password</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
                                     <input
                                         type="password"
                                         value={registerData.password}
                                         onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
-                                        className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                        className="w-full p-3"
                                         placeholder="Min. 6 characters"
                                         minLength={6}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2">Confirm Password</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-300">Confirm Password</label>
                                     <input
                                         type="password"
                                         value={registerData.confirmPassword}
                                         onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
-                                        className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none"
+                                        className="w-full p-3"
                                         required
                                     />
                                 </div>
 
                                 {!hasInviteCode && (
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">
+                                        <label className="block text-sm font-medium mb-2 text-gray-300">
                                             Why should you be a beta user? <span className="text-gray-500 font-normal">(optional)</span>
                                         </label>
                                         <textarea
                                             value={registerData.betaReason}
                                             onChange={(e) => setRegisterData({...registerData, betaReason: e.target.value})}
-                                            className="w-full p-3 bg-gray-900 border border-gray-600 rounded-lg focus:border-red-800 focus:outline-none text-sm resize-none"
+                                            className="w-full p-3 text-sm resize-none"
                                             rows={3}
                                             maxLength={500}
                                             placeholder="Tell us briefly about your interest in Marxist theory..."
@@ -1165,7 +1187,7 @@ const LandingPage = () => {
                                 )}
                                 
                                 {registerError && (
-                                    <p className="text-red-600 text-sm flex items-center gap-1">
+                                    <p className="text-red-500 text-sm flex items-center gap-1">
                                         <AlertTriangle size={14} /> {registerError}
                                     </p>
                                 )}
@@ -1173,25 +1195,25 @@ const LandingPage = () => {
                                 <button
                                     type="submit"
                                     disabled={registerLoading}
-                                    className="w-full p-3 bg-red-800 hover:bg-red-900 rounded-lg font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {registerLoading && <Loader2 className="animate-spin" size={20} />}
                                     {registerLoading ? 'Creating Account...' : hasInviteCode ? 'Register with Invite Code' : 'Join Waitlist'}
                                 </button>
                                 
                                 {!hasInviteCode && (
-                                    <p className="text-gray-400 text-xs text-center">
+                                    <p className="text-gray-500 text-xs text-center">
                                         Without an invite code, you'll be added to our waitlist and notified when spots open.
                                     </p>
                                 )}
                             </form>
                         )}
                         
-                        <p className="text-center text-gray-400 mt-4 text-sm">
+                        <p className="text-center text-gray-500 mt-4 text-sm">
                             Already have an account?{' '}
                             <button 
                                 onClick={() => { setShowRegisterModal(false); setShowLoginModal(true); }}
-                                className="text-red-600 hover:underline"
+                                className="text-red-500 hover:underline"
                             >
                                 Log In
                             </button>
@@ -1202,24 +1224,24 @@ const LandingPage = () => {
 
             {/* About Modal */}
             {showAboutModal && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                    <div className="bg-gray-800 rounded-xl p-6 w-full max-w-2xl border border-gray-700 max-h-[90vh] overflow-y-auto">
+                <div className="modal-backdrop">
+                    <div className="modal-panel modal-panel-wide">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold">About Marxist.info</h2>
-                            <button onClick={() => setShowAboutModal(false)} className="text-gray-400 hover:text-white">
+                            <h2 className="text-2xl font-bold text-white">About Marxist.info</h2>
+                            <button onClick={() => setShowAboutModal(false)} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
                         </div>
                         
-                        <div className="prose prose-invert max-w-none">
-                            <p className="text-gray-300 mb-4">
+                        <div className="max-w-none">
+                            <p className="text-gray-300 mb-5 leading-relaxed">
                                 Marxist.info is a digital platform dedicated to advancing Marxist theory and research in the 21st century. 
                                 Our mission is to provide a comprehensive resource for scholars, students, and activists interested in 
                                 understanding and applying Marxist analysis to contemporary issues.
                             </p>
                             
                             <h3 className="text-xl font-semibold text-white mt-6 mb-3">What We Offer</h3>
-                            <ul className="text-gray-300 space-y-2 list-disc list-inside">
+                            <ul className="text-gray-300 space-y-2 list-disc list-inside mb-4">
                                 <li>A curated digital library of classic and contemporary Marxist texts</li>
                                 <li>Interactive timelines of historical events and theoretical developments</li>
                                 <li>A glossary of key concepts and terminology</li>
@@ -1228,14 +1250,14 @@ const LandingPage = () => {
                             </ul>
                             
                             <h3 className="text-xl font-semibold text-white mt-6 mb-3">Early Access</h3>
-                            <p className="text-gray-300 mb-4">
+                            <p className="text-gray-300 mb-4 leading-relaxed">
                                 We're currently in early access with limited spots available. Users with invite codes get 
                                 immediate full access, while others can join our waitlist to be notified when more spots 
                                 open up or when we launch public beta.
                             </p>
                             
                             <h3 className="text-xl font-semibold text-white mt-6 mb-3">Guest Access</h3>
-                            <p className="text-gray-300">
+                            <p className="text-gray-300 leading-relaxed">
                                 You can browse the Home page and Digital Library as a guest without an account.
                                 Full features like Theory, Study tools, Forum, and Profile require registration with an invite code.
                             </p>
@@ -1244,13 +1266,13 @@ const LandingPage = () => {
                         <div className="mt-8 flex gap-4">
                             <button
                                 onClick={() => { setShowAboutModal(false); setShowRegisterModal(true); }}
-                                className="flex-1 p-3 bg-red-800 hover:bg-red-900 rounded-lg font-semibold transition"
+                                className="modal-btn-primary flex-1 p-3"
                             >
                                 Register Now
                             </button>
                             <button
                                 onClick={() => setShowAboutModal(false)}
-                                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition"
+                                className="modal-btn-ghost px-6 py-3"
                             >
                                 Close
                             </button>
@@ -1260,8 +1282,8 @@ const LandingPage = () => {
             )}
 
             {/* Footer */}
-            <footer className="bg-gray-900 border-t border-gray-800 py-8">
-                <div className="max-w-6xl mx-auto px-4 text-center text-gray-500 text-sm">
+            <footer className="py-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="max-w-6xl mx-auto px-4 text-center text-sm" style={{ color: 'rgba(255,255,255,0.28)' }}>
                     <p>© 2026 Marxist.info — Advancing Revolutionary Theory</p>
                 </div>
             </footer>

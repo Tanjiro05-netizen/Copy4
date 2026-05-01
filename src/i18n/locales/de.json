@@ -90,6 +90,7 @@
     "averageRating": "Durchschnittsbewertung",
     "readingLists": "Leselisten",
     "createList": "Liste erstellen",
+    "createAndAddToList": "Liste erstellen und hinzufugen",
     "listName": "Listenname",
     "booksInList": "Bucher",
     "removeFromList": "Von Liste entfernen",

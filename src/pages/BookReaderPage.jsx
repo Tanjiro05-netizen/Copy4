@@ -100,10 +100,12 @@ const BookReaderPage = () => {
         if (!isAuthed) return;
         try {
             if (isBookmarked) {
-                await supabase.from('user_book_bookmarks').delete().eq('user_id', user.id).eq('book_id', bookId);
+                const { error } = await supabase.from('user_book_bookmarks').delete().eq('user_id', user.id).eq('book_id', bookId);
+                if (error) throw error;
                 setIsBookmarked(false);
             } else {
-                await supabase.from('user_book_bookmarks').insert({ user_id: user.id, book_id: bookId });
+                const { error } = await supabase.from('user_book_bookmarks').insert({ user_id: user.id, book_id: bookId });
+                if (error) throw error;
                 setIsBookmarked(true);
             }
         } catch (err) {
@@ -156,7 +158,7 @@ const BookReaderPage = () => {
         return (
             <div className={s.page}>
                 <div className={s.errorWrap}>
-                    <div className={s.errorBox}>
+                    <div className={s.errorBox} data-testid="book-reader-error">
                         <AlertCircle size={18} />
                         <span>{error}</span>
                     </div>
@@ -266,7 +268,7 @@ const BookReaderPage = () => {
                     </aside>
 
                     {/* ── Reader ── */}
-                    <div className={s.readerSection}>
+                    <div className={s.readerSection} data-testid="book-reader">
                         <div className={s.readerHeader}>
                             <div>
                                 <p className={s.readerTitle}>{book.title}</p>
@@ -275,17 +277,18 @@ const BookReaderPage = () => {
                         </div>
 
                         {epubUrl ? (
-                            <div className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', borderRadius: 0 } : undefined}>
+                            <div data-testid="book-reader-epub" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', borderRadius: 0 } : undefined}>
                                 <EpubReader
                                     url={epubUrl}
                                     title={book.title}
                                     onProgressChange={handleAutoProgress}
                                     onToggleFullscreen={() => setIsFullscreen(f => !f)}
                                     isFullscreen={isFullscreen}
+                                    fallbackUrl={pdfDownloadUrl}
                                 />
                             </div>
                         ) : pdfDownloadUrl ? (
-                            <div className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', borderRadius: 0 } : undefined}>
+                            <div data-testid="book-reader-pdf" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', borderRadius: 0 } : undefined}>
                                 <iframe
                                     src={pdfDownloadUrl}
                                     className={s.iframe}
@@ -294,7 +297,7 @@ const BookReaderPage = () => {
                                 />
                             </div>
                         ) : (
-                            <div className={s.noPdfWrap}>
+                            <div className={s.noPdfWrap} data-testid="book-reader-no-file">
                                 <div className={s.noPdfBox}>
                                     <AlertCircle size={16} />
                                     <span>{t('book.noFile')}</span>
@@ -303,7 +306,7 @@ const BookReaderPage = () => {
                         )}
 
                         {/* Book Reviews */}
-                        <BookReviewSection bookId={bookId} />
+                        <BookReviewSection bookId={bookId} canWrite={isAuthed} />
                     </div>
                 </div>
             </div>
