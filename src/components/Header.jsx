@@ -52,7 +52,7 @@ const Header = () => {
     return (
         <header className={s.header}>
             <div className={s.headerInner}>
-                <Link to="/" className={s.logo}>
+                <Link to="/home" className={s.logo}>
                     Marxist.info
                 </Link>
                 

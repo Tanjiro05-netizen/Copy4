@@ -10,7 +10,6 @@ import {
     Layers
 } from 'lucide-react';
 import MarxBg from '../assets/Marx.jpg';
-import KoFiButton from '../components/KoFiButton';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -886,7 +885,6 @@ const LandingPage = () => {
                                     <ExternalLink size={16} />
                                     @Leninistwarrior on Twitter
                                 </a>
-                                <KoFiButton text="Support me on Ko-fi" color="#a61b1b" id="Z8Z31TQLEW" />
                             </div>
                         </div>
                     </div>
