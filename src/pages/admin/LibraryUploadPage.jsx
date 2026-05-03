@@ -88,6 +88,7 @@ const LibraryUploadPage = () => {
     const [coverPreview, setCoverPreview] = useState(null);
     
     const [saving, setSaving] = useState(false);
+    const [uploadStep, setUploadStep] = useState('');
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const [loadingBook, setLoadingBook] = useState(false);
@@ -323,6 +324,43 @@ const LibraryUploadPage = () => {
         return `${prefix}-${sanitizedTitle}-${timestamp}.${extension}`;
     };
 
+    // Get auth token directly from localStorage — avoids hanging supabase.auth calls
+    const getStoredToken = () => {
+        try {
+            const storageKey = `sb-yghsprwrzgfegvfbjmkq-auth-token`;
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            return parsed?.access_token || null;
+        } catch {
+            return null;
+        }
+    };
+
+    // Direct fetch upload — bypasses the Supabase JS client entirely
+    const directUpload = async (bucket, filename, file) => {
+        const token = getStoredToken();
+        if (!token) throw new Error('Not authenticated — please log out and log back in');
+
+        const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+        const url = `${supabaseUrl}/storage/v1/object/${bucket}/${encodeURIComponent(filename)}`;
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'x-upsert': 'false',
+            },
+            body: file,
+        });
+
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.message || body.error || `Upload failed (${res.status})`);
+        }
+        return { error: null };
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -338,24 +376,38 @@ const LibraryUploadPage = () => {
 
         setSaving(true);
         setError(null);
+        setUploadStep('');
 
         const withTimeout = (promise, ms, label) =>
             Promise.race([
                 promise,
                 new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s — check your Supabase connection and auth session`)), ms)
+                    setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s — try refreshing the page and re-uploading`)), ms)
                 ),
             ]);
 
+        const timeoutForFile = (file, base = 60000) => {
+            if (!file) return base;
+            const sizeMB = file.size / (1024 * 1024);
+            return Math.max(base, sizeMB * 5000);
+        };
+
         try {
+            // Quick token check — no Supabase client calls
+            setUploadStep('Preparing upload...');
+            if (!getStoredToken()) {
+                throw new Error('Not authenticated — please log out and log back in');
+            }
             // Upload EPUB to library bucket for new books. Existing books keep their reader file.
             let epubFilename = existingBook?.epub_filename || null;
             if (!isEditingBook) {
-                console.log('[Upload] Starting EPUB upload...');
+                const sizeMB = (epubFile.size / (1024 * 1024)).toFixed(1);
+                setUploadStep(`Uploading EPUB (${sizeMB} MB)...`);
+                console.log('[Upload] Starting EPUB upload...', sizeMB, 'MB');
                 epubFilename = generateFilename(epubFile, 'epub');
                 const { error: epubError } = await withTimeout(
-                    supabase.storage.from('library').upload(epubFilename, epubFile, { cacheControl: '3600', upsert: false }),
-                    60000,
+                    directUpload('library', epubFilename, epubFile),
+                    timeoutForFile(epubFile, 120000),
                     'EPUB upload'
                 );
 
@@ -367,11 +419,13 @@ const LibraryUploadPage = () => {
             let pdfFilename = existingBook?.pdf_filename || null;
             let oldPdfToRemove = null;
             if (pdfFile) {
-                console.log('[Upload] Starting PDF upload...');
+                const pdfSizeMB = (pdfFile.size / (1024 * 1024)).toFixed(1);
+                setUploadStep(`Uploading PDF (${pdfSizeMB} MB)...`);
+                console.log('[Upload] Starting PDF upload...', pdfSizeMB, 'MB');
                 pdfFilename = generateFilename(pdfFile, 'pdf');
                 const { error: pdfError } = await withTimeout(
-                    supabase.storage.from('library').upload(pdfFilename, pdfFile, { cacheControl: '3600', upsert: false }),
-                    60000,
+                    directUpload('library', pdfFilename, pdfFile),
+                    timeoutForFile(pdfFile, 120000),
                     'PDF upload'
                 );
                 
@@ -389,21 +443,19 @@ const LibraryUploadPage = () => {
             let coverImageUrl = existingBook?.cover_image_url || null;
             let oldCoverToRemove = null;
             if (coverFile) {
+                setUploadStep('Uploading cover image...');
                 console.log('[Upload] Starting cover upload...');
                 const coverFilename = generateFilename(coverFile, 'cover');
                 const { error: coverError } = await withTimeout(
-                    supabase.storage.from('covers').upload(coverFilename, coverFile, { cacheControl: '3600', upsert: false }),
-                    30000,
+                    directUpload('covers', coverFilename, coverFile),
+                    60000,
                     'Cover upload'
                 );
                 
                 if (coverError) throw new Error(`Cover upload failed: ${coverError.message}`);
                 
-                // Get public URL for cover
-                const { data: urlData } = supabase.storage
-                    .from('covers')
-                    .getPublicUrl(coverFilename);
-                coverImageUrl = urlData?.publicUrl;
+                // Build public URL for cover directly
+                coverImageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/covers/${encodeURIComponent(coverFilename)}`;
                 console.log('[Upload] Cover uploaded:', coverFilename);
                 if (isEditingBook && existingBook?.cover_image_url) {
                     oldCoverToRemove = getCoverStoragePath(existingBook.cover_image_url);
@@ -431,33 +483,52 @@ const LibraryUploadPage = () => {
                 payload.epub_filename = epubFilename;
             }
 
-            // Insert or update book record in database
+            // Insert or update book record via direct REST — bypasses Supabase JS client
+            setUploadStep('Saving to database...');
             console.log(isEditingBook ? '[Edit] Updating database record...' : '[Upload] Inserting database record...');
-            const dbPromise = isEditingBook
-                ? supabase.from('digital_library_books').update(payload).eq('id', editId)
-                : supabase.from('digital_library_books').insert(payload);
 
-            const { error: dbError } = await withTimeout(
-                dbPromise,
+            const token = getStoredToken();
+            const anonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+            const restBase = `${process.env.REACT_APP_SUPABASE_URL}/rest/v1/digital_library_books`;
+
+            const dbUrl = isEditingBook ? `${restBase}?id=eq.${editId}` : restBase;
+            const dbRes = await withTimeout(
+                fetch(dbUrl, {
+                    method: isEditingBook ? 'PATCH' : 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'apikey': anonKey,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal',
+                    },
+                    body: JSON.stringify(payload),
+                }),
                 15000,
                 isEditingBook ? 'Database update' : 'Database insert'
             );
 
-            if (dbError) throw new Error(`Database ${isEditingBook ? 'update' : 'insert'} failed: ${dbError.message}`);
+            if (!dbRes.ok) {
+                const dbBody = await dbRes.json().catch(() => ({}));
+                throw new Error(`Database ${isEditingBook ? 'update' : 'insert'} failed: ${dbBody.message || dbBody.error || dbRes.status}`);
+            }
             console.log(isEditingBook ? '[Edit] Database record updated successfully' : '[Upload] Database record inserted successfully');
 
-            const cleanupTasks = [];
-            if (oldPdfToRemove) cleanupTasks.push(supabase.storage.from('library').remove([oldPdfToRemove]));
-            if (oldCoverToRemove) cleanupTasks.push(supabase.storage.from('covers').remove([oldCoverToRemove]));
-            if (cleanupTasks.length > 0) {
-                const cleanupResults = await Promise.allSettled(cleanupTasks);
-                cleanupResults.forEach((result) => {
-                    if (result.status === 'rejected') {
-                        console.error('[Edit] Storage cleanup failed:', result.reason);
-                    } else if (result.value?.error) {
-                        console.error('[Edit] Storage cleanup failed:', result.value.error);
+            // Best-effort cleanup of old files (fire and forget)
+            if (oldPdfToRemove || oldCoverToRemove) {
+                try {
+                    if (oldPdfToRemove) {
+                        fetch(`${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/library/${encodeURIComponent(oldPdfToRemove)}`, {
+                            method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` },
+                        }).catch(() => {});
                     }
-                });
+                    if (oldCoverToRemove) {
+                        fetch(`${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/covers/${encodeURIComponent(oldCoverToRemove)}`, {
+                            method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` },
+                        }).catch(() => {});
+                    }
+                } catch (e) {
+                    console.warn('[Edit] Storage cleanup failed:', e);
+                }
             }
 
             setSuccess(true);
@@ -470,6 +541,7 @@ const LibraryUploadPage = () => {
             setError(err.message || (isEditingBook ? 'Failed to update book' : 'Failed to upload book'));
         } finally {
             setSaving(false);
+            setUploadStep('');
         }
     };
 
@@ -806,7 +878,7 @@ const LibraryUploadPage = () => {
                         {saving ? (
                             <>
                                 <Loader2 className="animate-spin" size={18} />
-                                {isEditingBook ? 'Saving...' : 'Uploading...'}
+                                {uploadStep || (isEditingBook ? 'Saving...' : 'Uploading...')}
                             </>
                         ) : (
                             <>
