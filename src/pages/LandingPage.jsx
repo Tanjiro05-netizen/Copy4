@@ -282,6 +282,7 @@ const LandingPage = () => {
                 }
             } else {
                 setWaitlistSuccess(true);
+                setRegisterSuccess(true);
             }
         } catch (err) {
             setWaitlistError('Failed to join. Please try again.');
@@ -591,7 +592,7 @@ const LandingPage = () => {
                         <div className="modal-panel">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-2xl font-bold text-white">Create Account</h2>
-                                <button onClick={() => { setShowRegisterModal(false); setRegisterSuccess(false); }} className="text-gray-400 hover:text-white transition">
+                                <button onClick={() => { setShowRegisterModal(false); setRegisterSuccess(false); setWaitlistError(''); setRegisterError(''); }} className="text-gray-400 hover:text-white transition">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -599,136 +600,137 @@ const LandingPage = () => {
                             {registerSuccess ? (
                                 <div className="text-center py-8">
                                     <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
-                                    <h3 className="text-xl font-semibold mb-2 text-white">Check Your Email</h3>
-                                    <p className="text-gray-300 mb-4">
-                                        We've sent a confirmation link to <span className="text-red-500">{registerData.email}</span>
-                                    </p>
                                     {hasInviteCode ? (
-                                        <p className="text-green-400 text-sm">
-                                            <Sparkles size={16} className="inline mr-1" />
-                                            Your invite code will be applied after email confirmation.
-                                        </p>
+                                        <>
+                                            <h3 className="text-xl font-semibold mb-2 text-white">Check Your Email</h3>
+                                            <p className="text-gray-300 mb-4">
+                                                We've sent a confirmation link to <span className="text-red-500">{registerData.email}</span>
+                                            </p>
+                                            <p className="text-green-400 text-sm">
+                                                <Sparkles size={16} className="inline mr-1" />
+                                                Your invite code will be applied after email confirmation.
+                                            </p>
+                                        </>
                                     ) : (
-                                        <p className="text-gray-400 text-sm">
-                                            You'll be added to the waitlist. We'll notify you when spots open up.
-                                        </p>
+                                        <>
+                                            <h3 className="text-xl font-semibold mb-2 text-white">You're on the list</h3>
+                                            <p className="text-gray-300">
+                                                We'll notify <span className="text-red-500">{registerData.email}</span> when access opens up.
+                                            </p>
+                                        </>
                                     )}
                                 </div>
                             ) : (
-                                <form onSubmit={handleRegister} className="space-y-4">
+                                <form onSubmit={hasInviteCode ? handleRegister : handleWaitlistSignup} className="space-y-4">
                                     <div className="bg-white/5 p-4 rounded-lg mb-4 border border-gray-700/50">
                                         <label className="flex items-center gap-2 cursor-pointer">
                                             <input
                                                 type="checkbox"
                                                 checked={hasInviteCode}
-                                                onChange={(e) => setHasInviteCode(e.target.checked)}
+                                                onChange={(e) => { setHasInviteCode(e.target.checked); setRegisterError(''); }}
                                                 className="accent-red-800"
                                             />
                                             <span className="font-medium text-white">I have an invite code</span>
                                         </label>
                                         <p className="text-gray-500 text-xs mt-1">
-                                            Invite codes grant immediate full access (limited to 50 spots)
+                                            Invite codes grant immediate full access
                                         </p>
                                     </div>
 
-                                    {hasInviteCode && (
-                                        <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300 flex items-center gap-1">
-                                                <Sparkles size={14} className="text-yellow-500" /> Invite Code
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={registerData.inviteCode}
-                                                onChange={(e) => setRegisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
-                                                className="w-full p-3 uppercase tracking-wider"
-                                                style={{ borderColor: 'rgba(202,138,4,0.5)' }}
-                                                placeholder="XXXX-XXXX"
-                                                required={hasInviteCode}
-                                            />
-                                        </div>
+                                    {hasInviteCode ? (
+                                        <>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300 flex items-center gap-1">
+                                                    <Sparkles size={14} className="text-yellow-500" /> Invite Code
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={registerData.inviteCode}
+                                                    onChange={(e) => setRegisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
+                                                    className="w-full p-3 uppercase tracking-wider"
+                                                    style={{ borderColor: 'rgba(202,138,4,0.5)' }}
+                                                    placeholder="XXXX-XXXX"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
+                                                <input
+                                                    type="text"
+                                                    value={registerData.username}
+                                                    onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
+                                                    className="w-full p-3"
+                                                    placeholder="Min. 3 characters"
+                                                    minLength={3}
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={registerData.email}
+                                                    onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                                                    className="w-full p-3"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
+                                                <input
+                                                    type="password"
+                                                    value={registerData.password}
+                                                    onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                                                    className="w-full p-3"
+                                                    placeholder="Min. 6 characters"
+                                                    minLength={6}
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">Confirm Password</label>
+                                                <input
+                                                    type="password"
+                                                    value={registerData.confirmPassword}
+                                                    onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                                                    className="w-full p-3"
+                                                    required
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={waitlistEmail}
+                                                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                                                    className="w-full p-3"
+                                                    placeholder="your@email.com"
+                                                    required
+                                                />
+                                            </div>
+                                            <p className="text-gray-500 text-xs">
+                                                You'll be notified when access opens up. No account is created.
+                                            </p>
+                                        </>
                                     )}
 
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
-                                        <input
-                                            type="text"
-                                            value={registerData.username}
-                                            onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
-                                            className="w-full p-3"
-                                            placeholder="Min. 3 characters"
-                                            minLength={3}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
-                                        <input
-                                            type="email"
-                                            value={registerData.email}
-                                            onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
-                                            className="w-full p-3"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
-                                        <input
-                                            type="password"
-                                            value={registerData.password}
-                                            onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
-                                            className="w-full p-3"
-                                            placeholder="Min. 6 characters"
-                                            minLength={6}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2 text-gray-300">Confirm Password</label>
-                                        <input
-                                            type="password"
-                                            value={registerData.confirmPassword}
-                                            onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
-                                            className="w-full p-3"
-                                            required
-                                        />
-                                    </div>
-
-                                    {!hasInviteCode && (
-                                        <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">
-                                                Why should you be a beta user? <span className="text-gray-500 font-normal">(optional)</span>
-                                            </label>
-                                            <textarea
-                                                value={registerData.betaReason}
-                                                onChange={(e) => setRegisterData({...registerData, betaReason: e.target.value})}
-                                                className="w-full p-3 text-sm resize-none"
-                                                rows={3}
-                                                maxLength={500}
-                                                placeholder="Tell us briefly about your interest in Marxist theory..."
-                                            />
-                                        </div>
-                                    )}
-                                    
-                                    {registerError && (
+                                    {(registerError || waitlistError) && (
                                         <p className="text-red-500 text-sm flex items-center gap-1">
-                                            <AlertTriangle size={14} /> {registerError}
+                                            <AlertTriangle size={14} /> {registerError || waitlistError}
                                         </p>
                                     )}
-                                    
+
                                     <button
                                         type="submit"
-                                        disabled={registerLoading}
+                                        disabled={registerLoading || waitlistLoading}
                                         className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                     >
-                                        {registerLoading && <Loader2 className="animate-spin" size={20} />}
-                                        {registerLoading ? 'Creating Account...' : hasInviteCode ? 'Register with Invite Code' : 'Join Waitlist'}
+                                        {(registerLoading || waitlistLoading) && <Loader2 className="animate-spin" size={20} />}
+                                        {registerLoading ? 'Creating Account...' : waitlistLoading ? 'Joining...' : hasInviteCode ? 'Register' : 'Join Waitlist'}
                                     </button>
-                                    
-                                    {!hasInviteCode && (
-                                        <p className="text-gray-500 text-xs text-center">
-                                            Without an invite code, you'll be added to our waitlist and notified when spots open.
-                                        </p>
-                                    )}
                                 </form>
                             )}
                             
