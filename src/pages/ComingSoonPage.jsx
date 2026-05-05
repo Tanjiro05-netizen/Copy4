@@ -7,43 +7,43 @@ import * as s from './ComingSoonPage.css.ts';
 const FEATURE_CONFIG = {
     theory: {
         icon: BookMarked,
-        title: 'Revolutionary Theory',
-        desc: 'Browse and read in-depth theory articles with advanced analysis tools and reading modes.',
+        title: 'Theory',
+        desc: 'In-depth articles and texts with advanced reading tools. Available to members.',
     },
     study: {
         icon: GraduationCap,
         title: 'Study Center',
-        desc: 'Structured learning paths, curated reading lists, and milestone tracking for systematic Marxist education.',
+        desc: 'Structured learning paths, curated reading lists, and progress tracking. Available to members.',
     },
     'science-tech': {
         icon: FlaskConical,
         title: 'Science & Technology',
-        desc: 'Courses and textbooks spanning natural sciences, mathematics, and technology — because communists should know everything.',
+        desc: 'Courses and reference material spanning the natural sciences, mathematics, and technology. Available to members.',
     },
     visualizations: {
         icon: LineChart,
         title: 'Data & Visualizations',
-        desc: 'Track global economic developments and class-struggle metrics through interactive data visualizations.',
+        desc: 'Interactive charts and dashboards covering economic and social indicators. Available to members.',
     },
     directory: {
         icon: Users,
         title: 'Member Directory',
-        desc: 'Connect with fellow researchers, theorists, and activists building revolutionary understanding together.',
+        desc: 'Browse and connect with other members of the platform. Available to members.',
     },
     forum: {
         icon: MessageSquare,
-        title: 'Discussion Forum',
-        desc: 'Engage in theoretical discussions, debates, and collaborative analysis with the community.',
+        title: 'Forum',
+        desc: 'A space for discussion, debate, and collaborative reading. Available to members.',
     },
     knowledge: {
         icon: HelpCircle,
-        title: 'Knowledge Q&A',
-        desc: 'Ask questions and build a collaborative knowledge base on Marxist theory and practice.',
+        title: 'Knowledge Base',
+        desc: 'A community Q&A and reference resource. Available to members.',
     },
     politics: {
         icon: Newspaper,
         title: 'Politics',
-        desc: 'A newspaper-style feed of political dispatches, analysis, and commentary on current events through a Marxist lens.',
+        desc: 'News, analysis, and commentary on current events. Available to members.',
     },
 };
 
@@ -140,12 +140,11 @@ const ComingSoonPage = () => {
                     <div className={s.card}>
                         <h2 className={s.cardTitle}>What to expect</h2>
                         <p className={s.cardText}>
-                            I'm working on a revolutionary platform for Marxist theory, education, and analysis. 
-                            I am building a comprehensive library of resources, interactive study tools, 
-                            and collaborative research features.
+                            This section is currently in development. A range of reading, research, 
+                            and community features are planned for members.
                         </p>
                         <p className={s.cardText}>
-                            Check back soon or sign up for updates to be notified when this feature launches.
+                            Check back soon or register to be notified when this feature becomes available.
                         </p>
                     </div>
                 )}
