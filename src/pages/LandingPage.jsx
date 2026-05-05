@@ -185,12 +185,12 @@ const LandingPage = () => {
 
     // Feature card data (cinematic view)
     const features = [
-        { icon: GraduationCap, title: 'Study Page', desc: 'A structured learning environment featuring curated reading lists, study guides, and theoretical discussions to develop Marxist understanding systematically.' },
-        { icon: FlaskConical, title: 'Science & Technology', desc: 'As Lenin emphasized, communists should know everything mankind has to offer. Dedicated to ensuring Marxists are thoroughly educated in natural sciences and all fields of human knowledge.' },
-        { icon: BookOpen, title: 'Digital Library', desc: 'An expanding collection of essential Marxist texts, articles, and analyses, organized and annotated for accessibility and theoretical development.' },
-        { icon: BarChart3, title: 'Data & Visualizations', desc: 'Tools for tracking global economic developments and staying updated on the evolving conditions of capitalist production and class struggle.' },
-        { icon: PenTool, title: "Writers' Collective", desc: 'A collaborative space for developing revolutionary thinkers and writers, emphasizing quality theoretical work that contributes to the Marxist tradition.' },
-        { icon: MessageSquare, title: 'Discussion Forum', desc: 'Engage in theoretical discussions with fellow researchers, theorists, and activists building revolutionary understanding.' },
+        { icon: GraduationCap, title: 'Study Center', desc: 'Structured learning paths, curated reading lists, and progress tracking for members.' },
+        { icon: FlaskConical, title: 'Science & Technology', desc: 'Courses and reference material spanning the natural sciences, mathematics, and technology.' },
+        { icon: BookOpen, title: 'Digital Library', desc: 'An expanding collection of texts, articles, and analyses, organised for accessibility.' },
+        { icon: BarChart3, title: 'Data & Visualizations', desc: 'Interactive charts and dashboards covering economic and social indicators.' },
+        { icon: PenTool, title: "Writers' Section", desc: 'A space for members to publish analysis, commentary, and research.' },
+        { icon: MessageSquare, title: 'Forum', desc: 'A space for discussion, debate, and collaborative reading.' },
     ];
 
     const handleLogin = async (e) => {

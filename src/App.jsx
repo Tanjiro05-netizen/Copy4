@@ -32,9 +32,9 @@ const App = () => {
 
                 <div className={s.heroContent}>
                     <div className={s.heroCopy}>
-                        <h1 className={s.heroTitle}>Advancing Revolutionary Theory</h1>
+                        <h1 className={s.heroTitle}>marxist.info</h1>
                         <p className={s.heroSubtitle}>
-                            A platform for the new generation of Marxist theorists and researchers.
+                            A platform for Marxist theory, education, and analysis.
                         </p>
                         <div className={s.heroCtas}>
                             <Link to={primaryCta.to} className={s.ctaPrimary}>
@@ -51,9 +51,9 @@ const App = () => {
             {/* About Section */}
             <section className={s.aboutSection}>
                 <div className={s.aboutInner}>
-                    <h2 className={s.aboutTitle}>About Our Collective</h2>
+                    <h2 className={s.aboutTitle}>About</h2>
                     <p className={s.aboutText}>
-                        We are a collective of researchers, theorists, and activists dedicated to advancing Marxist theory and practice in the contemporary world. Our platform serves as a hub for critical analysis, theoretical development, and revolutionary scholarship.
+                        A platform for the study and discussion of Marxist theory, political economy, and history. We aim to provide a well-organised space for reading, research, and debate.
                     </p>
                     <div className={s.aboutGrid}>
                         <div className={s.aboutCard}>
@@ -62,7 +62,7 @@ const App = () => {
                             </div>
                             <div>
                                 <h3 className={s.aboutCardTitle}>Research Focus</h3>
-                                <p className={s.aboutCardText}>Conducting rigorous theoretical research and analysis of contemporary social, economic, and political phenomena through a Marxist lens.</p>
+                                <p className={s.aboutCardText}>In-depth analysis of contemporary social, economic, and political developments from a Marxist perspective.</p>
                             </div>
                         </div>
                         <div className={s.aboutCard}>
@@ -71,7 +71,7 @@ const App = () => {
                             </div>
                             <div>
                                 <h3 className={s.aboutCardTitle}>Publication Platform</h3>
-                                <p className={s.aboutCardText}>Providing a platform for revolutionary scholars to publish and share their research, analyses, and theoretical contributions.</p>
+                                <p className={s.aboutCardText}>A space for writers and researchers to publish analysis, commentary, and theoretical work.</p>
                             </div>
                         </div>
                     </div>
@@ -111,16 +111,16 @@ const App = () => {
 
                         <div className={s.guestGrid}>
                             {[
-                                { icon: Newspaper, title: 'Politics', desc: 'A newspaper-style feed of political dispatches, analysis, and commentary on current events through a Marxist lens.' },
-                                { icon: GraduationCap, title: 'Study Center', desc: 'Structured learning paths, curated reading lists, and milestone tracking for systematic Marxist education.' },
-                                { icon: BookMarked, title: 'Revolutionary Theory', desc: 'Browse and read in-depth theory articles with advanced analysis tools and reading modes.' },
-                                { icon: HelpCircle, title: 'Knowledge Q&A', desc: 'Ask questions, get answers, and build a collaborative knowledge base on Marxist theory and practice.' },
-                                { icon: BookOpen, title: 'Glossary', desc: 'A self-contained wiki of Marxist concepts, terms, and definitions — all interconnected and searchable.' },
-                                { icon: FlaskConical, title: 'Science & Tech', desc: 'Courses and textbooks spanning natural sciences, mathematics, and technology — because communists should know everything.' },
-                                { icon: LineChart, title: 'Data & Visualizations', desc: 'Track global economic developments and class-struggle metrics through interactive data visualizations.' },
-                                { icon: Users, title: 'Member Directory', desc: 'Connect with fellow researchers, theorists, and activists building revolutionary understanding together.' },
-                                { icon: Terminal, title: 'World Sim', desc: 'An immersive historical-materialist simulation where you organize, strategize, and shape revolutionary history.' },
-                                { icon: Bot, title: 'MarxBot', desc: 'An AI assistant trained on Marxist theory to help with research, analysis, and theoretical questions.' },
+                                { icon: Newspaper, title: 'Politics', desc: 'News, analysis, and commentary on current events. Members only.' },
+                                { icon: GraduationCap, title: 'Study Center', desc: 'Structured learning paths, curated reading lists, and progress tracking. Members only.' },
+                                { icon: BookMarked, title: 'Theory', desc: 'In-depth articles and texts with advanced reading tools. Members only.' },
+                                { icon: HelpCircle, title: 'Knowledge Base', desc: 'A community Q&A and reference resource. Members only.' },
+                                { icon: BookOpen, title: 'Glossary', desc: 'An interconnected reference of key concepts, terms, and definitions. Members only.' },
+                                { icon: FlaskConical, title: 'Science & Tech', desc: 'Courses and reference material spanning the natural sciences, mathematics, and technology. Members only.' },
+                                { icon: LineChart, title: 'Data & Visualizations', desc: 'Interactive charts and dashboards covering economic and social indicators. Members only.' },
+                                { icon: Users, title: 'Member Directory', desc: 'Browse and connect with other members of the platform. Members only.' },
+                                { icon: Terminal, title: 'World Sim', desc: 'A historical simulation and strategy experience. Members only.' },
+                                { icon: Bot, title: 'MarxBot', desc: 'An AI assistant for research, reading, and analysis. Members only.' },
                             ].map((feature, i) => {
                                 const Icon = feature.icon;
                                 return (
