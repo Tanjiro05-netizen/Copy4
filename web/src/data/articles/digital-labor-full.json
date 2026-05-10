@@ -1,0 +1,63 @@
+{
+  "title": "Digital Labor: The New Frontier of Exploitation",
+  "category": "Labor Theory",
+  "excerpt": "Examining exploitation in the digital age, focusing on platform capitalism, algorithmic management, and the transformation of work in the information economy.",
+  "date": "2024-02-10",
+  "citations": 15,
+  "methodology": "Labor Process Theory",
+  "peerReviewed": true,
+  "keywords": ["digital labor", "platform capitalism", "automation"],
+  "references": 32,
+  "comments": 8,
+  "readTime": "15 min",
+  "author": "Dr. Sarah Chen",
+  "content": {
+    "abstract": "This paper examines the evolving nature of labor exploitation in the digital age, with a particular focus on platform capitalism, algorithmic management, and the transformation of work in the information economy. Through a critical analysis of contemporary labor processes, we investigate how digital technologies have created new forms of value extraction and worker control.",
+    "sections": [
+      {
+        "title": "Introduction",
+        "content": "The rise of digital platforms and algorithmic management systems has fundamentally transformed the nature of work in the 21st century. This transformation has not only changed how we work but has also created new mechanisms for surplus value extraction and labor control. This paper examines these changes through the lens of Marxist labor theory, analyzing how digital technologies have intensified exploitation while creating new forms of worker resistance."
+      },
+      {
+        "title": "Platform Capitalism and Digital Labor",
+        "content": "Platform capitalism represents a new stage in the organization of labor and capital accumulation. Digital platforms act as intermediaries that coordinate labor processes while extracting value through data collection and algorithmic control. This section examines how platforms like Uber, Deliveroo, and Amazon Mechanical Turk have created new forms of piece-work labor while maintaining the appearance of worker independence."
+      },
+      {
+        "title": "Algorithmic Management and Worker Control",
+        "content": "Algorithmic management systems represent a qualitative leap in labor control mechanisms. Unlike traditional forms of management, algorithms can monitor, evaluate, and direct workers in real-time with unprecedented precision. This section analyzes how these systems intensify work processes while creating new forms of alienation and stress for workers."
+      },
+      {
+        "title": "Digital Surveillance and Value Extraction",
+        "content": "Modern workplace surveillance extends beyond traditional time-motion studies to encompass continuous digital monitoring. Every keystroke, mouse movement, and communication can be tracked and analyzed. This section examines how this surveillance infrastructure enables new forms of value extraction through data collection and behavior modification."
+      },
+      {
+        "title": "Worker Resistance in the Digital Age",
+        "content": "Despite intensified control mechanisms, workers continue to find ways to resist exploitation. This section examines emerging forms of digital worker organization, from online forums and encrypted communication channels to coordinated action across platform workforces. We analyze successful cases of digital worker resistance and their implications for future labor struggles."
+      },
+      {
+        "title": "Conclusion",
+        "content": "The digital transformation of labor has created new challenges for workers while simultaneously opening new possibilities for resistance and organization. Understanding these dynamics is crucial for developing effective strategies for worker empowerment in the digital age."
+      }
+    ],
+    "references": [
+      {
+        "author": "Srnicek, N.",
+        "year": 2017,
+        "title": "Platform Capitalism",
+        "publisher": "Polity Press"
+      },
+      {
+        "author": "Moore, P.",
+        "year": 2018,
+        "title": "The Quantified Self in Precarity: Work, Technology and What Counts",
+        "publisher": "Routledge"
+      },
+      {
+        "author": "Woodcock, J.",
+        "year": 2020,
+        "title": "The Fight Against Platform Capitalism",
+        "publisher": "University of Westminster Press"
+      }
+    ]
+  }
+}
