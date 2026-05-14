@@ -28,6 +28,8 @@ import CertificateVerifyPage from './pages/CertificateVerifyPage.jsx';
 import ChapterTestPage from './pages/ChapterTestPage.jsx';
 import PoliticsPage from './pages/PoliticsPage.jsx';
 import PoliticsArticleReader from './pages/PoliticsArticleReader.jsx';
+import SubstackPage from './pages/SubstackPage.jsx';
+import SubstackReaderPage from './pages/SubstackReaderPage.jsx';
 import MainLayout from './components/MainLayout.jsx';
 import ArticleCollectionPage from './pages/ArticleCollectionPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
@@ -119,6 +121,8 @@ const AppRouter = () => {
                         <Route path="/verify/:certificateNumber" element={<MainLayout><CertificateVerifyPage /></MainLayout>} />
                         <Route path="/politics" element={<ProtectedRoute><MainLayout><PoliticsPage /></MainLayout></ProtectedRoute>} />
                         <Route path="/politics/:slug" element={<ProtectedRoute><MainLayout><PoliticsArticleReader /></MainLayout></ProtectedRoute>} />
+                        <Route path="/substack" element={<MainLayout><SubstackPage /></MainLayout>} />
+                        <Route path="/substack/:slug" element={<MainLayout><SubstackReaderPage /></MainLayout>} />
                         <Route path="/visualizations" element={<ProtectedRoute><MainLayout><DataVisualizationPage /></MainLayout></ProtectedRoute>} />
                         
                         {/* Admin-only routes */}

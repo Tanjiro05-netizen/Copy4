@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, MessageSquare, HelpCircle, ChevronDown } from 'lucide-react';
+import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, MessageSquare, HelpCircle, ChevronDown, Newspaper } from 'lucide-react';
 import { Link, useNavigate, useLocation } from '@/src/lib/router-shim';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -40,6 +40,7 @@ const Header = () => {
         { path: '/study', label: t('nav.study'), icon: BarChart, guestAccessible: false, featureKey: 'study' },
         { path: '/science-tech', label: t('nav.scienceTech'), icon: FileText, guestAccessible: false, featureKey: 'science-tech' },
         { path: '/politics', label: t('nav.politics'), icon: FileText, guestAccessible: false, featureKey: 'politics' },
+        { path: '/substack', label: t('nav.substack'), icon: Newspaper, guestAccessible: true },
         { path: '/visualizations', label: t('nav.data'), icon: LineChart, guestAccessible: false, featureKey: 'visualizations' },
         { path: '/directory', label: t('nav.directory'), icon: Users, guestAccessible: false, featureKey: 'directory' },
         { path: '/forum', label: t('nav.forum'), icon: MessageSquare, guestAccessible: false, featureKey: 'forum' },
