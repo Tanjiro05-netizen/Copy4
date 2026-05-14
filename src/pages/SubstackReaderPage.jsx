@@ -20,11 +20,25 @@ const formatDate = (value) => {
   });
 };
 
-const sanitizeArticleHtml = (html = '') => {
-  const clean = DOMPurify.sanitize(html, {
+const fallbackSanitizeArticleHtml = (html = '') =>
+  cleanSubstackContentHtml(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/\son\w+=(["']).*?\1/gi, '')
+    .replace(/\son\w+=\S+/gi, '')
+    .replace(/\s(href|src)=(["'])javascript:[\s\S]*?\2/gi, ' $1="#"')
+    .trim();
+
+export const sanitizeArticleHtml = (html = '') => {
+  if (!html) return '';
+
+  const purifier = typeof DOMPurify?.sanitize === 'function'
+    ? DOMPurify
+    : DOMPurify?.default;
+  const clean = typeof purifier?.sanitize === 'function' ? purifier.sanitize(html, {
     USE_PROFILES: { html: true },
     ADD_ATTR: ['target', 'rel'],
-  });
+  }) : fallbackSanitizeArticleHtml(html);
 
   if (typeof DOMParser === 'undefined') return clean;
 

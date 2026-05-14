@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import SubstackPage from './SubstackPage';
-import SubstackReaderPage from './SubstackReaderPage';
+import SubstackReaderPage, { sanitizeArticleHtml } from './SubstackReaderPage';
 import { loadSubstackPosts } from '../services/substackApi';
 
 jest.mock('../services/substackApi', () => ({
@@ -148,5 +148,9 @@ describe('SubstackPage', () => {
     const outboundLink = screen.getByRole('link', { name: 'a source' });
     expect(outboundLink).toHaveAttribute('target', '_blank');
     expect(outboundLink).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  test('sanitizes the empty initial reader render without browser-only assumptions', () => {
+    expect(sanitizeArticleHtml('')).toBe('');
   });
 });
