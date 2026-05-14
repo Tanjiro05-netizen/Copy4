@@ -61,7 +61,7 @@ serve(async (req) => {
           'Authorization': `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: 'Marxist.info <noreply@marxist.info>',
+          from: 'Marxist.info <onboarding@resend.dev>',
           to: [email],
           subject: 'Welcome to the Marxist.info Waitlist',
           html,
