@@ -1,6 +1,0 @@
-{
-  "buildCommand": "CI=false GENERATE_SOURCEMAP=false npm run build",
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
-}

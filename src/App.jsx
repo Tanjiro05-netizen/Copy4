@@ -2,12 +2,15 @@ import React from 'react';
 import { Book, FileText, BookOpen,
     Newspaper, GraduationCap, HelpCircle, BookMarked, FlaskConical, LineChart,
     Users, Bot, Terminal, Lock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 import { useAuth } from './context/AuthContext';
 import hammerAndSickleImage from './assets/hammerandsickle.png';
 import { Analytics } from '@vercel/analytics/react';
 import * as s from './App.css.ts';
+
+const hammerAndSickleImageUrl =
+    typeof hammerAndSickleImage === 'string' ? hammerAndSickleImage : hammerAndSickleImage.src;
 
 const App = () => {
     const { user } = useAuth();
@@ -27,7 +30,7 @@ const App = () => {
             <div className={s.hero}>
                 <div className={s.heroGrid} />
                 <div className={s.heroImageWrap}>
-                    <img src={hammerAndSickleImage} alt="Background" className={s.heroImage} />
+                    <img src={hammerAndSickleImageUrl} alt="Background" className={s.heroImage} />
                 </div>
 
                 <div className={s.heroContent}>
@@ -37,10 +40,10 @@ const App = () => {
                             A platform for Marxist theory, education, and analysis.
                         </p>
                         <div className={s.heroCtas}>
-                            <Link to={primaryCta.to} className={s.ctaPrimary}>
+                            <Link href={primaryCta.to} className={s.ctaPrimary}>
                                 {primaryCta.label}
                             </Link>
-                            <Link to={secondaryCta.to} className={s.ctaSecondary}>
+                            <Link href={secondaryCta.to} className={s.ctaSecondary}>
                                 {secondaryCta.label}
                             </Link>
                         </div>
@@ -143,7 +146,7 @@ const App = () => {
                         </div>
 
                         <div className={s.guestCta}>
-                            <Link to="/login" className={s.ctaPrimary}>
+                            <Link href="/login" className={s.ctaPrimary}>
                                 Register to Unlock
                                 <Lock size={16} />
                             </Link>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cpu, TrendingUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { knowledgeApiService } from '../api';
 
 // Level thresholds based on total engagement (views + likes*2 + follows*5)
@@ -122,8 +122,7 @@ export const Widgets = ({ userId }) => {
           ))}
         </div>
 
-        <Link
-          to="/profile?tab=dashboard"
+        <Link href="/profile?tab=dashboard"
           className="w-full bg-[rgba(200,30,30,0.1)] hover:bg-[rgba(200,30,30,0.18)] text-[#c81e1e] border border-[rgba(200,30,30,0.22)] font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.08em] py-2 rounded-xl transition-all block text-center"
         >
           Go to Dashboard
@@ -147,7 +146,7 @@ export const Widgets = ({ userId }) => {
             trendingQuestions.map((question, index) => (
               <Link
                 key={question.id}
-                to={`/knowledge/question/${question.id}`}
+                href={`/knowledge/question/${question.id}`}
                 className="px-3 py-2.5 hover:bg-white/[0.03] flex gap-2.5 group block"
               >
                 <div className={`font-[JetBrains_Mono,monospace] text-[10px] font-bold w-4 shrink-0 mt-0.5 ${

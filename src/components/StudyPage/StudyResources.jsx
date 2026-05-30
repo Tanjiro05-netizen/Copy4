@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BookOpen, Video, Headphones, ArrowRight, Library } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { emptyState, loadingSpinner, loadingState } from "./studyTheme.css.ts";
 import * as styles from "./StudyResources.css.ts";
 
@@ -105,8 +105,7 @@ const StudyResources = ({ resources = [], loading = false, hideFilter = false })
                         Open <ArrowRight size={14} />
                       </a>
                     ) : (
-                      <Link
-                        to={href}
+                      <Link href={href}
                         className={styles.action}
                       >
                         Read <ArrowRight size={14} />

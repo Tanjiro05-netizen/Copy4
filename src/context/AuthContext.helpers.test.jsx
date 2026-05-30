@@ -3,7 +3,7 @@ import {
     hasEditorialRoleInProfile,
     isLocalDevelopmentHost,
     isAdminProfile,
-} from './AuthContext';
+} from '../lib/auth.js';
 
 describe('AuthContext role helpers', () => {
     test('isAdminProfile returns true for is_admin flag', () => {

@@ -10,7 +10,7 @@ import {
   Edit3,
   Lock
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { knowledgeApiService } from '../api';
 
 const TOPIC_COLORS = {
@@ -114,7 +114,7 @@ const DenseSidebar = ({ activeItem = 'Feed', onNavigate, userId }) => {
               return (
                 <Link
                   key={topic.id}
-                  to={`/knowledge?topic=${topic.slug}`}
+                  href={`/knowledge?topic=${topic.slug}`}
                   className="flex items-center gap-2 text-[11px] text-white/40 hover:text-white transition-colors group"
                 >
                   <div className={`w-4 h-4 ${colors.bg} rounded flex items-center justify-center text-[8px] ${colors.text} border ${colors.border} shrink-0`}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, MessageSquare, HelpCircle, ChevronDown, Newspaper } from 'lucide-react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -9,18 +10,18 @@ import * as s from './Header.css.ts';
 const Header = () => {
     const { user, logout, isAdmin, canManagePolitics } = useAuth();
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const location = useLocation();
+    const router = useRouter();
+    const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const isAdminUser = isAdmin();
     const canEditPolitics = canManagePolitics();
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = (path) => pathname === path;
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        router.push('/login');
     };
     
     // All nav items - some are guest-accessible, others require login
@@ -53,7 +54,7 @@ const Header = () => {
     return (
         <header className={s.header}>
             <div className={s.headerInner}>
-                <Link to="/home" className={s.logo}>
+                <Link href="/home" className={s.logo}>
                     Marxist.info
                 </Link>
                 
@@ -78,7 +79,7 @@ const Header = () => {
                                                 {item.children.map(child => (
                                                     <Link
                                                         key={child.path}
-                                                        to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
+                                                        href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
                                                         className={`${s.dropdownItem} ${isActive(child.path) ? s.dropdownItemActive : ''}`}
                                                     >
                                                         <span className={s.dropdownItemLabel}>{child.label}</span>
@@ -95,7 +96,7 @@ const Header = () => {
                             return (
                                 <Link 
                                     key={item.path}
-                                    to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
+                                    href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                     className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : ''}`}
                                     title={isRestricted ? t('nav.membersOnly') : ''}
                                 >
@@ -111,8 +112,7 @@ const Header = () => {
                                     <span>Editorial</span>
                                 </div>
                                 <div className={s.dropdownMenu}>
-                                        <Link
-                                            to="/admin/politics/upload"
+                                        <Link href="/admin/politics/upload"
                                             className={`${s.dropdownItem} ${isActive('/admin/politics/upload') ? s.dropdownItemActive : ''}`}
                                         >
                                             Politics Upload
@@ -143,7 +143,7 @@ const Header = () => {
                                         ].map((link) => (
                                             <Link
                                                 key={link.to}
-                                                to={link.to}
+                                                href={link.to}
                                                 className={`${s.dropdownItem} ${isActive(link.to) ? s.dropdownItemActive : ''}`}
                                             >
                                                 {link.label}
@@ -153,7 +153,7 @@ const Header = () => {
                             </div>
                         )}
                         {user && (
-                            <Link to="/profile" className={s.navLink}>
+                            <Link href="/profile" className={s.navLink}>
                                 {t('nav.profile')}
                             </Link>
                         )}
@@ -170,7 +170,7 @@ const Header = () => {
                                 <LogOut size={18} />
                             </button>
                         ) : (
-                            <Link to="/login" className={s.loginButton}>
+                            <Link href="/login" className={s.loginButton}>
                                 {t('nav.login')}
                             </Link>
                         )}
@@ -207,7 +207,7 @@ const Header = () => {
                                                 {item.children.map(child => (
                                                     <Link
                                                         key={child.path}
-                                                        to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
+                                                        href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
                                                         className={`${s.mobileSubLink} ${isActive(child.path) ? s.mobileLinkActive : ''}`}
                                                         onClick={() => setMobileMenuOpen(false)}
                                                     >
@@ -225,7 +225,7 @@ const Header = () => {
                                 return (
                                     <Link 
                                         key={item.path}
-                                        to={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
+                                        href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                         className={`${s.mobileLink} ${isRestricted ? s.mobileLinkRestricted : isActive(item.path) ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
@@ -236,23 +236,20 @@ const Header = () => {
                             })}
                             {isAdminUser && (
                                 <>
-                                    <Link
-                                        to="/admin/tags"
+                                    <Link href="/admin/tags"
                                         className={`${s.mobileLink} ${isActive('/admin/tags') ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <Shield size={20} style={{ marginRight: 8 }} />
                                         <span>Admin Tools</span>
                                     </Link>
-                                    <Link
-                                        to="/admin/roles"
+                                    <Link href="/admin/roles"
                                         className={`${s.mobileSubLink} ${isActive('/admin/roles') ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         Role Management
                                     </Link>
-                                    <Link
-                                        to="/admin/politics/upload"
+                                    <Link href="/admin/politics/upload"
                                         className={`${s.mobileSubLink} ${isActive('/admin/politics/upload') ? s.mobileLinkActive : ''}`}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
@@ -261,8 +258,7 @@ const Header = () => {
                                 </>
                             )}
                             {!isAdminUser && canEditPolitics && (
-                                <Link
-                                    to="/admin/politics/upload"
+                                <Link href="/admin/politics/upload"
                                     className={`${s.mobileLink} ${isActive('/admin/politics/upload') ? s.mobileLinkActive : ''}`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
@@ -271,8 +267,7 @@ const Header = () => {
                                 </Link>
                             )}
                             {user && (
-                                <Link 
-                                    to="/profile"
+                                <Link href="/profile"
                                     className={s.mobileLink}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
@@ -290,7 +285,7 @@ const Header = () => {
                                     <span>{t('nav.logout')}</span>
                                 </button>
                             ) : (
-                                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className={s.loginButton}>
+                                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={s.loginButton}>
                                     {t('nav.login')}
                                 </Link>
                             )}

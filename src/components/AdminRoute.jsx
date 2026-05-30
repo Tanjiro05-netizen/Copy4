@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import RedirectTo from './RedirectTo.jsx';
 import { useAuth } from '../context/AuthContext';
 
 const AdminRoute = ({ children }) => {
@@ -24,11 +24,11 @@ const AdminRoute = ({ children }) => {
     }
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <RedirectTo href="/login" replace />;
     }
     
     if (!isAdmin()) {
-        return <Navigate to="/coming-soon" replace />;
+        return <RedirectTo href="/coming-soon" replace />;
     }
 
     return children;

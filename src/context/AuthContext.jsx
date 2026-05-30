@@ -1,33 +1,32 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import {
+    canProfileManagePolitics,
+    canProfileManageStudy,
+    DEV_ADMIN_PASSWORD,
+    DEV_ADMIN_PROFILE,
+    DEV_ADMIN_USER,
+    DEV_AUTH_COOKIE_KEY,
+    DEV_AUTH_STORAGE_KEY,
+    hasEditorialRoleInProfile,
+    isAdminProfile,
+    isLocalDevelopmentHost,
+} from '../lib/auth.js';
+
+export {
+    canProfileManagePolitics,
+    canProfileManageStudy,
+    hasEditorialRoleInProfile,
+    isAdminProfile,
+    isLocalDevelopmentHost,
+} from '../lib/auth.js';
 
 const AuthContext = createContext();
-
-const normalizeRoleToken = (value) => `${value || ''}`.trim().toLowerCase();
 const LOGIN_TIMEOUT_MS = 30000;
 const SESSION_TIMEOUT_MS = 20000;
 const SESSION_RETRY_DELAY_MS = 1200;
-const DEV_ADMIN_USER = { id: 'dev-admin', email: 'admin@localhost', role: 'authenticated' };
-const DEV_ADMIN_PROFILE = { id: 'dev-admin', username: 'DevAdmin', role: 'admin', is_admin: true };
-const DEV_ADMIN_PASSWORD = 'admin123';
-const DEV_AUTH_STORAGE_KEY = 'marxist_dev_auth';
 
 export const AUTH_TIMEOUT_MESSAGE = 'Connection is slow — Supabase may be waking up. Please try again in a few seconds.';
-
-export const isLocalDevelopmentHost = (hostname) => {
-    const currentHostname =
-        hostname ?? (typeof window !== 'undefined' ? window.location.hostname : '');
-    const normalizedHostname = `${currentHostname || ''}`.trim().toLowerCase();
-
-    return (
-        normalizedHostname === 'localhost' ||
-        normalizedHostname === '127.0.0.1' ||
-        normalizedHostname === '0.0.0.0' ||
-        normalizedHostname === '::1' ||
-        normalizedHostname === '[::1]' ||
-        normalizedHostname.endsWith('.localhost')
-    );
-};
 
 const hasLocalDevAuth = () =>
     isLocalDevelopmentHost() &&
@@ -72,34 +71,10 @@ const getSessionWithRetry = async () => {
     }
 };
 
-export const isAdminProfile = (profile) =>
-    profile?.is_admin === true || normalizeRoleToken(profile?.role) === 'admin';
-
-export const hasEditorialRoleInProfile = (profile, roleName) => {
-    const normalizedTarget = normalizeRoleToken(roleName);
-    if (!normalizedTarget) return false;
-
-    const editorialRoles = Array.isArray(profile?.editorial_roles) ? profile.editorial_roles : [];
-
-    const matchesEditorialArray = editorialRoles.some(
-        (role) => normalizeRoleToken(role) === normalizedTarget
-    );
-
-    const matchesLegacyRole = normalizeRoleToken(profile?.role) === normalizedTarget;
-
-    return matchesEditorialArray || matchesLegacyRole;
-};
-
-export const canProfileManagePolitics = (profile) =>
-    isAdminProfile(profile) || hasEditorialRoleInProfile(profile, 'News');
-
-export const canProfileManageStudy = (profile) =>
-    isAdminProfile(profile) || hasEditorialRoleInProfile(profile, 'Teacher');
-
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState(null);
-    const [loading, setLoading] = useState(true);
+export const AuthProvider = ({ children, initialUser = null, initialProfile = null, initialAuthResolved = false }) => {
+    const [user, setUser] = useState(initialUser);
+    const [profile, setProfile] = useState(initialProfile);
+    const [loading, setLoading] = useState(!initialAuthResolved);
 
     const fetchProfile = async (userId) => {
         if (!userId) {
@@ -211,6 +186,7 @@ export const AuthProvider = ({ children }) => {
                 credentials.password === DEV_ADMIN_PASSWORD
             ) {
                 localStorage.setItem(DEV_AUTH_STORAGE_KEY, 'true');
+                document.cookie = `${DEV_AUTH_COOKIE_KEY}=true; path=/; SameSite=Lax`;
                 setUser(DEV_ADMIN_USER);
                 setProfile(DEV_ADMIN_PROFILE);
                 return { error: null };
@@ -233,6 +209,7 @@ export const AuthProvider = ({ children }) => {
         logout: async () => {
             if (isLocalDevelopmentHost()) {
                 localStorage.removeItem(DEV_AUTH_STORAGE_KEY);
+                document.cookie = `${DEV_AUTH_COOKIE_KEY}=; path=/; Max-Age=0; SameSite=Lax`;
             }
             setUser(null);
             setProfile(null);

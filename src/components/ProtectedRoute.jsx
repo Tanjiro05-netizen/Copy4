@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import RedirectTo from './RedirectTo.jsx';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children }) => {
     }
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <RedirectTo href="/login" replace />;
     }
 
     // Admins always have access
@@ -35,7 +35,7 @@ const ProtectedRoute = ({ children }) => {
 
     // Check invite access
     if (!profile?.has_invite_access) {
-        return <Navigate to="/pending-access" replace />;
+        return <RedirectTo href="/pending-access" replace />;
     }
 
     return children;

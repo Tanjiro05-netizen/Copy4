@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 const KnowledgeLayout = ({ children, sidebar, widgets, searchQuery = '', onSearchChange }) => {
   return (
@@ -31,8 +31,7 @@ const KnowledgeLayout = ({ children, sidebar, widgets, searchQuery = '', onSearc
           </div>
 
           {/* Ask Question CTA */}
-          <Link
-            to="/knowledge/ask"
+          <Link href="/knowledge/ask"
             className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-4 md:px-5 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] shadow-[0_0_20px_rgba(200,30,30,0.22)] transition-all hover:shadow-[0_0_28px_rgba(200,30,30,0.38)] shrink-0"
           >
             <Zap className="w-3.5 h-3.5" />
@@ -61,8 +60,7 @@ const KnowledgeLayout = ({ children, sidebar, widgets, searchQuery = '', onSearc
       </div>
 
       {/* Mobile FAB */}
-      <Link
-        to="/knowledge/ask"
+      <Link href="/knowledge/ask"
         className="md:hidden fixed bottom-6 right-6 bg-[#c81e1e] hover:bg-[#e02424] text-white p-4 rounded-full shadow-[0_4px_24px_rgba(200,30,30,0.4)] z-50 transition-all hover:scale-105"
       >
         <Zap className="w-5 h-5" />

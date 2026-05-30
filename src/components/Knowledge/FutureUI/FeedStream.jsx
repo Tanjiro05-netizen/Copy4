@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Edit3, MessageSquare, HelpCircle, Send, Loader2, AlertCircle, CheckCircle, ChevronDown, X } from 'lucide-react';
 import FeedCard from './FeedCard';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { knowledgeApiService } from '../api';
 import { useTopics } from '../hooks/useTopics';
 
@@ -63,8 +63,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
           <h1 className="font-[Cormorant_Garamond,Georgia,serif] text-[40px] font-[500] leading-none tracking-[-0.03em] text-white">
             Knowledge Base
           </h1>
-          <Link
-            to="/knowledge/ask"
+          <Link href="/knowledge/ask"
             className="flex items-center gap-2 bg-[rgba(200,30,30,0.12)] hover:bg-[rgba(200,30,30,0.2)] border border-[rgba(200,30,30,0.28)] text-[#c81e1e] px-4 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
           >
             <Edit3 className="w-3.5 h-3.5" />

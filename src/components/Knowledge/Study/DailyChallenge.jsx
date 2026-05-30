@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Flame, Clock, Zap, Trophy, ChevronRight } from 'lucide-react';
 import { studyApiService } from '../api/study';
 
@@ -147,8 +147,7 @@ const DailyChallenge = ({ userId }) => {
             Completed Today
           </div>
         ) : (
-          <Link
-            to="/knowledge/study"
+          <Link href="/knowledge/study"
             className="flex items-center justify-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white py-2.5 rounded-xl font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.08em] transition-all hover:shadow-[0_0_20px_rgba(200,30,30,0.3)] group"
           >
             <Zap className="w-3.5 h-3.5" />

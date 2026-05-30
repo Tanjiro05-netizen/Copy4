@@ -12,7 +12,7 @@ import {
   Plus,
   Check
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 const FeedCard = ({ item, isFollowing, onToggleFollow, onVote, isFavorited, onToggleFavorite }) => {
   // Determine if it's an ad or promoted content
@@ -50,8 +50,7 @@ const FeedCard = ({ item, isFollowing, onToggleFollow, onVote, isFavorited, onTo
                 <User size={10} className="text-white/30" />
               </div>
             )}
-            <Link
-              to={`/profile/${item.author?.username}`}
+            <Link href={`/profile/${item.author?.username}`}
               className="text-[11px] font-medium text-white/70 hover:text-[#c81e1e] transition-colors font-[Hanken_Grotesk,sans-serif]"
             >
               {item.author?.username || 'Anonymous'}
@@ -74,7 +73,7 @@ const FeedCard = ({ item, isFollowing, onToggleFollow, onVote, isFavorited, onTo
       </div>
 
       {/* Title */}
-      <Link to={`/knowledge/question/${item.id}`}>
+      <Link href={`/knowledge/question/${item.id}`}>
         <h2 className="text-sm md:text-[15px] font-semibold text-white/90 leading-snug mb-2 group-hover:text-[#c81e1e] transition-colors flex items-start gap-2 font-[Hanken_Grotesk,sans-serif]">
           <span className={`shrink-0 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full mt-0.5 border ${
             item.type === 'question'

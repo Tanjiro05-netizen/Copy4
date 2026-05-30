@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
 import { Check, ChevronDown, ChevronUp, ExternalLink, HelpCircle, Lightbulb, Play, X } from 'lucide-react';
 
 const markdownComponents = {

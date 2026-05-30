@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import RedirectTo from './RedirectTo.jsx';
 import { useAuth } from '../context/AuthContext';
 
 const RoleRoute = ({ children, allowedEditorialRoles = [], allowAdmin = true }) => {
@@ -24,7 +24,7 @@ const RoleRoute = ({ children, allowedEditorialRoles = [], allowAdmin = true }) 
     }
 
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <RedirectTo href="/login" replace />;
     }
 
     const isAllowedByAdmin = allowAdmin && isAdmin();
@@ -33,7 +33,7 @@ const RoleRoute = ({ children, allowedEditorialRoles = [], allowAdmin = true }) 
         allowedEditorialRoles.some((roleName) => hasEditorialRole(roleName));
 
     if (!isAllowedByAdmin && !isAllowedByRole) {
-        return <Navigate to="/coming-soon" replace />;
+        return <RedirectTo href="/coming-soon" replace />;
     }
 
     return children;

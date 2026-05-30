@@ -40,6 +40,7 @@ function installAuditHooks(page) {
     if (!['document', 'script', 'xhr', 'fetch'].includes(resourceType)) return;
 
     const failure = request.failure();
+    if (request.url().includes('_rsc=') && failure?.errorText === 'net::ERR_ABORTED') return;
     issues.push(`requestfailed: ${request.method()} ${request.url()} ${failure?.errorText || ''}`.trim());
   });
 

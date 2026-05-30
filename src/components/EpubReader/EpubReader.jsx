@@ -143,7 +143,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     if (savedCfi) locationRef.current = savedCfi;
 
     // Create new book instance
-    const book = ePub(url);
+    const book = ePub(url, { openAs: 'epub' });
     bookRef.current = book;
 
     book.loaded.navigation.then((nav) => {
@@ -155,8 +155,16 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     book.loaded.spine.catch(() => setLoadError('Failed to load book content.'));
 
     return () => {
-      book.destroy();
-      bookRef.current = null;
+      if (bookRef.current === book) {
+        bookRef.current = null;
+      }
+
+      if (book.isOpen) {
+        book.destroy();
+        return;
+      }
+
+      book.opened?.finally(() => book.destroy());
     };
   }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
 

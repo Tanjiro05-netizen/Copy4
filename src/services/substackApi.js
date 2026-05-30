@@ -9,8 +9,6 @@ const SUBSTACK_PROMO_PATTERN =
   /☭\/Acc(?:['’]|&rsquo;|&#8217;|&#x2019;)?s Substack is a reader-supported publication\.?\s*To receive new posts and support my work,?\s*consider becoming a free or paid subscriber\.?/i;
 
 const envValues = {
-  REACT_APP_SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL,
-  REACT_APP_SUPABASE_ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY,
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 };
@@ -272,13 +270,13 @@ export const mergeSubstackPosts = (feedPosts = [], archivePosts = []) => {
 };
 
 const getSubstackFunctionUrl = () => {
-  const supabaseUrl = getEnv('REACT_APP_SUPABASE_URL') || getEnv('NEXT_PUBLIC_SUPABASE_URL');
+  const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
   return supabaseUrl ? `${supabaseUrl}/functions/v1/substack-feed` : '';
 };
 
 const getFunctionHeaders = () => {
   const anonKey =
-    getEnv('REACT_APP_SUPABASE_ANON_KEY') || getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
   const headers = { 'Content-Type': 'application/json' };
 
   if (anonKey) {

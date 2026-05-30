@@ -1,14 +1,15 @@
 // src/components/MainLayout.jsx
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Bot } from 'lucide-react';
 import Header from './Header';
 import * as s from './MainLayout.css.ts';
 import { studyThemeClass } from '../styles/obsidianTheme.css.ts';
 
 const MainLayout = ({ children }) => {
-    const location = useLocation();
-    const isMarxBotPage = location.pathname === '/marxbot';
+    const pathname = usePathname();
+    const isMarxBotPage = pathname === '/marxbot';
 
     return (
         <div className={`${studyThemeClass} ${s.shell}`}>
@@ -19,7 +20,7 @@ const MainLayout = ({ children }) => {
 
             {/* Floating MarxBot button — hidden on /marxbot page itself */}
             {!isMarxBotPage && (
-                <Link to="/marxbot" className={s.fab} title="MarxBot — Public Preview">
+                <Link href="/marxbot" className={s.fab} title="MarxBot — Public Preview">
                     <div className={s.fabCircle}>
                         <Bot size={18} />
                         <div className={s.fabPulse} />
