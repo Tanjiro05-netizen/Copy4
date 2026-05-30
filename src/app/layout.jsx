@@ -14,6 +14,10 @@ import '@/src/components/visualizations/DynamicBackground.css';
 import { getServerAuthState } from '@/src/lib/server-auth.js';
 import Providers from './providers.jsx';
 
+// All pages depend on runtime auth state (cookies/headers), so never statically prerender.
+export const dynamic = 'force-dynamic';
+
+
 const description =
   'An independent collective dedicated to the critique of political economy and the renaissance of genuine Marxist analysis.';
 
