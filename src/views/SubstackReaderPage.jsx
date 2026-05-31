@@ -158,7 +158,7 @@ const SubstackReaderPage = () => {
           </div>
         </header>
 
-        {post.imageUrl && <img src={post.imageUrl} alt="" className={s.articleImage} referrerPolicy="no-referrer" crossOrigin="anonymous" />}
+        {post.imageUrl && <img src={post.imageUrl} alt="" className={s.articleImage} referrerPolicy="no-referrer" />}
 
         {safeHtml ? (
           <section

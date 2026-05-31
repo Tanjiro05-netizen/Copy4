@@ -166,7 +166,7 @@ const SubstackPage = () => {
             <section className={s.heroGrid} aria-label="Featured Substack article">
               <Link href={`/substack/${featuredPost.slug}`} className={s.featuredStory}>
                 {featuredPost.imageUrl ? (
-                  <img src={featuredPost.imageUrl} alt="" className={s.featuredImage} referrerPolicy="no-referrer" crossOrigin="anonymous" />
+                  <img src={featuredPost.imageUrl} alt="" className={s.featuredImage} referrerPolicy="no-referrer" />
                 ) : (
                   <div className={s.featuredImageFallback}>
                     <ImageIcon size={44} />
@@ -189,7 +189,7 @@ const SubstackPage = () => {
                       {post.excerpt && <p className={s.sideExcerpt}>{post.excerpt}</p>}
                       <p className={s.storyMeta}>{formatMeta(post)}</p>
                     </div>
-                    {post.imageUrl && <img src={post.imageUrl} alt="" className={s.sideThumb} referrerPolicy="no-referrer" crossOrigin="anonymous" />}
+                    {post.imageUrl && <img src={post.imageUrl} alt="" className={s.sideThumb} referrerPolicy="no-referrer" />}
                   </Link>
                 ))}
               </aside>
@@ -211,7 +211,7 @@ const SubstackPage = () => {
                         <p className={s.storyMeta}>{formatMeta(post)}</p>
                       </div>
                       {post.imageUrl ? (
-                        <img src={post.imageUrl} alt="" className={s.popularThumb} referrerPolicy="no-referrer" crossOrigin="anonymous" />
+                        <img src={post.imageUrl} alt="" className={s.popularThumb} referrerPolicy="no-referrer" />
                       ) : (
                         <div className={s.popularThumbFallback} />
                       )}
@@ -231,7 +231,7 @@ const SubstackPage = () => {
                   {archivePosts.map((post) => (
                     <Link key={post.slug} href={`/substack/${post.slug}`} className={s.archiveCard}>
                       {post.imageUrl ? (
-                        <img src={post.imageUrl} alt="" className={s.archiveImage} loading="lazy" referrerPolicy="no-referrer" crossOrigin="anonymous" />
+                        <img src={post.imageUrl} alt="" className={s.archiveImage} loading="lazy" referrerPolicy="no-referrer" />
                       ) : (
                         <div className={s.archiveImageFallback}>
                           <ImageIcon size={28} />
