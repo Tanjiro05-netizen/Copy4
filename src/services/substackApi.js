@@ -289,7 +289,19 @@ export const mergeSubstackPosts = (feedPosts = [], archivePosts = []) => {
   });
 
   feedPosts.map(normalizeSubstackPost).forEach((post) => {
-    if (post.slug) bySlug.set(post.slug, post);
+    if (!post.slug) return;
+    const existing = bySlug.get(post.slug);
+    if (existing) {
+      // Feed posts take priority, but preserve fields the feed may lack.
+      bySlug.set(post.slug, {
+        ...existing,
+        ...post,
+        imageUrl: post.imageUrl || existing.imageUrl,
+        contentHtml: post.contentHtml || existing.contentHtml,
+      });
+    } else {
+      bySlug.set(post.slug, post);
+    }
   });
 
   return Array.from(bySlug.values()).sort((left, right) => {
