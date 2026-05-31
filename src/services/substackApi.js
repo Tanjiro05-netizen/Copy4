@@ -176,6 +176,36 @@ export const extractImageUrl = (itemNode, html = '') => {
   return '';
 };
 
+/**
+ * Sanitize a Substack image URL. CDN wrapper URLs
+ * (`substackcdn.com/image/fetch/…/https%3A%2F%2F…`) sometimes contain
+ * corrupted transformation parameters (e.g. `$s_!N1DW!`). When that happens
+ * the entire URL is broken. This helper extracts the underlying S3 URL from
+ * the wrapper and returns it directly.
+ */
+export const sanitizeImageUrl = (imageUrl = '') => {
+  const url = String(imageUrl || '').trim();
+  if (!url) return '';
+
+  // Only process substackcdn CDN wrapper URLs.
+  if (url.includes('substackcdn.com/image/fetch/')) {
+    try {
+      // The raw S3 URL is the last path segment, percent-encoded.
+      const marker = '/https';
+      const idx = url.indexOf(marker);
+      if (idx >= 0) {
+        const encoded = url.slice(idx + 1); // "https%3A%2F%2F…"
+        const decoded = decodeURIComponent(encoded);
+        if (decoded.startsWith('https://')) return decoded;
+      }
+    } catch (_err) {
+      // Fall through and return the original URL.
+    }
+  }
+
+  return url;
+};
+
 export const normalizeSubstackPost = (raw = {}) => {
   const title = `${raw.title || ''}`.trim() || 'Untitled Substack post';
   const url = `${raw.url || raw.link || ''}`.trim();
@@ -199,7 +229,7 @@ export const normalizeSubstackPost = (raw = {}) => {
     author: raw.author || SUBSTACK_AUTHOR_NAME,
     excerpt,
     contentHtml,
-    imageUrl: raw.imageUrl || '',
+    imageUrl: sanitizeImageUrl(raw.imageUrl),
     categories: categories.length ? categories : inferSubstackCategories({ title, excerpt }),
   };
 };
