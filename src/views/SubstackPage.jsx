@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { ChevronRight, ExternalLink, Image as ImageIcon, Search } from 'lucide-react';
 import {
   SUBSTACK_AUTHOR_PROFILE_URL,
@@ -166,7 +167,7 @@ const SubstackPage = () => {
             <section className={s.heroGrid} aria-label="Featured Substack article">
               <Link href={`/substack/${featuredPost.slug}`} className={s.featuredStory}>
                 {featuredPost.imageUrl ? (
-                  <img src={featuredPost.imageUrl} alt="" className={s.featuredImage} referrerPolicy="no-referrer" />
+                  <NextImage src={featuredPost.imageUrl} alt="" width={1200} height={800} className={s.featuredImage} />
                 ) : (
                   <div className={s.featuredImageFallback}>
                     <ImageIcon size={44} />
@@ -189,7 +190,7 @@ const SubstackPage = () => {
                       {post.excerpt && <p className={s.sideExcerpt}>{post.excerpt}</p>}
                       <p className={s.storyMeta}>{formatMeta(post)}</p>
                     </div>
-                    {post.imageUrl && <img src={post.imageUrl} alt="" className={s.sideThumb} referrerPolicy="no-referrer" />}
+                    {post.imageUrl && <NextImage src={post.imageUrl} alt="" width={400} height={320} className={s.sideThumb} />}
                   </Link>
                 ))}
               </aside>
@@ -211,7 +212,7 @@ const SubstackPage = () => {
                         <p className={s.storyMeta}>{formatMeta(post)}</p>
                       </div>
                       {post.imageUrl ? (
-                        <img src={post.imageUrl} alt="" className={s.popularThumb} referrerPolicy="no-referrer" />
+                        <NextImage src={post.imageUrl} alt="" width={150} height={150} className={s.popularThumb} />
                       ) : (
                         <div className={s.popularThumbFallback} />
                       )}
@@ -231,7 +232,7 @@ const SubstackPage = () => {
                   {archivePosts.map((post) => (
                     <Link key={post.slug} href={`/substack/${post.slug}`} className={s.archiveCard}>
                       {post.imageUrl ? (
-                        <img src={post.imageUrl} alt="" className={s.archiveImage} loading="lazy" referrerPolicy="no-referrer" />
+                        <NextImage src={post.imageUrl} alt="" width={600} height={338} className={s.archiveImage} />
                       ) : (
                         <div className={s.archiveImageFallback}>
                           <ImageIcon size={28} />
@@ -260,3 +261,4 @@ const SubstackPage = () => {
 };
 
 export default SubstackPage;
+

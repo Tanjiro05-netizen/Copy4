@@ -1,6 +1,7 @@
 import DOMPurify from 'dompurify';
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, CalendarDays, ExternalLink, Tag, User } from 'lucide-react';
 import {
@@ -158,7 +159,7 @@ const SubstackReaderPage = () => {
           </div>
         </header>
 
-        {post.imageUrl && <img src={post.imageUrl} alt="" className={s.articleImage} referrerPolicy="no-referrer" />}
+        {post.imageUrl && <NextImage src={post.imageUrl} alt="" width={1200} height={800} className={s.articleImage} />}
 
         {safeHtml ? (
           <section
