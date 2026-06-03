@@ -121,7 +121,7 @@ const App = () => {
                                 { icon: BookOpen, title: 'Glossary', desc: 'An interconnected reference of key concepts, terms, and definitions. Members only.' },
                                 { icon: FlaskConical, title: 'Science & Tech', desc: 'Courses and reference material spanning the natural sciences, mathematics, and technology. Members only.' },
                                 { icon: LineChart, title: 'Data & Visualizations', desc: 'Interactive charts and dashboards covering economic and social indicators. Members only.' },
-                                { icon: Users, title: 'Member Directory', desc: 'Browse and connect with other members of the platform. Members only.' },
+                                { icon: Users, title: 'Directory', desc: 'Browse and connect with other members of the platform. Members only.' },
                                 { icon: Terminal, title: 'World Sim', desc: 'A historical simulation and strategy experience. Members only.' },
                                 { icon: Bot, title: 'MarxBot', desc: 'An AI assistant for research, reading, and analysis. Members only.' },
                             ].map((feature, i) => {

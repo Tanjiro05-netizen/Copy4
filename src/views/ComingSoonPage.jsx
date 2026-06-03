@@ -28,8 +28,8 @@ const FEATURE_CONFIG = {
     },
     directory: {
         icon: Users,
-        title: 'Member Directory',
-        desc: 'Browse and connect with other members of the platform. Available to members.',
+        title: 'Directory',
+        desc: '',
     },
     forum: {
         icon: MessageSquare,
