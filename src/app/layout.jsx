@@ -11,11 +11,7 @@ import '@/src/components/visualizations/SplitView.css';
 import '@/src/components/visualizations/StockMarketCrash.css';
 import '@/src/components/visualizations/WhatIfAnalysis.css';
 import '@/src/components/visualizations/DynamicBackground.css';
-import { getServerAuthState } from '@/src/lib/server-auth.js';
 import Providers from './providers.jsx';
-
-// All pages depend on runtime auth state (cookies/headers), so never statically prerender.
-export const dynamic = 'force-dynamic';
 
 
 const description =
@@ -56,11 +52,11 @@ export const viewport = {
   themeColor: '#0a0a0a',
 };
 
-export default async function RootLayout({ children }) {
-  const initialAuth = {
-    ...(await getServerAuthState()),
-    resolved: true,
-  };
+export default function RootLayout({ children }) {
+  // Auth state is resolved client-side by AuthContext via supabase.auth.onAuthStateChange.
+  // Fetching it server-side on every request (force-dynamic) caused a full Supabase round-trip
+  // on every page navigation — making the site feel very slow.
+  const initialAuth = { user: null, profile: null, resolved: false };
 
   return (
     <html lang="en">
