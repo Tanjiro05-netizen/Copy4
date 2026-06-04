@@ -41,7 +41,12 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     
     useEffect(() => {
         const cover = isAudiobook ? book.cover_url : book.cover_image_url;
-        if (!cover) return;
+        if (!cover) {
+            setCoverUrl(null);
+            return;
+        }
+        // Reset error state whenever cover source changes
+        setImageError(false);
         // If the URL is already from Supabase storage or an external URL
         if (cover.includes('supabase') || cover.startsWith('http')) {
             setCoverUrl(cover);
@@ -91,9 +96,9 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                 </div>
             )}
             <div className={viewMode === 'grid' ? 'aspect-[3/4] mb-4 relative' : 'w-32 flex-shrink-0 relative'}>
-                {imageError ? (
+                {imageError || !coverUrl ? (
                     <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center">
-                        <p className="text-gray-400 text-xs">{book.title}</p>
+                        <p className="text-gray-400 text-xs text-center px-2">{book.title}</p>
                     </div>
                 ) : (
                     <img
