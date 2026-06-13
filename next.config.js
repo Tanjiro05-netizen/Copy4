@@ -37,10 +37,9 @@ const nextConfig = {
     if (!dev) {
       config.cache = false;
 
-      // Folders to completely strip and exclude from production builds.
+      // Member-facing sections that are intentionally hidden in production.
       // Their page files are swapped with a dummy component that redirects to /coming-soon.
       const blockedFolders = [
-        'admin',
         'theory',
         'analysis',
         'politics',
