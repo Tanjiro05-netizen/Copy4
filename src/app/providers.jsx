@@ -10,7 +10,8 @@ import ErrorBoundary from '@/src/components/ErrorBoundary.jsx';
 import FloatingMiniPlayer from '@/src/components/Library/FloatingMiniPlayer.jsx';
 import MaintenancePage from '@/src/views/MaintenancePage.jsx';
 
-const DEVELOPMENT_CACHE_NAMES = ['api-cache', 'google-fonts', 'images'];
+const DEVELOPMENT_CACHE_NAMES = ['api-cache', 'google-fonts', 'images', 'images-v2'];
+const SERVICE_WORKER_RELOAD_KEY = 'marxist-platform-sw-reload-at';
 
 const isDevelopmentAppCache = (cacheName) =>
   DEVELOPMENT_CACHE_NAMES.includes(cacheName) ||
@@ -45,13 +46,58 @@ const clearDevelopmentServiceWorkersAndCaches = () => {
   }
 };
 
+const reloadForServiceWorkerUpdate = () => {
+  let shouldReload = true;
+
+  try {
+    const lastReloadAt = Number(sessionStorage.getItem(SERVICE_WORKER_RELOAD_KEY) || 0);
+    shouldReload = Date.now() - lastReloadAt > 10000;
+    if (shouldReload) sessionStorage.setItem(SERVICE_WORKER_RELOAD_KEY, `${Date.now()}`);
+  } catch {
+    shouldReload = true;
+  }
+
+  if (shouldReload) window.location.reload();
+};
+
+const activateWaitingServiceWorker = (registration) => {
+  if (!navigator.serviceWorker.controller || !registration?.waiting) return;
+  registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+};
+
+const watchServiceWorkerUpdate = (registration) => {
+  if (!registration?.installing) return;
+
+  registration.installing.addEventListener('statechange', () => {
+    activateWaitingServiceWorker(registration);
+  });
+};
+
 const registerProductionServiceWorker = () => {
   if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
 
+  let refreshing = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    refreshing = true;
+    reloadForServiceWorkerUpdate();
+  });
+
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js').catch((error) => {
-      console.error('Error during service worker registration:', error);
-    });
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then((registration) => {
+        activateWaitingServiceWorker(registration);
+        watchServiceWorkerUpdate(registration);
+        registration.addEventListener('updatefound', () => watchServiceWorkerUpdate(registration));
+        registration.update().catch((error) => {
+          console.warn('Failed to check for service worker update:', error);
+        });
+      })
+      .catch((error) => {
+        console.error('Error during service worker registration:', error);
+      });
   });
 };
 
