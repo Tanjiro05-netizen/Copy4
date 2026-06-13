@@ -38,7 +38,6 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     const initialCover = isAudiobook ? book.cover_url : book.cover_image_url;
     const [coverUrl, setCoverUrl] = useState(initialCover);
     const [imageError, setImageError] = useState(false);
-    const [triedLowercase, setTriedLowercase] = useState(false);
     
     useEffect(() => {
         const cover = isAudiobook ? book.cover_url : book.cover_image_url;
@@ -48,7 +47,6 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
         }
         // Reset error state whenever cover source changes
         setImageError(false);
-        setTriedLowercase(false);
         // If the URL is already from Supabase storage or an external URL
         if (cover.includes('supabase') || cover.startsWith('http')) {
             setCoverUrl(cover);
@@ -66,18 +64,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     }, [book.cover_image_url, book.cover_url, isAudiobook]);
     
     const handleImageError = () => {
-        // Supabase storage on Linux is case-sensitive. If the URL has an uppercase
-        // extension (e.g. .PNG), retry once with a fully lowercase URL.
-        if (!triedLowercase && coverUrl) {
-            const lowered = coverUrl.replace(/\.[^.]+$/, (ext) => ext.toLowerCase());
-            if (lowered !== coverUrl) {
-                console.warn('Cover image failed, retrying with lowercase URL:', lowered);
-                setTriedLowercase(true);
-                setCoverUrl(lowered);
-                return;
-            }
-        }
-        console.error('Cover image failed to load:', coverUrl);
+        console.error('Image failed to load:', coverUrl);
         setImageError(true);
     };
 

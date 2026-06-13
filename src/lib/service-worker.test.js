@@ -7,9 +7,15 @@ const serviceWorkerSource = fs.readFileSync(
   'utf8'
 );
 
-const loadServiceWorker = () => {
+const loadServiceWorker = ({ fetchResponse = { status: 200 } } = {}) => {
   const listeners = {};
-  const fetch = jest.fn(() => Promise.resolve({ status: 200 }));
+  const fetch = jest.fn(() => Promise.resolve(fetchResponse));
+  const cache = {
+    keys: jest.fn(() => Promise.resolve([])),
+    delete: jest.fn(() => Promise.resolve(true)),
+    match: jest.fn(() => Promise.resolve(null)),
+    put: jest.fn(() => Promise.resolve()),
+  };
 
   const context = {
     URL,
@@ -25,14 +31,7 @@ const loadServiceWorker = () => {
     Response: class Response {},
     caches: {
       keys: jest.fn(() => Promise.resolve([])),
-      open: jest.fn(() =>
-        Promise.resolve({
-          keys: jest.fn(() => Promise.resolve([])),
-          delete: jest.fn(() => Promise.resolve(true)),
-          match: jest.fn(() => Promise.resolve(null)),
-          put: jest.fn(() => Promise.resolve()),
-        })
-      ),
+      open: jest.fn(() => Promise.resolve(cache)),
     },
     fetch,
     self: {
@@ -48,7 +47,7 @@ const loadServiceWorker = () => {
 
   vm.runInNewContext(serviceWorkerSource, context);
 
-  return { fetch, listeners };
+  return { cache, fetch, listeners };
 };
 
 describe('service worker', () => {
@@ -69,5 +68,31 @@ describe('service worker', () => {
     expect(event.respondWith).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(request);
     await expect(event.respondWith.mock.calls[0][0]).resolves.toEqual({ status: 200 });
+  });
+
+  it('passes opaque cross-origin image responses through without rebuilding them', async () => {
+    const opaqueResponse = {
+      status: 0,
+      type: 'opaque',
+      clone: jest.fn(),
+    };
+    const { cache, fetch, listeners } = loadServiceWorker({ fetchResponse: opaqueResponse });
+    const request = {
+      method: 'GET',
+      url: 'https://example.supabase.co/storage/v1/object/public/covers/cover.png',
+      destination: 'image',
+    };
+    const event = {
+      request,
+      respondWith: jest.fn(),
+    };
+
+    listeners.fetch(event);
+
+    expect(event.respondWith).toHaveBeenCalledTimes(1);
+    await expect(event.respondWith.mock.calls[0][0]).resolves.toBe(opaqueResponse);
+    expect(fetch).toHaveBeenCalledWith(request);
+    expect(opaqueResponse.clone).not.toHaveBeenCalled();
+    expect(cache.put).not.toHaveBeenCalled();
   });
 });

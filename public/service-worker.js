@@ -1,6 +1,6 @@
 const STATIC_CACHE = 'static-v1';
 const GOOGLE_FONTS_CACHE = 'google-fonts';
-const IMAGE_CACHE = 'images';
+const IMAGE_CACHE = 'images-v2';
 const API_CACHE = 'api-cache';
 const IMAGE_MAX_ENTRIES = 60;
 const API_MAX_ENTRIES = 100;
@@ -16,21 +16,28 @@ const trimCache = async (cacheName, maxEntries) => {
 };
 
 const cacheResponse = async (cacheName, request, response, maxEntries) => {
-  if (!response || ![0, 200].includes(response.status)) return response;
+  // Cross-origin image requests are often opaque responses with status 0.
+  // They cannot be reconstructed with custom headers, so pass them through.
+  if (!response || response.status !== 200 || response.type === 'opaque') return response;
 
-  const cache = await caches.open(cacheName);
-  const headers = new Headers(response.headers);
-  headers.set('x-sw-cached-at', `${Date.now()}`);
-  const body = await response.clone().blob();
-  await cache.put(
-    request,
-    new Response(body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    })
-  );
-  await trimCache(cacheName, maxEntries);
+  try {
+    const cache = await caches.open(cacheName);
+    const headers = new Headers(response.headers);
+    headers.set('x-sw-cached-at', `${Date.now()}`);
+    const body = await response.clone().blob();
+    await cache.put(
+      request,
+      new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      })
+    );
+    await trimCache(cacheName, maxEntries);
+  } catch {
+    return response;
+  }
+
   return response;
 };
 
