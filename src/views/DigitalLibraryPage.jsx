@@ -24,6 +24,29 @@ const categoryIcons = {
     'default': Database
 };
 
+const getCoverImageSrc = (coverUrl) => {
+    if (!coverUrl) return coverUrl;
+
+    try {
+        const parsedCoverUrl = new URL(coverUrl);
+        const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
+            ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
+            : null;
+
+        if (
+            supabaseOrigin &&
+            parsedCoverUrl.origin === supabaseOrigin &&
+            parsedCoverUrl.pathname.startsWith('/storage/v1/object/public/')
+        ) {
+            return `/api/cover-image?url=${encodeURIComponent(parsedCoverUrl.toString())}`;
+        }
+    } catch {
+        return coverUrl;
+    }
+
+    return coverUrl;
+};
+
 const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     const router = useRouter();
     const isAudiobook = book.isAudiobook;
@@ -35,7 +58,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
         .getPublicUrl(book.pdf_filename)?.data?.publicUrl : null;
     
     // Get a proper public URL for cover image from Supabase storage
-    const initialCover = isAudiobook ? book.cover_url : book.cover_image_url;
+    const initialCover = getCoverImageSrc(isAudiobook ? book.cover_url : book.cover_image_url);
     const [coverUrl, setCoverUrl] = useState(initialCover);
     const [imageError, setImageError] = useState(false);
     
@@ -49,7 +72,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
         setImageError(false);
         // If the URL is already from Supabase storage or an external URL
         if (cover.includes('supabase') || cover.startsWith('http')) {
-            setCoverUrl(cover);
+            setCoverUrl(getCoverImageSrc(cover));
             return;
         }
         
@@ -58,7 +81,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
             const filename = cover.split('/').pop();
             const { data } = supabase.storage.from('covers').getPublicUrl(filename);
             if (data?.publicUrl) {
-                setCoverUrl(data.publicUrl);
+                setCoverUrl(getCoverImageSrc(data.publicUrl));
             }
         }
     }, [book.cover_image_url, book.cover_url, isAudiobook]);

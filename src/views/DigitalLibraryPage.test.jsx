@@ -49,8 +49,15 @@ jest.mock('../supabaseClient', () => ({
 }));
 
 describe('DigitalLibraryPage', () => {
+    const originalSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
+    });
+
+    afterEach(() => {
+        process.env.NEXT_PUBLIC_SUPABASE_URL = originalSupabaseUrl;
     });
 
     test('shows ebooks without PDFs and hides the external PDF button', async () => {
@@ -90,12 +97,52 @@ describe('DigitalLibraryPage', () => {
 
         render(<DigitalLibraryPage />);
 
-        expect(await screen.findByText('Book Without PDF')).toBeInTheDocument();
+        expect(await screen.findByRole('link', { name: 'Book Without PDF' })).toBeInTheDocument();
         expect(screen.getByText('Read Now')).toBeInTheDocument();
         expect(screen.queryByTitle('Open in external viewer')).not.toBeInTheDocument();
 
         await waitFor(() => {
             expect(supabase.storage.from).not.toHaveBeenCalledWith('library');
         });
+    });
+
+    test('serves Supabase cover images through the same-origin cover proxy', async () => {
+        const coverUrl = 'https://example.supabase.co/storage/v1/object/public/covers/covered-book.png';
+        const bookWithCover = {
+            id: 'book-2',
+            title: 'Covered Book',
+            author: 'Test Author',
+            year: 1921,
+            description: 'Has a cover.',
+            category: 'History',
+            era: '20th Century',
+            language: 'English',
+            pages: 101,
+            epub_filename: 'covered.epub',
+            pdf_filename: null,
+            cover_image_url: coverUrl,
+        };
+
+        supabase.from.mockImplementation((tableName) => ({
+            select: jest.fn((columns) => {
+                if (tableName === 'digital_library_books' && columns === '*') {
+                    return Promise.resolve({ data: [bookWithCover], error: null });
+                }
+                if (tableName === 'digital_library_books' && columns === 'category') {
+                    return Promise.resolve({ data: [{ category: 'History' }], error: null });
+                }
+                if (tableName === 'audiobooks') {
+                    return Promise.resolve({ data: [], error: null });
+                }
+                throw new Error(`Unexpected select ${tableName}.${columns}`);
+            }),
+        }));
+
+        render(<DigitalLibraryPage />);
+
+        expect(await screen.findByRole('img', { name: 'Covered Book' })).toHaveAttribute(
+            'src',
+            `/api/cover-image?url=${encodeURIComponent(coverUrl)}`
+        );
     });
 });
