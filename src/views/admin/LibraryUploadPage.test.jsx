@@ -10,6 +10,9 @@ const AUTH_STORAGE_KEY = 'sb-yghsprwrzgfegvfbjmkq-auth-token';
 
 jest.mock('../../supabaseClient', () => ({
     supabase: {
+        auth: {
+            getSession: jest.fn(),
+        },
         from: jest.fn(),
         storage: {
             from: jest.fn(),
@@ -101,7 +104,12 @@ describe('LibraryUploadPage ebook editing', () => {
         useSearchParams.mockImplementation(() => mockSearchParams);
         mockPush.mockReset();
         mockSearchParams = new URLSearchParams();
+        localStorage.clear();
         localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ access_token: 'token-123' }));
+        supabase.auth.getSession.mockResolvedValue({
+            data: { session: { access_token: 'session-token-123' } },
+            error: null,
+        });
         process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'anon-key';
         global.fetch = jest.fn().mockResolvedValue({
@@ -146,6 +154,7 @@ describe('LibraryUploadPage ebook editing', () => {
 
         const patchCall = fetchCallsFor('/rest/v1/digital_library_books?id=eq.book-1')[0];
         expect(patchCall[1]).toEqual(expect.objectContaining({ method: 'PATCH' }));
+        expect(patchCall[1].headers.Authorization).toBe('Bearer session-token-123');
         expect(jsonBodyFor(patchCall)).toEqual(
             expect.objectContaining({
                 author: 'New Author',
@@ -181,6 +190,11 @@ describe('LibraryUploadPage ebook editing', () => {
         await waitFor(() => {
             expect(fetchCallsFor('/storage/v1/object/library/pdf-existing-book-1710000000000.pdf')).toHaveLength(1);
         });
+        expect(fetchCallsFor('/storage/v1/object/library/pdf-existing-book-1710000000000.pdf')[0][1].headers)
+            .toEqual(expect.objectContaining({
+                Authorization: 'Bearer session-token-123',
+                apikey: 'anon-key',
+            }));
 
         await waitFor(() => {
             expect(fetchCallsFor('/rest/v1/digital_library_books?id=eq.book-1')).toHaveLength(1);
@@ -266,5 +280,33 @@ describe('LibraryUploadPage ebook editing', () => {
             expect(fetchCallsFor('/storage/v1/object/library/old.pdf')).toHaveLength(1);
             expect(fetchCallsFor('/storage/v1/object/covers/old-cover.jpg')).toHaveLength(1);
         });
+    });
+
+    test('falls back to a Supabase storage token when the current session is not available', async () => {
+        mockSearchParams = new URLSearchParams('edit=book&id=book-1');
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        localStorage.setItem(
+            'sb-example-auth-token',
+            JSON.stringify({ currentSession: { access_token: 'stored-session-token' } })
+        );
+        supabase.auth.getSession.mockResolvedValueOnce({
+            data: { session: null },
+            error: null,
+        });
+        setupEditBookMocks({
+            book: { ...existingBook, pdf_filename: null, cover_image_url: null },
+        });
+
+        render(<LibraryUploadPage />);
+
+        await screen.findByDisplayValue('Existing Book');
+        fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+        await waitFor(() => {
+            expect(fetchCallsFor('/rest/v1/digital_library_books?id=eq.book-1')).toHaveLength(1);
+        });
+
+        const patchCall = fetchCallsFor('/rest/v1/digital_library_books?id=eq.book-1')[0];
+        expect(patchCall[1].headers.Authorization).toBe('Bearer stored-session-token');
     });
 });

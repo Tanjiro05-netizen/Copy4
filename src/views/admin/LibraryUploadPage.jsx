@@ -32,6 +32,9 @@ const LANGUAGES = [
     'Chinese',
 ];
 
+const AUTH_REQUIRED_MESSAGE = 'Not authenticated with Supabase - please log out and log back in with your admin account.';
+const AUTH_SESSION_TIMEOUT_MS = 10000;
+
 const getFilenameFromStoragePath = (path) => {
     if (!path) return '';
     return decodeURIComponent(`${path}`.split('?')[0].split('/').pop() || path);
@@ -50,6 +53,91 @@ const getCoverStoragePath = (coverUrl) => {
     }
 
     return null;
+};
+
+const getTokenFromStoredPayload = (payload) =>
+    payload?.access_token ||
+    payload?.session?.access_token ||
+    payload?.currentSession?.access_token ||
+    null;
+
+const getSupabaseProjectRef = () => {
+    try {
+        return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname.split('.')[0] || null;
+    } catch {
+        return null;
+    }
+};
+
+const getSupabaseAuthStorageKeys = () => {
+    if (typeof localStorage === 'undefined') return [];
+
+    const keys = [];
+    const projectRef = getSupabaseProjectRef();
+    if (projectRef) {
+        keys.push(`sb-${projectRef}-auth-token`);
+    }
+
+    try {
+        for (let i = 0; i < localStorage.length; i += 1) {
+            const key = localStorage.key(i);
+            if (key?.startsWith('sb-') && key.endsWith('-auth-token') && !keys.includes(key)) {
+                keys.push(key);
+            }
+        }
+    } catch {
+        return keys;
+    }
+
+    return keys;
+};
+
+const getStoredSupabaseToken = () => {
+    for (const key of getSupabaseAuthStorageKeys()) {
+        try {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            const token = getTokenFromStoredPayload(JSON.parse(raw));
+            if (token) return token;
+        } catch {
+            // Ignore malformed or stale auth entries and keep looking.
+        }
+    }
+
+    return null;
+};
+
+const withAuthTimeout = async (promise) => {
+    let timeoutId;
+
+    try {
+        return await Promise.race([
+            promise,
+            new Promise((_, reject) => {
+                timeoutId = setTimeout(
+                    () => reject(new Error('Auth session check timed out.')),
+                    AUTH_SESSION_TIMEOUT_MS
+                );
+            }),
+        ]);
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
+
+const getActiveSupabaseToken = async () => {
+    try {
+        if (supabase.auth?.getSession) {
+            const { data, error } = await withAuthTimeout(supabase.auth.getSession());
+            if (error) throw error;
+            const sessionToken = data?.session?.access_token;
+            if (sessionToken) return sessionToken;
+        }
+    } catch (err) {
+        console.warn('[Upload] Supabase session lookup failed; checking stored auth token.', err);
+    }
+
+    return getStoredSupabaseToken();
 };
 
 const LibraryUploadPage = () => {
@@ -324,31 +412,18 @@ const LibraryUploadPage = () => {
         return `${prefix}-${sanitizedTitle}-${timestamp}.${extension}`;
     };
 
-    // Get auth token directly from localStorage — avoids hanging supabase.auth calls
-    const getStoredToken = () => {
-        try {
-            const storageKey = `sb-yghsprwrzgfegvfbjmkq-auth-token`;
-            const raw = localStorage.getItem(storageKey);
-            if (!raw) return null;
-            const parsed = JSON.parse(raw);
-            return parsed?.access_token || null;
-        } catch {
-            return null;
-        }
-    };
-
     // Direct fetch upload — bypasses the Supabase JS client entirely
-    const directUpload = async (bucket, filename, file) => {
-        const token = getStoredToken();
-        if (!token) throw new Error('Not authenticated — please log out and log back in');
-
+    const directUpload = async (bucket, filename, file, token) => {
+        if (!token) throw new Error(AUTH_REQUIRED_MESSAGE);
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
         const url = `${supabaseUrl}/storage/v1/object/${bucket}/${encodeURIComponent(filename)}`;
 
         const res = await fetch(url, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
+                'apikey': anonKey,
                 'x-upsert': 'false',
             },
             body: file,
@@ -393,11 +468,10 @@ const LibraryUploadPage = () => {
         };
 
         try {
-            // Quick token check — no Supabase client calls
             setUploadStep('Preparing upload...');
-            if (!getStoredToken()) {
-                throw new Error('Not authenticated — please log out and log back in');
-            }
+            const token = await getActiveSupabaseToken();
+            if (!token) throw new Error(AUTH_REQUIRED_MESSAGE);
+
             // Upload EPUB to library bucket for new books. Existing books keep their reader file.
             let epubFilename = existingBook?.epub_filename || null;
             if (!isEditingBook) {
@@ -406,7 +480,7 @@ const LibraryUploadPage = () => {
                 console.log('[Upload] Starting EPUB upload...', sizeMB, 'MB');
                 epubFilename = generateFilename(epubFile, 'epub');
                 const { error: epubError } = await withTimeout(
-                    directUpload('library', epubFilename, epubFile),
+                    directUpload('library', epubFilename, epubFile, token),
                     timeoutForFile(epubFile, 120000),
                     'EPUB upload'
                 );
@@ -424,7 +498,7 @@ const LibraryUploadPage = () => {
                 console.log('[Upload] Starting PDF upload...', pdfSizeMB, 'MB');
                 pdfFilename = generateFilename(pdfFile, 'pdf');
                 const { error: pdfError } = await withTimeout(
-                    directUpload('library', pdfFilename, pdfFile),
+                    directUpload('library', pdfFilename, pdfFile, token),
                     timeoutForFile(pdfFile, 120000),
                     'PDF upload'
                 );
@@ -447,7 +521,7 @@ const LibraryUploadPage = () => {
                 console.log('[Upload] Starting cover upload...');
                 const coverFilename = generateFilename(coverFile, 'cover');
                 const { error: coverError } = await withTimeout(
-                    directUpload('covers', coverFilename, coverFile),
+                    directUpload('covers', coverFilename, coverFile, token),
                     60000,
                     'Cover upload'
                 );
@@ -487,7 +561,6 @@ const LibraryUploadPage = () => {
             setUploadStep('Saving to database...');
             console.log(isEditingBook ? '[Edit] Updating database record...' : '[Upload] Inserting database record...');
 
-            const token = getStoredToken();
             const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
             const restBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/digital_library_books`;
 
@@ -518,12 +591,12 @@ const LibraryUploadPage = () => {
                 try {
                     if (oldPdfToRemove) {
                         fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/library/${encodeURIComponent(oldPdfToRemove)}`, {
-                            method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` },
+                            method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'apikey': anonKey },
                         }).catch(() => {});
                     }
                     if (oldCoverToRemove) {
                         fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/covers/${encodeURIComponent(oldCoverToRemove)}`, {
-                            method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` },
+                            method: 'DELETE', headers: { 'Authorization': `Bearer ${token}`, 'apikey': anonKey },
                         }).catch(() => {});
                     }
                 } catch (e) {
