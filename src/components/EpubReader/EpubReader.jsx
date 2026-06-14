@@ -7,6 +7,11 @@ import {
   Maximize2, Minimize2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  findFullBookAnchorTarget,
+  getHrefParts,
+  getScrollTopForTarget,
+} from './epubNavigation.js';
 
 const ToolbarBtn = ({ icon: Icon, active, onClick, title }) => (
   <motion.button
@@ -83,6 +88,21 @@ const normalizeViewMode = (mode) => {
   return SCROLLED_VIEW_MODE;
 };
 
+const isResolvableEpubAsset = (url) => {
+  const value = `${url || ''}`.trim();
+  return value && !/^(?:[a-z][a-z0-9+.-]*:|#|\/\/)/i.test(value);
+};
+
+const resolveRelativeEpubPath = (section, assetPath) => {
+  const [pathWithoutHash, hash = ''] = `${assetPath || ''}`.split('#');
+  const [pathWithoutSearch, search = ''] = pathWithoutHash.split('?');
+  const basePath = section?.url || section?.href || '/';
+  const normalizedBase = basePath.startsWith('/') ? basePath : `/${basePath}`;
+  const resolved = new URL(pathWithoutSearch, `https://epub.local${normalizedBase}`).pathname;
+
+  return `${decodeURIComponent(resolved)}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+};
+
 const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullscreen, fallbackUrl }) => {
   const { t } = useTranslation();
   const viewerRef = useRef(null);
@@ -98,6 +118,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
   onProgressRef.current = onProgressChange;
 
   const storageKey = url ? `epub-cfi::${url.split('?')[0].split('/').pop()}` : null;
+  const scrollStorageKey = storageKey ? `${storageKey}::scroll` : null;
 
   const [toc, setToc] = useState([]);
   const [showToc, setShowToc] = useState(false);
@@ -119,6 +140,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
   const [fullBookSections, setFullBookSections] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [reloadNonce, setReloadNonce] = useState(0);
   const isScrolledMode = viewMode === SCROLLED_VIEW_MODE;
 
   // Auto-hide UI after 3s of inactivity
@@ -166,7 +188,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
 
       book.opened?.finally(() => book.destroy());
     };
-  }, [url]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [url, reloadNonce]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goNext = useCallback(() => {
     if (renditionRef.current && viewMode === 'paginated') renditionRef.current.next();
@@ -208,7 +230,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     }
   }, []);
 
-  const extractSectionBody = useCallback((html) => {
+  const extractSectionBody = useCallback(async (html, section, book) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const body = doc.body;
@@ -218,6 +240,40 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     body?.querySelectorAll('[name]').forEach((element) => {
       element.setAttribute('data-epub-anchor-name', element.getAttribute('name') || '');
     });
+
+    const resolveAsset = async (element, attrName, namespace = null) => {
+      const value = namespace
+        ? element.getAttributeNS(namespace, attrName) || element.getAttribute(`xlink:${attrName}`)
+        : element.getAttribute(attrName);
+
+      if (!isResolvableEpubAsset(value) || !book?.archive?.createUrl) return;
+
+      try {
+        const resolvedPath = resolveRelativeEpubPath(section, value);
+        const resolvedUrl = await book.archive.createUrl(resolvedPath);
+        if (resolvedUrl) {
+          if (namespace) {
+            element.setAttributeNS(namespace, attrName, resolvedUrl);
+            element.setAttribute(`xlink:${attrName}`, resolvedUrl);
+          }
+          element.setAttribute(attrName, resolvedUrl);
+        }
+      } catch (error) {
+        console.warn('[EPUB] Could not resolve embedded asset:', value, error);
+      }
+    };
+
+    const assetTasks = [];
+    body?.querySelectorAll('img[src]').forEach((element) => {
+      assetTasks.push(resolveAsset(element, 'src'));
+    });
+    body?.querySelectorAll('svg image').forEach((element) => {
+      assetTasks.push(resolveAsset(element, 'href', 'http://www.w3.org/1999/xlink'));
+      assetTasks.push(resolveAsset(element, 'href'));
+    });
+
+    await Promise.all(assetTasks);
+
     return body?.innerHTML || html;
   }, []);
 
@@ -258,7 +314,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 return section.href;
               }
             })(),
-            html: extractSectionBody(output),
+            html: await extractSectionBody(output, section, book),
           });
           section.unload();
         }
@@ -272,7 +328,8 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
         requestAnimationFrame(() => {
           const scroller = fullScrollRef.current;
           if (!scroller) return;
-          scroller.scrollTop = 0;
+          const savedScroll = scrollStorageKey ? Number(localStorage.getItem(scrollStorageKey)) : 0;
+          scroller.scrollTop = Number.isFinite(savedScroll) && savedScroll > 0 ? savedScroll : 0;
           const firstTocItem = tocRef.current[0];
           setCurrentChapter(firstTocItem?.label || title || '');
         });
@@ -290,7 +347,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       cancelled = true;
       if (renderTimeoutRef.current) clearTimeout(renderTimeoutRef.current);
     };
-  }, [extractSectionBody, isScrolledMode, t, title, url]);
+  }, [extractSectionBody, isScrolledMode, t, title, url, reloadNonce, scrollStorageKey]);
 
   const handleFullBookScroll = useCallback(() => {
     const scroller = fullScrollRef.current;
@@ -301,6 +358,9 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     const pct = maxScroll > 0 ? Math.round((scroller.scrollTop / maxScroll) * 100) : 0;
     setReadingProgress(pct);
     if (onProgressRef.current) onProgressRef.current(pct);
+    if (scrollStorageKey) {
+      localStorage.setItem(scrollStorageKey, String(Math.max(0, Math.round(scroller.scrollTop))));
+    }
 
     const sectionNodes = Array.from(scroller.querySelectorAll('[data-epub-section="true"]'));
     const activeNode = sectionNodes
@@ -319,14 +379,14 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       });
       if (match) setCurrentChapter(match.label);
     }
-  }, [resetIdleTimer]);
+  }, [resetIdleTimer, scrollStorageKey]);
 
-  const scrollToFullBookHref = useCallback((href, behavior = 'smooth') => {
+  const scrollToFullBookHref = useCallback((href, behavior = 'smooth', { sourceAnchor } = {}) => {
     const scroller = fullScrollRef.current;
     if (!scroller || !href) return false;
 
-    const [rawBase, rawHash] = href.split('#');
-    const targetCanonical = rawBase ? getCanonicalHref(rawBase) : null;
+    const { base, hash } = getHrefParts(href);
+    const targetCanonical = base ? getCanonicalHref(base) : null;
     let targetSection = null;
 
     if (targetCanonical) {
@@ -334,21 +394,23 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       targetSection = sections.find((section) => section.getAttribute('data-canonical') === targetCanonical);
     }
 
-    if (!targetSection && !rawBase) {
-      targetSection = scroller.querySelector('[data-epub-section="true"]');
+    let targetNode = null;
+    if (hash) {
+      targetNode = findFullBookAnchorTarget(scroller, {
+        hash,
+        preferredSection: targetSection,
+        sourceAnchor,
+      });
     }
 
-    if (!targetSection) return false;
-
-    let targetNode = targetSection;
-    if (rawHash) {
-      const anchor = decodeURIComponent(rawHash);
-      const escapeCssValue = window.CSS?.escape || ((value) => `${value}`.replace(/["\\]/g, '\\$&'));
-      const anchorSelector = `[data-epub-anchor-id="${escapeCssValue(anchor)}"], [data-epub-anchor-name="${escapeCssValue(anchor)}"]`;
-      targetNode = targetSection.querySelector(anchorSelector) || targetSection;
+    if (!targetNode && targetSection && base) {
+      targetNode = targetSection;
     }
 
-    scroller.scrollTo({ top: targetNode.offsetTop, behavior });
+    if (!targetNode) return false;
+
+    const top = Math.max(0, getScrollTopForTarget(scroller, targetNode));
+    scroller.scrollTo({ top, behavior });
     return true;
   }, [getCanonicalHref]);
 
@@ -365,10 +427,53 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     event.preventDefault();
     event.stopPropagation();
 
-    if (!scrollToFullBookHref(href)) {
+    if (!scrollToFullBookHref(href, 'smooth', { sourceAnchor: anchor })) {
       resetIdleTimer();
     }
   }, [resetIdleTimer, scrollToFullBookHref]);
+
+  useEffect(() => {
+    if (!url) return undefined;
+
+    let restoreTimer;
+    const restoreReader = () => {
+      clearTimeout(restoreTimer);
+      restoreTimer = setTimeout(() => {
+        if (document.visibilityState && document.visibilityState !== 'visible') return;
+
+        if (isScrolledMode) {
+          const hasSections = !!fullScrollRef.current?.querySelector('[data-epub-section="true"]');
+          if (loadError || !isFullBookRendered || !hasSections) {
+            setReloadNonce((value) => value + 1);
+          }
+          return;
+        }
+
+        if (renditionRef.current && locationRef.current) {
+          renditionRef.current.display(locationRef.current).catch(() => {
+            setReloadNonce((value) => value + 1);
+          });
+        } else if (loadError || !isRendered) {
+          setReloadNonce((value) => value + 1);
+        }
+      }, 150);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') restoreReader();
+    };
+
+    window.addEventListener('pageshow', restoreReader);
+    window.addEventListener('focus', restoreReader);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearTimeout(restoreTimer);
+      window.removeEventListener('pageshow', restoreReader);
+      window.removeEventListener('focus', restoreReader);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isFullBookRendered, isRendered, isScrolledMode, loadError, url]);
 
   // Re-render rendition whenever view mode changes
   useEffect(() => {
@@ -633,7 +738,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       if (renderTimeoutRef.current) clearTimeout(renderTimeoutRef.current);
     };
 
-  }, [url, viewMode, isScrolledMode, goNext, goPrev, resetIdleTimer, t, fontSize, storageKey]);
+  }, [url, viewMode, isScrolledMode, goNext, goPrev, resetIdleTimer, t, fontSize, storageKey, reloadNonce]);
 
   // Handle dynamic font size updates
   useEffect(() => {
@@ -1021,6 +1126,13 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 margin: 2em auto;
                 display: block;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+              }
+              .epub-full-section svg {
+                display: block;
+                width: min(100%, 460px);
+                height: auto;
+                max-height: 70vh;
+                margin: 2em auto;
               }
               .epub-full-section .indentb,
               .epub-full-section .quoteb {
