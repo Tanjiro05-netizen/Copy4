@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import {
     canProfileManagePolitics,
@@ -27,6 +27,7 @@ const AuthContext = createContext();
 const LOGIN_TIMEOUT_MS = 30000;
 const SESSION_TIMEOUT_MS = 20000;
 const SESSION_RETRY_DELAY_MS = 1200;
+const RESUME_SESSION_SYNC_MIN_INTERVAL_MS = 5000;
 
 export const AUTH_TIMEOUT_MESSAGE = 'Connection is slow — Supabase may be waking up. Please try again in a few seconds.';
 
@@ -86,12 +87,48 @@ const getSessionWithRetry = async () => {
     }
 };
 
+const refreshSessionWithFallback = async () => {
+    let refreshError;
+
+    try {
+        const response = await withTimeout(
+            supabase.auth.refreshSession(),
+            SESSION_TIMEOUT_MS,
+            'Auth session refresh timed out.'
+        );
+        if (!response?.error) return response;
+        refreshError = response.error;
+    } catch (error) {
+        refreshError = error;
+    }
+
+    try {
+        return await getSessionWithRetry();
+    } catch (fallbackError) {
+        fallbackError.cause = refreshError;
+        throw fallbackError;
+    }
+};
+
 export const AuthProvider = ({ children, initialUser = null, initialProfile = null, initialAuthResolved = false }) => {
     const [user, setUser] = useState(initialUser);
     const [profile, setProfile] = useState(initialProfile);
     const [loading, setLoading] = useState(!initialAuthResolved);
+    const latestUserRef = useRef(initialUser);
+    const lastResumeSessionSyncAtRef = useRef(0);
+    const resumeSessionSyncPromiseRef = useRef(null);
 
-    const fetchProfile = async (userId) => {
+    useEffect(() => {
+        latestUserRef.current = user;
+    }, [user]);
+
+    const applyLocalDevAuth = useCallback(() => {
+        setUser(DEV_ADMIN_USER);
+        setProfile(DEV_ADMIN_PROFILE);
+        setLoading(false);
+    }, []);
+
+    const fetchProfile = useCallback(async (userId) => {
         if (!userId) {
             setProfile(null);
             return;
@@ -111,38 +148,50 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
             console.error('Error fetching profile:', error);
             setProfile(await fetchRoleFallbackProfile(userId));
         }
-    };
+    }, []);
 
-    useEffect(() => {
-        const getSession = async () => {
-            // Check for dev auth bypass
-            if (hasLocalDevAuth()) {
-                setUser(DEV_ADMIN_USER);
-                setProfile(DEV_ADMIN_PROFILE);
-                setLoading(false);
-                return;
+    const syncSession = useCallback(async ({ refresh = false, clearOnFailure = true } = {}) => {
+        if (hasLocalDevAuth()) {
+            applyLocalDevAuth();
+            return;
+        }
+
+        const shouldRefreshExistingSession = refresh && !!latestUserRef.current;
+
+        try {
+            const response = shouldRefreshExistingSession
+                ? await refreshSessionWithFallback()
+                : await getSessionWithRetry();
+            const session = response?.data?.session ?? null;
+
+            if (response?.error) {
+                throw response.error;
             }
 
-            try {
-                const { data: { session } } = await getSessionWithRetry();
-                setUser(session?.user ?? null);
-                if (session?.user) {
-                    await withTimeout(fetchProfile(session.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
-                }
-            } catch (error) {
-                console.warn('Auth session unavailable; continuing without a saved session.', error);
+            setUser(session?.user ?? null);
+            if (session?.user) {
+                await withTimeout(fetchProfile(session.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
+            } else {
+                setProfile(null);
+            }
+        } catch (error) {
+            console.warn('Auth session unavailable; continuing with the current session state.', error);
+            if (clearOnFailure) {
                 setUser(null);
                 setProfile(null);
-            } finally {
-                setLoading(false);
             }
-        };
+        } finally {
+            setLoading(false);
+        }
+    }, [applyLocalDevAuth, fetchProfile]);
 
-        getSession();
+    useEffect(() => {
+        syncSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             // Respect dev auth if present
             if (hasLocalDevAuth()) {
+                applyLocalDevAuth();
                 return;
             }
             setUser(session?.user ?? null);
@@ -151,12 +200,42 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
             } else {
                 setProfile(null);
             }
+            setLoading(false);
         });
+
+        const handleResume = () => {
+            if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+
+            const now = Date.now();
+            if (now - lastResumeSessionSyncAtRef.current < RESUME_SESSION_SYNC_MIN_INTERVAL_MS) return;
+            if (resumeSessionSyncPromiseRef.current) return;
+
+            lastResumeSessionSyncAtRef.current = now;
+            resumeSessionSyncPromiseRef.current = syncSession({ refresh: true, clearOnFailure: false })
+                .finally(() => {
+                    resumeSessionSyncPromiseRef.current = null;
+                });
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                handleResume();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleResume);
+        window.addEventListener('pageshow', handleResume);
+        window.addEventListener('online', handleResume);
 
         return () => {
             subscription?.unsubscribe();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleResume);
+            window.removeEventListener('pageshow', handleResume);
+            window.removeEventListener('online', handleResume);
         };
-    }, []);
+    }, [applyLocalDevAuth, fetchProfile, syncSession]);
 
     const isAdmin = () => {
         if (hasLocalDevAuth()) {
@@ -228,7 +307,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
             }
             setUser(null);
             setProfile(null);
-            // Clear service-worker api-cache to prevent stale session data
+            // Clear the retired service-worker API cache for users who already have it installed.
             if ('caches' in window) {
                 caches.delete('api-cache').catch(() => {});
             }

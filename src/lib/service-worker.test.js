@@ -7,7 +7,7 @@ const serviceWorkerSource = fs.readFileSync(
   'utf8'
 );
 
-const loadServiceWorker = ({ fetchResponse = { status: 200 } } = {}) => {
+const loadServiceWorker = ({ fetchResponse = { status: 200 }, cacheNames = [] } = {}) => {
   const listeners = {};
   const fetch = jest.fn(() => Promise.resolve(fetchResponse));
   const cache = {
@@ -15,6 +15,11 @@ const loadServiceWorker = ({ fetchResponse = { status: 200 } } = {}) => {
     delete: jest.fn(() => Promise.resolve(true)),
     match: jest.fn(() => Promise.resolve(null)),
     put: jest.fn(() => Promise.resolve()),
+  };
+  const cachesApi = {
+    keys: jest.fn(() => Promise.resolve(cacheNames)),
+    delete: jest.fn(() => Promise.resolve(true)),
+    open: jest.fn(() => Promise.resolve(cache)),
   };
 
   const context = {
@@ -29,10 +34,7 @@ const loadServiceWorker = ({ fetchResponse = { status: 200 } } = {}) => {
       set() {}
     },
     Response: class Response {},
-    caches: {
-      keys: jest.fn(() => Promise.resolve([])),
-      open: jest.fn(() => Promise.resolve(cache)),
-    },
+    caches: cachesApi,
     fetch,
     self: {
       addEventListener: (eventName, handler) => {
@@ -47,12 +49,32 @@ const loadServiceWorker = ({ fetchResponse = { status: 200 } } = {}) => {
 
   vm.runInNewContext(serviceWorkerSource, context);
 
-  return { cache, fetch, listeners };
+  return { cache, cachesApi, fetch, listeners };
 };
 
 describe('service worker', () => {
+  it('removes the retired Supabase API cache on activation', async () => {
+    const { cachesApi, listeners } = loadServiceWorker({
+      cacheNames: ['static-v1', 'images-v2', 'api-cache', 'old-cache'],
+    });
+    const waitUntilPromises = [];
+    const event = {
+      waitUntil: jest.fn((promise) => {
+        waitUntilPromises.push(promise);
+      }),
+    };
+
+    listeners.activate(event);
+    await waitUntilPromises[0];
+
+    expect(cachesApi.delete).toHaveBeenCalledWith('api-cache');
+    expect(cachesApi.delete).toHaveBeenCalledWith('old-cache');
+    expect(cachesApi.delete).not.toHaveBeenCalledWith('static-v1');
+    expect(cachesApi.delete).not.toHaveBeenCalledWith('images-v2');
+  });
+
   it('bypasses Supabase auth requests instead of caching them', async () => {
-    const { fetch, listeners } = loadServiceWorker();
+    const { cachesApi, fetch, listeners } = loadServiceWorker();
     const request = {
       method: 'GET',
       url: 'https://example.supabase.co/auth/v1/user',
@@ -67,6 +89,27 @@ describe('service worker', () => {
 
     expect(event.respondWith).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(request);
+    expect(cachesApi.open).not.toHaveBeenCalled();
+    await expect(event.respondWith.mock.calls[0][0]).resolves.toEqual({ status: 200 });
+  });
+
+  it('bypasses Supabase REST requests instead of serving stale cached data', async () => {
+    const { cachesApi, fetch, listeners } = loadServiceWorker();
+    const request = {
+      method: 'GET',
+      url: 'https://example.supabase.co/rest/v1/digital_library_books?select=*',
+      destination: '',
+    };
+    const event = {
+      request,
+      respondWith: jest.fn(),
+    };
+
+    listeners.fetch(event);
+
+    expect(event.respondWith).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith(request);
+    expect(cachesApi.open).not.toHaveBeenCalled();
     await expect(event.respondWith.mock.calls[0][0]).resolves.toEqual({ status: 200 });
   });
 

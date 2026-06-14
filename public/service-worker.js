@@ -1,10 +1,7 @@
 const STATIC_CACHE = 'static-v1';
 const GOOGLE_FONTS_CACHE = 'google-fonts';
 const IMAGE_CACHE = 'images-v2';
-const API_CACHE = 'api-cache';
 const IMAGE_MAX_ENTRIES = 60;
-const API_MAX_ENTRIES = 100;
-const API_MAX_AGE_MS = 5 * 60 * 1000;
 const IMAGE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 const trimCache = async (cacheName, maxEntries) => {
@@ -81,7 +78,7 @@ self.addEventListener('activate', (event) => {
       caches.keys().then((cacheNames) =>
         Promise.all(
           cacheNames
-            .filter((name) => ![STATIC_CACHE, GOOGLE_FONTS_CACHE, IMAGE_CACHE, API_CACHE].includes(name))
+            .filter((name) => ![STATIC_CACHE, GOOGLE_FONTS_CACHE, IMAGE_CACHE].includes(name))
             .map((name) => caches.delete(name))
         )
       ),
@@ -122,6 +119,6 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (isSupabase) {
-    event.respondWith(staleWhileRevalidate(request, API_CACHE, API_MAX_ENTRIES, API_MAX_AGE_MS));
+    event.respondWith(fetch(request));
   }
 });
