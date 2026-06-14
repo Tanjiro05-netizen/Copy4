@@ -10,6 +10,7 @@ import {
     DEV_AUTH_STORAGE_KEY,
     hasEditorialRoleInProfile,
     isAdminProfile,
+    isAdminUser,
     isLocalDevelopmentHost,
 } from '../lib/auth.js';
 
@@ -18,6 +19,7 @@ export {
     canProfileManageStudy,
     hasEditorialRoleInProfile,
     isAdminProfile,
+    isAdminUser,
     isLocalDevelopmentHost,
 } from '../lib/auth.js';
 
@@ -49,6 +51,19 @@ const withTimeout = async (promise, ms, timeoutMessage) => {
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const fetchRoleFallbackProfile = async (userId) => {
+    if (!userId) return null;
+
+    try {
+        const { data: role, error } = await supabase.rpc('get_user_role');
+        if (error || !role) return null;
+        return { id: userId, role };
+    } catch (error) {
+        console.warn('Profile role fallback failed:', error);
+        return null;
+    }
+};
 
 const getSessionWithRetry = async () => {
     const getSessionOnce = () =>
@@ -86,15 +101,15 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
                 .from('profiles')
                 .select('*')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
             
             if (error && error.code !== 'PGRST116') {
                 console.error('Error fetching profile:', error);
             }
-            setProfile(data || null);
+            setProfile(data || await fetchRoleFallbackProfile(userId));
         } catch (error) {
             console.error('Error fetching profile:', error);
-            setProfile(null);
+            setProfile(await fetchRoleFallbackProfile(userId));
         }
     };
 
@@ -147,7 +162,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
         if (hasLocalDevAuth()) {
             return true;
         }
-        return isAdminProfile(profile);
+        return isAdminProfile(profile) || isAdminUser(user);
     };
 
     const hasEditorialRole = (roleName) => {
@@ -158,14 +173,14 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
         if (hasLocalDevAuth()) {
             return true;
         }
-        return canProfileManagePolitics(profile);
+        return canProfileManagePolitics(profile) || isAdminUser(user);
     };
 
     const canManageStudy = () => {
         if (hasLocalDevAuth()) {
             return true;
         }
-        return canProfileManageStudy(profile);
+        return canProfileManageStudy(profile) || isAdminUser(user);
     };
 
     const value = {

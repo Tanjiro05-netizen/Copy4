@@ -3,6 +3,7 @@ import {
     hasEditorialRoleInProfile,
     isLocalDevelopmentHost,
     isAdminProfile,
+    isAdminUser,
 } from '../lib/auth.js';
 
 describe('AuthContext role helpers', () => {
@@ -12,6 +13,18 @@ describe('AuthContext role helpers', () => {
 
     test('isAdminProfile returns true for admin role (case-insensitive)', () => {
         expect(isAdminProfile({ role: 'Admin' })).toBe(true);
+    });
+
+    test('isAdminProfile returns true for string is_admin flags and role arrays', () => {
+        expect(isAdminProfile({ is_admin: 'true' })).toBe(true);
+        expect(isAdminProfile({ roles: ['member', 'admin'] })).toBe(true);
+        expect(isAdminProfile({ roles: 'member, admin' })).toBe(true);
+    });
+
+    test('isAdminUser returns true for Supabase app metadata admin roles', () => {
+        expect(isAdminUser({ app_metadata: { role: 'admin' } })).toBe(true);
+        expect(isAdminUser({ app_metadata: { roles: ['member', 'admin'] } })).toBe(true);
+        expect(isAdminUser({ app_metadata: { is_admin: true } })).toBe(true);
     });
 
     test('hasEditorialRoleInProfile matches editorial_roles entries case-insensitively', () => {

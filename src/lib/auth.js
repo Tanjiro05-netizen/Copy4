@@ -6,8 +6,35 @@ export const DEV_AUTH_COOKIE_KEY = 'marxist_dev_auth';
 
 export const normalizeRoleToken = (value) => `${value || ''}`.trim().toLowerCase();
 
+const truthyRoleFlag = (value) =>
+  value === true || ['true', '1', 'yes'].includes(normalizeRoleToken(value));
+
+const roleValues = (value) => {
+  if (Array.isArray(value)) return value.map(normalizeRoleToken);
+  if (typeof value === 'string' && value.includes(',')) {
+    return value.split(',').map(normalizeRoleToken);
+  }
+  return [normalizeRoleToken(value)];
+};
+
+const hasRoleToken = (value, roleName) => roleValues(value).includes(normalizeRoleToken(roleName));
+
 export const isAdminProfile = (profile) =>
-  profile?.is_admin === true || normalizeRoleToken(profile?.role) === 'admin';
+  truthyRoleFlag(profile?.is_admin) ||
+  hasRoleToken(profile?.role, 'admin') ||
+  hasRoleToken(profile?.roles, 'admin') ||
+  hasRoleToken(profile?.app_role, 'admin');
+
+export const isAdminUser = (user) => {
+  const metadata = user?.app_metadata || {};
+
+  return (
+    truthyRoleFlag(metadata.is_admin) ||
+    hasRoleToken(metadata.role, 'admin') ||
+    hasRoleToken(metadata.roles, 'admin') ||
+    hasRoleToken(metadata.app_role, 'admin')
+  );
+};
 
 export const hasEditorialRoleInProfile = (profile, roleName) => {
   const normalizedTarget = normalizeRoleToken(roleName);

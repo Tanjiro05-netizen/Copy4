@@ -9,6 +9,31 @@ import { createMiddlewareClient } from './src/lib/supabase/middleware.js';
 
 const redirectTo = (request, pathname) => NextResponse.redirect(new URL(pathname, request.url));
 
+const loadProfileForRouteAccess = async (supabase, user) => {
+  if (!user) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!error && data) return data;
+  } catch (_error) {
+    // Fall through to the SECURITY DEFINER role helper below.
+  }
+
+  try {
+    const { data: role, error } = await supabase.rpc('get_user_role');
+    if (!error && role) return { id: user.id, role };
+  } catch (_error) {
+    // No usable profile signal; route-access will deny admin-only paths.
+  }
+
+  return null;
+};
+
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
   const host = request.headers.get('host')?.split(':')[0] || '';
@@ -29,12 +54,7 @@ export async function middleware(request) {
     response = middlewareClient.response;
 
     if (user) {
-      const { data } = await middlewareClient.supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-      profile = data || null;
+      profile = await loadProfileForRouteAccess(middlewareClient.supabase, user);
     }
   }
 

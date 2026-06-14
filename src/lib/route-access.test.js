@@ -32,6 +32,18 @@ describe('route access decisions', () => {
     });
   });
 
+  test('lets Supabase app-metadata admins through admin routes before profile hydration', () => {
+    expect(
+      getRouteAccessDecision('/admin/library/upload', {
+        user: { id: 'admin-user', app_metadata: { role: 'admin' } },
+        profile: null,
+      })
+    ).toEqual({
+      allowed: true,
+      redirectTo: null,
+    });
+  });
+
   test('redirects non-admin users away from admin routes', () => {
     expect(
       getRouteAccessDecision('/admin/tags', {

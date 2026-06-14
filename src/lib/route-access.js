@@ -2,6 +2,7 @@ import {
   canProfileManagePolitics,
   canProfileManageStudy,
   isAdminProfile,
+  isAdminUser,
 } from './auth.js';
 
 const PROTECTED_PREFIXES = [
@@ -26,6 +27,8 @@ export const isProtectedPath = (pathname) =>
 export const isAdminPath = (pathname) => pathname === '/admin' || pathname.startsWith('/admin/');
 
 export const getRouteAccessDecision = (pathname, { user, profile, isDevAdmin = false } = {}) => {
+  const hasAdminAccess = isDevAdmin || isAdminProfile(profile) || isAdminUser(user);
+
   if (!isProtectedPath(pathname) && !isAdminPath(pathname)) {
     return { allowed: true, redirectTo: null };
   }
@@ -36,23 +39,23 @@ export const getRouteAccessDecision = (pathname, { user, profile, isDevAdmin = f
 
   if (isAdminPath(pathname)) {
     if (pathname === '/admin/politics/upload') {
-      return canProfileManagePolitics(profile)
+      return hasAdminAccess || canProfileManagePolitics(profile)
         ? { allowed: true, redirectTo: null }
         : { allowed: false, redirectTo: '/coming-soon' };
     }
 
     if (pathname === '/admin/study') {
-      return canProfileManageStudy(profile)
+      return hasAdminAccess || canProfileManageStudy(profile)
         ? { allowed: true, redirectTo: null }
         : { allowed: false, redirectTo: '/coming-soon' };
     }
 
-    return isAdminProfile(profile)
+    return hasAdminAccess
       ? { allowed: true, redirectTo: null }
       : { allowed: false, redirectTo: '/coming-soon' };
   }
 
-  if (!isAdminProfile(profile) && !profile?.has_invite_access) {
+  if (!hasAdminAccess && !profile?.has_invite_access) {
     return { allowed: false, redirectTo: '/pending-access' };
   }
 
