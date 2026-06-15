@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';
 import { supabase } from '../supabaseClient';
 
@@ -22,7 +22,7 @@ const makeProfileQuery = (profile) => {
     const query = {
         select: jest.fn(() => query),
         eq: jest.fn(() => query),
-        maybeSingle: jest.fn(() => Promise.resolve({ data: profile, error: null })),
+        maybeSingle: jest.fn(() => Promise.resolve(profile).then((data) => ({ data, error: null }))),
     };
     return query;
 };
@@ -35,6 +35,24 @@ const AuthProbe = () => {
             <span data-testid="loading">{String(loading)}</span>
             <span data-testid="user-id">{user?.id || 'none'}</span>
             <span data-testid="profile-id">{profile?.id || 'none'}</span>
+        </div>
+    );
+};
+
+const LoginProbe = () => {
+    const { login } = useAuth();
+    const [status, setStatus] = React.useState('idle');
+
+    const handleLogin = async () => {
+        setStatus('pending');
+        await login({ email: 'Test@Example.com', password: 'password' });
+        setStatus('done');
+    };
+
+    return (
+        <div>
+            <button onClick={handleLogin}>Login</button>
+            <span data-testid="login-status">{status}</span>
         </div>
     );
 };
@@ -87,6 +105,47 @@ describe('AuthProvider session resume', () => {
         await waitFor(() => {
             expect(supabase.auth.refreshSession).toHaveBeenCalledTimes(1);
             expect(screen.getByTestId('user-id')).toHaveTextContent(refreshedUser.id);
+        });
+    });
+
+    test('does not block a successful login on profile loading', async () => {
+        let resolveProfile;
+        const profilePromise = new Promise((resolve) => {
+            resolveProfile = resolve;
+        });
+
+        supabase.auth.getSession.mockResolvedValue({
+            data: { session: null },
+            error: null,
+        });
+        supabase.auth.signInWithPassword.mockResolvedValue({
+            data: { user: refreshedUser, session: { user: refreshedUser } },
+            error: null,
+        });
+        supabase.from.mockImplementation((tableName) => {
+            if (tableName !== 'profiles') throw new Error(`Unexpected table: ${tableName}`);
+            return makeProfileQuery(profilePromise);
+        });
+
+        render(
+            <AuthProvider>
+                <LoginProbe />
+            </AuthProvider>
+        );
+
+        await waitFor(() => {
+            expect(supabase.auth.getSession).toHaveBeenCalled();
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Login' }));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('login-status')).toHaveTextContent('done');
+        });
+
+        await act(async () => {
+            resolveProfile({ id: 'profile-after-login', username: 'Loaded later' });
+            await profilePromise;
         });
     });
 });

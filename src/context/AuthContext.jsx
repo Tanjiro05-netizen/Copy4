@@ -188,7 +188,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
     useEffect(() => {
         syncSession();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             // Respect dev auth if present
             if (hasLocalDevAuth()) {
                 applyLocalDevAuth();
@@ -196,7 +196,9 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
             }
             setUser(session?.user ?? null);
             if (session?.user) {
-                await fetchProfile(session.user.id);
+                setTimeout(() => {
+                    fetchProfile(session.user.id);
+                }, 0);
             } else {
                 setProfile(null);
             }
@@ -294,7 +296,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
 
             if (result.data?.user) {
                 setUser(result.data.user);
-                await withTimeout(fetchProfile(result.data.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.')
+                withTimeout(fetchProfile(result.data.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.')
                     .catch((error) => console.error('Error fetching profile after login:', error));
             }
 
