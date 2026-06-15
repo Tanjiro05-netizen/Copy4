@@ -180,13 +180,21 @@
     background: rgba(153, 27, 27, 0.15);
 }
 
-.btn-kofi {
-    background: #FF5E5B;
-    transition: background 0.2s ease;
+.btn-donate {
+    background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+    border: 1px solid rgba(200,30,30,0.4);
+    color: #fff;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
-.btn-kofi:hover {
-    background: #e54e4b;
+.btn-donate:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    box-shadow: 0 0 22px rgba(180, 30, 30, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-donate:active {
+    transform: translateY(0);
 }
 
 /* Modal styles — obsidian theme */

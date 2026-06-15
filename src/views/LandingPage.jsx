@@ -10,6 +10,7 @@ import {
     Layers
 } from 'lucide-react';
 import MarxBg from '../assets/Marx.jpg';
+import DonationModal from '../components/DonationModal';
 
 const marxBgUrl = typeof MarxBg === 'string' ? MarxBg : MarxBg.src;
 
@@ -21,6 +22,10 @@ const LandingPage = () => {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showAboutModal, setShowAboutModal] = useState(false);
+    const [showDonationModal, setShowDonationModal] = useState(false);
+    const [showDonatedBanner, setShowDonatedBanner] = useState(
+        () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('donated') === 'true'
+    );
 
     // Login modal is now only opened by explicit user click on "Log In" buttons
     
@@ -427,10 +432,14 @@ const LandingPage = () => {
                                     <ExternalLink size={16} />
                                     JinbuJYG.com
                                 </a>
-                                <span className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-gray-500 border border-gray-700 cursor-default">
+                                <button
+                                    onClick={() => setShowDonationModal(true)}
+                                    className="landing-highlightable btn-donate flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition"
+                                    ref={registerHighlightable}
+                                >
                                     <Heart size={18} />
-                                    Donations coming soon
-                                </span>
+                                    Support the Project
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -537,6 +546,45 @@ const LandingPage = () => {
                         </div>
                     </footer>
                 </div>
+
+                {/* ===== SUCCESS BANNER ===== */}
+                {showDonatedBanner && (
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: '1.25rem',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            zIndex: 300,
+                            background: 'linear-gradient(135deg, #14532d 0%, #166534 100%)',
+                            border: '1px solid rgba(74,222,128,0.35)',
+                            borderRadius: '14px',
+                            padding: '0.75rem 1.25rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            color: '#86efac',
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        <CheckCircle size={18} />
+                        Thank you for your support! The revolution lives on. ✊
+                        <button
+                            onClick={() => setShowDonatedBanner(false)}
+                            style={{ marginLeft: '0.5rem', opacity: 0.7, cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Donation Modal */}
+                {showDonationModal && (
+                    <DonationModal onClose={() => setShowDonationModal(false)} />
+                )}
 
                 {/* ===== CINEMATIC MODALS ===== */}
 
@@ -918,6 +966,13 @@ const LandingPage = () => {
                                     <ExternalLink size={16} />
                                     JinbuJYG.com
                                 </a>
+                                <button
+                                    onClick={() => setShowDonationModal(true)}
+                                    className="btn-donate flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition"
+                                >
+                                    <Heart size={18} />
+                                    Support the Project
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1024,6 +1079,45 @@ const LandingPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* ===== SUCCESS BANNER ===== */}
+            {showDonatedBanner && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: '1.25rem',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 300,
+                        background: 'linear-gradient(135deg, #14532d 0%, #166534 100%)',
+                        border: '1px solid rgba(74,222,128,0.35)',
+                        borderRadius: '14px',
+                        padding: '0.75rem 1.25rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        color: '#86efac',
+                        fontSize: '0.9rem',
+                        fontWeight: 600,
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    <CheckCircle size={18} />
+                    Thank you for your support! The revolution lives on. ✊
+                    <button
+                        onClick={() => setShowDonatedBanner(false)}
+                        style={{ marginLeft: '0.5rem', opacity: 0.7, cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+            )}
+
+            {/* Donation Modal */}
+            {showDonationModal && (
+                <DonationModal onClose={() => setShowDonationModal(false)} />
+            )}
 
             {/* Login Modal */}
             {showLoginModal && (

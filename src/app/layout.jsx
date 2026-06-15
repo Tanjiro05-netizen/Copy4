@@ -4,7 +4,6 @@ import 'katex/dist/katex.min.css';
 import '@/src/views/MaintenancePage.css';
 import '@/src/views/LandingPage.css';
 import '@/src/views/MarxBotPage.css';
-import '@/src/components/KoFiButton.css';
 import '@/src/components/WorldSim/worldsim.css';
 import '@/src/components/visualizations/EnhancedChart.css';
 import '@/src/components/visualizations/SplitView.css';
