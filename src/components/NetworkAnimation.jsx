@@ -1,7 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const NetworkAnimation = () => {
+  const { mode } = useTheme();
   const svgRef = useRef(null);
+
+  if (mode === 'lite') return null;
   
   useEffect(() => {
     if (!svgRef.current) return;

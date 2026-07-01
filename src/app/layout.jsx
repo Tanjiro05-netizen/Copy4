@@ -1,5 +1,6 @@
 import '@/src/index.css';
 import '@/src/styles/theme.css';
+import '@/src/styles/liteMode.css';
 import 'katex/dist/katex.min.css';
 import '@/src/views/MaintenancePage.css';
 import '@/src/views/LandingPage.css';

@@ -13,6 +13,7 @@
     "substack": "Substack",
     "data": "数据",
     "directory": "目录",
+    "feed": "社区",
     "forum": "论坛",
     "knowledgeQA": "知识问答",
     "admin": "管理",
@@ -20,6 +21,10 @@
     "login": "登录",
     "logout": "退出",
     "membersOnly": "仅限会员"
+  },
+  "aesthetic": {
+    "full": "完整",
+    "lite": "精简"
   },
   "common": {
     "loading": "加载中...",

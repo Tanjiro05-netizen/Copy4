@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, MessageSquare, HelpCircle, ChevronDown, Newspaper } from 'lucide-react';
+import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, HelpCircle, ChevronDown, Newspaper, Radio } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import PerformanceToggle from './PerformanceToggle';
+import SocialNotificationsButton from './Social/SocialNotificationsButton';
 import * as s from './Header.css.ts';
 
 const Header = () => {
@@ -17,7 +19,7 @@ const Header = () => {
     const isAdminUser = isAdmin();
     const canEditPolitics = canManagePolitics();
 
-    const isActive = (path) => pathname === path;
+    const isActive = (path) => pathname === path || pathname.startsWith(`${path}/`);
 
     const handleLogout = () => {
         logout();
@@ -44,7 +46,7 @@ const Header = () => {
         { path: '/substack', label: t('nav.substack'), icon: Newspaper, guestAccessible: true },
         { path: '/visualizations', label: t('nav.data'), icon: LineChart, guestAccessible: false, featureKey: 'visualizations' },
         { path: '/directory', label: t('nav.directory'), icon: Users, guestAccessible: false, featureKey: 'directory' },
-        { path: '/forum', label: t('nav.forum'), icon: MessageSquare, guestAccessible: false, featureKey: 'forum' },
+        { path: '/feed', label: t('nav.feed'), icon: Radio, guestAccessible: true, featureKey: 'feed' },
         { path: '/knowledge', label: t('nav.knowledgeQA'), icon: HelpCircle, guestAccessible: false, featureKey: 'knowledge' }
     ];
     
@@ -160,6 +162,8 @@ const Header = () => {
                     </nav>
                     
                     <div className={s.actionsRow}>
+                        {user && <SocialNotificationsButton userId={user.id} />}
+                        {user && <PerformanceToggle />}
                         <LanguageSwitcher />
                         {user ? (
                             <button
@@ -276,6 +280,7 @@ const Header = () => {
                             )}
                         </nav>
                         <div className={s.mobileActions}>
+                            {user && <PerformanceToggle />}
                             {user ? (
                                 <button
                                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}

@@ -13,6 +13,7 @@
     "substack": "Substack",
     "data": "Dati",
     "directory": "Directory",
+    "feed": "Comunita",
     "forum": "Forum",
     "knowledgeQA": "Domande e Risposte",
     "admin": "Admin",
@@ -20,6 +21,10 @@
     "login": "Accedi",
     "logout": "Esci",
     "membersOnly": "Solo Membri"
+  },
+  "aesthetic": {
+    "full": "Pieno",
+    "lite": "Lite"
   },
   "common": {
     "loading": "Caricamento...",

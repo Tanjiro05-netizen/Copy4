@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 const DynamicBackground = ({ sentiment = 'neutral', intensity = 0.5, interactionEnabled = true }) => {
+    const { mode } = useTheme();
     const canvasRef = useRef(null);
     const particlesRef = useRef([]);
     const mouseRef = useRef({ x: 0, y: 0, active: false });
+
+    if (mode === 'lite') return null;
     
     // Convert sentiment to color
     const getBaseColor = () => {
