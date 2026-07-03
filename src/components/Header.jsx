@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import PerformanceToggle from './PerformanceToggle';
 import SocialNotificationsButton from './Social/SocialNotificationsButton';
 import * as s from './Header.css.ts';
 
@@ -163,7 +162,6 @@ const Header = () => {
                     
                     <div className={s.actionsRow}>
                         {user && <SocialNotificationsButton userId={user.id} />}
-                        {user && <PerformanceToggle />}
                         <LanguageSwitcher />
                         {user ? (
                             <button
@@ -280,7 +278,6 @@ const Header = () => {
                             )}
                         </nav>
                         <div className={s.mobileActions}>
-                            {user && <PerformanceToggle />}
                             {user ? (
                                 <button
                                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}

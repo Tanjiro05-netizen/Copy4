@@ -5,17 +5,14 @@ import { usePathname } from 'next/navigation';
 import { Bot } from 'lucide-react';
 import Header from './Header';
 import * as s from './MainLayout.css.ts';
-import { studyThemeClass, liteThemeClass } from '../styles/obsidianTheme.css.ts';
-import { useTheme } from '../context/ThemeContext';
+import { studyThemeClass } from '../styles/obsidianTheme.css.ts';
 
 const MainLayout = ({ children, hideHeader = false, hideFab = false }) => {
     const pathname = usePathname();
     const isMarxBotPage = pathname === '/marxbot';
-    const { mode } = useTheme();
-    const themeClass = mode === 'lite' ? liteThemeClass : studyThemeClass;
 
     return (
-        <div className={`${themeClass} ${s.shell}`}>
+        <div className={`${studyThemeClass} ${s.shell}`}>
             {!hideHeader && <Header />}
             <main className={hideHeader ? s.mainFullBleed : s.main}>
                 {children}

@@ -22,10 +22,6 @@
     "logout": "退出",
     "membersOnly": "仅限会员"
   },
-  "aesthetic": {
-    "full": "完整",
-    "lite": "精简"
-  },
   "common": {
     "loading": "加载中...",
     "error": "发生错误",

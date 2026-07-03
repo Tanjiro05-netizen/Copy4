@@ -22,10 +22,6 @@
     "logout": "Deconnexion",
     "membersOnly": "Membres uniquement"
   },
-  "aesthetic": {
-    "full": "Complet",
-    "lite": "Lite"
-  },
   "common": {
     "loading": "Chargement...",
     "error": "Une erreur est survenue",

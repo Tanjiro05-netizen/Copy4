@@ -22,10 +22,6 @@
     "logout": "Cerrar Sesion",
     "membersOnly": "Solo Miembros"
   },
-  "aesthetic": {
-    "full": "Completo",
-    "lite": "Lite"
-  },
   "common": {
     "loading": "Cargando...",
     "error": "Ocurrio un error",

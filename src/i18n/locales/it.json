@@ -22,10 +22,6 @@
     "logout": "Esci",
     "membersOnly": "Solo Membri"
   },
-  "aesthetic": {
-    "full": "Pieno",
-    "lite": "Lite"
-  },
   "common": {
     "loading": "Caricamento...",
     "error": "Si e verificato un errore",
