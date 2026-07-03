@@ -1,11 +1,11 @@
 import { isAdminProfile, isAdminUser } from '@/src/lib/auth.js';
 import { getServerAuthState } from '@/src/lib/server-auth.js';
+import { isSafeStoragePath } from '@/src/lib/storage-path.js';
 import { createClient } from '@/src/lib/supabase/server.js';
 
 export const runtime = 'nodejs';
 
 const ALLOWED_BUCKETS = new Set(['library', 'covers']);
-const SAFE_STORAGE_PATH_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
 
 const json = (body, status = 200) => Response.json(body, { status });
 
@@ -22,12 +22,6 @@ const requireAdmin = async () => {
 
   return { user, profile };
 };
-
-const isSafeStoragePath = (path) =>
-  typeof path === 'string' &&
-  path.length <= 180 &&
-  SAFE_STORAGE_PATH_RE.test(path) &&
-  !path.includes('..');
 
 export async function POST(request) {
   const admin = await requireAdmin();
@@ -48,7 +42,7 @@ export async function POST(request) {
   }
 
   if (!isSafeStoragePath(path)) {
-    return json({ message: 'Invalid upload filename.' }, 400);
+    return json({ message: `Invalid upload filename: ${path || '(empty)'}` }, 400);
   }
 
   const supabase = createClient();
