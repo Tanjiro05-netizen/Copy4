@@ -341,8 +341,11 @@ const LibraryUploadPage = () => {
         setPdfFile(file);
         setPdfPreview(file.name);
         setRemoveExistingPdf(false);
+        if (!isEditingBook && uploadType === 'book' && bookFormat !== 'pdf' && !epubFile) {
+            setBookFormat('pdf');
+        }
         setError(null);
-    }, []);
+    }, [bookFormat, epubFile, isEditingBook, uploadType]);
 
     const handleCoverUpload = useCallback((e) => {
         const file = e.target.files?.[0];

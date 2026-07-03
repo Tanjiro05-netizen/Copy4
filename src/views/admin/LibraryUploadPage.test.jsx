@@ -141,6 +141,23 @@ describe('LibraryUploadPage ebook editing', () => {
         expect(screen.getByRole('button', { name: 'Upload PDF' })).toBeDisabled();
     });
 
+    test('switches to Download PDFs mode when a PDF is uploaded before an EPUB', async () => {
+        render(<LibraryUploadPage />);
+
+        fireEvent.change(screen.getByPlaceholderText('e.g., Capital Volume I'), {
+            target: { name: 'title', value: 'PDF First Upload' },
+        });
+        const pdf = new File(['pdf'], 'source.pdf', { type: 'application/pdf' });
+        fireEvent.change(screen.getByLabelText('Click to upload PDF'), {
+            target: { files: [pdf] },
+        });
+
+        expect(await screen.findByRole('heading', { name: 'Upload to Download PDFs' })).toBeInTheDocument();
+        expect(screen.getByText('PDF File *')).toBeInTheDocument();
+        expect(screen.queryByText(/EPUB File/)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Upload PDF' })).toBeEnabled();
+    });
+
     test('uploads a pure PDF book without requiring an EPUB', async () => {
         const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1710000000000);
         const { libraryStorage } = setupStorageMocks();
