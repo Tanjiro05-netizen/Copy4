@@ -156,6 +156,13 @@ describe('LibraryUploadPage ebook editing', () => {
         expect(screen.getByText('PDF File *')).toBeInTheDocument();
         expect(screen.queryByText(/EPUB File/)).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Upload PDF' })).toBeEnabled();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Upload PDF' }));
+
+        await waitFor(() => {
+            expect(fetchCallsFor('/api/admin/library-upload-url')).toHaveLength(1);
+            expect(fetchCallsFor('/api/admin/library-books')).toHaveLength(1);
+        });
     });
 
     test('uploads a pure PDF book without requiring an EPUB', async () => {

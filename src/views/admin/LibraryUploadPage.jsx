@@ -161,7 +161,8 @@ const LibraryUploadPage = () => {
     const [existingBook, setExistingBook] = useState(null);
     const [removeExistingPdf, setRemoveExistingPdf] = useState(false);
     const [removeExistingCover, setRemoveExistingCover] = useState(false);
-    const isPdfBookForm = uploadType === 'book' && bookFormat === 'pdf';
+    const isPdfOnlyUpload = !isEditingBook && uploadType === 'book' && !!pdfFile && !epubFile;
+    const isPdfBookForm = uploadType === 'book' && (bookFormat === 'pdf' || isPdfOnlyUpload);
     const hasEpubAttachment = !!epubFile || (isEditingBook && !!existingBook?.epub_filename);
     const hasPdfAttachment = !!pdfFile || (isEditingBook && !!existingBook?.pdf_filename && !removeExistingPdf);
     const hasReadableFile = hasEpubAttachment || hasPdfAttachment;
@@ -429,13 +430,13 @@ const LibraryUploadPage = () => {
             return;
         }
         
-        if (!isEditingBook && bookFormat === 'epub' && !epubFile) {
-            setError('EPUB file is required');
+        if (!isEditingBook && isPdfBookForm && !pdfFile) {
+            setError('PDF file is required for PDF books');
             return;
         }
 
-        if (!isEditingBook && bookFormat === 'pdf' && !pdfFile) {
-            setError('PDF file is required for PDF books');
+        if (!isEditingBook && !isPdfBookForm && !epubFile) {
+            setError('EPUB file is required');
             return;
         }
 
@@ -605,7 +606,7 @@ const LibraryUploadPage = () => {
                         <button
                             type="button"
                             onClick={() => handleUploadChoice('epub')}
-                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'epub' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'epub' && !isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
                             <BookOpen size={16} />
                             EPUB Book
@@ -613,7 +614,7 @@ const LibraryUploadPage = () => {
                         <button
                             type="button"
                             onClick={() => handleUploadChoice('pdf')}
-                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'pdf' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
                             <FileText size={16} />
                             Download PDFs
