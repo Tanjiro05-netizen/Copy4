@@ -272,7 +272,7 @@ const LandingPage = () => {
         try {
             const { data, error } = await supabase.functions.invoke('waitlist-signup', {
                 body: {
-                    email: waitlistEmail,
+                    email: waitlistEmail.trim().toLowerCase(),
                     notify_invite_codes: notifyInvites,
                     notify_public_beta: notifyBeta,
                 },
@@ -280,12 +280,10 @@ const LandingPage = () => {
 
             if (error) {
                 setWaitlistError('Failed to join. Please try again.');
+            } else if (data?.alreadyExists) {
+                setWaitlistError('This email is already on the list.');
             } else if (data?.error) {
-                if (data.error.includes('already on the list')) {
-                    setWaitlistError('This email is already on the list.');
-                } else {
-                    setWaitlistError(data.error);
-                }
+                setWaitlistError(data.error);
             } else {
                 setWaitlistSuccess(true);
                 setRegisterSuccess(true);
