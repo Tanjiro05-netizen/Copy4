@@ -8,6 +8,30 @@ describe('route access decisions', () => {
     });
   });
 
+  test('lets unauthenticated users read the community feed', () => {
+    expect(getRouteAccessDecision('/feed')).toEqual({
+      allowed: true,
+      redirectTo: null,
+    });
+
+    expect(getRouteAccessDecision('/feed/post/post-1')).toEqual({
+      allowed: true,
+      redirectTo: null,
+    });
+  });
+
+  test('lets unauthenticated users reach legacy forum routes', () => {
+    expect(getRouteAccessDecision('/forum')).toEqual({
+      allowed: true,
+      redirectTo: null,
+    });
+
+    expect(getRouteAccessDecision('/forum/thread/thread-1')).toEqual({
+      allowed: true,
+      redirectTo: null,
+    });
+  });
+
   test('redirects authenticated users without invite access to pending access', () => {
     expect(
       getRouteAccessDecision('/study', {

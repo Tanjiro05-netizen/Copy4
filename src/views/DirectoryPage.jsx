@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import { Clock, Network, BookCopy, GitFork, Book } from 'lucide-react';
+import { Clock, Network, BookCopy, GitFork, Book, Globe } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Timeline from '../components/Timeline';
 import ConceptMapper from '../components/AIFeatures/ConceptMapper';
 import Bibliography from '../components/AIFeatures/Bibliography';
@@ -8,7 +9,17 @@ import CrossReferences from '../components/AIFeatures/CrossReferences';
 import MarxistGlossary from '../components/AIFeatures/MarxistGlossary';
 import * as s from './DirectoryPage.css.ts';
 
-const VALID_TABS = ['concepts', 'bibliography', 'references', 'glossary', 'timeline'];
+const RealisticGlobe = dynamic(() => import('../components/Globe/RealisticGlobe'), {
+    ssr: false,
+    loading: () => (
+        <div className={s.placeholder}>
+            <h2 className={s.placeholderTitle}>Loading Globe…</h2>
+            <p className={s.placeholderText}>Preparing 3D Earth visualization.</p>
+        </div>
+    ),
+});
+
+const VALID_TABS = ['concepts', 'bibliography', 'references', 'glossary', 'timeline', 'globe'];
 
 const DirectoryPage = () => {
     const [hash, setHash] = useState('');
@@ -77,11 +88,21 @@ const DirectoryPage = () => {
                             <Clock size={22} className={activeTab === 'timeline' ? s.timelineIconActive : s.timelineIcon} />
                             <span>{activeTab === 'timeline' ? 'Close Timeline' : 'Historical Timeline'}</span>
                         </button>
+
+                        <button
+                            onClick={() => setActiveTab(activeTab === 'globe' ? null : 'globe')}
+                            className={`${s.timelineBtn} ${activeTab === 'globe' ? s.timelineBtnActive : ''}`}
+                        >
+                            <Globe size={22} className={activeTab === 'globe' ? s.timelineIconActive : s.timelineIcon} />
+                            <span>{activeTab === 'globe' ? 'Close Globe' : '3D Earth Globe'}</span>
+                        </button>
                     </div>
 
                     <div className={s.contentArea}>
                         {activeTab === 'timeline' ? (
                             <Timeline />
+                        ) : activeTab === 'globe' ? (
+                            <RealisticGlobe />
                         ) : activeTab === 'concepts' ? (
                             <ConceptMapper />
                         ) : activeTab === 'bibliography' ? (

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Award, Cpu, Eye, Heart, Users, MessageSquare, TrendingUp, Star, Loader2, GraduationCap, Zap, BarChart2 } from 'lucide-react';
+import { Award, Cpu, Eye, Heart, Users, MessageSquare, TrendingUp, Star, Loader2, GraduationCap, Zap, BarChart2, User, Image as ImageIcon, Shield, CheckCircle, FileText, Repeat2, Bookmark, Camera, Pencil, X } from 'lucide-react';
 import { knowledgeApiService } from '../components/Knowledge/api';
+import { forumApiService } from '../components/Forum/api';
 import * as s from './ProfilePage.css.ts';
 
 // Level thresholds (same as Widgets.jsx)
@@ -49,12 +50,12 @@ const formatCount = (num) => {
 };
 
 const ProfilePage = () => {
-    const { user } = useAuth();
+    const { user, refreshProfile } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    // Dashboard state
-    const activeTab = searchParams.get('tab') || 'learning';
+    // Tab state
+    const activeTab = searchParams.get('tab') || 'overview';
     const [dashboardLoading, setDashboardLoading] = useState(false);
     const [creatorStats, setCreatorStats] = useState({ views: 0, likes: 0, follows: 0, growth: 0 });
     const [contentCounts, setContentCounts] = useState({ questions: 0, answers: 0 });
@@ -68,11 +69,164 @@ const ProfilePage = () => {
     const [stemXP, setStemXP] = useState(null);
     const [certificates, setCertificates] = useState([]);
     const [courseProgressMap, setCourseProgressMap] = useState({});
-    
+
+    // Profile header state
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profileData, setProfileData] = useState({
+        username: '', bio: '', ideology: '', avatar_url: null, banner_url: null,
+        is_certified: false, role: 'user', follower_count: 0, following_count: 0,
+    });
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState({ username: '', bio: '', ideology: '' });
+    const [saving, setSaving] = useState(false);
+    const [avatarUploading, setAvatarUploading] = useState(false);
+    const [bannerUploading, setBannerUploading] = useState(false);
+    const avatarInputRef = useRef(null);
+    const bannerInputRef = useRef(null);
+
+    // Overview (posts/replies/reposts) state
+    const [activitySubTab, setActivitySubTab] = useState('posts');
+    const [loadingActivity, setLoadingActivity] = useState(false);
+    const [forumPosts, setForumPosts] = useState([]);
+    const [forumReplies, setForumReplies] = useState([]);
+    const [forumReposts, setForumReposts] = useState([]);
+
+    // Bookmarks state
+    const [loadingBookmarks, setLoadingBookmarks] = useState(false);
+    const [bookmarks, setBookmarks] = useState([]);
+
     const setActiveTab = (tab) => {
         router.push(`${pathname}?tab=${encodeURIComponent(tab)}`);
     };
 
+    // Fetch own profile (banner/avatar/bio/ideology/stats)
+    useEffect(() => {
+        const fetchOwnProfile = async () => {
+            if (!user) { setProfileLoading(false); return; }
+            setProfileLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('id, username, bio, ideology, avatar_url, banner_url, is_certified, role, follower_count, following_count')
+                    .eq('id', user.id)
+                    .single();
+                if (!error && data) setProfileData(data);
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setProfileLoading(false);
+            }
+        };
+        fetchOwnProfile();
+    }, [user]);
+
+    // Fetch posts/replies/reposts for Overview tab
+    useEffect(() => {
+        const fetchActivity = async () => {
+            if (activeTab !== 'overview' || !user) return;
+            setLoadingActivity(true);
+            try {
+                const [posts, replies, reposts] = await Promise.all([
+                    forumApiService.getUserThreads(user.id),
+                    forumApiService.getUserComments(user.id),
+                    forumApiService.getUserReposts(user.id),
+                ]);
+                setForumPosts(posts || []);
+                setForumReplies(replies || []);
+                setForumReposts(reposts || []);
+            } catch (error) {
+                console.error('Error fetching activity:', error);
+            } finally {
+                setLoadingActivity(false);
+            }
+        };
+        fetchActivity();
+    }, [activeTab, user]);
+
+    // Fetch bookmarks for Bookmarks tab
+    useEffect(() => {
+        const fetchBookmarks = async () => {
+            if (activeTab !== 'bookmarks' || !user) return;
+            setLoadingBookmarks(true);
+            try {
+                const data = await forumApiService.getBookmarks(user.id);
+                setBookmarks(data);
+            } catch (error) {
+                console.error('Error fetching bookmarks:', error);
+            } finally {
+                setLoadingBookmarks(false);
+            }
+        };
+        fetchBookmarks();
+    }, [activeTab, user]);
+
+    const startEditing = () => {
+        setEditForm({
+            username: profileData.username || '',
+            bio: profileData.bio || '',
+            ideology: profileData.ideology || '',
+        });
+        setIsEditing(true);
+    };
+
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        if (editForm.username.trim().length < 3) {
+            alert('Username must be at least 3 characters.');
+            return;
+        }
+        setSaving(true);
+        try {
+            const updates = {
+                username: editForm.username.trim(),
+                bio: editForm.bio.trim(),
+                ideology: editForm.ideology.trim(),
+            };
+            const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+            if (error) throw error;
+            setProfileData((prev) => ({ ...prev, ...updates }));
+            refreshProfile?.();
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            alert('Failed to save profile: ' + (error.message || 'unknown error'));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleImageUpload = async (file, kind) => {
+        if (!file || !user) return;
+        const setUploading = kind === 'avatar' ? setAvatarUploading : setBannerUploading;
+        setUploading(true);
+        try {
+            const ext = file.name.split('.').pop();
+            const path = `${user.id}/${kind}-${Date.now()}.${ext}`;
+            const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+            if (uploadError) throw uploadError;
+            const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+            const column = kind === 'avatar' ? 'avatar_url' : 'banner_url';
+            const { error: updateError } = await supabase.from('profiles').update({ [column]: urlData.publicUrl }).eq('id', user.id);
+            if (updateError) throw updateError;
+            setProfileData((prev) => ({ ...prev, [column]: urlData.publicUrl }));
+            refreshProfile?.();
+        } catch (error) {
+            console.error(`Error uploading ${kind}:`, error);
+            alert(`Failed to upload ${kind === 'avatar' ? 'profile picture' : 'banner'}: ` + (error.message || 'unknown error'));
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleRemoveBookmark = async (threadId) => {
+        if (!threadId) return;
+        try {
+            await forumApiService.removeBookmark(threadId);
+            setBookmarks((prev) => prev.filter((b) => b.thread?.id !== threadId));
+        } catch (error) {
+            console.error('Error removing bookmark:', error);
+        }
+    };
     
     // Fetch learning data when tab changes
     useEffect(() => {
@@ -456,20 +610,268 @@ const ProfilePage = () => {
         </div>
     );
 
+    // Overview Tab Content (posts / replies / reposts)
+    const renderOverview = () => (
+        <div>
+            <div className={s.subTabRow}>
+                <button onClick={() => setActivitySubTab('posts')} className={`${s.tabBtn} ${activitySubTab === 'posts' ? s.tabBtnActive : ''}`}>
+                    <FileText size={14} style={{marginRight:6}} />Posts ({forumPosts.length})
+                </button>
+                <button onClick={() => setActivitySubTab('replies')} className={`${s.tabBtn} ${activitySubTab === 'replies' ? s.tabBtnActive : ''}`}>
+                    <MessageSquare size={14} style={{marginRight:6}} />Replies ({forumReplies.length})
+                </button>
+                <button onClick={() => setActivitySubTab('reposts')} className={`${s.tabBtn} ${activitySubTab === 'reposts' ? s.tabBtnActive : ''}`}>
+                    <Repeat2 size={14} style={{marginRight:6}} />Reposts ({forumReposts.length})
+                </button>
+            </div>
+
+            {loadingActivity ? (
+                <div className={s.loadingCenter}><Loader2 className="w-8 h-8 animate-spin text-red-500" /></div>
+            ) : (
+                <>
+                    {activitySubTab === 'posts' && (
+                        forumPosts.length > 0 ? (
+                            <div className={s.cardGrid}>
+                                {forumPosts.map((post) => (
+                                    <Link key={post.id} href="/feed?section=boards" className={s.card}>
+                                        <h3 className={s.cardTitle}>{post.title}</h3>
+                                        <p className={s.cardExcerpt}>{post.content}</p>
+                                        <div className={s.cardMeta}>
+                                            <span>/{post.category_slug}/</span>
+                                            <span>{post.comment_count} replies</span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : <div className={s.emptyCard}>No posts yet.</div>
+                    )}
+
+                    {activitySubTab === 'replies' && (
+                        forumReplies.length > 0 ? (
+                            <div className={s.cardGrid}>
+                                {forumReplies.map((reply) => (
+                                    <Link key={reply.id} href="/feed?section=boards" className={s.card}>
+                                        <h3 className={s.cardTitle}>{reply.thread?.title || 'Unknown thread'}</h3>
+                                        <p className={s.cardExcerpt}>{reply.content}</p>
+                                        <div className={s.cardMeta}>
+                                            <span>♥ {reply.like_count || 0}</span>
+                                            <span>{new Date(reply.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : <div className={s.emptyCard}>No replies yet.</div>
+                    )}
+
+                    {activitySubTab === 'reposts' && (
+                        forumReposts.length > 0 ? (
+                            <div className={s.dashStack}>
+                                {forumReposts.map((repost) => (
+                                    <div key={repost.id} className={s.quoteBlock}>
+                                        {repost.quote_content && (
+                                            <p className={s.quoteText}>&ldquo;{repost.quote_content}&rdquo;</p>
+                                        )}
+                                        <div className={s.quoteFooter}>
+                                            <span>Reposted: {repost.thread?.title}</span>
+                                            <span>{new Date(repost.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : <div className={s.emptyCard}>No reposts yet.</div>
+                    )}
+                </>
+            )}
+        </div>
+    );
+
+    // Bookmarks Tab Content
+    const renderBookmarks = () => (
+        <div>
+            {loadingBookmarks ? (
+                <div className={s.loadingCenter}><Loader2 className="w-8 h-8 animate-spin text-red-500" /></div>
+            ) : bookmarks.length > 0 ? (
+                <div className={s.cardGrid}>
+                    {bookmarks.map((bookmark) => (
+                        <div key={bookmark.id} className={s.card}>
+                            <div className={s.cardHeaderRow}>
+                                <Link href="/feed?section=boards" style={{ flex: 1, minWidth: 0 }}>
+                                    <h3 className={s.cardTitle}>{bookmark.thread?.title}</h3>
+                                </Link>
+                                <button
+                                    className={s.cardRemoveBtn}
+                                    onClick={() => handleRemoveBookmark(bookmark.thread?.id)}
+                                    title="Remove bookmark"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+                            <p className={s.cardExcerpt}>{bookmark.thread?.content}</p>
+                            <div className={s.cardMeta}>
+                                <span>/{bookmark.thread?.category_slug}/</span>
+                                <span>{bookmark.thread?.comment_count || 0} replies</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className={s.emptyCard}>No bookmarks yet. Save threads from the forum to see them here.</div>
+            )}
+        </div>
+    );
+
     return (
         <div className={s.page}>
             <main className={s.main}>
-                {/* Tab Navigation */}
-                <div className={s.tabRow}>
-                    <button onClick={() => setActiveTab('learning')} className={`${s.tabBtn} ${activeTab === 'learning' ? s.tabBtnActive : ''}`}>
-                        <GraduationCap size={16} style={{marginRight:8}} />Learning
-                    </button>
-                    <button onClick={() => setActiveTab('dashboard')} className={`${s.tabBtn} ${activeTab === 'dashboard' ? s.tabBtnActive : ''}`}>
-                        <Cpu size={16} style={{marginRight:8}} />Creator Dashboard
-                    </button>
-                </div>
-                
-                {activeTab === 'dashboard' ? renderDashboard() : renderLearning()}
+                {profileLoading ? (
+                    <div className={s.loadingCenter}><Loader2 className="w-8 h-8 animate-spin text-red-500" /></div>
+                ) : (
+                    <>
+                        {/* Banner */}
+                        <div className={s.banner}>
+                            {profileData.banner_url ? (
+                                <img src={profileData.banner_url} alt="Profile banner" className={s.bannerImg} />
+                            ) : (
+                                <div className={s.bannerPlaceholder}><ImageIcon size={40} /></div>
+                            )}
+                            {isEditing && (
+                                <button
+                                    type="button"
+                                    className={s.bannerUploadBtn}
+                                    onClick={() => bannerInputRef.current?.click()}
+                                    disabled={bannerUploading}
+                                >
+                                    <Camera size={14} />{bannerUploading ? 'Uploading…' : 'Change banner'}
+                                </button>
+                            )}
+                            <input
+                                ref={bannerInputRef}
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => { handleImageUpload(e.target.files?.[0], 'banner'); e.target.value = ''; }}
+                            />
+                        </div>
+
+                        <div className={s.profileCard}>
+                            <div className={s.avatarWrap}>
+                                {profileData.avatar_url ? (
+                                    <img src={profileData.avatar_url} alt={profileData.username} className={s.avatarImg} />
+                                ) : (
+                                    <User size={40} />
+                                )}
+                                {isEditing && (
+                                    <div className={s.uploadOverlay} onClick={() => avatarInputRef.current?.click()}>
+                                        {avatarUploading ? <Loader2 size={20} className="animate-spin" /> : <Camera size={20} />}
+                                    </div>
+                                )}
+                            </div>
+                            <input
+                                ref={avatarInputRef}
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={(e) => { handleImageUpload(e.target.files?.[0], 'avatar'); e.target.value = ''; }}
+                            />
+
+                            <div className={s.editRow}>
+                                {!isEditing && (
+                                    <button type="button" className={s.editBtn} onClick={startEditing}>
+                                        <Pencil size={14} style={{marginRight:6}} />Edit Profile
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className={s.profileBody}>
+                                {!isEditing ? (
+                                    <>
+                                        <h1 className={s.profileName}>
+                                            {profileData.username || 'Unnamed'}
+                                            {profileData.is_certified && (
+                                                <span className={s.certBadge}><CheckCircle size={12} />Certified</span>
+                                            )}
+                                            {profileData.role === 'admin' && (
+                                                <span className={s.certBadge}><Shield size={12} />Admin</span>
+                                            )}
+                                        </h1>
+                                        <div className={s.statsRow}>
+                                            <span><span className={s.statsCount}>{profileData.follower_count || 0}</span> followers</span>
+                                            <span><span className={s.statsCount}>{profileData.following_count || 0}</span> following</span>
+                                        </div>
+                                        {profileData.ideology && (
+                                            <p className={s.ideologyText}>{profileData.ideology}</p>
+                                        )}
+                                        {profileData.bio ? (
+                                            <p className={s.bioText}>{profileData.bio}</p>
+                                        ) : (
+                                            <p className={s.emptyBioText}>Add a bio to tell others about yourself.</p>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={s.fieldBlock}>
+                                            <label className={s.fieldLabel}>Username</label>
+                                            <input
+                                                className={s.textInput}
+                                                value={editForm.username}
+                                                onChange={(e) => setEditForm((f) => ({ ...f, username: e.target.value }))}
+                                                minLength={3}
+                                            />
+                                        </div>
+                                        <div className={s.fieldBlock}>
+                                            <label className={s.fieldLabel}>Ideology</label>
+                                            <input
+                                                className={s.textInput}
+                                                value={editForm.ideology}
+                                                onChange={(e) => setEditForm((f) => ({ ...f, ideology: e.target.value }))}
+                                                placeholder="e.g. Marxist-Leninist"
+                                            />
+                                        </div>
+                                        <div className={s.fieldBlock}>
+                                            <label className={s.fieldLabel}>Bio</label>
+                                            <textarea
+                                                className={s.textArea}
+                                                rows={4}
+                                                value={editForm.bio}
+                                                onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
+                                                placeholder="Tell others about yourself…"
+                                            />
+                                        </div>
+                                        <div className={s.saveRow}>
+                                            <button type="button" className={s.cancelBtn} onClick={() => setIsEditing(false)} disabled={saving}>
+                                                Cancel
+                                            </button>
+                                            <button type="button" className={s.saveBtn} onClick={handleSaveProfile} disabled={saving}>
+                                                {saving ? 'Saving…' : 'Save Changes'}
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Tab Navigation */}
+                        <div className={`${s.tabRow} ${s.sectionBlock}`}>
+                            <button onClick={() => setActiveTab('overview')} className={`${s.tabBtn} ${activeTab === 'overview' ? s.tabBtnActive : ''}`}>
+                                <User size={16} style={{marginRight:8}} />Overview
+                            </button>
+                            <button onClick={() => setActiveTab('bookmarks')} className={`${s.tabBtn} ${activeTab === 'bookmarks' ? s.tabBtnActive : ''}`}>
+                                <Bookmark size={16} style={{marginRight:8}} />Bookmarks
+                            </button>
+                            <button onClick={() => setActiveTab('learning')} className={`${s.tabBtn} ${activeTab === 'learning' ? s.tabBtnActive : ''}`}>
+                                <GraduationCap size={16} style={{marginRight:8}} />Learning
+                            </button>
+                            <button onClick={() => setActiveTab('dashboard')} className={`${s.tabBtn} ${activeTab === 'dashboard' ? s.tabBtnActive : ''}`}>
+                                <Cpu size={16} style={{marginRight:8}} />Creator Dashboard
+                            </button>
+                        </div>
+
+                        {activeTab === 'bookmarks' && renderBookmarks()}
+                        {activeTab === 'dashboard' && renderDashboard()}
+                        {activeTab === 'learning' && renderLearning()}
+                        {activeTab === 'overview' && renderOverview()}
+                    </>
+                )}
             </main>
         </div>
     );

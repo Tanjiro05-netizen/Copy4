@@ -17,7 +17,6 @@ const PROTECTED_PREFIXES = [
   '/science-tech',
   '/politics',
   '/visualizations',
-  '/forum',
   '/knowledge',
 ];
 

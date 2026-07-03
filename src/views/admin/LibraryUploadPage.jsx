@@ -66,7 +66,8 @@ const requestSignedUploadUrl = async (bucket, path) => {
     });
 
     if (!response.ok) {
-        throw new Error(await readApiError(response, 'Could not prepare upload.'));
+        const message = await readApiError(response, 'Could not prepare upload.');
+        throw new Error(`${message} (${bucket}/${path})`);
     }
 
     return response.json();

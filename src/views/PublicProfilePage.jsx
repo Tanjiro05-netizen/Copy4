@@ -4,8 +4,9 @@ import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import { User, Image, Shield, CheckCircle, ArrowLeft, FileText, MessageSquare, Repeat2, Loader2 } from 'lucide-react';
+import { User, Image, Shield, CheckCircle, ArrowLeft, FileText, MessageSquare, Repeat2, Loader2, Users } from 'lucide-react';
 import { forumApiService } from '../components/Forum/api';
+import FollowButton from '../components/Social/FollowButton';
 import * as s from './PublicProfilePage.css.ts';
 
 const PublicProfilePage = () => {
@@ -32,7 +33,7 @@ const PublicProfilePage = () => {
             try {
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('id, username, bio, ideology, avatar_url, banner_url, is_certified, role')
+                    .select('id, username, bio, ideology, avatar_url, banner_url, is_certified, role, follower_count, following_count')
                     .eq('username', username)
                     .single();
 
@@ -72,7 +73,15 @@ const PublicProfilePage = () => {
         };
 
         fetchProfile();
-    }, [username, user, navigate]);
+    }, [username, user, router]);
+
+    const handleFollowChange = (following) => {
+        setProfile((current) => {
+            if (!current) return current;
+            const followerCount = Math.max(0, (current.follower_count || 0) + (following ? 1 : -1));
+            return { ...current, follower_count: followerCount };
+        });
+    };
 
     if (loading) {
         return (
@@ -138,18 +147,35 @@ const PublicProfilePage = () => {
 
                     <div className="mt-16">
                         {/* Username and badges */}
-                        <div className="flex items-center mb-4">
-                            <h1 className="text-3xl font-bold text-white">{profile.username}</h1>
-                            {profile.is_certified && (
-                                <span className="ml-3 flex items-center bg-blue-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                    <CheckCircle size={14} className="mr-1"/> Certified
-                                </span>
-                            )}
-                            {profile.role === 'admin' && (
-                                <span className="ml-2 flex items-center bg-red-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                                    <Shield size={14} className="mr-1"/> Admin
-                                </span>
-                            )}
+                        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <h1 className="text-3xl font-bold text-white">{profile.username}</h1>
+                                {profile.is_certified && (
+                                    <span className="flex items-center bg-blue-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                        <CheckCircle size={14} className="mr-1"/> Certified
+                                    </span>
+                                )}
+                                {profile.role === 'admin' && (
+                                    <span className="flex items-center bg-red-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                        <Shield size={14} className="mr-1"/> Admin
+                                    </span>
+                                )}
+                            </div>
+                            <FollowButton
+                                targetUserId={profile.id}
+                                currentUserId={user?.id}
+                                onChange={handleFollowChange}
+                            />
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-400">
+                            <span className="inline-flex items-center gap-2">
+                                <Users size={16} />
+                                <strong className="text-white">{profile.follower_count || 0}</strong> followers
+                            </span>
+                            <span>
+                                <strong className="text-white">{profile.following_count || 0}</strong> following
+                            </span>
                         </div>
 
                         {/* Bio */}
@@ -218,7 +244,7 @@ const PublicProfilePage = () => {
                             {activeTab === 'posts' && (
                                 <div className="space-y-4">
                                     {forumPosts.length > 0 ? forumPosts.map(post => (
-                                        <Link href="/forum" key={post.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
+                                        <Link href="/feed?section=boards" key={post.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
                                             <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
                                             <p className="text-gray-400 text-sm line-clamp-2 mb-2">{post.content}</p>
                                             <div className="flex items-center gap-4 text-xs text-gray-500">
@@ -239,7 +265,7 @@ const PublicProfilePage = () => {
                             {activeTab === 'replies' && (
                                 <div className="space-y-4">
                                     {forumReplies.length > 0 ? forumReplies.map(reply => (
-                                        <Link href="/forum" key={reply.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
+                                        <Link href="/feed?section=boards" key={reply.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
                                             <div className="text-xs text-gray-500 mb-2">
                                                 Reply in: <span className="text-red-400">{reply.thread?.title || 'Unknown thread'}</span>
                                             </div>
@@ -261,7 +287,7 @@ const PublicProfilePage = () => {
                             {activeTab === 'reposts' && (
                                 <div className="space-y-4">
                                     {forumReposts.length > 0 ? forumReposts.map(repost => (
-                                        <Link href="/forum" key={repost.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
+                                        <Link href="/feed?section=boards" key={repost.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
                                             {repost.quote_content && (
                                                 <div className="border-l-4 border-red-500 pl-3 mb-3 italic text-gray-400 text-sm">
                                                     "{repost.quote_content}"

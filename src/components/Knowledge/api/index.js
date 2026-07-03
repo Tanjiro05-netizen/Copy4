@@ -651,6 +651,12 @@ class KnowledgeApiService {
         .eq('author_id', userId)
         .eq('status', 'approved')
 
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('follower_count')
+        .eq('id', userId)
+        .maybeSingle()
+
       const totalViews = (questions || []).reduce((sum, q) => sum + (q.view_count || 0), 0)
       const questionLikes = (questions || []).reduce((sum, q) => sum + (q.upvote_count || 0), 0)
       const answerLikes = (answers || []).reduce((sum, a) => sum + (a.upvote_count || 0), 0)
@@ -658,7 +664,7 @@ class KnowledgeApiService {
       return {
         views: totalViews,
         likes: questionLikes + answerLikes,
-        follows: 0, // Placeholder for now
+        follows: profile?.follower_count || 0,
       }
     } catch (err) {
       console.error('Error fetching user stats:', err)
@@ -686,6 +692,12 @@ class KnowledgeApiService {
         .select('upvote_count, created_at')
         .eq('author_id', userId)
         .eq('status', 'approved')
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('follower_count')
+        .eq('id', userId)
+        .maybeSingle()
 
       // Calculate current totals
       const totalViews = (questions || []).reduce((sum, q) => sum + (q.view_count || 0), 0)
@@ -720,7 +732,7 @@ class KnowledgeApiService {
       return {
         views: totalViews,
         likes: totalLikes,
-        follows: 0, // Placeholder
+        follows: profile?.follower_count || 0,
         growth,
       }
     } catch (err) {
