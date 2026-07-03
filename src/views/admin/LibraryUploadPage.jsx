@@ -66,7 +66,8 @@ const requestSignedUploadUrl = async (bucket, path) => {
     });
 
     if (!response.ok) {
-        throw new Error(await readApiError(response, 'Could not prepare upload.'));
+        const message = await readApiError(response, 'Could not prepare upload.');
+        throw new Error(`${message} (${bucket}/${path})`);
     }
 
     return response.json();
@@ -107,6 +108,27 @@ const saveLibraryBook = async ({ isEditingBook, editId, book, removeExistingPdf,
     }
 
     return response.json();
+};
+
+const sanitizeStorageSlug = (value, fallback = 'book') => {
+    const slug = `${value || ''}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .replace(/-{2,}/g, '-')
+        .substring(0, 50)
+        .replace(/-+$/g, '');
+
+    return slug || fallback;
+};
+
+const getSafeFileExtension = (fileName, fallback = 'bin') => {
+    const rawExtension = `${fileName || ''}`.split('.').pop() || '';
+    const extension = rawExtension
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+
+    return extension || fallback;
 };
 
 const LibraryUploadPage = () => {
@@ -402,11 +424,8 @@ const LibraryUploadPage = () => {
 
     const generateFilename = (file, prefix) => {
         const timestamp = Date.now();
-        const sanitizedTitle = formData.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, '-')
-            .substring(0, 50);
-        const extension = file.name.split('.').pop();
+        const sanitizedTitle = sanitizeStorageSlug(formData.title);
+        const extension = getSafeFileExtension(file.name);
         return `${prefix}-${sanitizedTitle}-${timestamp}.${extension}`;
     };
 

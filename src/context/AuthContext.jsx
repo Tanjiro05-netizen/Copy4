@@ -322,6 +322,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
         hasEditorialRole,
         canManagePolitics,
         canManageStudy,
+        refreshProfile: () => fetchProfile(latestUserRef.current?.id),
     };
 
     return (

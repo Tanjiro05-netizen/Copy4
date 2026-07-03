@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.2",
     "@vanilla-extract/css": "^1.18.0",
@@ -56,6 +58,7 @@
     "remark-slug": "^7.0.1",
     "schema-utils": "^4.3.0",
     "stripe": "^22.2.1",
+    "three": "^0.169.0",
     "tsparticles": "^2.12.0",
     "unified": "^11.0.5",
     "web-vitals": "^2.1.4"
