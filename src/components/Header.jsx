@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
-import SocialNotificationsButton from './Social/SocialNotificationsButton';
 import * as s from './Header.css.ts';
 
 const Header = () => {
@@ -161,7 +160,6 @@ const Header = () => {
                     </nav>
                     
                     <div className={s.actionsRow}>
-                        {user && <SocialNotificationsButton userId={user.id} />}
                         <LanguageSwitcher />
                         {user ? (
                             <button
