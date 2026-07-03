@@ -130,6 +130,40 @@ describe('LibraryUploadPage ebook editing', () => {
         expect(screen.getByRole('button', { name: 'Upload Book' })).toBeDisabled();
     });
 
+    test('generates API-safe storage names from awkward titles and extensions', async () => {
+        const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1710000000000);
+        const { libraryStorage } = setupStorageMocks();
+
+        render(<LibraryUploadPage />);
+
+        fireEvent.change(screen.getByPlaceholderText('e.g., Capital Volume I'), {
+            target: { name: 'title', value: '!!!' },
+        });
+        const epub = new File(['epub'], 'NATIONAL.EPUB', { type: 'application/epub+zip' });
+        fireEvent.change(screen.getByLabelText('Click to upload EPUB'), {
+            target: { files: [epub] },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'Upload Book' }));
+
+        await waitFor(() => {
+            expect(fetchCallsFor('/api/admin/library-upload-url')).toHaveLength(1);
+        });
+        expect(jsonBodyFor(fetchCallsFor('/api/admin/library-upload-url')[0])).toEqual({
+            bucket: 'library',
+            path: 'epub-book-1710000000000.epub',
+        });
+        await waitFor(() => {
+            expect(libraryStorage.uploadToSignedUrl).toHaveBeenCalledWith(
+                'epub-book-1710000000000.epub',
+                'signed-token',
+                epub,
+                expect.objectContaining({ contentType: 'application/epub+zip', upsert: false })
+            );
+        });
+
+        nowSpy.mockRestore();
+    });
+
     test('starts in PDF upload mode from the Download PDFs entry point', () => {
         mockSearchParams = new URLSearchParams('format=pdf');
 

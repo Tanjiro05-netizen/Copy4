@@ -5,7 +5,7 @@ import { createClient } from '@/src/lib/supabase/server.js';
 export const runtime = 'nodejs';
 
 const ALLOWED_BUCKETS = new Set(['library', 'covers']);
-const SAFE_STORAGE_PATH_RE = /^[a-z0-9][a-z0-9.-]*$/;
+const SAFE_STORAGE_PATH_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/;
 
 const json = (body, status = 200) => Response.json(body, { status });
 
