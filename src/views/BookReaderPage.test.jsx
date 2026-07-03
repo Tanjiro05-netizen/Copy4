@@ -129,4 +129,27 @@ describe('BookReaderPage bookmarks', () => {
     expect(screen.getByRole('button', { name: /^Bookmark$/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Bookmarked/i })).not.toBeInTheDocument();
   });
+
+  test('renders the PDF reader when a book has no EPUB file', async () => {
+    bookQuery.single.mockResolvedValueOnce({
+      data: {
+        id: bookId,
+        title: 'PDF Only Reader Test',
+        author: 'Author',
+        year: 2024,
+        description: 'A PDF-only test book',
+        cover_image_url: null,
+        epub_filename: null,
+        pdf_filename: 'pdf-only.pdf',
+        category: 'Theory',
+      },
+      error: null,
+    });
+
+    renderBookReader();
+
+    expect(await screen.findByTestId('book-reader-pdf')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-epub-reader')).not.toBeInTheDocument();
+    expect(screen.getByTitle('PDF Only Reader Test')).toHaveAttribute('src', 'https://cdn.test/pdf-only.pdf');
+  });
 });

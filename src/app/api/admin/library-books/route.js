@@ -46,7 +46,9 @@ const getCoverStoragePath = (coverUrl) => {
   return null;
 };
 
-const buildBookPayload = (book, { includeEpub = false } = {}) => {
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
+
+const buildBookPayload = (book, { includeEpub = false, requireReadableFile = false } = {}) => {
   const title = nullableString(book?.title);
   if (!title) throw new Error('Title is required.');
 
@@ -64,9 +66,12 @@ const buildBookPayload = (book, { includeEpub = false } = {}) => {
     is_official: book?.is_official !== false,
   };
 
-  if (includeEpub) {
+  if (includeEpub || hasOwn(book, 'epub_filename')) {
     payload.epub_filename = nullableString(book?.epub_filename);
-    if (!payload.epub_filename) throw new Error('EPUB file is required.');
+  }
+
+  if (requireReadableFile && !payload.epub_filename && !payload.pdf_filename) {
+    throw new Error('EPUB or PDF file is required.');
   }
 
   return payload;
@@ -99,7 +104,7 @@ export async function POST(request) {
 
   let payload;
   try {
-    payload = buildBookPayload(body?.book, { includeEpub: true });
+    payload = buildBookPayload(body?.book, { includeEpub: true, requireReadableFile: true });
   } catch (error) {
     return json({ message: error.message }, 400);
   }
@@ -142,12 +147,17 @@ export async function PATCH(request) {
   const supabase = createClient();
   const { data: existingBook, error: fetchError } = await supabase
     .from('digital_library_books')
-    .select('id, pdf_filename, cover_image_url')
+    .select('id, epub_filename, pdf_filename, cover_image_url')
     .eq('id', bookId)
     .single();
 
   if (fetchError || !existingBook) {
     return json({ message: fetchError?.message || 'Book not found.' }, fetchError?.code === 'PGRST116' ? 404 : 500);
+  }
+
+  const nextEpub = hasOwn(payload, 'epub_filename') ? payload.epub_filename : existingBook.epub_filename;
+  if (!nextEpub && !payload.pdf_filename) {
+    return json({ message: 'A readable EPUB or PDF file is required.' }, 400);
   }
 
   const oldPdfToRemove =

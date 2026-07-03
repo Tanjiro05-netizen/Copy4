@@ -116,6 +116,7 @@ const LibraryUploadPage = () => {
     const editType = searchParams.get('edit');
     const isEditingBook = editType === 'book' && !!editId;
     const [uploadType, setUploadType] = useState(editType === 'audiobook' ? 'audiobook' : 'book'); // 'book' | 'audiobook'
+    const [bookFormat, setBookFormat] = useState('epub'); // 'epub' | 'pdf'
 
     useEffect(() => {
         if (editType === 'audiobook' && editId) {
@@ -152,7 +153,18 @@ const LibraryUploadPage = () => {
     const [existingBook, setExistingBook] = useState(null);
     const [removeExistingPdf, setRemoveExistingPdf] = useState(false);
     const [removeExistingCover, setRemoveExistingCover] = useState(false);
+    const isPdfBookForm = uploadType === 'book' && bookFormat === 'pdf';
+    const hasEpubAttachment = !!epubFile || (isEditingBook && !!existingBook?.epub_filename);
     const hasPdfAttachment = !!pdfFile || (isEditingBook && !!existingBook?.pdf_filename && !removeExistingPdf);
+    const hasReadableFile = hasEpubAttachment || hasPdfAttachment;
+    const shouldShowPages = isPdfBookForm || hasPdfAttachment;
+    const canSubmitBook = !!formData.title.trim() && (
+        isEditingBook
+            ? hasReadableFile
+            : isPdfBookForm
+                ? !!pdfFile
+                : !!epubFile
+    );
 
     // Manage existing books
     const [existingBooks, setExistingBooks] = useState([]);
@@ -200,6 +212,7 @@ const LibraryUploadPage = () => {
                 if (!data) throw new Error('Book not found.');
 
                 setExistingBook(data);
+                setBookFormat(data.epub_filename ? 'epub' : 'pdf');
                 setFormData({
                     title: data.title || '',
                     author: data.author || '',
@@ -276,6 +289,22 @@ const LibraryUploadPage = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleUploadChoice = (choice) => {
+        if (choice === 'audiobook') {
+            setUploadType('audiobook');
+            setError(null);
+            return;
+        }
+
+        setUploadType('book');
+        setBookFormat(choice);
+        if (choice === 'pdf') {
+            setEpubFile(null);
+            setEpubPreview(null);
+        }
+        setError(null);
     };
 
     const handleEpubUpload = useCallback((e) => {
@@ -389,8 +418,18 @@ const LibraryUploadPage = () => {
             return;
         }
         
-        if (!isEditingBook && !epubFile) {
+        if (!isEditingBook && bookFormat === 'epub' && !epubFile) {
             setError('EPUB file is required');
+            return;
+        }
+
+        if (!isEditingBook && bookFormat === 'pdf' && !pdfFile) {
+            setError('PDF file is required for PDF books');
+            return;
+        }
+
+        if (isEditingBook && !hasReadableFile) {
+            setError('A readable EPUB or PDF file is required');
             return;
         }
 
@@ -415,9 +454,9 @@ const LibraryUploadPage = () => {
         try {
             setUploadStep('Preparing upload...');
 
-            // Upload EPUB to library bucket for new books. Existing books keep their reader file.
+            // Upload EPUB to library bucket for new EPUB books. Existing books keep their reader file.
             let epubFilename = existingBook?.epub_filename || null;
-            if (!isEditingBook) {
+            if (!isEditingBook && epubFile) {
                 const sizeMB = (epubFile.size / (1024 * 1024)).toFixed(1);
                 setUploadStep(`Uploading EPUB (${sizeMB} MB)...`);
                 console.log('[Upload] Starting EPUB upload...', sizeMB, 'MB');
@@ -432,7 +471,7 @@ const LibraryUploadPage = () => {
                 console.log('[Upload] EPUB uploaded:', epubFilename);
             }
 
-            // Upload PDF to library bucket (optional, download only)
+            // Upload PDF to library bucket. EPUB books can use it as a download; PDF books use it as the reader file.
             let pdfFilename = existingBook?.pdf_filename || null;
             let oldPdfToRemove = null;
             if (pdfFile) {
@@ -542,26 +581,38 @@ const LibraryUploadPage = () => {
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold">{isEditingBook ? 'Edit Digital Book' : 'Upload to Digital Library'}</h1>
+                        <h1 className="text-2xl font-bold">{isEditingBook ? `Edit ${isPdfBookForm ? 'PDF Book' : 'Digital Book'}` : 'Upload to Digital Library'}</h1>
                         <p className="text-gray-400 text-sm">
-                            {isEditingBook ? 'Update book information and optional download files' : 'Add a new book or audiobook to the library'}
+                            {isEditingBook ? 'Update book information and reader files' : 'Add a new EPUB book, PDF book, or audiobook to the library'}
                         </p>
                     </div>
                 </div>
 
                 {/* Upload Type Toggle */}
                 {!editId && (
-                    <div className="flex bg-gray-900 rounded-lg p-1 mb-8 max-w-sm mx-auto md:mx-0">
+                    <div className="grid grid-cols-3 bg-gray-900 rounded-lg p-1 mb-8 max-w-2xl mx-auto md:mx-0">
                         <button
-                            onClick={() => setUploadType('book')}
-                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${uploadType === 'book' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            type="button"
+                            onClick={() => handleUploadChoice('epub')}
+                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'epub' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
-                            Digital Book
+                            <BookOpen size={16} />
+                            EPUB Book
                         </button>
                         <button
-                            onClick={() => setUploadType('audiobook')}
-                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${uploadType === 'audiobook' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            type="button"
+                            onClick={() => handleUploadChoice('pdf')}
+                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'pdf' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
+                            <FileText size={16} />
+                            PDF Book
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => handleUploadChoice('audiobook')}
+                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'audiobook' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                        >
+                            <Headphones size={16} />
                             Audiobook
                         </button>
                     </div>
@@ -596,8 +647,9 @@ const LibraryUploadPage = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* File Uploads */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className={`grid grid-cols-1 ${isPdfBookForm ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
                         {/* EPUB Upload (Required) */}
+                        {!isPdfBookForm && (
                         <div className="bg-gray-900/50 rounded-xl p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <BookOpen className="text-red-500" size={20} />
@@ -640,14 +692,21 @@ const LibraryUploadPage = () => {
                                 </div>
                             )}
                         </div>
+                        )}
 
-                        {/* PDF Upload (Optional download) */}
+                        {/* PDF Upload */}
                         <div className="bg-gray-900/50 rounded-xl p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                <Download className="text-gray-400" size={20} />
-                                PDF Download
+                                {isPdfBookForm ? (
+                                    <FileText className="text-red-500" size={20} />
+                                ) : (
+                                    <Download className="text-gray-400" size={20} />
+                                )}
+                                {isPdfBookForm ? `PDF Book File ${!isEditingBook ? '*' : ''}` : 'PDF Download'}
                             </h3>
-                            <p className="text-xs text-gray-500 mb-3">Optional — available as a download for users</p>
+                            <p className="text-xs text-gray-500 mb-3">
+                                {isPdfBookForm ? 'Required — this opens in the in-app PDF reader' : 'Optional — available as a download for users'}
+                            </p>
                             
                             {pdfPreview ? (
                                 <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
@@ -810,7 +869,7 @@ const LibraryUploadPage = () => {
                                 </select>
                             </div>
                             
-                            {hasPdfAttachment && (
+                            {shouldShowPages && (
                                 <div>
                                     <label className="block text-sm text-gray-400 mb-1">PDF Pages</label>
                                     <input
@@ -857,7 +916,7 @@ const LibraryUploadPage = () => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={saving || loadingBook || !formData.title || (!isEditingBook && !epubFile)}
+                        disabled={saving || loadingBook || !canSubmitBook}
                         className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                     >
                         {saving ? (
@@ -924,7 +983,7 @@ const LibraryUploadPage = () => {
                                                     <div className="min-w-0 flex-1">
                                                         <p className="text-sm font-medium text-white truncate">{book.title}</p>
                                                         <p className="text-xs text-gray-500 truncate">
-                                                            {book.author || 'Unknown author'}{book.year ? ` • ${book.year}` : ''}
+                                                            {book.epub_filename ? 'EPUB book' : book.pdf_filename ? 'PDF book' : 'No reader file'} - {book.author || 'Unknown author'}{book.year ? ` • ${book.year}` : ''}
                                                         </p>
                                                     </div>
                                                     <button

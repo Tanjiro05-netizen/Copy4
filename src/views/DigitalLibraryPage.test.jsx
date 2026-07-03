@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import DigitalLibraryPage from './DigitalLibraryPage';
 import { supabase } from '../supabaseClient';
 
@@ -144,5 +144,67 @@ describe('DigitalLibraryPage', () => {
             'src',
             `/api/cover-image?url=${encodeURIComponent(coverUrl)}`
         );
+    });
+
+    test('groups pure PDF books into their own section and filter', async () => {
+        const epubBook = {
+            id: 'book-epub',
+            title: 'EPUB History',
+            author: 'Test Author',
+            year: 1922,
+            description: 'Readable as EPUB.',
+            category: 'History',
+            era: '20th Century',
+            language: 'English',
+            pages: null,
+            epub_filename: 'history.epub',
+            pdf_filename: null,
+            cover_image_url: null,
+        };
+        const pdfBook = {
+            id: 'book-pdf',
+            title: 'PDF Pamphlet',
+            author: 'PDF Author',
+            year: 1930,
+            description: 'Readable as PDF only.',
+            category: 'History',
+            era: '20th Century',
+            language: 'English',
+            pages: 44,
+            epub_filename: null,
+            pdf_filename: 'pamphlet.pdf',
+            cover_image_url: null,
+        };
+
+        supabase.from.mockImplementation((tableName) => ({
+            select: jest.fn((columns) => {
+                if (tableName === 'digital_library_books' && columns === '*') {
+                    return Promise.resolve({ data: [epubBook, pdfBook], error: null });
+                }
+                if (tableName === 'digital_library_books' && columns === 'category') {
+                    return Promise.resolve({ data: [{ category: 'History' }, { category: 'History' }], error: null });
+                }
+                if (tableName === 'audiobooks') {
+                    return Promise.resolve({ data: [], error: null });
+                }
+                throw new Error(`Unexpected select ${tableName}.${columns}`);
+            }),
+        }));
+
+        supabase.storage.from.mockReturnValue({
+            getPublicUrl: jest.fn((path) => ({ data: { publicUrl: `https://library.test/${path}` } })),
+        });
+
+        render(<DigitalLibraryPage />);
+
+        expect(await screen.findByRole('heading', { name: 'History' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'PDF Books' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Open PDF' })).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'PDF Books' }));
+
+        expect(await screen.findByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'EPUB History' })).not.toBeInTheDocument();
     });
 });

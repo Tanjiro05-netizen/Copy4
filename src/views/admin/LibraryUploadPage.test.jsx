@@ -130,6 +130,61 @@ describe('LibraryUploadPage ebook editing', () => {
         expect(screen.getByRole('button', { name: 'Upload Book' })).toBeDisabled();
     });
 
+    test('uploads a pure PDF book without requiring an EPUB', async () => {
+        const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1710000000000);
+        const { libraryStorage } = setupStorageMocks();
+
+        render(<LibraryUploadPage />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'PDF Book' }));
+        expect(screen.queryByLabelText('Click to upload EPUB')).not.toBeInTheDocument();
+
+        fireEvent.change(screen.getByPlaceholderText('e.g., Capital Volume I'), {
+            target: { name: 'title', value: 'PDF Only Book' },
+        });
+        const pdf = new File(['pdf'], 'source.pdf', { type: 'application/pdf' });
+        fireEvent.change(screen.getByLabelText('Click to upload PDF'), {
+            target: { files: [pdf] },
+        });
+        fireEvent.change(screen.getByPlaceholderText('e.g., 500'), {
+            target: { name: 'pages', value: '42' },
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Upload Book' }));
+
+        await waitFor(() => {
+            expect(fetchCallsFor('/api/admin/library-upload-url')).toHaveLength(1);
+        });
+        expect(jsonBodyFor(fetchCallsFor('/api/admin/library-upload-url')[0])).toEqual({
+            bucket: 'library',
+            path: 'pdf-pdf-only-book-1710000000000.pdf',
+        });
+        await waitFor(() => {
+            expect(libraryStorage.uploadToSignedUrl).toHaveBeenCalledWith(
+                'pdf-pdf-only-book-1710000000000.pdf',
+                'signed-token',
+                pdf,
+                expect.objectContaining({ contentType: 'application/pdf', upsert: false })
+            );
+        });
+
+        await waitFor(() => {
+            expect(fetchCallsFor('/api/admin/library-books')).toHaveLength(1);
+        });
+        const saveCall = fetchCallsFor('/api/admin/library-books')[0];
+        expect(saveCall[1]).toEqual(expect.objectContaining({ method: 'POST' }));
+        expect(jsonBodyFor(saveCall).book).toEqual(
+            expect.objectContaining({
+                title: 'PDF Only Book',
+                epub_filename: null,
+                pdf_filename: 'pdf-pdf-only-book-1710000000000.pdf',
+                pages: 42,
+            })
+        );
+
+        nowSpy.mockRestore();
+    });
+
     test('loads an existing ebook and can save metadata without uploading a new EPUB', async () => {
         mockSearchParams = new URLSearchParams('edit=book&id=book-1');
         setupEditBookMocks({

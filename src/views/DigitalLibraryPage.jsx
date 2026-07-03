@@ -20,8 +20,20 @@ const categoryIcons = {
     'History': Landmark,
     'Sociology': Users,
     'Strategy & Tactics': Target,
+    'PDF Books': FileText,
     'Audiobooks': Headphones,
     'default': Database
+};
+
+const PDF_BOOKS_SECTION = 'PDF Books';
+const AUDIOBOOKS_SECTION = 'Audiobooks';
+
+const isPurePdfBook = (book) => !!book?.pdf_filename && !book?.epub_filename && !book?.isAudiobook;
+
+const getBookSectionName = (book) => {
+    if (book?.isAudiobook) return AUDIOBOOKS_SECTION;
+    if (isPurePdfBook(book)) return PDF_BOOKS_SECTION;
+    return book.category || 'Uncategorized';
 };
 
 const getCoverImageSrc = (coverUrl) => {
@@ -50,6 +62,7 @@ const getCoverImageSrc = (coverUrl) => {
 const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     const router = useRouter();
     const isAudiobook = book.isAudiobook;
+    const isPdfBook = isPurePdfBook(book);
     
     // Get the public URL for the book's PDF file (if not audiobook)
     const externalViewerUrl = !isAudiobook && book.pdf_filename ? supabase
@@ -96,7 +109,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
             ${viewMode === 'grid' 
                 ? 'bg-black/30 rounded-lg p-4 border border-red-900/20 hover:border-red-900/40 transition-colors flex flex-col relative group'
                 : 'flex items-start space-x-4 bg-black/30 rounded-lg p-4 border border-red-900/20 relative group'}
-        `} data-testid={isAudiobook ? 'audiobook-card' : 'ebook-card'}>
+        `} data-testid={isAudiobook ? 'audiobook-card' : isPdfBook ? 'pdf-book-card' : 'ebook-card'}>
             {isAdminUser && (
                 <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                     <button
@@ -105,7 +118,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                             router.push(`/admin/library/upload?edit=${isAudiobook ? 'audiobook' : 'book'}&id=${book.id}`);
                         }}
                         className="p-2 bg-black/60 text-gray-400 hover:text-blue-400 rounded-full"
-                        title={isAudiobook ? 'Edit audiobook' : 'Edit book'}
+                        title={isAudiobook ? 'Edit audiobook' : isPdfBook ? 'Edit PDF book' : 'Edit book'}
                     >
                         <Pencil size={16} />
                     </button>
@@ -134,6 +147,12 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                 {isAudiobook && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded pointer-events-none">
                         <Headphones size={32} className="text-white/80 drop-shadow-md" />
+                    </div>
+                )}
+                {isPdfBook && (
+                    <div className="absolute left-2 top-2 flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-xs font-semibold text-gray-100 pointer-events-none">
+                        <FileText size={12} />
+                        PDF
                     </div>
                 )}
             </div>
@@ -178,7 +197,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                             data-testid="ebook-read-link"
                             className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors text-sm font-bold"
                         >
-                            Read Now
+                            {isPdfBook ? 'Open PDF' : 'Read Now'}
                         </Link>
                      )}
                     {!isAudiobook && externalViewerUrl && (
@@ -252,10 +271,12 @@ const DigitalLibraryPage = () => {
                 const allData = booksResponse.data || [];
                 setAllBooks(allData);
                 
-                const allAudiobooks = (audiobooksResponse.data || []).map(ab => ({...ab, isAudiobook: true, category: 'Audiobooks'}));
+                const allAudiobooks = (audiobooksResponse.data || []).map(ab => ({...ab, isAudiobook: true, category: AUDIOBOOKS_SECTION}));
 
                 // Generate dynamic categories
-                const distinctCategories = [...new Set(categoriesResponse.data.map(item => item.category).filter(Boolean))];
+                const distinctCategories = [...new Set(categoriesResponse.data
+                    .map(item => item.category)
+                    .filter(category => category && category !== PDF_BOOKS_SECTION && category !== AUDIOBOOKS_SECTION))];
                 const dynamicCategories = distinctCategories.map(name => ({
                     id: name,
                     name: name,
@@ -264,13 +285,16 @@ const DigitalLibraryPage = () => {
                 setCategories([
                     { id: 'all', name: 'All Categories', icon: categoryIcons.default },
                     ...dynamicCategories,
-                    { id: 'Audiobooks', name: 'Audiobooks', icon: categoryIcons.Audiobooks }
+                    { id: PDF_BOOKS_SECTION, name: PDF_BOOKS_SECTION, icon: categoryIcons[PDF_BOOKS_SECTION] },
+                    { id: AUDIOBOOKS_SECTION, name: AUDIOBOOKS_SECTION, icon: categoryIcons[AUDIOBOOKS_SECTION] }
                 ]);
 
                 // Apply filters
                 let filteredData = allData;
-                if (activeCategory === 'Audiobooks') {
+                if (activeCategory === AUDIOBOOKS_SECTION) {
                     filteredData = allAudiobooks;
+                } else if (activeCategory === PDF_BOOKS_SECTION) {
+                    filteredData = allData.filter(isPurePdfBook);
                 }
                 
                 if (debouncedSearchQuery) {
@@ -279,13 +303,13 @@ const DigitalLibraryPage = () => {
                         (book.author && book.author.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
                     );
                 }
-                if (activeCategory !== 'all' && activeCategory !== 'Audiobooks') {
+                if (activeCategory !== 'all' && activeCategory !== AUDIOBOOKS_SECTION && activeCategory !== PDF_BOOKS_SECTION) {
                     filteredData = filteredData.filter(book => book.category === activeCategory);
                 }
-                if (activeEra !== 'all' && activeCategory !== 'Audiobooks') {
+                if (activeEra !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
                     filteredData = filteredData.filter(book => book.era === activeEra);
                 }
-                if (activeLanguage !== 'all' && activeCategory !== 'Audiobooks') {
+                if (activeLanguage !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
                     filteredData = filteredData.filter(book => book.language === activeLanguage);
                 }
 
@@ -325,7 +349,7 @@ const DigitalLibraryPage = () => {
 
     const groupedBooks = useMemo(() => {
         return books.reduce((acc, book) => {
-            const category = book.category || 'Uncategorized';
+            const category = getBookSectionName(book);
             (acc[category] = acc[category] || []).push(book);
             return acc;
         }, {});
