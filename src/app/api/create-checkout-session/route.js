@@ -1,10 +1,6 @@
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
-});
-
 // Minimum amounts per currency (in smallest unit)
 const CURRENCY_MINIMUMS = {
   usd: 100,  // $1.00
@@ -20,6 +16,18 @@ const MAX_AMOUNT = 100000_00; // $100,000 in cents — hard ceiling
 
 export async function POST(request) {
   try {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        { error: 'Stripe checkout is not configured.' },
+        { status: 503 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2024-06-20',
+    });
+
     const { amount, currency = 'eur' } = await request.json();
 
     const cur = currency.toLowerCase();
