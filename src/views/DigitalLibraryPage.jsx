@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 import { 
-    Search, List, Grid, ExternalLink, FileText,
+    Search, List, Grid, ExternalLink, FileText, Upload,
     Database, BookOpen, Landmark, Users, Target, BookmarkPlus,
     Trash2, Headphones, Pencil
 } from 'lucide-react';
@@ -20,21 +20,32 @@ const categoryIcons = {
     'History': Landmark,
     'Sociology': Users,
     'Strategy & Tactics': Target,
-    'PDF Books': FileText,
+    'Download PDFs': FileText,
     'Audiobooks': Headphones,
     'default': Database
 };
 
-const PDF_BOOKS_SECTION = 'PDF Books';
+const PDF_DOWNLOADS_SECTION = 'Download PDFs';
 const AUDIOBOOKS_SECTION = 'Audiobooks';
+const PDF_UPLOAD_URL = '/admin/library/upload?format=pdf';
 
 const isPurePdfBook = (book) => !!book?.pdf_filename && !book?.epub_filename && !book?.isAudiobook;
 
 const getBookSectionName = (book) => {
     if (book?.isAudiobook) return AUDIOBOOKS_SECTION;
-    if (isPurePdfBook(book)) return PDF_BOOKS_SECTION;
+    if (isPurePdfBook(book)) return PDF_DOWNLOADS_SECTION;
     return book.category || 'Uncategorized';
 };
+
+const PdfUploadAction = () => (
+    <Link
+        href={PDF_UPLOAD_URL}
+        className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-900/30 bg-black/30 px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-red-700/60 hover:text-white"
+    >
+        <Upload size={16} />
+        Upload PDF
+    </Link>
+);
 
 const getCoverImageSrc = (coverUrl) => {
     if (!coverUrl) return coverUrl;
@@ -276,7 +287,7 @@ const DigitalLibraryPage = () => {
                 // Generate dynamic categories
                 const distinctCategories = [...new Set(categoriesResponse.data
                     .map(item => item.category)
-                    .filter(category => category && category !== PDF_BOOKS_SECTION && category !== AUDIOBOOKS_SECTION))];
+                    .filter(category => category && category !== PDF_DOWNLOADS_SECTION && category !== AUDIOBOOKS_SECTION))];
                 const dynamicCategories = distinctCategories.map(name => ({
                     id: name,
                     name: name,
@@ -285,7 +296,7 @@ const DigitalLibraryPage = () => {
                 setCategories([
                     { id: 'all', name: 'All Categories', icon: categoryIcons.default },
                     ...dynamicCategories,
-                    { id: PDF_BOOKS_SECTION, name: PDF_BOOKS_SECTION, icon: categoryIcons[PDF_BOOKS_SECTION] },
+                    { id: PDF_DOWNLOADS_SECTION, name: PDF_DOWNLOADS_SECTION, icon: categoryIcons[PDF_DOWNLOADS_SECTION] },
                     { id: AUDIOBOOKS_SECTION, name: AUDIOBOOKS_SECTION, icon: categoryIcons[AUDIOBOOKS_SECTION] }
                 ]);
 
@@ -293,7 +304,7 @@ const DigitalLibraryPage = () => {
                 let filteredData = allData;
                 if (activeCategory === AUDIOBOOKS_SECTION) {
                     filteredData = allAudiobooks;
-                } else if (activeCategory === PDF_BOOKS_SECTION) {
+                } else if (activeCategory === PDF_DOWNLOADS_SECTION) {
                     filteredData = allData.filter(isPurePdfBook);
                 }
                 
@@ -303,7 +314,7 @@ const DigitalLibraryPage = () => {
                         (book.author && book.author.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
                     );
                 }
-                if (activeCategory !== 'all' && activeCategory !== AUDIOBOOKS_SECTION && activeCategory !== PDF_BOOKS_SECTION) {
+                if (activeCategory !== 'all' && activeCategory !== AUDIOBOOKS_SECTION && activeCategory !== PDF_DOWNLOADS_SECTION) {
                     filteredData = filteredData.filter(book => book.category === activeCategory);
                 }
                 if (activeEra !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
@@ -468,6 +479,15 @@ const DigitalLibraryPage = () => {
                     </div>
                 </div>
 
+                {activeCategory === PDF_DOWNLOADS_SECTION && (
+                    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <h2 className="text-3xl font-bold text-red-500">
+                            {PDF_DOWNLOADS_SECTION}
+                        </h2>
+                        {isAdminUser && <PdfUploadAction />}
+                    </div>
+                )}
+
                 {isLoading ? (
                     <div className="text-white col-span-full text-center p-8">{t('common.loading')}</div>
                 ) : error ? (
@@ -478,9 +498,12 @@ const DigitalLibraryPage = () => {
                     <div className="space-y-12">
                         {Object.entries(groupedBooks).map(([categoryName, booksInCategory]) => (
                             <section key={categoryName}>
-                                <h2 className="text-3xl font-bold text-red-500 mb-6">
-                                    {categoryName}
-                                </h2>
+                                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <h2 className="text-3xl font-bold text-red-500">
+                                        {categoryName}
+                                    </h2>
+                                    {isAdminUser && categoryName === PDF_DOWNLOADS_SECTION && <PdfUploadAction />}
+                                </div>
                                 <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' : 'space-y-4'}>
                                     {booksInCategory.map(book => (
                                         <BookCard key={book.id} book={book} viewMode={viewMode} isAdminUser={isAdminUser} onDelete={handleDeleteBook} onPlay={playAudiobook} />

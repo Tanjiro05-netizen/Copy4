@@ -130,13 +130,24 @@ describe('LibraryUploadPage ebook editing', () => {
         expect(screen.getByRole('button', { name: 'Upload Book' })).toBeDisabled();
     });
 
+    test('starts in PDF upload mode from the Download PDFs entry point', () => {
+        mockSearchParams = new URLSearchParams('format=pdf');
+
+        render(<LibraryUploadPage />);
+
+        expect(screen.getByRole('heading', { name: 'Upload to Download PDFs' })).toBeInTheDocument();
+        expect(screen.getByText('PDF File *')).toBeInTheDocument();
+        expect(screen.queryByText(/EPUB File/)).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Upload PDF' })).toBeDisabled();
+    });
+
     test('uploads a pure PDF book without requiring an EPUB', async () => {
         const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1710000000000);
         const { libraryStorage } = setupStorageMocks();
 
         render(<LibraryUploadPage />);
 
-        fireEvent.click(screen.getByRole('button', { name: 'PDF Book' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Download PDFs' }));
         expect(screen.queryByLabelText('Click to upload EPUB')).not.toBeInTheDocument();
 
         fireEvent.change(screen.getByPlaceholderText('e.g., Capital Volume I'), {
@@ -150,7 +161,7 @@ describe('LibraryUploadPage ebook editing', () => {
             target: { name: 'pages', value: '42' },
         });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Upload Book' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Upload PDF' }));
 
         await waitFor(() => {
             expect(fetchCallsFor('/api/admin/library-upload-url')).toHaveLength(1);

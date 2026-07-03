@@ -198,11 +198,15 @@ describe('DigitalLibraryPage', () => {
         render(<DigitalLibraryPage />);
 
         expect(await screen.findByRole('heading', { name: 'History' })).toBeInTheDocument();
-        expect(screen.getByRole('heading', { name: 'PDF Books' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Download PDFs' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Open PDF' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Upload PDF' })).toHaveAttribute(
+            'href',
+            '/admin/library/upload?format=pdf'
+        );
 
-        fireEvent.click(screen.getByRole('button', { name: 'PDF Books' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Download PDFs' }));
 
         expect(await screen.findByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
         expect(screen.queryByRole('link', { name: 'EPUB History' })).not.toBeInTheDocument();
