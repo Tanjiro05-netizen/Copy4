@@ -164,18 +164,28 @@ describe('LibraryUploadPage ebook editing', () => {
         nowSpy.mockRestore();
     });
 
-    test('starts in PDF upload mode from the Download PDFs entry point', () => {
+    test('starts in PDF upload mode from the Downloads entry point', () => {
         mockSearchParams = new URLSearchParams('format=pdf');
 
         render(<LibraryUploadPage />);
 
-        expect(screen.getByRole('heading', { name: 'Upload to Download PDFs' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Upload to Downloads' })).toBeInTheDocument();
         expect(screen.getByText('PDF File *')).toBeInTheDocument();
         expect(screen.queryByText(/EPUB File/)).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Upload PDF' })).toBeDisabled();
     });
 
-    test('switches to Download PDFs mode when a PDF is uploaded before an EPUB', async () => {
+    test('also starts in PDF upload mode from the Downloads alias', () => {
+        mockSearchParams = new URLSearchParams('section=downloads');
+
+        render(<LibraryUploadPage />);
+
+        expect(screen.getByRole('heading', { name: 'Upload to Downloads' })).toBeInTheDocument();
+        expect(screen.getByText('PDF File *')).toBeInTheDocument();
+        expect(screen.queryByText(/EPUB File/)).not.toBeInTheDocument();
+    });
+
+    test('switches to Downloads mode when a PDF is uploaded before an EPUB', async () => {
         render(<LibraryUploadPage />);
 
         fireEvent.change(screen.getByPlaceholderText('e.g., Capital Volume I'), {
@@ -186,7 +196,7 @@ describe('LibraryUploadPage ebook editing', () => {
             target: { files: [pdf] },
         });
 
-        expect(await screen.findByRole('heading', { name: 'Upload to Download PDFs' })).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'Upload to Downloads' })).toBeInTheDocument();
         expect(screen.getByText('PDF File *')).toBeInTheDocument();
         expect(screen.queryByText(/EPUB File/)).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Upload PDF' })).toBeEnabled();
@@ -205,7 +215,7 @@ describe('LibraryUploadPage ebook editing', () => {
 
         render(<LibraryUploadPage />);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Download PDFs' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Downloads' }));
         expect(screen.queryByLabelText('Click to upload EPUB')).not.toBeInTheDocument();
 
         fireEvent.change(screen.getByPlaceholderText('e.g., Capital Volume I'), {

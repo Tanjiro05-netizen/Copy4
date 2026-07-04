@@ -146,7 +146,7 @@ describe('DigitalLibraryPage', () => {
         );
     });
 
-    test('groups pure PDF books into their own section and filter', async () => {
+    test('groups pure PDF books into their own Downloads section and filter', async () => {
         const epubBook = {
             id: 'book-epub',
             title: 'EPUB History',
@@ -198,15 +198,23 @@ describe('DigitalLibraryPage', () => {
         render(<DigitalLibraryPage />);
 
         expect(await screen.findByRole('heading', { name: 'History' })).toBeInTheDocument();
-        expect(screen.getByRole('heading', { name: 'Download PDFs' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Downloads' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Open PDF' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Download PDF' })).toHaveAttribute(
+            'href',
+            'https://library.test/pamphlet.pdf'
+        );
+        expect(screen.getByRole('link', { name: 'Download PDF' })).toHaveAttribute(
+            'download',
+            'PDF Pamphlet.pdf'
+        );
         expect(screen.getByRole('link', { name: 'Upload PDF' })).toHaveAttribute(
             'href',
             '/admin/library/upload?format=pdf'
         );
 
-        fireEvent.click(screen.getByRole('button', { name: 'Download PDFs' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Downloads' }));
 
         expect(await screen.findByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
         expect(screen.queryByRole('link', { name: 'EPUB History' })).not.toBeInTheDocument();

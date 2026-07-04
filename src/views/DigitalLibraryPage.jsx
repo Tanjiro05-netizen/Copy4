@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { 
     Search, List, Grid, ExternalLink, FileText, Upload,
-    Database, BookOpen, Landmark, Users, Target, BookmarkPlus,
+    Database, BookOpen, Landmark, Users, Target, BookmarkPlus, Download,
     Trash2, Headphones, Pencil
 } from 'lucide-react';
 import ReadingListPanel from '../components/Library/ReadingListPanel';
@@ -20,12 +20,13 @@ const categoryIcons = {
     'History': Landmark,
     'Sociology': Users,
     'Strategy & Tactics': Target,
-    'Download PDFs': FileText,
+    'Downloads': FileText,
     'Audiobooks': Headphones,
     'default': Database
 };
 
-const PDF_DOWNLOADS_SECTION = 'Download PDFs';
+const PDF_DOWNLOADS_SECTION = 'Downloads';
+const LEGACY_PDF_DOWNLOADS_SECTION = 'Download PDFs';
 const AUDIOBOOKS_SECTION = 'Audiobooks';
 const PDF_UPLOAD_URL = '/admin/library/upload?format=pdf';
 
@@ -80,6 +81,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
         .storage
         .from('library')
         .getPublicUrl(book.pdf_filename)?.data?.publicUrl : null;
+    const pdfFileActionLabel = isPdfBook ? 'Download PDF' : 'Open in external viewer';
     
     // Get a proper public URL for cover image from Supabase storage
     const initialCover = getCoverImageSrc(isAudiobook ? book.cover_url : book.cover_image_url);
@@ -216,11 +218,13 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                             href={externalViewerUrl} 
                             target="_blank"
                             rel="noopener noreferrer"
+                            download={isPdfBook ? `${book.title}.pdf` : undefined}
                             data-testid="ebook-external-pdf-link"
                             className="p-2 bg-black/50 text-gray-400 rounded hover:text-white"
-                            title="Open in external viewer"
+                            title={pdfFileActionLabel}
+                            aria-label={pdfFileActionLabel}
                         >
-                            <ExternalLink size={16} />
+                            {isPdfBook ? <Download size={16} /> : <ExternalLink size={16} />}
                         </a>
                     )}
                     {!isAudiobook && <AddToListButton bookId={book.id} />}
@@ -287,7 +291,7 @@ const DigitalLibraryPage = () => {
                 // Generate dynamic categories
                 const distinctCategories = [...new Set(categoriesResponse.data
                     .map(item => item.category)
-                    .filter(category => category && category !== PDF_DOWNLOADS_SECTION && category !== AUDIOBOOKS_SECTION))];
+                    .filter(category => category && ![PDF_DOWNLOADS_SECTION, LEGACY_PDF_DOWNLOADS_SECTION, AUDIOBOOKS_SECTION].includes(category)))];
                 const dynamicCategories = distinctCategories.map(name => ({
                     id: name,
                     name: name,

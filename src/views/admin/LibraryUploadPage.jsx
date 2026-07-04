@@ -138,7 +138,7 @@ const LibraryUploadPage = () => {
     const editType = searchParams.get('edit');
     const isEditingBook = editType === 'book' && !!editId;
     const requestedFormat = `${searchParams.get('format') || searchParams.get('type') || searchParams.get('section') || ''}`.toLowerCase();
-    const shouldStartInPdfMode = ['pdf', 'pdfs', 'download-pdfs'].includes(requestedFormat);
+    const shouldStartInPdfMode = ['pdf', 'pdfs', 'downloads', 'download-pdfs'].includes(requestedFormat);
     const [uploadType, setUploadType] = useState(editType === 'audiobook' ? 'audiobook' : 'book'); // 'book' | 'audiobook'
     const [bookFormat, setBookFormat] = useState(shouldStartInPdfMode ? 'pdf' : 'epub'); // 'epub' | 'pdf'
 
@@ -612,9 +612,9 @@ const LibraryUploadPage = () => {
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold">{isEditingBook ? `Edit ${isPdfBookForm ? 'PDF Book' : 'Digital Book'}` : isPdfBookForm ? 'Upload to Download PDFs' : 'Upload to Digital Library'}</h1>
+                        <h1 className="text-2xl font-bold">{isEditingBook ? `Edit ${isPdfBookForm ? 'PDF Book' : 'Digital Book'}` : isPdfBookForm ? 'Upload to Downloads' : 'Upload to Digital Library'}</h1>
                         <p className="text-gray-400 text-sm">
-                            {isEditingBook ? 'Update book information and reader files' : isPdfBookForm ? 'Add a PDF-only title to the Download PDFs library section' : 'Add a new EPUB book, PDF book, or audiobook to the library'}
+                            {isEditingBook ? 'Update book information and reader files' : isPdfBookForm ? 'Add a PDF-only title to the Downloads library section' : 'Add a new EPUB book, PDF book, or audiobook to the library'}
                         </p>
                     </div>
                 </div>
@@ -636,7 +636,7 @@ const LibraryUploadPage = () => {
                             className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
                             <FileText size={16} />
-                            Download PDFs
+                            Downloads
                         </button>
                         <button
                             type="button"
@@ -736,7 +736,7 @@ const LibraryUploadPage = () => {
                                 {isPdfBookForm ? `PDF File ${!isEditingBook ? '*' : ''}` : 'PDF Download'}
                             </h3>
                             <p className="text-xs text-gray-500 mb-3">
-                                {isPdfBookForm ? 'Required — this is the reader and download file for the Download PDFs section' : 'Optional — available as a download for users'}
+                                {isPdfBookForm ? 'Required — this is the reader and download file for the Downloads section' : 'Optional — available as a download for users'}
                             </p>
                             
                             {pdfPreview ? (
