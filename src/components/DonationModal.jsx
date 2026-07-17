@@ -231,7 +231,7 @@ export default function DonationModal({ onClose }) {
               <Heart size={18} />
               Donate {getDisplayAmount() > 0
                 ? `${cur.symbol}${getDisplayAmount()}`
-                : ''} via Stripe
+                : ''} securely
             </>
           )}
         </button>
@@ -239,7 +239,7 @@ export default function DonationModal({ onClose }) {
         {/* Trust note */}
         <p className="text-center text-gray-600 text-xs mt-4 flex items-center justify-center gap-1">
           <ExternalLink size={11} />
-          Secure payment via Stripe — we never store your card details
+          Available payment methods are shown securely by Stripe — we never store your payment details
         </p>
       </div>
     </div>

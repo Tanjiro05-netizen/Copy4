@@ -57,7 +57,8 @@ export async function POST(request) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.marxist.info';
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      // Let Stripe show the payment methods enabled in the Dashboard and
+      // eligible for this donation (including PayPal where supported).
       line_items: [
         {
           price_data: {
