@@ -7,6 +7,7 @@ import {
   SUBSTACK_PUBLICATION_URL,
   loadSubstackPosts,
 } from '../services/substackApi';
+import PageHeader from '../components/PageHeader';
 import * as s from './SubstackPage.css.ts';
 
 const formatDate = (value) => {
@@ -101,6 +102,11 @@ const SubstackPage = () => {
   return (
     <div className={s.page}>
       <main className={s.main}>
+        <PageHeader
+          kicker="Periodical"
+          title="The Journal"
+          note="Essays and dispatches syndicated from our Substack publication."
+        />
         <section className={s.editorialNav} aria-label="Substack sections">
           <div className={s.sectionTabs}>
             <button

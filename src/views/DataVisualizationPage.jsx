@@ -9,6 +9,7 @@ import ClassVisualization from '../components/visualizations/ClassVisualization'
 import TrendsVisualization from '../components/visualizations/TrendsVisualization';
 import MovementsVisualization from '../components/visualizations/MovementsVisualization';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '../components/PageHeader';
 import * as s from './DataVisualizationPage.css.ts';
 
 const DataVisualizationPage = () => {
@@ -146,7 +147,11 @@ const DataVisualizationPage = () => {
         <div className={s.page}>
             
             <main className={s.main}>
-                <h1 className={s.pageTitle}>{t('data.title')}</h1>
+                <PageHeader
+                    kicker="Data Desk"
+                    title={t('data.title')}
+                    note="Interactive charts and dashboards covering economic and social indicators."
+                />
                 
                 <div className={s.vizGrid}>
                     {visualizations.map((viz) => (

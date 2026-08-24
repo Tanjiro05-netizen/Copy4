@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import Header from '../components/Header';
 import ScienceBlockRenderer from '../components/ScienceTechV2/ScienceBlockRenderer';
 import {
   completeScienceLesson,
@@ -130,31 +129,28 @@ const LessonPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <div className="pt-24 text-center text-gray-400">Loading lesson...</div>
+      <div className="min-h-screen bg-[#0b0d12]">
+        <div className="py-24 text-center text-gray-400">Loading lesson...</div>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <main className="pt-24 px-4 text-center">
+      <div className="min-h-screen bg-[#0b0d12]">
+        <div className="py-24 px-4 text-center">
           <p className="text-red-300">{error || 'Lesson not found.'}</p>
           <Link href={`/science-tech/courses/${courseSlug}`} className="mt-4 inline-flex text-red-400 hover:text-red-300">
             Back to course
           </Link>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#12131A] text-gray-200">
-      <Header />
-      <main className="pt-20">
+    <div className="min-h-screen bg-[#0b0d12] text-gray-200">
+      <div className="pb-12">
         <div className="border-b border-gray-800 bg-black/35">
           <div className="container mx-auto max-w-7xl px-4 py-4">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -293,7 +289,7 @@ const LessonPage = () => {
             </div>
           </aside>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

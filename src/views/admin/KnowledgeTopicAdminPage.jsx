@@ -6,7 +6,7 @@ import {
     Plus, Pencil, Trash2, Check, X, Loader2, Tag, ArrowLeft, AlertCircle
 } from 'lucide-react';
 
-const inputCls = "w-full bg-[#090909] border border-white/[0.06] rounded-xl px-4 py-2.5 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(200,30,30,0.4)] transition-all font-[Hanken_Grotesk,sans-serif]";
+const inputCls = "w-full bg-[#0b0d12] border border-white/[0.06] rounded-none px-4 py-2.5 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(179, 18, 46,0.4)] transition-all font-[Outfit,sans-serif]";
 const labelCls = "block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/35 mb-1.5";
 
 const slugify = (str) =>
@@ -86,7 +86,7 @@ const KnowledgeTopicAdminPage = () => {
     const cancelEdit = () => { setEditingId(null); setForm(emptyForm); };
 
     return (
-        <div className="min-h-screen bg-[#090909] text-white font-[Hanken_Grotesk,sans-serif]">
+        <div className="min-h-screen bg-[#0b0d12] text-white font-[Outfit,sans-serif]">
             <div className="max-w-3xl mx-auto px-4 py-8">
 
                 {/* Back */}
@@ -99,7 +99,7 @@ const KnowledgeTopicAdminPage = () => {
                 {/* Header */}
                 <div className="flex items-end justify-between gap-4 mb-6">
                     <div>
-                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#c81e1e] opacity-70 mb-1">
+                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#b3122e] opacity-70 mb-1">
                             Admin · Knowledge Q&amp;A
                         </p>
                         <h1 className="font-[Cormorant_Garamond,Georgia,serif] text-[32px] font-[500] leading-none text-white tracking-[-0.02em]">
@@ -109,7 +109,7 @@ const KnowledgeTopicAdminPage = () => {
                     {!showCreate && (
                         <button
                             onClick={() => { setShowCreate(true); setEditingId(null); setForm(emptyForm); }}
-                            className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-4 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all shrink-0"
+                            className="flex items-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white px-4 py-2 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all shrink-0"
                         >
                             <Plus size={14} /> New Topic
                         </button>
@@ -118,20 +118,20 @@ const KnowledgeTopicAdminPage = () => {
 
                 {/* Flash messages */}
                 {error && (
-                    <div className="flex items-center gap-2 bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.25)] text-[#c81e1e] px-4 py-3 rounded-xl text-[12px] mb-4">
+                    <div className="flex items-center gap-2 bg-[rgba(179, 18, 46,0.1)] border border-[rgba(179, 18, 46,0.25)] text-[#b3122e] px-4 py-3 rounded-none text-[12px] mb-4">
                         <AlertCircle size={14} /> {error}
                     </div>
                 )}
                 {success && (
-                    <div className="flex items-center gap-2 bg-emerald-900/20 border border-emerald-800/30 text-emerald-400 px-4 py-3 rounded-xl text-[12px] mb-4">
+                    <div className="flex items-center gap-2 bg-emerald-900/20 border border-emerald-800/30 text-emerald-400 px-4 py-3 rounded-none text-[12px] mb-4">
                         <Check size={14} /> {success}
                     </div>
                 )}
 
                 {/* Create form */}
                 {showCreate && (
-                    <div className="bg-[#0f0f0f] border border-[rgba(200,30,30,0.22)] rounded-2xl p-5 mb-4 shadow-[0_0_24px_rgba(200,30,30,0.06)]">
-                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#c81e1e] mb-4">
+                    <div className="bg-[#10131b] border border-[rgba(179, 18, 46,0.22)] rounded-none p-5 mb-4 shadow-[0_0_24px_rgba(179, 18, 46,0.06)]">
+                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#b3122e] mb-4">
                             New Topic
                         </p>
                         <TopicForm
@@ -151,10 +151,10 @@ const KnowledgeTopicAdminPage = () => {
                 {/* Topics list */}
                 {loading ? (
                     <div className="py-16 flex justify-center">
-                        <div className="w-5 h-5 rounded-full border-2 border-white/[0.12] border-t-[#c81e1e] animate-spin" />
+                        <div className="w-5 h-5 rounded-full border-2 border-white/[0.12] border-t-[#b3122e] animate-spin" />
                     </div>
                 ) : topics.length === 0 ? (
-                    <div className="py-16 text-center bg-[#0f0f0f] border border-white/[0.06] rounded-2xl">
+                    <div className="py-16 text-center bg-[#10131b] border border-white/[0.06] rounded-none">
                         <Tag size={28} className="mx-auto text-white/15 mb-3" />
                         <p className="text-white/30 text-sm">No topics yet. Create one above.</p>
                     </div>
@@ -163,15 +163,15 @@ const KnowledgeTopicAdminPage = () => {
                         {topics.map(topic => (
                             <div
                                 key={topic.id}
-                                className={`bg-[#0f0f0f] border rounded-2xl transition-all ${
+                                className={`bg-[#10131b] border rounded-none transition-all ${
                                     editingId === topic.id
-                                        ? 'border-[rgba(200,30,30,0.22)] p-5'
+                                        ? 'border-[rgba(179, 18, 46,0.22)] p-5'
                                         : 'border-white/[0.06] px-5 py-3.5 hover:border-white/[0.12]'
                                 }`}
                             >
                                 {editingId === topic.id ? (
                                     <>
-                                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#c81e1e] mb-4">
+                                        <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#b3122e] mb-4">
                                             Editing — {topic.name}
                                         </p>
                                         <TopicForm
@@ -195,7 +195,7 @@ const KnowledgeTopicAdminPage = () => {
                                             <button
                                                 onClick={() => handleDelete(topic.id)}
                                                 disabled={saving}
-                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(200,30,30,0.15)] hover:bg-[rgba(200,30,30,0.25)] border border-[rgba(200,30,30,0.3)] text-[#c81e1e] rounded-xl text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors disabled:opacity-40"
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(179, 18, 46,0.15)] hover:bg-[rgba(179, 18, 46,0.25)] border border-[rgba(179, 18, 46,0.3)] text-[#b3122e] rounded-none text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors disabled:opacity-40"
                                             >
                                                 {saving ? <Loader2 size={11} className="animate-spin" /> : <Trash2 size={11} />} Confirm
                                             </button>
@@ -210,7 +210,7 @@ const KnowledgeTopicAdminPage = () => {
                                 ) : (
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-3 min-w-0">
-                                            <Tag size={13} className="text-[#c81e1e] shrink-0" />
+                                            <Tag size={13} className="text-[#b3122e] shrink-0" />
                                             <div className="min-w-0">
                                                 <span className="text-[14px] font-medium text-white/80 truncate block">{topic.name}</span>
                                                 <div className="flex items-center gap-3 mt-0.5">
@@ -227,14 +227,14 @@ const KnowledgeTopicAdminPage = () => {
                                         <div className="flex items-center gap-1 shrink-0">
                                             <button
                                                 onClick={() => startEdit(topic)}
-                                                className="p-1.5 text-white/25 hover:text-white/70 hover:bg-white/[0.04] rounded-lg transition-all"
+                                                className="p-1.5 text-white/25 hover:text-white/70 hover:bg-white/[0.04] rounded-none transition-all"
                                                 title="Edit"
                                             >
                                                 <Pencil size={13} />
                                             </button>
                                             <button
                                                 onClick={() => setDeletingId(topic.id)}
-                                                className="p-1.5 text-white/25 hover:text-[#c81e1e] hover:bg-[rgba(200,30,30,0.08)] rounded-lg transition-all"
+                                                className="p-1.5 text-white/25 hover:text-[#b3122e] hover:bg-[rgba(179, 18, 46,0.08)] rounded-none transition-all"
                                                 title="Delete"
                                             >
                                                 <Trash2 size={13} />
@@ -264,7 +264,7 @@ const TopicForm = ({ form, setForm, onSubmit, onCancel, saving, inputCls, labelC
         <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className={labelCls}>Name <span className="text-[#c81e1e]">*</span></label>
+                    <label className={labelCls}>Name <span className="text-[#b3122e]">*</span></label>
                     <input
                         type="text"
                         value={form.name}
@@ -275,7 +275,7 @@ const TopicForm = ({ form, setForm, onSubmit, onCancel, saving, inputCls, labelC
                     />
                 </div>
                 <div>
-                    <label className={labelCls}>Slug <span className="text-[#c81e1e]">*</span></label>
+                    <label className={labelCls}>Slug <span className="text-[#b3122e]">*</span></label>
                     <input
                         type="text"
                         value={form.slug}
@@ -300,14 +300,14 @@ const TopicForm = ({ form, setForm, onSubmit, onCancel, saving, inputCls, labelC
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="px-4 py-2 border border-white/[0.08] text-white/40 hover:text-white/70 hover:border-white/[0.16] rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
+                    className="px-4 py-2 border border-white/[0.08] text-white/40 hover:text-white/70 hover:border-white/[0.16] rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
                     disabled={saving || !form.name.trim()}
-                    className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-4 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white px-4 py-2 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
                     {submitLabel}

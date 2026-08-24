@@ -54,11 +54,11 @@ const CollectButton = ({ results, quiz, userId, onCollected, onClose }) => {
                        { label: 'Keep Studying!', icon: '✊' };
 
   return (
-    <div className="text-center space-y-5 font-[Hanken_Grotesk,sans-serif]">
+    <div className="text-center space-y-5 font-[Outfit,sans-serif]">
       {/* Close */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 p-1.5 hover:bg-white/[0.06] rounded-xl transition-colors"
+        className="absolute top-4 right-4 p-1.5 hover:bg-white/[0.06] rounded-none transition-colors"
       >
         <X size={16} className="text-white/30" />
       </button>
@@ -71,7 +71,7 @@ const CollectButton = ({ results, quiz, userId, onCollected, onClose }) => {
       </div>
 
       {/* Score breakdown */}
-      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-2.5 text-left">
+      <div className="bg-white/[0.03] border border-white/[0.06] rounded-none p-4 space-y-2.5 text-left">
         {[
           { label: 'Score', value: `${results.score}/${results.maxScore}` },
           { label: 'Accuracy', value: `${percentage}%` },
@@ -89,7 +89,7 @@ const CollectButton = ({ results, quiz, userId, onCollected, onClose }) => {
       </div>
 
       {/* XP collect panel */}
-      <div className={`relative overflow-hidden rounded-xl border p-5 transition-all duration-500 ${
+      <div className={`relative overflow-hidden rounded-none border p-5 transition-all duration-500 ${
         collected
           ? 'bg-yellow-900/20 border-yellow-700/40'
           : 'bg-white/[0.03] border-white/[0.07]'
@@ -115,17 +115,17 @@ const CollectButton = ({ results, quiz, userId, onCollected, onClose }) => {
         )}
       </div>
 
-      {error && <p className="text-[#c81e1e] text-[12px]">{error}</p>}
+      {error && <p className="text-[#b3122e] text-[12px]">{error}</p>}
 
       {/* Collect / Collected */}
       {!collected ? (
         <button
           onClick={handleCollect}
           disabled={collecting}
-          className={`w-full py-3.5 rounded-xl font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.1em] transition-all active:scale-[0.98] ${
+          className={`w-full py-3.5 rounded-none font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.1em] transition-all active:scale-[0.98] ${
             collecting
               ? 'bg-white/[0.04] text-white/20 cursor-not-allowed'
-              : 'bg-gradient-to-r from-yellow-500 to-orange-500 text-black hover:from-yellow-400 hover:to-orange-400 shadow-[0_0_20px_rgba(234,179,8,0.15)]'
+              : 'bg-[#10131b] from-yellow-500 to-orange-500 text-black hover:from-yellow-400 hover:to-orange-400 shadow-[0_0_20px_rgba(234,179,8,0.15)]'
           }`}
         >
           {collecting ? (

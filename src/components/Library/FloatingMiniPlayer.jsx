@@ -12,7 +12,7 @@ const FloatingMiniPlayer = () => {
     if (isExpanded) {
         return (
             <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
-                <div className="w-full max-w-4xl max-h-screen overflow-y-auto bg-[#12131A] rounded-xl border border-gray-800 shadow-2xl relative">
+                <div className="w-full max-w-4xl max-h-screen overflow-y-auto bg-[#0b0d12] rounded-none border border-gray-800 shadow-none relative">
                     <AudiobookPlayer book={currentBook} onClose={() => setIsExpanded(false)} />
                 </div>
             </div>
@@ -30,7 +30,7 @@ const FloatingMiniPlayer = () => {
     const progressPercent = duration ? (progress / duration) * 100 : 0;
 
     return (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-black/80 backdrop-blur-lg border border-gray-800 rounded-2xl shadow-2xl z-[90] overflow-hidden flex flex-col group">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-black/80 backdrop-blur-lg border border-gray-800 rounded-none shadow-none z-[90] overflow-hidden flex flex-col group">
             {/* Progress Bar Top Edge */}
             <div className="h-1 w-full bg-gray-900">
                 <div 
@@ -42,7 +42,7 @@ const FloatingMiniPlayer = () => {
             <div className="flex items-center p-3 gap-3">
                 {/* Cover Art Thumbnail */}
                 <div 
-                    className="w-12 h-12 bg-gray-900 rounded-lg overflow-hidden flex-shrink-0 relative cursor-pointer"
+                    className="w-12 h-12 bg-gray-900 rounded-none overflow-hidden flex-shrink-0 relative cursor-pointer"
                     onClick={() => setIsExpanded(true)}
                 >
                     {currentBook.cover_url ? (

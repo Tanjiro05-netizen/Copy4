@@ -76,7 +76,7 @@ export const mainColumnSocial = style({
 
 export const mainColumnBoards = style({
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   overflow: 'hidden',
   background: vars.color.surface,
   '@media': {
@@ -143,7 +143,7 @@ export const boardPicker = style({
   alignItems: 'center',
   gap: '8px',
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
 })
 
@@ -162,7 +162,7 @@ export const entityTab = style({
   justifyContent: 'center',
   gap: '8px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surface,
   color: vars.color.textMuted,
   fontSize: '13px',
@@ -270,11 +270,11 @@ export const boardStripChip = style({
   alignItems: 'center',
   gap: '6px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.background,
   color: vars.color.textMuted,
   padding: '0 10px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   selectors: {
     '&:hover': {
@@ -338,7 +338,7 @@ export const composerGrid = style({
 export const avatar = style({
   width: '40px',
   height: '40px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -348,7 +348,7 @@ export const avatar = style({
   border: vars.border.subtle,
   background: vars.color.surfaceSoft,
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
 })
 
@@ -363,8 +363,8 @@ globalStyle(`${socialComposer} ${avatar}`, {
 })
 
 globalStyle(`${boardComposer} ${avatar}`, {
-  borderRadius: '6px',
-  fontFamily: vars.font.mono,
+  borderRadius: '0px',
+  fontFamily: vars.font.label,
 })
 
 export const composerBody = style({
@@ -404,7 +404,7 @@ globalStyle(`${socialComposer} ${composerTextarea}`, {
 globalStyle(`${boardComposer} ${composerTextarea}`, {
   minHeight: '112px',
   fontSize: '15px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
 })
 
 globalStyle(`${composerTextarea}::placeholder`, {
@@ -440,7 +440,7 @@ export const topicChipGroup = style({
 
 export const composerToolLabel = style({
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   fontWeight: 800,
   letterSpacing: '0',
@@ -474,7 +474,7 @@ export const topicChip = style({
 export const characterCount = style({
   flexShrink: 0,
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
 })
 
@@ -488,14 +488,14 @@ export const boardComposerHeader = style({
 })
 
 globalStyle(`${boardComposerHeader} strong`, {
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '13px',
   textTransform: 'uppercase',
 })
 
 globalStyle(`${boardComposerHeader} span`, {
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
 })
 
@@ -512,7 +512,7 @@ export const selectLabel = style({
   gap: '8px',
   color: vars.color.textFaint,
   fontSize: '11px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
 })
 
 export const guestComposerPrompt = style({
@@ -543,7 +543,7 @@ export const select = style({
   minHeight: '34px',
   maxWidth: '170px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surface,
   color: vars.color.textSoft,
   padding: '0 10px',
@@ -556,7 +556,7 @@ export const toggleLabel = style({
   alignItems: 'center',
   gap: '7px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surface,
   color: vars.color.textMuted,
   padding: '0 10px',
@@ -567,7 +567,7 @@ export const anonInput = style({
   width: '132px',
   minHeight: '34px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surface,
   color: vars.color.text,
   padding: '0 10px',
@@ -629,7 +629,7 @@ export const topicSpotlight = style({
   alignItems: 'center',
   gap: '14px',
   borderBottom: vars.border.subtle,
-  background: `linear-gradient(135deg, ${vars.color.accentWash}, ${vars.color.surface})`,
+  background: `${vars.color.surface}`,
   padding: '14px 18px',
   '@media': {
     'screen and (max-width: 620px)': {
@@ -642,7 +642,7 @@ export const topicSpotlight = style({
 globalStyle(`${topicSpotlight} span`, {
   display: 'block',
   color: vars.color.accent,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   fontWeight: 800,
   textTransform: 'uppercase',
@@ -679,7 +679,7 @@ globalStyle(`${topicStats} strong`, {
   background: vars.color.background,
   color: vars.color.textMuted,
   padding: '0 8px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
 })
 
@@ -736,7 +736,7 @@ export const boardPostCard = style({
   gap: '10px',
   margin: '10px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.background,
   selectors: {
     '&:hover': {
@@ -749,7 +749,7 @@ export const boardPostCard = style({
 globalStyle(`${boardPostCard} ${avatar}`, {
   width: '34px',
   height: '34px',
-  borderRadius: '6px',
+  borderRadius: '0px',
   fontSize: '11px',
 })
 
@@ -801,7 +801,7 @@ export const boardBadge = style({
   background: vars.color.accentWash,
   color: vars.color.accent,
   padding: '0 8px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
 })
 
@@ -815,7 +815,7 @@ export const postTitle = style({
 
 globalStyle(`${boardPostCard} ${postTitle}`, {
   fontSize: '15px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontWeight: 800,
 })
 
@@ -836,7 +836,7 @@ globalStyle(`${boardPostCard} ${postContent}`, {
 export const embeddedPost = style({
   marginTop: '12px',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   padding: '12px',
   background: vars.color.surface,
 })
@@ -882,7 +882,7 @@ export const actionButton = style({
 
 globalStyle(`${boardActions} ${actionButton}`, {
   minHeight: '26px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
 })
 
@@ -895,7 +895,7 @@ export const threadCard = style({
   display: 'flex',
   flexDirection: 'column',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.background,
   padding: '12px',
   selectors: {
@@ -912,7 +912,7 @@ export const threadCardHeader = style({
   justifyContent: 'space-between',
   gap: '8px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
 })
 
@@ -926,7 +926,7 @@ export const threadBoardTag = style({
   background: vars.color.accentWash,
   color: vars.color.accent,
   padding: '0 8px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   fontWeight: 800,
 })
@@ -945,7 +945,7 @@ export const threadTitleButton = style({
 
 globalStyle(`${threadTitleButton} strong`, {
   minWidth: 0,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '15px',
   lineHeight: 1.3,
   overflowWrap: 'anywhere',
@@ -972,7 +972,7 @@ export const threadMetaGrid = style({
   marginTop: 'auto',
   paddingTop: '14px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
 })
 
@@ -993,7 +993,7 @@ export const threadStatButton = style({
   alignItems: 'center',
   gap: '6px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   selectors: {
     '&:hover': {
@@ -1039,7 +1039,7 @@ export const rail = style({
 
 export const railSection = style({
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surface,
   overflow: 'hidden',
 })
@@ -1095,7 +1095,7 @@ export const discoveryCategoryButton = style({
   alignItems: 'center',
   justifyContent: 'center',
   border: vars.border.subtle,
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.background,
   color: vars.color.textMuted,
   padding: '6px',
@@ -1152,7 +1152,7 @@ export const hotSearchItemActive = style({
 
 globalStyle(`${hotSearchItem} span`, {
   color: vars.color.accent,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   fontWeight: 800,
 })
@@ -1180,7 +1180,7 @@ globalStyle(`${hotSearchItem} em`, {
   gridRow: '1 / span 3',
   alignSelf: 'center',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   fontStyle: 'normal',
 })
@@ -1188,7 +1188,7 @@ globalStyle(`${hotSearchItem} em`, {
 globalStyle(`${hotSearchItem} b`, {
   gridColumn: '2',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   fontWeight: 500,
 })
@@ -1247,7 +1247,7 @@ export const superTopicBoardLink = style({
   borderRadius: '999px',
   color: vars.color.textMuted,
   padding: '0 8px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
 })
 
@@ -1273,7 +1273,7 @@ globalStyle(`${pulsePanel} div`, {
   justifyContent: 'space-between',
   gap: '8px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
 })
 
@@ -1379,7 +1379,7 @@ export const boardChip = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '8px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.background,
   color: vars.color.textMuted,
@@ -1426,14 +1426,14 @@ export const pageButton = style({
 })
 
 export const monoMeta = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   color: vars.color.textFaint,
 })
 
 export const weiboPage = style({
   minHeight: '100vh',
-  background: 'linear-gradient(180deg, #111417 0%, #080a0d 420px, #070809 100%)',
+  background: 'linear-gradient(180deg, #10131b 0%, #0b0d12 420px, #0b0d12 100%)',
 })
 
 export const weiboTopbar = style({
@@ -1474,10 +1474,10 @@ export const weiboMark = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '10px',
-  background: 'linear-gradient(135deg, #e23d3d 0%, #d3a84f 58%, #5aa6c8 100%)',
-  color: '#070809',
-  fontFamily: vars.font.mono,
+  borderRadius: '0px',
+  background: '#b3122e',
+  color: '#0b0d12',
+  fontFamily: vars.font.label,
   fontSize: '17px',
   fontWeight: 900,
   transform: 'rotate(-6deg)',
@@ -1504,8 +1504,8 @@ export const weiboGlobalSearch = style({
   alignItems: 'center',
   gap: '8px',
   border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '10px',
-  background: '#171c21',
+  borderRadius: '0px',
+  background: '#151924',
   color: vars.color.textFaint,
   padding: '0 14px',
   '@media': {
@@ -1554,7 +1554,7 @@ globalStyle(`${weiboTopNav} a:hover`, {
 })
 
 export const weiboTopNavActive = style({
-  color: '#f1cf74',
+  color: '#d8c79f',
   selectors: {
     '&::after': {
       content: '""',
@@ -1564,7 +1564,7 @@ export const weiboTopNavActive = style({
       bottom: 0,
       height: '3px',
       borderRadius: '999px 999px 0 0',
-      background: 'linear-gradient(90deg, #e23d3d, #f1cf74)',
+      background: '#d41f3d',
     },
   },
 })
@@ -1581,8 +1581,8 @@ export const weiboLoginButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '10px',
-  background: '#e23d3d',
+  borderRadius: '0px',
+  background: '#d41f3d',
   color: '#fff',
   padding: '0 18px',
   fontSize: '13px',
@@ -1606,8 +1606,8 @@ export const weiboIconButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '10px',
-  background: '#192027',
+  borderRadius: '0px',
+  background: '#1a1f2b',
   color: vars.color.textMuted,
   '@media': {
     'screen and (max-width: 900px)': {
@@ -1623,9 +1623,9 @@ export const weiboComposeButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '10px',
-  background: '#d3a84f',
-  color: '#070809',
+  borderRadius: '0px',
+  background: '#d8c79f',
+  color: '#0b0d12',
 })
 
 export const weiboShell = style({
@@ -1690,7 +1690,7 @@ export const weiboLeftNavItem = style({
 })
 
 export const weiboLeftNavItemActive = style({
-  color: '#f1cf74',
+  color: '#d8c79f',
 })
 
 export const weiboLeftCategoryList = style({
@@ -1716,7 +1716,7 @@ export const weiboLeftCategoryItem = style({
 })
 
 export const weiboLeftCategoryItemActive = style({
-  color: '#5aa6c8',
+  color: '#4a7fb5',
 })
 
 export const weiboMainFeed = style({
@@ -1751,15 +1751,15 @@ globalStyle(`${weiboFeedTabs} ${tab}`, {
 })
 
 globalStyle(`${weiboFeedTabs} ${tabActive}`, {
-  color: '#f1cf74',
-  borderBottomColor: '#e23d3d',
+  color: '#d8c79f',
+  borderBottomColor: '#d41f3d',
 })
 
 export const signalBriefing = style({
   borderLeft: vars.border.subtle,
   borderRight: vars.border.subtle,
   borderBottom: vars.border.subtle,
-  background: 'linear-gradient(135deg, rgba(226,61,61,0.13), rgba(90,166,200,0.08) 52%, rgba(211,168,79,0.10))',
+  background: 'rgba(179,18,46,0.08)',
   padding: '14px',
 })
 
@@ -1775,7 +1775,7 @@ globalStyle(`${signalBriefingHeader} span`, {
   display: 'inline-flex',
   alignItems: 'center',
   gap: '8px',
-  color: '#f1cf74',
+  color: '#d8c79f',
   fontSize: '12px',
   fontWeight: 900,
   textTransform: 'uppercase',
@@ -1796,7 +1796,7 @@ export const signalBriefingLead = style({
   gap: '14px',
   alignItems: 'end',
   border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: 'rgba(7, 9, 12, 0.58)',
   padding: '14px',
   '@media': {
@@ -1808,8 +1808,8 @@ export const signalBriefingLead = style({
 
 globalStyle(`${signalBriefingLead} small`, {
   display: 'block',
-  color: '#5aa6c8',
-  fontFamily: vars.font.mono,
+  color: '#4a7fb5',
+  fontFamily: vars.font.label,
   fontSize: '10px',
   fontWeight: 900,
   textTransform: 'uppercase',
@@ -1844,16 +1844,16 @@ globalStyle(`${signalBriefingMetrics} span`, {
   flexDirection: 'column',
   justifyContent: 'center',
   border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '8px',
-  background: '#10151a',
+  borderRadius: '0px',
+  background: '#10131b',
   color: vars.color.textFaint,
   padding: '0 10px',
   fontSize: '11px',
 })
 
 globalStyle(`${signalBriefingMetrics} b`, {
-  color: '#f1cf74',
-  fontFamily: vars.font.mono,
+  color: '#d8c79f',
+  fontFamily: vars.font.label,
   fontSize: '15px',
 })
 
@@ -1872,7 +1872,7 @@ export const signalBriefingGrid = style({
 globalStyle(`${signalBriefingGrid} a`, {
   minWidth: 0,
   border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: 'rgba(7, 9, 12, 0.48)',
   padding: '10px',
 })
@@ -1896,7 +1896,7 @@ globalStyle(`${signalBriefingGrid} span`, {
 globalStyle(`${weiboMainFeed} ${socialTopicDock}`, {
   borderLeft: vars.border.subtle,
   borderRight: vars.border.subtle,
-  background: '#0c1014',
+  background: '#10131b',
   paddingLeft: '14px',
   paddingRight: '14px',
 })
@@ -1904,19 +1904,19 @@ globalStyle(`${weiboMainFeed} ${socialTopicDock}`, {
 globalStyle(`${weiboMainFeed} ${composer}`, {
   borderLeft: vars.border.subtle,
   borderRight: vars.border.subtle,
-  background: '#11161b',
+  background: '#10131b',
 })
 
 globalStyle(`${weiboMainFeed} ${postCard}`, {
   marginTop: '10px',
   border: vars.border.subtle,
-  borderRadius: '8px',
-  background: '#11161b',
+  borderRadius: '0px',
+  background: '#10131b',
   padding: '20px 26px',
 })
 
 globalStyle(`${weiboMainFeed} ${socialPostCard}:hover`, {
-  background: '#141b21',
+  background: '#151924',
 })
 
 globalStyle(`${weiboMainFeed} ${displayName}`, {
@@ -1924,7 +1924,7 @@ globalStyle(`${weiboMainFeed} ${displayName}`, {
 })
 
 globalStyle(`${weiboMainFeed} ${boardBadge}`, {
-  color: '#f1cf74',
+  color: '#d8c79f',
   borderColor: 'rgba(241,207,116,0.34)',
   background: 'rgba(241,207,116,0.09)',
 })
@@ -1958,8 +1958,8 @@ export const weiboRightRail = style({
 
 export const weiboHotPanel = style({
   border: vars.border.subtle,
-  borderRadius: '8px',
-  background: '#11161b',
+  borderRadius: '0px',
+  background: '#10131b',
   overflow: 'hidden',
 })
 
@@ -1997,15 +1997,15 @@ export const weiboHotTabs = style({
 globalStyle(`${weiboHotTabs} button`, {
   ...buttonReset,
   minHeight: '34px',
-  borderRadius: '6px',
-  background: '#0c1014',
+  borderRadius: '0px',
+  background: '#10131b',
   color: vars.color.textMuted,
   fontSize: '13px',
 })
 
 export const weiboHotTabActive = style({
   color: vars.color.text,
-  background: '#1a2229',
+  background: '#1a1f2b',
 })
 
 export const weiboHotRankList = style({
@@ -2030,8 +2030,8 @@ export const weiboHotRankItem = style({
 })
 
 globalStyle(`${weiboHotRankItem} span`, {
-  color: '#f1cf74',
-  fontFamily: vars.font.mono,
+  color: '#d8c79f',
+  fontFamily: vars.font.label,
   fontSize: '16px',
   fontWeight: 800,
 })
@@ -2046,7 +2046,7 @@ globalStyle(`${weiboHotRankItem} strong`, {
 
 globalStyle(`${weiboHotRankItem} em`, {
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
   fontStyle: 'normal',
 })
@@ -2057,15 +2057,15 @@ globalStyle(`${weiboHotRankItem} b`, {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '4px',
-  background: '#e23d3d',
+  borderRadius: '0px',
+  background: '#d41f3d',
   color: '#fff',
   padding: '0 4px',
   fontSize: '10px',
 })
 
 export const weiboHotRankItemActive = style({
-  color: '#f1cf74',
+  color: '#d8c79f',
 })
 
 export const weiboFullHotLink = style({
@@ -2075,8 +2075,8 @@ export const weiboFullHotLink = style({
   justifyContent: 'center',
   gap: '8px',
   margin: '0 14px 14px',
-  borderRadius: '6px',
-  background: '#0c1014',
+  borderRadius: '0px',
+  background: '#10131b',
   color: vars.color.textMuted,
   fontSize: '13px',
 })

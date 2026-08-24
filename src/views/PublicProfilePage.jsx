@@ -131,7 +131,7 @@ const PublicProfilePage = () => {
                     )}
                 </div>
 
-                <div className="relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-b-lg shadow-lg">
+                <div className="relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-b-lg shadow-none">
                     {/* Profile Picture */}
                     <div className="absolute -top-16 left-8 w-32 h-32 bg-gray-700 rounded-full border-4 border-gray-900 flex items-center justify-center overflow-hidden">
                         {profile.avatar_url ? (
@@ -211,21 +211,21 @@ const PublicProfilePage = () => {
                     <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-700 pb-4">
                         <button
                             onClick={() => setActiveTab('posts')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeTab === 'posts' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors ${activeTab === 'posts' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                         >
                             <FileText size={16} />
                             Posts ({forumPosts.length})
                         </button>
                         <button
                             onClick={() => setActiveTab('replies')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeTab === 'replies' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors ${activeTab === 'replies' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                         >
                             <MessageSquare size={16} />
                             Replies ({forumReplies.length})
                         </button>
                         <button
                             onClick={() => setActiveTab('reposts')}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${activeTab === 'reposts' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors ${activeTab === 'reposts' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}
                         >
                             <Repeat2 size={16} />
                             Reposts ({forumReposts.length})
@@ -234,7 +234,7 @@ const PublicProfilePage = () => {
 
                     {/* Tab Content */}
                     {loadingActivity ? (
-                        <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                        <div className="text-center py-12 bg-gray-800/50 rounded-none">
                             <Loader2 className="animate-spin mx-auto mb-2" size={24} />
                             <p className="text-gray-400">Loading activity...</p>
                         </div>
@@ -244,7 +244,7 @@ const PublicProfilePage = () => {
                             {activeTab === 'posts' && (
                                 <div className="space-y-4">
                                     {forumPosts.length > 0 ? forumPosts.map(post => (
-                                        <Link href="/feed?section=boards" key={post.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
+                                        <Link href="/feed?section=boards" key={post.id} className="block bg-gray-800/50 rounded-none p-4 hover:bg-gray-800/80 transition-colors">
                                             <h3 className="text-lg font-semibold text-white mb-2">{post.title}</h3>
                                             <p className="text-gray-400 text-sm line-clamp-2 mb-2">{post.content}</p>
                                             <div className="flex items-center gap-4 text-xs text-gray-500">
@@ -254,7 +254,7 @@ const PublicProfilePage = () => {
                                             </div>
                                         </Link>
                                     )) : (
-                                        <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                                        <div className="text-center py-12 bg-gray-800/50 rounded-none">
                                             <p className="text-gray-400">No posts yet.</p>
                                         </div>
                                     )}
@@ -265,7 +265,7 @@ const PublicProfilePage = () => {
                             {activeTab === 'replies' && (
                                 <div className="space-y-4">
                                     {forumReplies.length > 0 ? forumReplies.map(reply => (
-                                        <Link href="/feed?section=boards" key={reply.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
+                                        <Link href="/feed?section=boards" key={reply.id} className="block bg-gray-800/50 rounded-none p-4 hover:bg-gray-800/80 transition-colors">
                                             <div className="text-xs text-gray-500 mb-2">
                                                 Reply in: <span className="text-red-400">{reply.thread?.title || 'Unknown thread'}</span>
                                             </div>
@@ -276,7 +276,7 @@ const PublicProfilePage = () => {
                                             </div>
                                         </Link>
                                     )) : (
-                                        <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                                        <div className="text-center py-12 bg-gray-800/50 rounded-none">
                                             <p className="text-gray-400">No replies yet.</p>
                                         </div>
                                     )}
@@ -287,7 +287,7 @@ const PublicProfilePage = () => {
                             {activeTab === 'reposts' && (
                                 <div className="space-y-4">
                                     {forumReposts.length > 0 ? forumReposts.map(repost => (
-                                        <Link href="/feed?section=boards" key={repost.id} className="block bg-gray-800/50 rounded-lg p-4 hover:bg-gray-800/80 transition-colors">
+                                        <Link href="/feed?section=boards" key={repost.id} className="block bg-gray-800/50 rounded-none p-4 hover:bg-gray-800/80 transition-colors">
                                             {repost.quote_content && (
                                                 <div className="border-l-4 border-red-500 pl-3 mb-3 italic text-gray-400 text-sm">
                                                     "{repost.quote_content}"
@@ -298,7 +298,7 @@ const PublicProfilePage = () => {
                                             <p className="text-gray-400 text-sm line-clamp-2">{repost.thread?.content}</p>
                                         </Link>
                                     )) : (
-                                        <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                                        <div className="text-center py-12 bg-gray-800/50 rounded-none">
                                             <p className="text-gray-400">No reposts yet.</p>
                                         </div>
                                     )}

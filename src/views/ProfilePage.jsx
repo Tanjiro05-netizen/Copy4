@@ -339,21 +339,21 @@ const ProfilePage = () => {
                 <>
                     {/* XP Summary */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-gray-800/50 rounded-lg p-5 border border-yellow-600/30">
+                        <div className="bg-gray-800/50 rounded-none p-5 border border-yellow-600/30">
                             <div className="flex items-center gap-2 text-yellow-500 mb-2">
                                 <Zap className="w-5 h-5" />
                                 <span className="text-sm font-medium">Total XP</span>
                             </div>
                             <p className="text-3xl font-bold text-white">{stemXP?.total_xp || 0}</p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-5 border border-orange-600/30">
+                        <div className="bg-gray-800/50 rounded-none p-5 border border-orange-600/30">
                             <div className="flex items-center gap-2 text-orange-400 mb-2">
                                 <BarChart2 className="w-5 h-5" />
                                 <span className="text-sm font-medium">Current Streak</span>
                             </div>
                             <p className="text-3xl font-bold text-white">{stemXP?.current_streak || 0} <span className="text-lg text-gray-500">days</span></p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-5 border border-green-600/30">
+                        <div className="bg-gray-800/50 rounded-none p-5 border border-green-600/30">
                             <div className="flex items-center gap-2 text-green-400 mb-2">
                                 <Award className="w-5 h-5" />
                                 <span className="text-sm font-medium">Certificates</span>
@@ -363,7 +363,7 @@ const ProfilePage = () => {
                     </div>
 
                     {/* Enrolled Courses */}
-                    <div className="bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
                             <h3 className="font-semibold text-white flex items-center gap-2">
                                 <GraduationCap className="w-4 h-4 text-red-400" /> My Courses
@@ -376,8 +376,8 @@ const ProfilePage = () => {
                                 const progress = courseProgressMap[course?.id] || 0;
                                 return (
                                     <Link key={e.id} href={`/science-tech/courses/${course?.slug}`} className="flex items-center gap-4 p-4 hover:bg-gray-700/30 transition-colors">
-                                        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: (course?.stem_subjects?.color || '#ef4444') + '20' }}>
-                                            <GraduationCap className="w-5 h-5" style={{ color: course?.stem_subjects?.color || '#ef4444' }} />
+                                        <div className="w-10 h-10 rounded-none flex items-center justify-center" style={{ backgroundColor: (course?.stem_subjects?.color || '#d41f3d') + '20' }}>
+                                            <GraduationCap className="w-5 h-5" style={{ color: course?.stem_subjects?.color || '#d41f3d' }} />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-white font-medium truncate">{course?.title}</p>
@@ -404,7 +404,7 @@ const ProfilePage = () => {
 
                     {/* Certificates */}
                     {certificates.length > 0 && (
-                        <div className="bg-gray-800/50 rounded-lg border border-gray-700">
+                        <div className="bg-gray-800/50 rounded-none border border-gray-700">
                             <div className="p-4 border-b border-gray-700">
                                 <h3 className="font-semibold text-white flex items-center gap-2">
                                     <Award className="w-4 h-4 text-yellow-500" /> My Certificates
@@ -447,7 +447,7 @@ const ProfilePage = () => {
             ) : (
                 <>
                     {/* Level Header */}
-                    <div className="bg-gray-800/50 border border-red-600/30 rounded-lg p-6">
+                    <div className="bg-gray-800/50 border border-red-600/30 rounded-none p-6">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 bg-red-600/20 rounded-full flex items-center justify-center">
@@ -479,7 +479,7 @@ const ProfilePage = () => {
                                 </div>
                                 <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                                     <div 
-                                        className="h-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-500"
+                                        className="h-full bg-[#10131b] from-red-600 to-red-400 transition-all duration-500"
                                         style={{ width: `${levelInfo.progress}%` }}
                                     />
                                 </div>
@@ -492,28 +492,28 @@ const ProfilePage = () => {
                     
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                        <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <Eye className="w-4 h-4" />
                                 <span className="text-sm">Views</span>
                             </div>
                             <p className="text-2xl font-bold text-white">{formatCount(creatorStats.views)}</p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                        <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <Heart className="w-4 h-4" />
                                 <span className="text-sm">Likes</span>
                             </div>
                             <p className="text-2xl font-bold text-white">{formatCount(creatorStats.likes)}</p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                        <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <Users className="w-4 h-4" />
                                 <span className="text-sm">Follows</span>
                             </div>
                             <p className="text-2xl font-bold text-white">{formatCount(creatorStats.follows)}</p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                        <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <MessageSquare className="w-4 h-4" />
                                 <span className="text-sm">Content</span>
@@ -524,7 +524,7 @@ const ProfilePage = () => {
                     </div>
                     
                     {/* My Questions */}
-                    <div className="bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
                             <h3 className="font-semibold text-white">My Questions</h3>
                             <Link href="/knowledge" className="text-sm text-red-400 hover:text-red-300">View All →</Link>
@@ -555,7 +555,7 @@ const ProfilePage = () => {
                     </div>
                     
                     {/* My Answers */}
-                    <div className="bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
                             <h3 className="font-semibold text-white">My Answers</h3>
                         </div>
@@ -581,7 +581,7 @@ const ProfilePage = () => {
                     </div>
                     
                     {/* My Favorites */}
-                    <div className="bg-gray-800/50 rounded-lg border border-gray-700">
+                    <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
                             <h3 className="font-semibold text-white flex items-center gap-2">
                                 <Star className="w-4 h-4 text-yellow-500" /> My Favorites

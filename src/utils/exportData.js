@@ -37,7 +37,7 @@ export async function exportToPNG(element, filename = 'chart') {
 
   try {
     const canvas = await html2canvas(element, {
-      backgroundColor: '#0a0a0a',
+      backgroundColor: '#10131b',
       scale: 2,
       useCORS: true,
     });

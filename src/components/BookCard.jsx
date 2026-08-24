@@ -5,8 +5,8 @@ import { Book, Clock } from 'lucide-react';
 const BookCard = ({ book }) => {
     return (
         <Link href={`/reader/${book.id}`} className="block">
-            <div className="bg-black/30 rounded-lg p-4 hover:bg-black/40 transition-colors group">
-                <div className="relative mb-4 aspect-[3/4] overflow-hidden rounded-lg bg-black/50">
+            <div className="bg-black/30 rounded-none p-4 hover:bg-black/40 transition-colors group">
+                <div className="relative mb-4 aspect-[3/4] overflow-hidden rounded-none bg-black/50">
                     {book.coverImage ? (
                         <img 
                             src={book.coverImage} 

@@ -146,7 +146,7 @@ export const eyebrow = style({
   gap: vars.space.xs,
   marginBottom: vars.space.sm,
   color: vars.color.accent,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -294,7 +294,7 @@ export const filterButtonActive = style({
 
 export const statusBar = style({
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.04em',
   textAlign: 'right',
@@ -380,7 +380,7 @@ export const featuredExcerpt = style({
 export const storyMeta = style({
   margin: 0,
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   fontWeight: 700,
   letterSpacing: '0.04em',
@@ -567,7 +567,7 @@ export const archiveSection = style({
 
 export const archiveCount = style({
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.04em',
   textTransform: 'uppercase',
@@ -711,7 +711,7 @@ export const category = style({
   borderRadius: vars.radius.tiny,
   background: vars.color.accentWash,
   color: vars.color.accent,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -746,7 +746,7 @@ export const cardFooter = style({
   padding: `${vars.space.sm} ${vars.space.md}`,
   borderTop: vars.border.subtle,
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
 });
 

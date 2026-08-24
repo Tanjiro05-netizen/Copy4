@@ -4,10 +4,12 @@ import { vars } from '../styles/obsidianTheme.css.ts';
 export const page = style({ minHeight: '100vh', background: vars.color.background, color: vars.color.text });
 
 export const hero = style({ position: 'relative', height: '50vh', overflow: 'hidden' });
-export const heroGrid = style({ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(200,30,30,0.12) 1px, transparent 1px)', backgroundSize: '16px 16px', opacity: 0.35, pointerEvents: 'none' });
+export const heroGrid = style({ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(179, 18, 46,0.12) 1px, transparent 1px)', backgroundSize: '16px 16px', opacity: 0.35, pointerEvents: 'none' });
 export const heroContent = style({ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: vars.color.text });
-export const heroCopy = style({ textAlign: 'center', maxWidth: '800px', padding: `0 ${vars.space.md}`, display: 'flex', flexDirection: 'column', gap: vars.space.xl });
-export const heroTitle = style({ fontFamily: vars.font.display, fontSize: '60px', fontWeight: 500, letterSpacing: '-0.04em', lineHeight: 1, '@media': { 'screen and (max-width: 640px)': { fontSize: '38px' } } });
+export const heroCopy = style({ textAlign: 'center', maxWidth: '800px', padding: `0 ${vars.space.md}`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: vars.space.md });
+export const heroKicker = style({ margin: 0, fontFamily: vars.font.label, fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.32em', color: vars.color.accentHover });
+export const heroTitle = style({ fontFamily: vars.font.display, fontSize: '60px', fontWeight: 500, letterSpacing: '0.01em', lineHeight: 1.02, '@media': { 'screen and (max-width: 640px)': { fontSize: '38px' } } });
+export const heroRule = style({ width: '44px', height: '2px', background: vars.color.accent });
 export const heroQuote = style({ fontSize: '18px', lineHeight: 1.6, fontWeight: 300, color: vars.color.textSoft, '@media': { 'screen and (max-width: 640px)': { fontSize: '16px' } } });
 
 export const formSection = style({ maxWidth: '720px', margin: '-64px auto 0', position: 'relative', zIndex: 1, padding: `0 ${vars.space.md} ${vars.space.hero}` });

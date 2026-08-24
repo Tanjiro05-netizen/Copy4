@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bot } from 'lucide-react';
 import Header from './Header';
+import Footer from './Footer';
 import * as s from './MainLayout.css.ts';
 import { studyThemeClass } from '../styles/obsidianTheme.css.ts';
 
@@ -17,6 +18,8 @@ const MainLayout = ({ children, hideHeader = false, hideFab = false }) => {
             <main className={hideHeader ? s.mainFullBleed : s.main}>
                 {children}
             </main>
+
+            <Footer />
 
             {/* Floating MarxBot button — hidden on /marxbot page itself */}
             {!hideFab && !isMarxBotPage && (

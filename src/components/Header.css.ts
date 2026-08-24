@@ -1,44 +1,95 @@
-import { style, styleVariants } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 import { vars } from '../styles/obsidianTheme.css.ts';
 
+/* Band ink — the dark text that lives on the paper navband */
+const bandInk = '#14161d';
+const bandInkFaint = 'rgba(20, 22, 29, 0.72)';
+const bandHairline = 'rgba(20, 22, 29, 0.16)';
+const bandAccent = '#b3122e';
+
 export const header = style({
-  position: 'fixed',
-  top: 0,
+  position: 'relative',
   width: '100%',
-  height: '64px',
-  zIndex: 50,
+  zIndex: 40,
   background: vars.color.background,
-  borderBottom: vars.border.subtle,
-  padding: `0`,
 });
 
-export const headerInner = style({
+/* ── Masthead — centered, scrolls away ── */
+
+export const masthead = style({
+  textAlign: 'center',
+  padding: `26px ${vars.space.md} 20px`,
+});
+
+export const mastheadLink = style({
+  display: 'inline-block',
+  textDecoration: 'none',
+});
+
+export const mastheadWord = style({
+  fontFamily: vars.font.display,
+  fontSize: 'clamp(22px, 3.2vw, 34px)',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.18em',
+  lineHeight: 1,
+  color: vars.color.text,
+});
+
+export const mastheadDot = style({
+  color: vars.color.accentHover,
+});
+
+export const mastheadRule = style({
+  display: 'block',
+  width: '32px',
+  height: '2px',
+  background: vars.color.accent,
+  margin: '12px auto 0',
+  transition: 'width 300ms cubic-bezier(0.22, 1, 0.36, 1)',
+  selectors: {
+    [`${mastheadLink}:hover &`]: {
+      width: '52px',
+    },
+  },
+});
+
+/* ── Paper navband — sticky ── */
+
+export const navband = style({
+  position: 'sticky',
+  top: 0,
+  zIndex: 50,
+  background: '#f4f2ec',
+  borderTop: `1px solid ${bandHairline}`,
+  borderBottom: `1px solid ${bandHairline}`,
+  boxShadow: '0 12px 28px rgba(0, 0, 0, 0.3)',
+});
+
+export const navbandInner = style({
   maxWidth: vars.layout.maxWidth,
   margin: '0 auto',
-  display: 'flex',
-  justifyContent: 'space-between',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto 1fr',
   alignItems: 'center',
-  height: '100%',
+  minHeight: '46px',
   padding: `0 ${vars.space.md}`,
 });
 
-export const logo = style({
-  fontFamily: vars.font.display,
-  fontSize: '20px',
-  fontWeight: 600,
-  letterSpacing: '-0.02em',
-  color: vars.color.text,
-  textDecoration: 'none',
-  selectors: {
-    '&:hover': {
-      color: vars.color.accent,
-    },
-  },
+export const bandSlot = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: vars.space.sm,
+});
+
+export const bandSlotRight = style({
+  justifyContent: 'flex-end',
 });
 
 export const desktopNav = style({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   '@media': {
     'screen and (max-width: 768px)': {
       display: 'none',
@@ -49,9 +100,9 @@ export const desktopNav = style({
 export const navRow = style({
   display: 'flex',
   alignItems: 'center',
+  flexWrap: 'nowrap',
   overflowX: 'visible',
   overflowY: 'visible',
-  flexWrap: 'nowrap',
   scrollbarWidth: 'none',
   selectors: {
     '&::-webkit-scrollbar': {
@@ -60,40 +111,73 @@ export const navRow = style({
   },
 });
 
+/* Link states are split into idle / active / restricted variants so exactly
+   one underline rule is ever applied per link. */
+
 export const navLink = style({
-  display: 'flex',
+  position: 'relative',
+  display: 'inline-flex',
   alignItems: 'center',
-  padding: `${vars.space.xs} ${vars.space.md}`,
-  fontFamily: vars.font.body,
-  fontSize: '13px',
-  fontWeight: 400,
-  color: vars.color.textMuted,
-  transition: 'color 180ms ease',
+  height: '46px',
+  padding: '0 9px',
+  fontFamily: vars.font.label,
+  fontSize: '10.5px',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.22em',
+  color: bandInk,
   whiteSpace: 'nowrap',
+  transition: 'color 180ms ease',
+});
+
+const navUnderline = {
+  content: '""',
+  position: 'absolute',
+  left: '9px',
+  right: '9px',
+  bottom: '10px',
+  height: '1px',
+  background: bandAccent,
+  transform: 'scaleX(0)',
+  transformOrigin: 'left center',
+  transition: 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)',
+};
+
+export const navLinkIdle = style({
   selectors: {
+    '&::after': navUnderline,
     '&:hover': {
-      color: vars.color.text,
+      color: bandAccent,
+    },
+    '&:hover::after': {
+      transform: 'scaleX(1)',
     },
   },
 });
 
 export const navLinkActive = style({
-  color: vars.color.accent,
+  color: bandAccent,
+  selectors: {
+    '&::after': {
+      ...navUnderline,
+      transform: 'scaleX(1)',
+    },
+  },
 });
 
 export const navLinkRestricted = style({
-  color: vars.color.textFaint,
+  color: bandInk,
   selectors: {
     '&:hover': {
-      color: vars.color.textMuted,
+      color: bandAccent,
     },
   },
 });
 
 export const restrictedMark = style({
   marginLeft: vars.space.xxs,
-  fontSize: '10px',
-  color: vars.color.textFaint,
+  fontSize: '9px',
+  color: bandInkFaint,
 });
 
 /* ── Dropdown ── */
@@ -105,40 +189,44 @@ export const dropdownWrap = style({
 export const dropdownTrigger = style({
   display: 'flex',
   alignItems: 'center',
-  padding: `${vars.space.xs} ${vars.space.md}`,
-  fontFamily: vars.font.body,
-  fontSize: '13px',
-  fontWeight: 400,
-  color: vars.color.textMuted,
+  height: '46px',
+  padding: '0 9px',
+  fontFamily: vars.font.label,
+  fontSize: '10.5px',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.22em',
+  color: bandInk,
   background: 'none',
   border: 'none',
   cursor: 'pointer',
+  whiteSpace: 'nowrap',
   transition: 'color 180ms ease',
   selectors: {
     '&:hover': {
-      color: vars.color.text,
+      color: bandAccent,
     },
   },
 });
 
 export const dropdownTriggerActive = style({
-  color: vars.color.accent,
+  color: bandAccent,
 });
 
 export const dropdownMenu = style({
   position: 'absolute',
   left: 0,
   top: '100%',
-  width: '240px',
-  background: vars.color.surface,
-  border: vars.border.subtle,
-  borderRadius: vars.radius.md,
+  width: '250px',
+  background: '#ffffff',
+  border: `1px solid ${bandHairline}`,
+  borderRadius: vars.radius.tiny,
   boxShadow: vars.shadow.panel,
-  padding: vars.space.xxs,
+  padding: `${vars.space.xxs} 0`,
   opacity: 0,
   visibility: 'hidden' as any,
   transition: 'opacity 180ms ease, visibility 180ms ease',
-  zIndex: 50,
+  zIndex: 60,
   selectors: {
     [`${dropdownWrap}:hover &`]: {
       opacity: 1,
@@ -149,22 +237,22 @@ export const dropdownMenu = style({
 
 export const dropdownItem = style({
   display: 'block',
-  padding: `${vars.space.sm} ${vars.space.md}`,
-  borderRadius: vars.radius.sm,
-  fontSize: '13px',
-  color: vars.color.textSoft,
-  transition: 'all 140ms ease',
+  padding: `${vars.space.sm} ${vars.space.lg}`,
+  borderRadius: vars.radius.tiny,
+  fontFamily: vars.font.body,
+  fontSize: '14px',
+  color: bandInk,
+  transition: 'color 140ms ease, background 140ms ease',
   selectors: {
     '&:hover': {
-      background: vars.color.surfaceSoft,
-      color: vars.color.text,
+      background: 'rgba(179, 18, 46, 0.06)',
+      color: bandAccent,
     },
   },
 });
 
 export const dropdownItemActive = style({
-  background: vars.color.surfaceSoft,
-  color: vars.color.text,
+  color: bandAccent,
 });
 
 export const dropdownItemLabel = style({
@@ -175,11 +263,14 @@ export const dropdownItemLabel = style({
 
 export const dropdownItemDesc = style({
   display: 'block',
-  fontSize: '11px',
-  color: vars.color.textFaint,
+  fontFamily: vars.font.label,
+  fontSize: '10px',
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: bandInkFaint,
 });
 
-/* ── Actions ── */
+/* ── Band actions ── */
 
 export const actionsRow = style({
   display: 'flex',
@@ -187,22 +278,53 @@ export const actionsRow = style({
   gap: vars.space.sm,
 });
 
+/* ── Band flanks — the printer's marks at either end of the navband ── */
+
+export const bandIconLink = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '30px',
+  height: '34px',
+  color: bandInk,
+  opacity: 0.65,
+  transition: 'color 180ms ease, opacity 180ms ease',
+  selectors: {
+    '&:hover': {
+      color: bandAccent,
+      opacity: 1,
+    },
+  },
+});
+
+export const bandMark = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '30px',
+  height: '34px',
+  color: bandInk,
+  opacity: 0.55,
+  pointerEvents: 'none',
+});
+
 export const iconButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '36px',
-  height: '36px',
-  borderRadius: vars.radius.pill,
+  width: '34px',
+  height: '34px',
+  borderRadius: vars.radius.tiny,
   background: 'transparent',
   border: 'none',
-  color: vars.color.textMuted,
+  color: bandInk,
+  opacity: 0.7,
   cursor: 'pointer',
-  transition: 'all 180ms ease',
+  transition: 'color 180ms ease, opacity 180ms ease',
   selectors: {
     '&:hover': {
-      background: vars.color.surfaceSoft,
-      color: vars.color.text,
+      color: bandAccent,
+      opacity: 1,
     },
   },
 });
@@ -222,7 +344,7 @@ export const notificationBadge = style({
   justifyContent: 'center',
   borderRadius: vars.radius.pill,
   background: vars.color.accent,
-  color: vars.color.text,
+  color: '#ffffff',
   fontSize: '10px',
   fontWeight: 700,
   lineHeight: 1,
@@ -239,8 +361,8 @@ export const notificationPanel = style({
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  border: vars.border.subtle,
-  borderRadius: vars.radius.md,
+  border: vars.border.strong,
+  borderRadius: vars.radius.tiny,
   background: vars.color.surface,
   boxShadow: vars.shadow.panel,
   zIndex: 80,
@@ -275,7 +397,7 @@ export const notificationItem = style({
   cursor: 'pointer',
   selectors: {
     '&:hover': {
-      background: vars.color.surfaceSoft,
+      background: vars.color.surfaceRaised,
       color: vars.color.text,
     },
   },
@@ -315,19 +437,23 @@ export const loginButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: `${vars.space.xs} ${vars.space.md}`,
-  background: vars.color.accent,
-  color: vars.color.text,
-  borderRadius: vars.radius.pill,
-  border: 'none',
-  fontSize: '13px',
+  padding: `9px ${vars.space.lg}`,
+  fontFamily: vars.font.label,
+  fontSize: '10px',
   fontWeight: 500,
-  fontFamily: vars.font.body,
+  textTransform: 'uppercase',
+  letterSpacing: '0.2em',
+  color: '#ffffff',
+  border: `1px solid ${bandAccent}`,
+  background: bandAccent,
+  borderRadius: vars.radius.tiny,
   cursor: 'pointer',
-  transition: 'background 180ms ease',
+  whiteSpace: 'nowrap',
+  transition: 'background 200ms ease, border-color 200ms ease',
   selectors: {
     '&:hover': {
-      background: vars.color.accentHover,
+      background: '#d41f3d',
+      borderColor: '#d41f3d',
     },
   },
 });
@@ -345,9 +471,9 @@ export const mobileMenuBtn = style([iconButton, {
 export const mobileOverlay = style({
   position: 'fixed',
   inset: 0,
-  zIndex: 50,
+  zIndex: 60,
   background: vars.color.background,
-  paddingTop: '64px',
+  paddingTop: '72px',
   overflowY: 'auto',
   '@media': {
     'screen and (min-width: 769px)': {
@@ -357,7 +483,7 @@ export const mobileOverlay = style({
 });
 
 export const mobileInner = style({
-  maxWidth: vars.layout.maxWidth,
+  maxWidth: '820px',
   margin: '0 auto',
   padding: `${vars.space.xl} ${vars.space.md}`,
   display: 'flex',
@@ -370,28 +496,47 @@ export const mobileCloseRow = style({
   marginBottom: vars.space.md,
 });
 
+/* iconButton restyled for the ink mobile overlay (band colors would vanish) */
+export const mobileCloseButton = style([iconButton, {
+  color: vars.color.textMuted,
+  border: vars.border.strong,
+  selectors: {
+    '&:hover': {
+      color: vars.color.accentHover,
+    },
+  },
+}]);
+
 export const mobileNavStack = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: vars.space.lg,
+  gap: vars.space.md,
+  borderTop: vars.border.subtle,
+  borderBottom: vars.border.subtle,
+  padding: `${vars.space.lg} 0`,
 });
 
 export const mobileLink = style({
   display: 'flex',
   alignItems: 'center',
-  fontSize: '18px',
+  padding: '10px 0',
+  fontFamily: vars.font.label,
+  fontSize: '12px',
   fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.2em',
   color: vars.color.text,
+  borderBottom: vars.border.subtle,
   transition: 'color 180ms ease',
   selectors: {
     '&:hover': {
-      color: vars.color.accent,
+      color: vars.color.accentHover,
     },
   },
 });
 
 export const mobileLinkActive = style({
-  color: vars.color.accent,
+  color: vars.color.accentHover,
 });
 
 export const mobileLinkRestricted = style({
@@ -404,40 +549,51 @@ export const mobileLinkRestricted = style({
 });
 
 export const mobileGroupLabel = style({
-  fontSize: '18px',
+  fontFamily: vars.font.label,
+  fontSize: '11px',
   fontWeight: 500,
-  color: vars.color.textMuted,
+  textTransform: 'uppercase',
+  letterSpacing: '0.24em',
+  color: vars.color.accentHover,
 });
 
 export const mobileSubStack = style({
   paddingLeft: vars.space.md,
+  borderLeft: vars.border.strong,
   display: 'flex',
   flexDirection: 'column',
   gap: vars.space.sm,
+  margin: `${vars.space.xs} 0`,
 });
 
 export const mobileSubLink = style({
   display: 'block',
+  fontFamily: vars.font.body,
   fontSize: '16px',
-  fontWeight: 500,
-  color: vars.color.text,
+  color: vars.color.textSoft,
   transition: 'color 180ms ease',
   selectors: {
     '&:hover': {
-      color: vars.color.accent,
+      color: vars.color.accentHover,
     },
   },
 });
 
 export const mobileSubDesc = style({
   display: 'block',
-  fontSize: '12px',
+  fontFamily: vars.font.label,
+  fontSize: '10px',
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
   color: vars.color.textFaint,
 });
 
 export const mobileComingSoon = style({
   marginLeft: vars.space.xs,
-  fontSize: '12px',
+  fontFamily: vars.font.label,
+  fontSize: '10px',
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
   color: vars.color.textFaint,
 });
 
@@ -452,15 +608,19 @@ export const mobileLogout = style({
   display: 'flex',
   alignItems: 'center',
   gap: vars.space.xs,
+  fontFamily: vars.font.label,
+  fontSize: '12px',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.2em',
   color: vars.color.text,
   background: 'none',
   border: 'none',
-  fontSize: '16px',
   cursor: 'pointer',
   transition: 'color 180ms ease',
   selectors: {
     '&:hover': {
-      color: vars.color.accent,
+      color: vars.color.accentHover,
     },
   },
 });

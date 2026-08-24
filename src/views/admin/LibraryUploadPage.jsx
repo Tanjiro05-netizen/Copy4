@@ -607,7 +607,7 @@ const LibraryUploadPage = () => {
                 <div className="flex items-center gap-4 mb-8">
                     <button
                         onClick={() => router.push('/digital-library')}
-                        className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                        className="p-2 hover:bg-gray-800 rounded-none transition-colors"
                     >
                         <ArrowLeft size={20} />
                     </button>
@@ -621,11 +621,11 @@ const LibraryUploadPage = () => {
 
                 {/* Upload Type Toggle */}
                 {!editId && (
-                    <div className="grid grid-cols-3 bg-gray-900 rounded-lg p-1 mb-8 max-w-2xl mx-auto md:mx-0">
+                    <div className="grid grid-cols-3 bg-gray-900 rounded-none p-1 mb-8 max-w-2xl mx-auto md:mx-0">
                         <button
                             type="button"
                             onClick={() => handleUploadChoice('epub')}
-                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'epub' && !isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            className={`py-2 px-3 text-sm font-medium rounded-none transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && bookFormat === 'epub' && !isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
                             <BookOpen size={16} />
                             EPUB Book
@@ -633,7 +633,7 @@ const LibraryUploadPage = () => {
                         <button
                             type="button"
                             onClick={() => handleUploadChoice('pdf')}
-                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            className={`py-2 px-3 text-sm font-medium rounded-none transition-colors flex items-center justify-center gap-2 ${uploadType === 'book' && isPdfBookForm ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
                             <FileText size={16} />
                             Downloads
@@ -641,7 +641,7 @@ const LibraryUploadPage = () => {
                         <button
                             type="button"
                             onClick={() => handleUploadChoice('audiobook')}
-                            className={`py-2 px-3 text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-2 ${uploadType === 'audiobook' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
+                            className={`py-2 px-3 text-sm font-medium rounded-none transition-colors flex items-center justify-center gap-2 ${uploadType === 'audiobook' ? 'bg-gray-800 text-white border border-gray-700/50' : 'text-gray-400 hover:text-gray-200'}`}
                         >
                             <Headphones size={16} />
                             Audiobook
@@ -654,7 +654,7 @@ const LibraryUploadPage = () => {
                 ) : (
                     <>
                         {loadingBook && (
-                            <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700/50 rounded-xl flex items-center gap-3 text-gray-300">
+                            <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700/50 rounded-none flex items-center gap-3 text-gray-300">
                                 <Loader2 className="animate-spin" size={18} />
                                 <span>Loading book data...</span>
                             </div>
@@ -662,7 +662,7 @@ const LibraryUploadPage = () => {
 
                         {/* Success Message */}
                         {success && (
-                    <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-xl flex items-center gap-3">
+                    <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-none flex items-center gap-3">
                         <Check className="text-green-400" />
                         <span className="text-green-300">{isEditingBook ? 'Book updated successfully!' : 'Book uploaded successfully!'} Redirecting...</span>
                     </div>
@@ -670,7 +670,7 @@ const LibraryUploadPage = () => {
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mb-6 p-4 bg-red-900/50 border border-red-500/50 rounded-xl flex items-center gap-3">
+                    <div className="mb-6 p-4 bg-red-900/50 border border-red-500/50 rounded-none flex items-center gap-3">
                         <AlertTriangle className="text-red-400" />
                         <span className="text-red-300">{error}</span>
                     </div>
@@ -681,7 +681,7 @@ const LibraryUploadPage = () => {
                     <div className={`grid grid-cols-1 ${isPdfBookForm ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
                         {/* EPUB Upload (Required) */}
                         {!isPdfBookForm && (
-                        <div className="bg-gray-900/50 rounded-xl p-6">
+                        <div className="bg-gray-900/50 rounded-none p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <BookOpen className="text-red-500" size={20} />
                                 EPUB File {!isEditingBook && '*'}
@@ -691,7 +691,7 @@ const LibraryUploadPage = () => {
                             </p>
                             
                             {epubPreview ? (
-                                <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+                                <div className="flex items-center justify-between p-3 bg-gray-800 rounded-none">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <BookOpen size={18} className="text-red-400 flex-shrink-0" />
                                         <span className="text-sm text-gray-300 truncate">{epubPreview}</span>
@@ -708,7 +708,7 @@ const LibraryUploadPage = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-red-500/50 transition-colors">
+                                <div className="border-2 border-dashed border-gray-700 rounded-none p-6 text-center hover:border-red-500/50 transition-colors">
                                     <input
                                         type="file"
                                         accept=".epub,application/epub+zip"
@@ -726,7 +726,7 @@ const LibraryUploadPage = () => {
                         )}
 
                         {/* PDF Upload */}
-                        <div className="bg-gray-900/50 rounded-xl p-6">
+                        <div className="bg-gray-900/50 rounded-none p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 {isPdfBookForm ? (
                                     <FileText className="text-red-500" size={20} />
@@ -740,7 +740,7 @@ const LibraryUploadPage = () => {
                             </p>
                             
                             {pdfPreview ? (
-                                <div className="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+                                <div className="flex items-center justify-between p-3 bg-gray-800 rounded-none">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <FileText size={18} className="text-gray-400 flex-shrink-0" />
                                         <span className="text-sm text-gray-300 truncate">{pdfPreview}</span>
@@ -755,7 +755,7 @@ const LibraryUploadPage = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-gray-600 transition-colors">
+                                <div className="border-2 border-dashed border-gray-700 rounded-none p-6 text-center hover:border-gray-600 transition-colors">
                                     <input
                                         type="file"
                                         accept=".pdf,application/pdf"
@@ -772,7 +772,7 @@ const LibraryUploadPage = () => {
                         </div>
 
                         {/* Cover Image Upload */}
-                        <div className="bg-gray-900/50 rounded-xl p-6">
+                        <div className="bg-gray-900/50 rounded-none p-6">
                             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                                 <Image className="text-red-500" size={20} />
                                 Cover Image
@@ -783,7 +783,7 @@ const LibraryUploadPage = () => {
                                     <img 
                                         src={coverPreview} 
                                         alt="Cover preview" 
-                                        className="w-full h-48 object-contain bg-gray-800 rounded-lg"
+                                        className="w-full h-48 object-contain bg-gray-800 rounded-none"
                                     />
                                     <button
                                         type="button"
@@ -795,7 +795,7 @@ const LibraryUploadPage = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-red-500/50 transition-colors">
+                                <div className="border-2 border-dashed border-gray-700 rounded-none p-6 text-center hover:border-red-500/50 transition-colors">
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -813,7 +813,7 @@ const LibraryUploadPage = () => {
                     </div>
 
                     {/* Metadata Form */}
-                    <div className="bg-gray-900/50 rounded-xl p-6 space-y-4">
+                    <div className="bg-gray-900/50 rounded-none p-6 space-y-4">
                         <h3 className="text-lg font-semibold">Book Information</h3>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -825,7 +825,7 @@ const LibraryUploadPage = () => {
                                     value={formData.title}
                                     onChange={handleInputChange}
                                     required
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                     placeholder="e.g., Capital Volume I"
                                 />
                             </div>
@@ -837,7 +837,7 @@ const LibraryUploadPage = () => {
                                     name="author"
                                     value={formData.author}
                                     onChange={handleInputChange}
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                     placeholder="e.g., Karl Marx"
                                 />
                             </div>
@@ -851,7 +851,7 @@ const LibraryUploadPage = () => {
                                     onChange={handleInputChange}
                                     min="1400"
                                     max="2100"
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                     placeholder="e.g., 1867"
                                 />
                             </div>
@@ -862,7 +862,7 @@ const LibraryUploadPage = () => {
                                     name="category"
                                     value={formData.category}
                                     onChange={handleInputChange}
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                 >
                                     <option value="">Select category</option>
                                     {CATEGORIES.map(cat => (
@@ -877,7 +877,7 @@ const LibraryUploadPage = () => {
                                     name="era"
                                     value={formData.era}
                                     onChange={handleInputChange}
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                 >
                                     <option value="">Select era</option>
                                     {ERAS.map(era => (
@@ -892,7 +892,7 @@ const LibraryUploadPage = () => {
                                     name="language"
                                     value={formData.language}
                                     onChange={handleInputChange}
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                 >
                                     {LANGUAGES.map(lang => (
                                         <option key={lang} value={lang}>{lang}</option>
@@ -909,7 +909,7 @@ const LibraryUploadPage = () => {
                                         value={formData.pages}
                                         onChange={handleInputChange}
                                         min="1"
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
                                         placeholder="e.g., 500"
                                     />
                                 </div>
@@ -937,7 +937,7 @@ const LibraryUploadPage = () => {
                                     value={formData.description}
                                     onChange={handleInputChange}
                                     rows={3}
-                                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-y"
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-y"
                                     placeholder="Brief description of the book..."
                                 />
                             </div>
@@ -948,7 +948,7 @@ const LibraryUploadPage = () => {
                     <button
                         type="submit"
                         disabled={saving || loadingBook || !canSubmitBook}
-                        className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-none font-medium transition-colors flex items-center justify-center gap-2"
                     >
                         {saving ? (
                             <>
@@ -966,7 +966,7 @@ const LibraryUploadPage = () => {
                         <button
                             type="button"
                             onClick={() => router.push('/digital-library')}
-                            className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-medium transition-colors text-gray-300"
+                            className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-none font-medium transition-colors text-gray-300"
                         >
                             Cancel
                         </button>
@@ -1009,7 +1009,7 @@ const LibraryUploadPage = () => {
                                             {existingBooks.map(book => (
                                                 <div
                                                     key={book.id}
-                                                    className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-lg px-4 py-3 group"
+                                                    className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-none px-4 py-3 group"
                                                 >
                                                     <div className="min-w-0 flex-1">
                                                         <p className="text-sm font-medium text-white truncate">{book.title}</p>
@@ -1019,7 +1019,7 @@ const LibraryUploadPage = () => {
                                                     </div>
                                                     <button
                                                         onClick={() => router.push(`/admin/library/upload?edit=book&id=${book.id}`)}
-                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg text-gray-400 hover:text-blue-400 hover:bg-blue-900/20 transition-colors flex-shrink-0"
+                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-none text-gray-400 hover:text-blue-400 hover:bg-blue-900/20 transition-colors flex-shrink-0"
                                                     >
                                                         <Pencil size={16} />
                                                         Edit
@@ -1027,7 +1027,7 @@ const LibraryUploadPage = () => {
                                                     <button
                                                         onClick={() => handleDeleteBook(book)}
                                                         disabled={deleting === book.id}
-                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors flex-shrink-0"
+                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-none text-gray-400 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors flex-shrink-0"
                                                     >
                                                         {deleting === book.id ? (
                                                             <Loader2 size={16} className="animate-spin" />
@@ -1057,7 +1057,7 @@ const LibraryUploadPage = () => {
                                             {existingAudiobooks.map(ab => (
                                                 <div
                                                     key={ab.id}
-                                                    className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-lg px-4 py-3 group"
+                                                    className="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-none px-4 py-3 group"
                                                 >
                                                     <div className="min-w-0 flex-1">
                                                         <p className="text-sm font-medium text-white truncate">{ab.title}</p>
@@ -1068,7 +1068,7 @@ const LibraryUploadPage = () => {
                                                     <button
                                                         onClick={() => handleDeleteAudiobook(ab)}
                                                         disabled={deleting === ab.id}
-                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors flex-shrink-0"
+                                                        className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm rounded-none text-gray-400 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors flex-shrink-0"
                                                     >
                                                         {deleting === ab.id ? (
                                                             <Loader2 size={16} className="animate-spin" />

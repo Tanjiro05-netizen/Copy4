@@ -130,7 +130,7 @@ const LandingPage = () => {
                 lastEchoTime = now;
                 const echo = document.createElement('div');
                 echo.className = 'landing-echo';
-                echo.innerHTML = '<span style="color:#991b1b">Marxist</span><span style="color:#fff">.info</span>';
+                echo.innerHTML = '<span style="color:#b3122e">Marxist</span><span style="color:#fff">.info</span>';
                 echo.style.maskImage = `radial-gradient(circle 160px at ${x}px ${y}px, rgba(0,0,0,0.6) 0%, transparent 70%)`;
                 echo.style.webkitMaskImage = echo.style.maskImage;
                 echoContainer.appendChild(echo);
@@ -302,10 +302,10 @@ const LandingPage = () => {
     const toggleButton = (
         <button
             onClick={() => setViewMode(v => v === 'cinematic' ? 'normal' : 'cinematic')}
-            className="fixed top-4 left-4 z-[200] flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800/80 backdrop-blur-sm border border-gray-600/50 text-gray-300 hover:text-white hover:bg-gray-700/80 transition text-sm font-medium"
+            className="fixed top-5 left-5 z-[200] flex items-center gap-2 px-4 py-2.5 rounded-none bg-[#0b0d12]/90 border border-[#262a35] font-[Outfit,sans-serif] text-[10px] font-medium uppercase tracking-[0.22em] text-[#a5a194] hover:text-[#ece9e0] hover:border-[#d41f3d] transition-colors"
             title={viewMode === 'cinematic' ? 'Switch to Normal View' : 'Switch to Cinematic View'}
         >
-            <Layers size={16} />
+            <Layers size={13} strokeWidth={1.8} />
             {viewMode === 'cinematic' ? 'Normal View' : 'Cinematic View'}
         </button>
     );
@@ -879,17 +879,17 @@ const LandingPage = () => {
 
     // ===== NORMAL VIEW (existing landing page) =====
     return (
-        <div className="relative min-h-screen text-white" style={{ background: '#090909' }}>
+        <div className="relative min-h-screen text-white" style={{ background: '#0b0d12' }}>
             {toggleButton}
             {/* Hero Section */}
             <div className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: `url(${marxBgUrl})` }}></div>
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(9,9,9,0.5), #090909)' }}></div>
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent, rgba(9,9,9,0.5), #0b0d12)' }}></div>
                 
                 <div className="relative max-w-6xl mx-auto px-4 py-20">
                     <div className="text-center mb-16">
                         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-                            <span className="text-red-800">Marxist</span>.info
+                            <span className="text-red-600">Marxist</span>.info
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8">
                             A platform for the new generation of Marxist theorists and researchers
@@ -913,7 +913,7 @@ const LandingPage = () => {
                             </button>
                             <button
                                 onClick={() => setShowRegisterModal(true)}
-                                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition" style={{ border: '1px solid rgba(200,30,30,0.28)', background: 'transparent', color: '#fff' }}
+                                className="flex items-center gap-2 px-6 py-3 rounded-none font-semibold transition" style={{ border: '1px solid rgba(179, 18, 46,0.28)', background: 'transparent', color: '#fff' }}
                             >
                                 <UserPlus size={20} />
                                 Register
@@ -929,7 +929,7 @@ const LandingPage = () => {
 
                     {/* Introduction */}
                     <div className="max-w-4xl mx-auto mb-16">
-                        <div className="p-8 rounded-2xl" style={{ background: 'linear-gradient(180deg, #141414 0%, #0f0f0f 100%)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
+                        <div className="p-8 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
                             <h2 className="text-2xl font-bold mb-4">The Vision</h2>
                             <p className="text-gray-300 mb-4">
                                 I am Leninistwarrior, as many know me across various platforms. Since November, I have been 
@@ -966,7 +966,7 @@ const LandingPage = () => {
                                 </a>
                                 <button
                                     onClick={() => setShowDonationModal(true)}
-                                    className="btn-donate flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition"
+                                    className="btn-donate flex items-center gap-2 px-5 py-2.5 rounded-none font-semibold transition"
                                 >
                                     <Heart size={18} />
                                     Support the Project
@@ -979,33 +979,33 @@ const LandingPage = () => {
                     <div className="mb-16">
                         <h2 className="text-3xl font-bold text-center mb-8">Platform Features</h2>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <GraduationCap className="text-red-800 mb-4" size={32} />
+                            <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <GraduationCap className="text-red-600 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Study Page</h3>
                                 <p className="text-gray-400">A structured learning environment featuring curated reading lists, study guides, and theoretical discussions to develop Marxist understanding systematically.</p>
                             </div>
-                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <FlaskConical className="text-red-800 mb-4" size={32} />
+                            <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <FlaskConical className="text-red-600 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Science & Technology</h3>
                                 <p className="text-gray-400">As Lenin emphasized, communists should know everything mankind has to offer. Dedicated to ensuring Marxists are thoroughly educated in natural sciences and all fields of human knowledge.</p>
                             </div>
-                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <BookOpen className="text-red-800 mb-4" size={32} />
+                            <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <BookOpen className="text-red-600 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Digital Library</h3>
                                 <p className="text-gray-400">An expanding collection of essential Marxist texts, articles, and analyses, organized and annotated for accessibility and theoretical development.</p>
                             </div>
-                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <BarChart3 className="text-red-800 mb-4" size={32} />
+                            <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <BarChart3 className="text-red-600 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Data & Visualizations</h3>
                                 <p className="text-gray-400">Tools for tracking global economic developments and staying updated on the evolving conditions of capitalist production and class struggle.</p>
                             </div>
-                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <PenTool className="text-red-800 mb-4" size={32} />
+                            <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <PenTool className="text-red-600 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Writers' Collective</h3>
                                 <p className="text-gray-400">A collaborative space for developing revolutionary thinkers and writers, emphasizing quality theoretical work that contributes to the Marxist tradition.</p>
                             </div>
-                            <div className="p-6 rounded-xl" style={{ background: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <MessageSquare className="text-red-800 mb-4" size={32} />
+                            <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                <MessageSquare className="text-red-600 mb-4" size={32} />
                                 <h3 className="text-xl font-bold mb-2">Discussion Forum</h3>
                                 <p className="text-gray-400">Engage in theoretical discussions with fellow researchers, theorists, and activists building revolutionary understanding.</p>
                             </div>
@@ -1013,9 +1013,9 @@ const LandingPage = () => {
                     </div>
 
                     {/* Email Signup Section */}
-                    <div className="max-w-xl mx-auto p-8 rounded-2xl" style={{ background: 'linear-gradient(180deg, #141414 0%, #0f0f0f 100%)', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
+                    <div className="max-w-xl mx-auto p-8 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
                         <div className="flex items-center gap-2 mb-4">
-                            <Mail className="text-red-800" size={24} />
+                            <Mail className="text-red-600" size={24} />
                             <h2 className="text-2xl font-bold">Stay Updated</h2>
                         </div>
                         <p className="text-gray-400 mb-6">
@@ -1035,8 +1035,8 @@ const LandingPage = () => {
                                     value={waitlistEmail}
                                     onChange={(e) => setWaitlistEmail(e.target.value)}
                                     placeholder="Enter your email"
-                                    className="w-full p-3 rounded-xl focus:outline-none"
-                                    style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.06)', color: '#fff' }}
+                                    className="w-full p-3 rounded-none focus:outline-none"
+                                    style={{ background: '#1a1f2b', border: '1px solid rgba(255,255,255,0.06)', color: '#fff' }}
                                     required
                                 />
                                 <div className="flex flex-col gap-2 text-sm">
@@ -1087,14 +1087,14 @@ const LandingPage = () => {
                         left: '50%',
                         transform: 'translateX(-50%)',
                         zIndex: 300,
-                        background: 'linear-gradient(135deg, #14532d 0%, #166534 100%)',
-                        border: '1px solid rgba(74,222,128,0.35)',
-                        borderRadius: '14px',
+                        background: '#6f0b1d',
+                        border: '1px solid rgba(212, 31, 61, 0.45)',
+                        borderRadius: "0px",
                         padding: '0.75rem 1.25rem',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.6rem',
-                        color: '#86efac',
+                        color: '#e8a5ad',
                         fontSize: '0.9rem',
                         fontWeight: 600,
                         boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
@@ -1221,7 +1221,7 @@ const LandingPage = () => {
                             </div>
                         ) : (
                             <form onSubmit={hasInviteCode ? handleRegister : handleWaitlistSignup} className="space-y-4">
-                                <div className="bg-white/5 p-4 rounded-lg mb-4 border border-gray-700/50">
+                                <div className="bg-white/5 p-4 rounded-none mb-4 border border-gray-700/50">
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
                                             type="checkbox"

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import Header from '../components/Header';
 import { fetchScienceHub, getCurrentUser, getScienceErrorMessage } from '../services/scienceApi';
 import {
   Atom,
@@ -118,25 +117,23 @@ const ScienceTechPage = () => {
   }), [courses, enrolledCourses.length, subjects.length]);
 
   return (
-    <div className="min-h-screen bg-[#12131A] text-gray-200">
-      <Header />
-      <main className="pt-20 pb-12">
-        <section className="bg-black/35 border-b border-red-900/20">
-          <div className="container mx-auto max-w-7xl px-4 py-10">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="text-red-500 text-sm font-semibold uppercase tracking-wide">Science & Technology</p>
-                <h1 className="text-4xl md:text-5xl font-bold text-white mt-2">Course and Research Catalog</h1>
-                <p className="text-gray-400 mt-4 max-w-3xl text-lg">
-                  Structured courses, technical readings, practice sets, simulations, and reference materials for systematic study.
-                </p>
-              </div>
-              <div className="grid grid-cols-4 gap-4 min-w-full lg:min-w-[460px]">
-                <Stat label="Courses" value={stats.courses} />
-                <Stat label="Subjects" value={stats.subjects} />
-                <Stat label="Modules" value={stats.modules} />
-                <Stat label="Active" value={stats.active} />
-              </div>
+    <div className="min-h-screen bg-[#0b0d12] text-gray-200">
+      <div className="pb-12">
+        <section className="border-b border-[#1c202b]">
+          <div className="container mx-auto max-w-7xl px-4 py-14">
+            <div className="flex flex-col items-center text-center gap-3">
+              <p className="text-red-500 text-[11px] font-medium uppercase tracking-[0.32em]">Science &amp; Technology</p>
+              <h1 className="font-display text-4xl md:text-5xl font-medium text-white tracking-[0.01em]">Course and Research Catalog</h1>
+              <div className="h-[2px] w-11 bg-[#b3122e]" aria-hidden="true" />
+              <p className="text-gray-400 mt-2 max-w-2xl text-base">
+                Structured courses, technical readings, practice sets, simulations, and reference materials for systematic study.
+              </p>
+            </div>
+            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-[#262a35] border border-[#1c202b]">
+              <Stat label="Courses" value={stats.courses} />
+              <Stat label="Subjects" value={stats.subjects} />
+              <Stat label="Modules" value={stats.modules} />
+              <Stat label="Active" value={stats.active} />
             </div>
           </div>
         </section>
@@ -320,15 +317,15 @@ const ScienceTechPage = () => {
             </aside>
           </section>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
 
 const Stat = ({ label, value }) => (
-  <div className="border border-gray-800 bg-black/35 p-3">
-    <p className="text-2xl font-bold text-red-500">{value}</p>
-    <p className="text-xs text-gray-500 uppercase tracking-wide">{label}</p>
+  <div className="bg-[#10131b] p-4 text-center">
+    <p className="font-display text-3xl font-medium text-red-500">{value}</p>
+    <p className="mt-1 text-[10px] text-gray-500 uppercase tracking-[0.22em]">{label}</p>
   </div>
 );
 

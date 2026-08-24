@@ -66,7 +66,7 @@ const SourceBadge = ({ source }) => {
 };
 
 const ResultCard = ({ source, children }) => (
-    <div className="rounded-xl border border-zinc-800 bg-black/30 p-4 transition hover:border-zinc-700">
+    <div className="rounded-none border border-zinc-800 bg-black/30 p-4 transition hover:border-zinc-700">
         <div className="mb-2">
             <SourceBadge source={source} />
         </div>
@@ -116,7 +116,7 @@ const Bibliography = () => {
 
     return (
         <div className="space-y-6 text-white">
-            <div className="rounded-2xl border border-red-900/20 bg-black/30 p-5 backdrop-blur-sm md:p-6">
+            <div className="rounded-none border border-red-900/20 bg-black/30 p-5 backdrop-blur-sm md:p-6">
                 <div className="mb-5 flex items-center gap-2">
                     <div className="inline-flex items-center gap-2 rounded-full border border-red-900/40 bg-red-950/30 px-3 py-1 text-xs uppercase tracking-[0.24em] text-red-200">
                         <Sparkles className="h-3.5 w-3.5" />
@@ -136,13 +136,13 @@ const Bibliography = () => {
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
                             placeholder="e.g. Imperialism, Paris Commune, Dialectics"
-                            className="w-full rounded-xl border border-zinc-800 bg-black/50 py-3 pl-10 pr-4 text-sm text-white outline-none transition focus:border-red-700"
+                            className="w-full rounded-none border border-zinc-800 bg-black/50 py-3 pl-10 pr-4 text-sm text-white outline-none transition focus:border-red-700"
                         />
                     </div>
                     <button
                         type="submit"
                         disabled={loading || !query.trim()}
-                        className="inline-flex items-center gap-2 rounded-xl bg-red-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-600 disabled:opacity-40"
+                        className="inline-flex items-center gap-2 rounded-none bg-red-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-red-600 disabled:opacity-40"
                     >
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                         Search
@@ -164,7 +164,7 @@ const Bibliography = () => {
             </div>
 
             {error && (
-                <div className="rounded-xl border border-red-900/40 bg-red-950/30 p-4 text-sm text-red-200">{error}</div>
+                <div className="rounded-none border border-red-900/40 bg-red-950/30 p-4 text-sm text-red-200">{error}</div>
             )}
 
             {loading && (
@@ -183,7 +183,7 @@ const Bibliography = () => {
                     </div>
 
                     {totalResults === 0 && (
-                        <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-8 text-center">
+                        <div className="rounded-none border border-zinc-800 bg-zinc-950/70 p-8 text-center">
                             <p className="text-zinc-400">No results found for "{searchedTopic}". Try a broader term or one of the suggestions above.</p>
                         </div>
                     )}
@@ -285,7 +285,7 @@ const Bibliography = () => {
                     )}
 
                     {relatedTerms.length > 0 && (
-                        <section className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-5">
+                        <section className="rounded-none border border-zinc-800 bg-zinc-950/70 p-5">
                             <h4 className="mb-3 text-sm font-medium text-zinc-300">Related glossary terms</h4>
                             <div className="flex flex-wrap gap-2">
                                 {relatedTerms.map((term) => (

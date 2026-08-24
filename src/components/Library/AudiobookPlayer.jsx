@@ -36,12 +36,12 @@ const useAudioVisualizer = (analyserRef, canvasRef, isPlaying) => {
       c.lineTo(0, yBase + 10);
       c.closePath();
       const grad = c.createLinearGradient(0, yBase - amplitude, 0, yBase);
-      grad.addColorStop(0, `rgba(200,30,30,${alpha})`);
-      grad.addColorStop(0.6, `rgba(200,30,30,${alpha * 0.4})`);
-      grad.addColorStop(1, `rgba(200,30,30,0)`);
+      grad.addColorStop(0, `rgba(179, 18, 46,${alpha})`);
+      grad.addColorStop(0.6, `rgba(179, 18, 46,${alpha * 0.4})`);
+      grad.addColorStop(1, `rgba(179, 18, 46,0)`);
       c.fillStyle = grad;
       c.fill();
-      c.strokeStyle = `rgba(200,30,30,${Math.min(1, alpha * 2.2)})`;
+      c.strokeStyle = `rgba(179, 18, 46,${Math.min(1, alpha * 2.2)})`;
       c.lineWidth = lineW;
       c.beginPath();
       for (let i = 0; i <= POINTS; i++) {

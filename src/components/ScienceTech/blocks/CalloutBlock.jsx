@@ -63,7 +63,7 @@ const CalloutBlock = ({ block }) => {
   const title = block.title || variant.label;
 
   return (
-    <div className={`rounded-xl border ${variant.border} ${variant.bg} p-5`}>
+    <div className={`rounded-none border ${variant.border} ${variant.bg} p-5`}>
       <div className="flex items-start gap-3">
         <div className={`mt-0.5 shrink-0 ${variant.iconColor}`}>
           <Icon className="w-5 h-5" />

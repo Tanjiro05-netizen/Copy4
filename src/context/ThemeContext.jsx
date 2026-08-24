@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect } from 'react';
 
 const FONT_LINK_ID = 'marxist-google-fonts';
-const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap';
+const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap';
 
 const ThemeContext = createContext();
 

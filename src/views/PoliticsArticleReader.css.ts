@@ -9,7 +9,7 @@ export const errorWrap = style({ textAlign: 'center', padding: `${vars.space.her
 
 export const articleCard = style({ background: vars.color.surfaceRaised, border: vars.border.subtle, borderRadius: vars.radius.xl, padding: `${vars.space.lg} ${vars.space.xl}`, marginBottom: vars.space.lg, '@media': { 'screen and (max-width: 640px)': { padding: vars.space.lg } } });
 export const badgeRow = style({ display: 'flex', flexWrap: 'wrap', gap: vars.space.xs, marginBottom: vars.space.md });
-export const badge = style({ display: 'inline-flex', alignItems: 'center', gap: vars.space.xxs, padding: `${vars.space.xxs} ${vars.space.sm}`, borderRadius: vars.radius.pill, fontSize: '11px', fontFamily: vars.font.mono, letterSpacing: '0.06em', textTransform: 'uppercase' });
+export const badge = style({ display: 'inline-flex', alignItems: 'center', gap: vars.space.xxs, padding: `${vars.space.xxs} ${vars.space.sm}`, borderRadius: vars.radius.pill, fontSize: '11px', fontFamily: vars.font.label, letterSpacing: '0.06em', textTransform: 'uppercase' });
 export const badgeAccent = style({ background: vars.color.accentWash, color: vars.color.accent });
 export const badgeDefault = style({ background: vars.color.surfaceSoft, color: vars.color.textSoft });
 export const articleTitle = style({ fontFamily: vars.font.display, fontSize: '36px', fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: vars.space.md, '@media': { 'screen and (max-width: 640px)': { fontSize: '28px' } } });
@@ -21,7 +21,24 @@ export const imageWrap = style({ marginBottom: vars.space.xl, overflow: 'hidden'
 export const articleImage = style({ width: '100%', maxHeight: '520px', objectFit: 'cover' });
 
 export const contentCard = style({ background: vars.color.surfaceRaised, border: vars.border.subtle, borderRadius: vars.radius.xl, padding: `${vars.space.lg} ${vars.space.xl}`, '@media': { 'screen and (max-width: 640px)': { padding: vars.space.lg } } });
-export const contentBody = style({ fontSize: '15px', lineHeight: 1.8, color: vars.color.textSoft, whiteSpace: 'pre-wrap' });
+export const contentBody = style({
+  fontSize: '16px',
+  lineHeight: 1.85,
+  color: vars.color.textSoft,
+  whiteSpace: 'pre-wrap',
+  selectors: {
+    '&::first-letter': {
+      fontFamily: vars.font.display,
+      fontWeight: 600,
+      fontSize: '3.4em',
+      float: 'left',
+      lineHeight: 0.8,
+      paddingRight: '0.14em',
+      paddingTop: '0.06em',
+      color: vars.color.accentHover,
+    },
+  },
+});
 
 export const navSection = style({ marginTop: vars.space.lg, background: vars.color.surfaceRaised, border: vars.border.subtle, borderRadius: vars.radius.xl, padding: vars.space.lg });
 export const navTitle = style({ fontSize: '16px', fontWeight: 600, marginBottom: vars.space.sm });

@@ -144,13 +144,13 @@ const KnowledgeStudyPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#090909] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0b0d12] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Zap className="w-10 h-10 text-[#c81e1e] mx-auto" />
+          <Zap className="w-10 h-10 text-[#b3122e] mx-auto" />
           <h1 className="font-[Cormorant_Garamond,Georgia,serif] text-[28px] font-[500] text-white">Study Arena</h1>
-          <p className="text-white/40 text-sm font-[Hanken_Grotesk,sans-serif]">Please log in to access the Study Arena</p>
+          <p className="text-white/40 text-sm font-[Outfit,sans-serif]">Please log in to access the Study Arena</p>
           <Link href="/login"
-            className="inline-block bg-[#c81e1e] hover:bg-[#e02424] px-6 py-2 rounded-xl text-white text-sm font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
+            className="inline-block bg-[#b3122e] hover:bg-[#d41f3d] px-6 py-2 rounded-none text-white text-sm font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
           >
             Log In
           </Link>
@@ -160,16 +160,16 @@ const KnowledgeStudyPage = () => {
   }
 
   const tabCls = (id) =>
-    `flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all ${
+    `flex items-center gap-2 px-4 py-2 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all ${
       activeTab === id
-        ? 'bg-[rgba(200,30,30,0.15)] text-[#c81e1e] border border-[rgba(200,30,30,0.3)]'
+        ? 'bg-[rgba(179, 18, 46,0.15)] text-[#b3122e] border border-[rgba(179, 18, 46,0.3)]'
         : 'text-white/30 hover:text-white/60 hover:bg-white/[0.04] border border-transparent'
     }`;
 
   return (
-    <div className="min-h-screen bg-[#090909] font-[Hanken_Grotesk,sans-serif]">
+    <div className="min-h-screen bg-[#0b0d12] font-[Outfit,sans-serif]">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-[#090909]/95 backdrop-blur border-b border-white/[0.05] py-3">
+      <div className="sticky top-0 z-40 bg-[#0b0d12]/95 backdrop-blur border-b border-white/[0.05] py-3">
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/knowledge"
@@ -179,7 +179,7 @@ const KnowledgeStudyPage = () => {
             </Link>
             <span className="text-white/10">|</span>
             <div className="flex items-center gap-2">
-              <Zap size={14} className="text-[#c81e1e]" />
+              <Zap size={14} className="text-[#b3122e]" />
               <span className="font-[Cormorant_Garamond,Georgia,serif] text-[18px] font-[500] text-white/80">Study Arena</span>
             </div>
           </div>
@@ -215,7 +215,7 @@ const KnowledgeStudyPage = () => {
             {activeTab === 'daily' && (
               <>
                 {/* Today's Challenge Card */}
-                <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl overflow-hidden shadow-[0_0_32px_rgba(200,30,30,0.05)]">
+                <div className="bg-[#10131b] border border-white/[0.06] rounded-none overflow-hidden shadow-[0_0_32px_rgba(179, 18, 46,0.05)]">
                   <div className="border-b border-white/[0.05] px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{dayTopic.icon}</span>
@@ -229,7 +229,7 @@ const KnowledgeStudyPage = () => {
                       </div>
                     </div>
                     {hasCompletedToday && (
-                      <div className="flex items-center gap-1.5 bg-emerald-900/20 border border-emerald-800/30 text-emerald-400 px-3 py-1.5 rounded-xl text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider">
+                      <div className="flex items-center gap-1.5 bg-emerald-900/20 border border-emerald-800/30 text-emerald-400 px-3 py-1.5 rounded-none text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider">
                         <Target size={11} /> Completed
                       </div>
                     )}
@@ -247,10 +247,10 @@ const KnowledgeStudyPage = () => {
                         <button
                           onClick={() => handleStartQuiz(todaysChallenge)}
                           disabled={hasCompletedToday}
-                          className={`w-full py-3.5 rounded-xl font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 ${
+                          className={`w-full py-3.5 rounded-none font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 ${
                             hasCompletedToday
                               ? 'bg-white/[0.04] text-white/20 cursor-not-allowed'
-                              : 'bg-[#c81e1e] hover:bg-[#e02424] text-white shadow-[0_0_20px_rgba(200,30,30,0.2)]'
+                              : 'bg-[#b3122e] hover:bg-[#d41f3d] text-white shadow-[0_0_20px_rgba(179, 18, 46,0.2)]'
                           }`}
                         >
                           <Zap size={13} />
@@ -266,7 +266,7 @@ const KnowledgeStudyPage = () => {
                 </div>
 
                 {/* Weekly Schedule */}
-                <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-5">
+                <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-5">
                   <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-white/25 mb-4">Weekly Schedule</p>
                   <div className="grid grid-cols-7 gap-1.5">
                     {[
@@ -282,17 +282,17 @@ const KnowledgeStudyPage = () => {
                       return (
                         <div
                           key={idx}
-                          className={`p-2 rounded-xl text-center transition-all ${
+                          className={`p-2 rounded-none text-center transition-all ${
                             isToday
-                              ? 'bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.3)]'
+                              ? 'bg-[rgba(179, 18, 46,0.1)] border border-[rgba(179, 18, 46,0.3)]'
                               : 'bg-white/[0.02] border border-white/[0.04]'
                           }`}
                         >
                           <div className="text-base mb-1">{item.icon}</div>
-                          <div className={`text-[9px] font-[JetBrains_Mono,monospace] font-bold ${isToday ? 'text-[#c81e1e]' : 'text-white/25'}`}>
+                          <div className={`text-[9px] font-[JetBrains_Mono,monospace] font-bold ${isToday ? 'text-[#b3122e]' : 'text-white/25'}`}>
                             {item.day}
                           </div>
-                          <div className={`text-[8px] ${isToday ? 'text-[#c81e1e]/70' : 'text-white/15'}`}>
+                          <div className={`text-[8px] ${isToday ? 'text-[#b3122e]/70' : 'text-white/15'}`}>
                             {item.topic}
                           </div>
                         </div>
@@ -302,9 +302,9 @@ const KnowledgeStudyPage = () => {
                 </div>
 
                 {/* Survival Mode — coming soon */}
-                <div className="bg-[#0f0f0f] border border-white/[0.04] rounded-2xl p-5 opacity-50">
+                <div className="bg-[#10131b] border border-white/[0.04] rounded-none p-5 opacity-50">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-white/[0.04] rounded-xl">
+                    <div className="p-2.5 bg-white/[0.04] rounded-none">
                       <Target size={18} className="text-white/30" />
                     </div>
                     <div>
@@ -326,7 +326,7 @@ const KnowledgeStudyPage = () => {
                     <select
                       value={filterType}
                       onChange={(e) => setFilterType(e.target.value)}
-                      className="bg-[#0f0f0f] border border-white/[0.07] rounded-xl px-3 py-1.5 text-[12px] text-white/60 focus:outline-none focus:border-[rgba(200,30,30,0.4)] font-[JetBrains_Mono,monospace]"
+                      className="bg-[#10131b] border border-white/[0.07] rounded-none px-3 py-1.5 text-[12px] text-white/60 focus:outline-none focus:border-[rgba(179, 18, 46,0.4)] font-[JetBrains_Mono,monospace]"
                     >
                       <option value="all">All Quizzes</option>
                       <option value="standard">Standard</option>
@@ -341,7 +341,7 @@ const KnowledgeStudyPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {filteredQuizzes.length === 0 ? (
-                    <div className="col-span-2 text-center py-16 bg-[#0f0f0f] border border-white/[0.06] rounded-2xl text-white/25">
+                    <div className="col-span-2 text-center py-16 bg-[#10131b] border border-white/[0.06] rounded-none text-white/25">
                       <BookOpen size={28} className="mx-auto mb-3 opacity-50" />
                       <p className="text-sm">No quizzes available yet.</p>
                     </div>
@@ -349,7 +349,7 @@ const KnowledgeStudyPage = () => {
                     filteredQuizzes.map((quiz) => (
                       <div
                         key={quiz.id}
-                        className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-4 hover:border-white/[0.12] transition-all group"
+                        className="bg-[#10131b] border border-white/[0.06] rounded-none p-4 hover:border-white/[0.12] transition-all group"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1 min-w-0">
@@ -377,7 +377,7 @@ const KnowledgeStudyPage = () => {
                           </span>
                           <button
                             onClick={() => handleStartQuiz(quiz)}
-                            className="flex items-center gap-1 bg-[#c81e1e] hover:bg-[#e02424] text-white px-3 py-1.5 rounded-xl text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-all"
+                            className="flex items-center gap-1 bg-[#b3122e] hover:bg-[#d41f3d] text-white px-3 py-1.5 rounded-none text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-all"
                           >
                             Start <ChevronRight size={12} />
                           </button>
@@ -403,7 +403,7 @@ const KnowledgeStudyPage = () => {
                 </div>
 
                 {scenarios.length === 0 ? (
-                  <div className="text-center py-16 bg-[#0f0f0f] border border-white/[0.06] rounded-2xl text-white/25">
+                  <div className="text-center py-16 bg-[#10131b] border border-white/[0.06] rounded-none text-white/25">
                     <GitBranch size={28} className="mx-auto mb-3 opacity-50" />
                     <p className="text-sm">No scenarios available yet.</p>
                   </div>
@@ -411,7 +411,7 @@ const KnowledgeStudyPage = () => {
                   scenarios.map(scenario => (
                     <div
                       key={scenario.id}
-                      className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-4 hover:border-[rgba(200,30,30,0.2)] transition-all group"
+                      className="bg-[#10131b] border border-white/[0.06] rounded-none p-4 hover:border-[rgba(179, 18, 46,0.2)] transition-all group"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
@@ -438,7 +438,7 @@ const KnowledgeStudyPage = () => {
                         </div>
                         <button
                           onClick={() => handleStartScenario(scenario)}
-                          className="flex items-center gap-1 bg-white/[0.06] hover:bg-[rgba(200,30,30,0.15)] hover:border-[rgba(200,30,30,0.3)] border border-white/[0.08] text-white/60 hover:text-white px-3 py-1.5 rounded-xl text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-all"
+                          className="flex items-center gap-1 bg-white/[0.06] hover:bg-[rgba(179, 18, 46,0.15)] hover:border-[rgba(179, 18, 46,0.3)] border border-white/[0.08] text-white/60 hover:text-white px-3 py-1.5 rounded-none text-[10px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-all"
                         >
                           Play <ChevronRight size={12} />
                         </button>
@@ -464,7 +464,7 @@ const KnowledgeStudyPage = () => {
             />
 
             {/* Quick Stats */}
-            <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-4">
+            <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-4">
               <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-white/25 mb-3">Your Stats</p>
               <div className="space-y-2.5">
                 {[
@@ -495,7 +495,7 @@ const KnowledgeStudyPage = () => {
 
       {/* Scenario Player Modal */}
       {showScenarioPlayer && selectedScenario && (
-        <div className="fixed inset-0 bg-[#090909]/95 backdrop-blur z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-[#0b0d12]/95 backdrop-blur z-50 overflow-y-auto">
           <div className="min-h-screen p-4 pt-16">
             <ScenarioPlayer
               scenario={selectedScenario}

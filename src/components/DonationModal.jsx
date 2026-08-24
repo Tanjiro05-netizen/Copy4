@@ -121,15 +121,15 @@ export default function DonationModal({ onClose }) {
               <button
                 key={c.code}
                 onClick={() => { setCurrency(c.code); setError(''); }}
-                className="px-3 py-1.5 rounded-lg text-sm font-semibold transition"
+                className="px-3 py-1.5 rounded-none text-sm font-semibold transition"
                 style={{
                   background: currency === c.code
-                    ? 'rgba(200,30,30,0.18)'
+                    ? 'rgba(179, 18, 46,0.18)'
                     : 'rgba(255,255,255,0.05)',
                   border: currency === c.code
-                    ? '1px solid rgba(200,30,30,0.5)'
+                    ? '1px solid rgba(179, 18, 46,0.5)'
                     : '1px solid rgba(255,255,255,0.08)',
-                  color: currency === c.code ? '#f87171' : '#9ca3af',
+                  color: currency === c.code ? '#d41f3d' : '#a5a194',
                 }}
               >
                 {c.label}
@@ -150,16 +150,16 @@ export default function DonationModal({ onClose }) {
                 <button
                   key={amt}
                   onClick={() => handlePreset(amt)}
-                  className="py-3 rounded-xl font-bold text-sm transition"
+                  className="py-3 rounded-none font-bold text-sm transition"
                   style={{
                     background: active
-                      ? 'linear-gradient(135deg, #c81e1e 0%, #991b1b 100%)'
+                      ? 'linear-gradient(135deg, #b3122e 0%, #b3122e 100%)'
                       : 'rgba(255,255,255,0.05)',
                     border: active
-                      ? '1px solid rgba(200,30,30,0.5)'
+                      ? '1px solid rgba(179, 18, 46,0.5)'
                       : '1px solid rgba(255,255,255,0.08)',
-                    color: active ? '#fff' : '#9ca3af',
-                    boxShadow: active ? '0 0 18px rgba(200,30,30,0.25)' : 'none',
+                    color: active ? '#fff' : '#a5a194',
+                    boxShadow: active ? '0 0 18px rgba(179, 18, 46,0.25)' : 'none',
                   }}
                 >
                   {cur.symbol}{amt}
@@ -192,15 +192,15 @@ export default function DonationModal({ onClose }) {
                 setError('');
               }}
               placeholder="0"
-              className="w-full p-3 pl-8 rounded-xl text-white"
+              className="w-full p-3 pl-8 rounded-none text-white"
               style={{
-                background: '#1a1a1a',
+                background: '#1a1f2b',
                 border: isCustom
-                  ? '1px solid rgba(200,30,30,0.45)'
+                  ? '1px solid rgba(179, 18, 46,0.45)'
                   : '1px solid rgba(255,255,255,0.08)',
                 outline: 'none',
                 fontFamily: 'inherit',
-                boxShadow: isCustom ? '0 0 0 2px rgba(200,30,30,0.1)' : 'none',
+                boxShadow: isCustom ? '0 0 0 2px rgba(179, 18, 46,0.1)' : 'none',
               }}
             />
           </div>

@@ -73,7 +73,7 @@ const MaintenancePage = () => {
                 lastEchoTime = now;
                 const echo = document.createElement('div');
                 echo.className = 'maintenance-echo';
-                echo.innerHTML = '<span style="color:#991b1b">Marxist</span><span style="color:#fff">.info</span>';
+                echo.innerHTML = '<span style="color:#b3122e">Marxist</span><span style="color:#fff">.info</span>';
                 echo.style.maskImage = `radial-gradient(circle 180px at ${x}px ${y}px, rgba(0,0,0,0.5) 0%, transparent 70%)`;
                 echo.style.webkitMaskImage = echo.style.maskImage;
                 echoContainer.appendChild(echo);
@@ -157,7 +157,7 @@ const MaintenancePage = () => {
                     {/* Title */}
                     <div className="maintenance-title">
                         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-2">
-                            <span style={{ color: '#991b1b' }}>Marxist</span>
+                            <span style={{ color: '#b3122e' }}>Marxist</span>
                             <span style={{ color: '#fff' }}>.info</span>
                         </h1>
                     </div>
@@ -165,7 +165,7 @@ const MaintenancePage = () => {
                     {/* Divider */}
                     <div
                         className="maintenance-divider mx-auto my-6"
-                        style={{ height: '1px', background: 'linear-gradient(90deg, transparent, #991b1b, transparent)' }}
+                        style={{ height: '1px', background: 'linear-gradient(90deg, transparent, #b3122e, transparent)' }}
                     />
 
                     {/* Subtitle */}

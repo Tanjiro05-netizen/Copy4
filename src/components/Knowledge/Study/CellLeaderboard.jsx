@@ -62,7 +62,7 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
   };
 
   return (
-    <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl overflow-hidden font-[Hanken_Grotesk,sans-serif]">
+    <div className="bg-[#10131b] border border-white/[0.06] rounded-none overflow-hidden font-[Outfit,sans-serif]">
       {/* Header */}
       <div className="border-b border-white/[0.05] px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
               <div
                 key={cell.id}
                 className={`px-4 py-3 flex items-center gap-3 transition-colors ${
-                  isUserCell ? 'bg-[rgba(200,30,30,0.05)]' : 'hover:bg-white/[0.02]'
+                  isUserCell ? 'bg-[rgba(179, 18, 46,0.05)]' : 'hover:bg-white/[0.02]'
                 }`}
               >
                 <div className="w-5 flex items-center justify-center shrink-0">
@@ -105,12 +105,12 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className={`text-[12px] font-medium truncate ${
-                      isUserCell ? 'text-[#c81e1e]' : 'text-white/70'
+                      isUserCell ? 'text-[#b3122e]' : 'text-white/70'
                     }`}>
                       {cell.name}
                     </span>
                     {isUserCell && (
-                      <span className="font-[JetBrains_Mono,monospace] text-[8px] bg-[rgba(200,30,30,0.15)] text-[#c81e1e] px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                      <span className="font-[JetBrains_Mono,monospace] text-[8px] bg-[rgba(179, 18, 46,0.15)] text-[#b3122e] px-1.5 py-0.5 rounded-full uppercase tracking-wider">
                         You
                       </span>
                     )}
@@ -138,20 +138,20 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
             <>
               <button
                 onClick={() => setShowJoinModal(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-[#c81e1e] hover:bg-[#e02424] text-white py-2 rounded-xl font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider transition-all"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-[#b3122e] hover:bg-[#d41f3d] text-white py-2 rounded-none font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider transition-all"
               >
                 <UserPlus size={12} /> Join
               </button>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/50 py-2 rounded-xl font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider transition-all"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/50 py-2 rounded-none font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider transition-all"
               >
                 <Plus size={12} /> Create
               </button>
             </>
           ) : (
             <div className="flex-1 text-center font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-wider">
-              Member of <span className="text-[#c81e1e]">{userCell.name}</span>
+              Member of <span className="text-[#b3122e]">{userCell.name}</span>
             </div>
           )}
         </div>
@@ -159,28 +159,28 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
 
       {/* Create Cell Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-[#090909]/90 backdrop-blur flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0f0f0f] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-full space-y-4">
+        <div className="fixed inset-0 bg-[#0b0d12]/90 backdrop-blur flex items-center justify-center z-50 p-4">
+          <div className="bg-[#10131b] border border-white/[0.08] rounded-none p-6 max-w-sm w-full space-y-4">
             <h3 className="font-[Cormorant_Garamond,Georgia,serif] text-[20px] font-[500] text-white">Create New Cell</h3>
             <input
               type="text"
               placeholder="Cell name..."
               value={newCellName}
               onChange={(e) => setNewCellName(e.target.value)}
-              className="w-full p-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/20 focus:outline-none focus:border-[rgba(200,30,30,0.4)] text-[13px] transition-colors"
+              className="w-full p-3 bg-white/[0.04] border border-white/[0.08] rounded-none text-white placeholder-white/20 focus:outline-none focus:border-[rgba(179, 18, 46,0.4)] text-[13px] transition-colors"
               maxLength={30}
             />
             <div className="flex gap-2">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="flex-1 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/50 rounded-xl font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider transition-all"
+                className="flex-1 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/50 rounded-none font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateCell}
                 disabled={!newCellName.trim() || creating}
-                className="flex-1 py-2.5 bg-[#c81e1e] hover:bg-[#e02424] disabled:bg-white/[0.05] disabled:text-white/20 text-white rounded-xl font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider transition-all"
+                className="flex-1 py-2.5 bg-[#b3122e] hover:bg-[#d41f3d] disabled:bg-white/[0.05] disabled:text-white/20 text-white rounded-none font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider transition-all"
               >
                 {creating ? 'Creating...' : 'Create'}
               </button>
@@ -191,15 +191,15 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
 
       {/* Join Cell Modal */}
       {showJoinModal && (
-        <div className="fixed inset-0 bg-[#090909]/90 backdrop-blur flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0f0f0f] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-full space-y-4">
+        <div className="fixed inset-0 bg-[#0b0d12]/90 backdrop-blur flex items-center justify-center z-50 p-4">
+          <div className="bg-[#10131b] border border-white/[0.08] rounded-none p-6 max-w-sm w-full space-y-4">
             <h3 className="font-[Cormorant_Garamond,Georgia,serif] text-[20px] font-[500] text-white">Join a Cell</h3>
             <div className="max-h-64 overflow-y-auto space-y-2">
               {cells.filter(c => (c.members?.length || 0) < 5).map(cell => (
                 <button
                   key={cell.id}
                   onClick={() => handleJoinCell(cell.id)}
-                  className="w-full p-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.07] rounded-xl text-left transition-all"
+                  className="w-full p-3 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.07] rounded-none text-left transition-all"
                 >
                   <div className="text-white/70 text-[13px] font-medium">{cell.name}</div>
                   <div className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 mt-0.5">
@@ -215,7 +215,7 @@ const CellLeaderboard = ({ userId, userCell, onCellChange }) => {
             </div>
             <button
               onClick={() => setShowJoinModal(false)}
-              className="w-full py-2.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/40 rounded-xl font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider transition-all"
+              className="w-full py-2.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-white/40 rounded-none font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider transition-all"
             >
               Cancel
             </button>

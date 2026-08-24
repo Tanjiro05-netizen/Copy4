@@ -23,7 +23,7 @@ export const tabButton = styleVariants({
     background: vars.color.accentSoft,
     color: vars.color.text,
     cursor: 'pointer',
-    fontFamily: vars.font.mono,
+    fontFamily: vars.font.label,
     fontSize: '11px',
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
@@ -40,7 +40,7 @@ export const tabButton = styleVariants({
     background: 'transparent',
     color: vars.color.textMuted,
     cursor: 'pointer',
-    fontFamily: vars.font.mono,
+    fontFamily: vars.font.label,
     fontSize: '11px',
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
@@ -127,7 +127,7 @@ export const pathMarker = styleVariants({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: vars.font.mono,
+    fontFamily: vars.font.label,
     fontSize: '10px',
     boxShadow: vars.shadow.soft,
   },
@@ -188,7 +188,7 @@ export const pathTitle = style({
 
 export const pathSubtitle = style({
   margin: 0,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   lineHeight: 1.5,
   letterSpacing: '0.08em',
@@ -208,7 +208,7 @@ export const resourceMeta = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space.xs,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
@@ -325,7 +325,7 @@ export const sourceList = style({
 });
 
 export const sourceListLabel = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '9px',
   lineHeight: 1,
   letterSpacing: '0.08em',
@@ -357,7 +357,7 @@ export const sourceChip = style({
 });
 
 export const sourceMarker = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   color: vars.color.accent,
 });
 

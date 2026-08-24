@@ -78,7 +78,7 @@ const TextbookReaderPage = () => {
     <div className={s.page} style={{display:'flex',flexDirection:'column'}}>
       
       {/* Top Bar */}
-      <div className="fixed top-16 left-0 right-0 z-10 bg-[#12131A]/95 backdrop-blur-sm border-b border-red-900/30">
+      <div className="fixed top-16 left-0 right-0 z-10 bg-[#0b0d12]/95 backdrop-blur-sm border-b border-red-900/30">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Left - Back & Title */}
@@ -163,7 +163,7 @@ const TextbookReaderPage = () => {
         <div className="max-w-4xl mx-auto">
           {textbook.file_url ? (
             <div 
-              className="bg-white rounded-lg shadow-2xl overflow-hidden"
+              className="bg-white rounded-none shadow-none overflow-hidden"
               style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
             >
               <iframe
@@ -184,7 +184,7 @@ const TextbookReaderPage = () => {
       {/* Textbook Info Sidebar (optional) */}
       {textbook.description && (
         <div className="fixed bottom-4 right-4 max-w-xs">
-          <div className="bg-black/80 backdrop-blur-lg rounded-lg p-4 border border-red-900/30">
+          <div className="bg-black/80 backdrop-blur-lg rounded-none p-4 border border-red-900/30">
             <h3 className="text-white font-semibold text-sm mb-2">About this textbook</h3>
             <p className="text-gray-400 text-xs line-clamp-3">{textbook.description}</p>
           </div>

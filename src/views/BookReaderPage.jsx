@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Loader, AlertCircle, Download, BookOpen, Bookmark, ArrowLeft, FileText, Calendar, BookMarked } from 'lucide-react';
+import { Loader, AlertCircle, Download, BookOpen, Bookmark, ArrowLeft, FileText, BookMarked } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import EpubReader from '../components/EpubReader/EpubReader';
+import EditorialReader from '../components/EditorialReader/EditorialReader';
 import BookReviewSection from '../components/Library/BookReviewSection';
 import AddToListButton from '../components/Library/AddToListButton';
 import * as s from './BookReaderPage.css.ts';
@@ -27,6 +28,7 @@ const BookReaderPage = () => {
     const [progress, setProgress] = useState(0);
     const [isSavingProgress, setIsSavingProgress] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [view, setView] = useState('read'); // 'read' (editorial) | 'ebook' (paginated reader)
     const progressTimerRef = useRef(null);
 
     const isAuthed = !!user && user.id !== 'dev-admin';
@@ -130,7 +132,7 @@ const BookReaderPage = () => {
         }
     }, [isAuthed, user, bookId]);
 
-    // Debounced auto-progress callback from EpubReader
+    // Debounced auto-progress callback from both readers
     const handleAutoProgress = useCallback((pct) => {
         if (!isAuthed) return;
         setProgress(pct);
@@ -168,117 +170,118 @@ const BookReaderPage = () => {
         );
     }
 
+    const metaParts = [
+        book.author,
+        book.year,
+        book.pages ? `${book.pages} pp.` : null,
+    ].filter(Boolean);
+
     return (
         <div className={s.page}>
             <div className={s.inner}>
                 <Link href="/digital-library" className={s.backLink}>
-                    <ArrowLeft size={14} />
+                    <ArrowLeft size={13} />
                     Digital Library
                 </Link>
 
-                <div className={s.grid}>
-                    {/* ── Sidebar ── */}
-                    <aside className={s.sidebar}>
-                        <div className={s.coverWrap}>
-                            {coverUrl && !coverError ? (
-                                <img
-                                    src={coverUrl}
-                                    alt={book.title}
-                                    className={s.coverImg}
-                                    onError={() => setCoverError(true)}
-                                />
-                            ) : (
-                                <div className={s.coverFallback}>
-                                    <BookOpen size={48} className={s.coverFallbackIcon} />
-                                    <p className={s.coverFallbackText}>{book.title}</p>
-                                </div>
-                            )}
+                {/* ── Title page ── */}
+                <header className={s.titlePage}>
+                    {coverUrl && !coverError ? (
+                        <div className={s.coverFrame}>
+                            <img
+                                src={coverUrl}
+                                alt={book.title}
+                                className={s.coverImg}
+                                onError={() => setCoverError(true)}
+                            />
                         </div>
-
-                        <h1 className={s.bookTitle}>{book.title}</h1>
-                        {book.author && <p className={s.bookAuthor}>{book.author}</p>}
-                        {book.description && <p className={s.bookDesc}>{book.description}</p>}
-
-                        <div className={s.metaStack}>
-                            {book.year && (
-                                <div className={s.metaRow}>
-                                    <span className={s.metaLabel}>Year</span>
-                                    <span className={s.metaValue}>
-                                        <Calendar size={12} />
-                                        {book.year}
-                                    </span>
-                                </div>
-                            )}
-                            {book.pages && (
-                                <div className={s.metaRow}>
-                                    <span className={s.metaLabel}>Pages</span>
-                                    <span className={s.metaValue}>
-                                        <FileText size={12} />
-                                        {book.pages}
-                                    </span>
-                                </div>
-                            )}
-                            {book.category && (
-                                <div className={s.metaRow}>
-                                    <span className={s.metaLabel}>Category</span>
-                                    <span className={s.metaValue}>{book.category}</span>
-                                </div>
-                            )}
+                    ) : (
+                        <div className={s.coverFallback}>
+                            <BookOpen size={36} className={s.coverFallbackIcon} />
+                            <p className={s.coverFallbackText}>{book.title}</p>
                         </div>
+                    )}
 
-                        {/* Auto-tracked reading progress */}
-                        {isAuthed && (
-                            <div className={s.metaStack}>
-                                <div className={s.metaRow}>
-                                    <span className={s.metaLabel}>
-                                        Reading progress
-                                        {isSavingProgress && <Loader size={10} className="inline ml-1 animate-spin" />}
-                                    </span>
-                                    <span className={s.metaValue}>{progress}%</span>
-                                </div>
-                                <div style={{ height: '4px', borderRadius: '2px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                                    <div style={{ height: '100%', width: `${progress}%`, background: '#ef4444', borderRadius: '2px', transition: 'width 0.4s ease' }} />
-                                </div>
+                    <p className={s.kicker}>{book.category || 'Digital Library'}</p>
+                    <h1 className={s.title}>{book.title}</h1>
+                    <div className={s.rule} aria-hidden="true" />
+                    {metaParts.length > 0 && <p className={s.metaLine}>{metaParts.join('  ·  ')}</p>}
+                    {book.description && <p className={s.standfirst}>{book.description}</p>}
+
+                    {isAuthed && (
+                        <div className={s.progressRow}>
+                            <span className={s.progressLabel}>
+                                {isSavingProgress ? 'Saving…' : `Reading — ${progress}%`}
+                            </span>
+                            <div className={s.progressTrack}>
+                                <div className={s.progressFill} style={{ width: `${progress}%` }} />
                             </div>
+                        </div>
+                    )}
+                </header>
+
+                {/* ── Toolbar: view toggle + actions ── */}
+                <div className={s.toolbar}>
+                    {epubUrl && (
+                        <div className={s.viewTabs} role="tablist" aria-label="Reading view">
+                            <button
+                                className={`${s.viewTab} ${view === 'read' ? s.viewTabActive : ''}`}
+                                onClick={() => setView('read')}
+                                role="tab"
+                                aria-selected={view === 'read'}
+                            >
+                                Read
+                            </button>
+                            <button
+                                className={`${s.viewTab} ${view === 'ebook' ? s.viewTabActive : ''}`}
+                                onClick={() => setView('ebook')}
+                                role="tab"
+                                aria-selected={view === 'ebook'}
+                            >
+                                Ebook
+                            </button>
+                        </div>
+                    )}
+
+                    <div className={s.actions}>
+                        {pdfDownloadUrl && (
+                            <a href={pdfDownloadUrl} download={`${book.title}.pdf`} className={s.toolBtn}>
+                                <Download size={14} />
+                                {t('book.downloadPDF')}
+                            </a>
                         )}
+                        {isAuthed && (
+                            <button onClick={handleToggleBookmark} className={s.toolBtn}>
+                                {isBookmarked ? (
+                                    <>
+                                        <BookMarked size={14} style={{ color: '#d41f3d' }} />
+                                        {t('common.bookmarked')}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Bookmark size={14} />
+                                        {t('common.bookmark')}
+                                    </>
+                                )}
+                            </button>
+                        )}
+                        <AddToListButton bookId={bookId} />
+                    </div>
+                </div>
 
-                        <div className={s.actionStack}>
-                            {pdfDownloadUrl && (
-                                <a href={pdfDownloadUrl} download={`${book.title}.pdf`} className={s.downloadBtn}>
-                                    <Download size={15} style={{ marginRight: '6px' }} />
-                                    {t('book.downloadPDF')}
-                                </a>
-                            )}
-                            {isAuthed && (
-                                <button onClick={handleToggleBookmark} className={s.extBtn}>
-                                    {isBookmarked ? (
-                                        <>
-                                            <BookMarked size={15} style={{ marginRight: '6px', color: '#ef4444' }} />
-                                            {t('common.bookmarked')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Bookmark size={15} style={{ marginRight: '6px' }} />
-                                            {t('common.bookmark')}
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                            <AddToListButton bookId={bookId} />
-                        </div>
-                    </aside>
-
-                    {/* ── Reader ── */}
-                    <div className={s.readerSection} data-testid="book-reader">
-                        <div className={s.readerHeader}>
-                            <div>
-                                <p className={s.readerTitle}>{book.title}</p>
-                                {book.author && <p className={s.readerDesc}>{book.author}</p>}
+                {/* ── Reader surface ── */}
+                <div className={s.readerSection} data-testid="book-reader">
+                    {epubUrl ? (
+                        view === 'read' ? (
+                            <div data-testid="book-reader-editorial">
+                                <EditorialReader
+                                    url={epubUrl}
+                                    onProgressChange={handleAutoProgress}
+                                    fallbackUrl={pdfDownloadUrl}
+                                />
                             </div>
-                        </div>
-
-                        {epubUrl ? (
-                            <div data-testid="book-reader-epub" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', borderRadius: 0 } : undefined}>
+                        ) : (
+                            <div data-testid="book-reader-epub" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', border: 'none' } : undefined}>
                                 <EpubReader
                                     url={epubUrl}
                                     title={book.title}
@@ -288,28 +291,28 @@ const BookReaderPage = () => {
                                     fallbackUrl={pdfDownloadUrl}
                                 />
                             </div>
-                        ) : pdfDownloadUrl ? (
-                            <div data-testid="book-reader-pdf" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', borderRadius: 0 } : undefined}>
-                                <iframe
-                                    src={pdfDownloadUrl}
-                                    className={s.iframe}
-                                    title={book.title}
-                                    allowFullScreen
-                                />
+                        )
+                    ) : pdfDownloadUrl ? (
+                        <div data-testid="book-reader-pdf" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', border: 'none' } : undefined}>
+                            <iframe
+                                src={pdfDownloadUrl}
+                                className={s.iframe}
+                                title={book.title}
+                                allowFullScreen
+                            />
+                        </div>
+                    ) : (
+                        <div className={s.noPdfWrap} data-testid="book-reader-no-file">
+                            <div className={s.noPdfBox}>
+                                <AlertCircle size={16} />
+                                <span>{t('book.noFile')}</span>
                             </div>
-                        ) : (
-                            <div className={s.noPdfWrap} data-testid="book-reader-no-file">
-                                <div className={s.noPdfBox}>
-                                    <AlertCircle size={16} />
-                                    <span>{t('book.noFile')}</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Book Reviews */}
-                        <BookReviewSection bookId={bookId} canWrite={isAuthed} />
-                    </div>
+                        </div>
+                    )}
                 </div>
+
+                {/* Book Reviews */}
+                <BookReviewSection bookId={bookId} canWrite={isAuthed} />
             </div>
         </div>
     );

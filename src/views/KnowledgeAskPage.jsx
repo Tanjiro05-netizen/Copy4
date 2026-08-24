@@ -6,7 +6,7 @@ import { knowledgeApiService } from '../components/Knowledge/api';
 import { useTopics } from '../components/Knowledge/hooks/useTopics';
 import { ArrowLeft, HelpCircle, Send, Loader2, AlertCircle, CheckCircle, Info, Edit3 } from 'lucide-react';
 
-const inputCls = "w-full bg-[#090909] border border-white/[0.06] rounded-xl px-4 py-3 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(200,30,30,0.4)] transition-all font-[Hanken_Grotesk,sans-serif]";
+const inputCls = "w-full bg-[#0b0d12] border border-white/[0.06] rounded-none px-4 py-3 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(179, 18, 46,0.4)] transition-all font-[Outfit,sans-serif]";
 const labelCls = "block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/35 mb-2";
 
 const KnowledgeAskPage = () => {
@@ -40,12 +40,12 @@ const KnowledgeAskPage = () => {
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-[#090909] text-white flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[#0b0d12] text-white flex items-center justify-center px-4">
                 <div className="text-center">
                     <HelpCircle size={40} className="mx-auto text-white/15 mb-4" />
-                    <h2 className="text-lg font-semibold text-white/60 mb-2 font-[Hanken_Grotesk,sans-serif]">Login Required</h2>
+                    <h2 className="text-lg font-semibold text-white/60 mb-2 font-[Outfit,sans-serif]">Login Required</h2>
                     <p className="text-white/30 text-sm mb-6">You need to be logged in to ask a question.</p>
-                    <Link href="/" className="text-[#c81e1e] text-sm hover:underline">Go to login</Link>
+                    <Link href="/" className="text-[#b3122e] text-sm hover:underline">Go to login</Link>
                 </div>
             </div>
         );
@@ -53,20 +53,20 @@ const KnowledgeAskPage = () => {
 
     if (success) {
         return (
-            <div className="min-h-screen bg-[#090909] text-white flex items-center justify-center px-4">
+            <div className="min-h-screen bg-[#0b0d12] text-white flex items-center justify-center px-4">
                 <div className="text-center max-w-sm">
                     <CheckCircle size={40} className="mx-auto text-emerald-500 mb-4" />
-                    <h2 className="text-lg font-semibold text-white/80 mb-2 font-[Hanken_Grotesk,sans-serif]">Question Submitted!</h2>
+                    <h2 className="text-lg font-semibold text-white/80 mb-2 font-[Outfit,sans-serif]">Question Submitted!</h2>
                     <p className="text-white/40 text-sm mb-8 leading-relaxed">
                         Your question is awaiting admin approval. It will appear in the feed once approved.
                     </p>
                     <div className="flex items-center justify-center gap-3">
-                        <Link href="/knowledge" className="px-5 py-2 border border-white/[0.1] text-white/50 hover:text-white/80 hover:border-white/[0.2] rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all">
+                        <Link href="/knowledge" className="px-5 py-2 border border-white/[0.1] text-white/50 hover:text-white/80 hover:border-white/[0.2] rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all">
                             Back to Feed
                         </Link>
                         <button
                             onClick={() => { setSuccess(false); setTitle(''); setContent(''); setTopicId(''); }}
-                            className="px-5 py-2 bg-[#c81e1e] hover:bg-[#e02424] text-white rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
+                            className="px-5 py-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
                         >
                             Ask Another
                         </button>
@@ -77,7 +77,7 @@ const KnowledgeAskPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#090909] text-white font-[Hanken_Grotesk,sans-serif]">
+        <div className="min-h-screen bg-[#0b0d12] text-white font-[Outfit,sans-serif]">
             <div className="max-w-2xl mx-auto px-4 py-8">
 
                 <Link href="/knowledge" className="inline-flex items-center gap-2 text-white/30 hover:text-white/70 text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-colors mb-8">
@@ -86,7 +86,7 @@ const KnowledgeAskPage = () => {
 
                 {/* Header */}
                 <div className="mb-6">
-                    <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#c81e1e] opacity-70 mb-2">
+                    <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#b3122e] opacity-70 mb-2">
                         Knowledge Q&amp;A
                     </p>
                     <h1 className="font-[Cormorant_Garamond,Georgia,serif] text-[36px] font-[500] leading-none text-white mb-2 tracking-[-0.02em]">
@@ -96,7 +96,7 @@ const KnowledgeAskPage = () => {
                 </div>
 
                 {/* Guidelines */}
-                <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 mb-6 flex items-start gap-3">
+                <div className="bg-white/[0.02] border border-white/[0.06] rounded-none p-4 mb-6 flex items-start gap-3">
                     <Info size={15} className="text-white/30 mt-0.5 shrink-0" />
                     <div>
                         <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/30 mb-2">Before you ask</p>
@@ -110,10 +110,10 @@ const KnowledgeAskPage = () => {
                 </div>
 
                 {/* Form card */}
-                <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
+                <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-6 shadow-[0_2px_20px_rgba(0,0,0,0.3)]">
 
                     {error && (
-                        <div className="flex items-center gap-2 bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.25)] text-[#c81e1e] px-4 py-3 rounded-xl text-[12px] mb-5">
+                        <div className="flex items-center gap-2 bg-[rgba(179, 18, 46,0.1)] border border-[rgba(179, 18, 46,0.25)] text-[#b3122e] px-4 py-3 rounded-none text-[12px] mb-5">
                             <AlertCircle size={14} className="shrink-0" /> {error}
                         </div>
                     )}
@@ -137,7 +137,7 @@ const KnowledgeAskPage = () => {
 
                         {/* Title */}
                         <div>
-                            <label className={labelCls}>Question Title <span className="text-[#c81e1e]">*</span></label>
+                            <label className={labelCls}>Question Title <span className="text-[#b3122e]">*</span></label>
                             <input
                                 type="text"
                                 value={title}
@@ -149,13 +149,13 @@ const KnowledgeAskPage = () => {
                             />
                             <div className="flex items-center justify-between mt-1.5 px-0.5">
                                 <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">Be specific — imagine you're asking a person</span>
-                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 280 ? 'text-[#c81e1e]' : 'text-white/20'}`}>{title.length}/300</span>
+                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 280 ? 'text-[#b3122e]' : 'text-white/20'}`}>{title.length}/300</span>
                             </div>
                         </div>
 
                         {/* Description */}
                         <div>
-                            <label className={labelCls}>Description <span className="text-[#c81e1e]">*</span></label>
+                            <label className={labelCls}>Description <span className="text-[#b3122e]">*</span></label>
                             <textarea
                                 value={content}
                                 onChange={e => setContent(e.target.value)}
@@ -165,7 +165,7 @@ const KnowledgeAskPage = () => {
                             />
                             <div className="flex items-center justify-between mt-1.5 px-0.5">
                                 <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">Minimum 20 characters</span>
-                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length < 20 && content.length > 0 ? 'text-[#c81e1e]' : 'text-white/20'}`}>
+                                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length < 20 && content.length > 0 ? 'text-[#b3122e]' : 'text-white/20'}`}>
                                     {content.length}/20 min
                                 </span>
                             </div>
@@ -177,7 +177,7 @@ const KnowledgeAskPage = () => {
                             <button
                                 type="submit"
                                 disabled={submitting || title.length < 10 || content.length < 20}
-                                className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-5 py-2.5 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(200,30,30,0.2)] hover:shadow-[0_0_28px_rgba(200,30,30,0.35)]"
+                                className="flex items-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white px-5 py-2.5 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(179, 18, 46,0.2)] hover:shadow-[0_0_28px_rgba(179, 18, 46,0.35)]"
                             >
                                 {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                                 Submit Question

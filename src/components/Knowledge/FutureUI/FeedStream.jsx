@@ -11,7 +11,7 @@ const TABS = [
   { key: 'hot',       label: 'Hot' },
 ];
 
-const inputCls = "w-full bg-[#090909] border border-white/[0.06] rounded-xl px-4 py-3 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(200,30,30,0.4)] transition-all font-[Hanken_Grotesk,sans-serif]";
+const inputCls = "w-full bg-[#0b0d12] border border-white/[0.06] rounded-none px-4 py-3 text-[13px] text-white/80 placeholder-white/20 focus:outline-none focus:border-[rgba(179, 18, 46,0.4)] transition-all font-[Outfit,sans-serif]";
 const labelCls = "block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/35 mb-2";
 
 const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange, viewMode, isFollowing, onToggleFollow, onVote, isFavorited, onToggleFavorite, hasMore, onLoadMore }) => {
@@ -55,8 +55,8 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
       {/* ── Page Header ── */}
       <div className="relative mb-6 pb-5 border-b border-white/[0.06] overflow-hidden">
         {/* Ambient glow */}
-        <div className="pointer-events-none absolute -top-10 -left-10 w-64 h-64 rounded-full bg-[rgba(200,30,30,0.06)] blur-3xl" />
-        <p className="relative font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#c81e1e] opacity-70 mb-2">
+        <div className="pointer-events-none absolute -top-10 -left-10 w-64 h-64 rounded-full bg-[rgba(179, 18, 46,0.06)] blur-3xl" />
+        <p className="relative font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#b3122e] opacity-70 mb-2">
           Community · Knowledge Q&amp;A
         </p>
         <div className="relative flex items-end justify-between gap-4 flex-wrap">
@@ -64,7 +64,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
             Knowledge Base
           </h1>
           <Link href="/knowledge/ask"
-            className="flex items-center gap-2 bg-[rgba(200,30,30,0.12)] hover:bg-[rgba(200,30,30,0.2)] border border-[rgba(200,30,30,0.28)] text-[#c81e1e] px-4 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
+            className="flex items-center gap-2 bg-[rgba(179, 18, 46,0.12)] hover:bg-[rgba(179, 18, 46,0.2)] border border-[rgba(179, 18, 46,0.28)] text-[#b3122e] px-4 py-2 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all"
           >
             <Edit3 className="w-3.5 h-3.5" />
             Ask a Question
@@ -76,11 +76,11 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
       </div>
 
       {/* ── Post Creator ── */}
-      <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-4">
+      <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-4">
         {success ? (
           <div className="flex items-center gap-3 py-2">
             <CheckCircle size={18} className="text-emerald-500 shrink-0" />
-            <p className="text-white/60 text-[13px] font-[Hanken_Grotesk,sans-serif] flex-1">
+            <p className="text-white/60 text-[13px] font-[Outfit,sans-serif] flex-1">
               Question submitted! It will appear once approved.
             </p>
             <button onClick={resetForm} className="text-white/30 hover:text-white/60 text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors">
@@ -99,9 +99,9 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
               </div>
               <button
                 onClick={() => setExpanded(true)}
-                className="flex-1 bg-white/[0.03] rounded-xl border border-white/[0.06] px-4 py-2.5 hover:bg-white/[0.06] hover:border-white/[0.1] transition-all text-left"
+                className="flex-1 bg-white/[0.03] rounded-none border border-white/[0.06] px-4 py-2.5 hover:bg-white/[0.06] hover:border-white/[0.1] transition-all text-left"
               >
-                <span className="text-white/30 text-xs font-[Hanken_Grotesk,sans-serif]">
+                <span className="text-white/30 text-xs font-[Outfit,sans-serif]">
                   Share your insights or ask a question…
                 </span>
               </button>
@@ -109,19 +109,19 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
             <div className="flex items-center gap-4 pt-2.5 mt-2.5 border-t border-white/[0.04]">
               <button
                 onClick={() => setExpanded(true)}
-                className="flex items-center gap-1.5 text-white/40 hover:text-[#c81e1e] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors"
+                className="flex items-center gap-1.5 text-white/40 hover:text-[#b3122e] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors"
               >
                 <Edit3 className="w-3 h-3" /> Answer
               </button>
               <button
                 onClick={() => setExpanded(true)}
-                className="flex items-center gap-1.5 text-white/40 hover:text-[#c81e1e] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors"
+                className="flex items-center gap-1.5 text-white/40 hover:text-[#b3122e] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors"
               >
                 <HelpCircle className="w-3 h-3" /> Question
               </button>
               <button
                 onClick={() => setExpanded(true)}
-                className="flex items-center gap-1.5 text-white/40 hover:text-[#c81e1e] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors"
+                className="flex items-center gap-1.5 text-white/40 hover:text-[#b3122e] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.06em] transition-colors"
               >
                 <MessageSquare className="w-3 h-3" /> Discuss
               </button>
@@ -130,12 +130,12 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#c81e1e] opacity-70">Ask a Question</span>
+              <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#b3122e] opacity-70">Ask a Question</span>
               <button type="button" onClick={resetForm} className="text-white/25 hover:text-white/60 transition-colors"><X size={16} /></button>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.25)] text-[#c81e1e] px-3 py-2 rounded-xl text-[12px]">
+              <div className="flex items-center gap-2 bg-[rgba(179, 18, 46,0.1)] border border-[rgba(179, 18, 46,0.25)] text-[#b3122e] px-3 py-2 rounded-none text-[12px]">
                 <AlertCircle size={14} className="shrink-0" /> {error}
               </div>
             )}
@@ -151,7 +151,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
 
             {/* Title */}
             <div>
-              <label className={labelCls}>Question Title <span className="text-[#c81e1e]">*</span></label>
+              <label className={labelCls}>Question Title <span className="text-[#b3122e]">*</span></label>
               <input
                 ref={titleRef}
                 type="text"
@@ -163,16 +163,16 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
                 disabled={submitting}
               />
               <div className="flex items-center justify-between mt-1 px-0.5">
-                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 0 && title.length < 10 ? 'text-[#c81e1e]' : 'text-white/20'}`}>
+                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 0 && title.length < 10 ? 'text-[#b3122e]' : 'text-white/20'}`}>
                   {title.length > 0 && title.length < 10 ? `${10 - title.length} more characters needed` : 'Min 10 characters'}
                 </span>
-                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 280 ? 'text-[#c81e1e]' : 'text-white/20'}`}>{title.length}/300</span>
+                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${title.length > 280 ? 'text-[#b3122e]' : 'text-white/20'}`}>{title.length}/300</span>
               </div>
             </div>
 
             {/* Description */}
             <div>
-              <label className={labelCls}>Description <span className="text-[#c81e1e]">*</span></label>
+              <label className={labelCls}>Description <span className="text-[#b3122e]">*</span></label>
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
@@ -181,10 +181,10 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
                 disabled={submitting}
               />
               <div className="flex items-center justify-between mt-1 px-0.5">
-                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length > 0 && content.length < 20 ? 'text-[#c81e1e]' : 'text-white/20'}`}>
+                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length > 0 && content.length < 20 ? 'text-[#b3122e]' : 'text-white/20'}`}>
                   {content.length > 0 && content.length < 20 ? `${20 - content.length} more characters needed` : 'Min 20 characters'}
                 </span>
-                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length < 20 && content.length > 0 ? 'text-[#c81e1e]' : 'text-white/20'}`}>{content.length}/20 min</span>
+                <span className={`font-[JetBrains_Mono,monospace] text-[9px] ${content.length < 20 && content.length > 0 ? 'text-[#b3122e]' : 'text-white/20'}`}>{content.length}/20 min</span>
               </div>
             </div>
 
@@ -194,7 +194,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
               <button
                 type="submit"
                 disabled={submitting || title.length < 10 || content.length < 20}
-                className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-4 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-[#c81e1e] shadow-[0_0_20px_rgba(200,30,30,0.2)] hover:shadow-[0_0_28px_rgba(200,30,30,0.35)]"
+                className="flex items-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white px-4 py-2 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:hover:bg-[#b3122e] shadow-[0_0_20px_rgba(179, 18, 46,0.2)] hover:shadow-[0_0_28px_rgba(179, 18, 46,0.35)]"
               >
                 {submitting ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 Submit
@@ -205,7 +205,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
       </div>
 
       {/* ── Navigation Tabs ── */}
-      <div className="bg-[#090909]/95 backdrop-blur z-30 sticky top-[104px]">
+      <div className="bg-[#0b0d12]/95 backdrop-blur z-30 sticky top-[104px]">
         <div className="flex items-center gap-1.5 py-2">
           {TABS.map(tab => (
             <button
@@ -213,7 +213,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
               onClick={() => onTabChange(tab.key)}
               className={`px-4 py-1.5 rounded-full text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] transition-all ${
                 activeTab === tab.key
-                  ? 'bg-[rgba(200,30,30,0.15)] text-[#c81e1e] border border-[rgba(200,30,30,0.3)]'
+                  ? 'bg-[rgba(179, 18, 46,0.15)] text-[#b3122e] border border-[rgba(179, 18, 46,0.3)]'
                   : 'text-white/30 hover:text-white/70 hover:bg-white/[0.04] border border-transparent'
               }`}
             >
@@ -228,7 +228,7 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
       <div className="space-y-2">
         {loading ? (
           <div className="py-16 flex justify-center">
-            <div className="w-6 h-6 rounded-full border-2 border-white/[0.12] border-t-[#c81e1e] animate-spin" />
+            <div className="w-6 h-6 rounded-full border-2 border-white/[0.12] border-t-[#b3122e] animate-spin" />
           </div>
         ) : questions && questions.length > 0 ? (
           questions.map((item) => (
@@ -243,20 +243,20 @@ const FeedStream = ({ questions, loading, user, profile, activeTab, onTabChange,
             />
           ))
         ) : viewMode === 'following' ? (
-          <div className="py-16 text-center space-y-2 bg-[#0f0f0f] border border-white/[0.06] rounded-2xl">
-            <p className="text-white/50 text-sm font-medium font-[Hanken_Grotesk,sans-serif]">No questions from followed topics yet.</p>
+          <div className="py-16 text-center space-y-2 bg-[#10131b] border border-white/[0.06] rounded-none">
+            <p className="text-white/50 text-sm font-medium font-[Outfit,sans-serif]">No questions from followed topics yet.</p>
             <p className="text-white/25 text-xs">Click a topic tag on any question to follow it.</p>
           </div>
         ) : (
-          <div className="py-16 text-center bg-[#0f0f0f] border border-white/[0.06] rounded-2xl">
-            <p className="text-white/30 text-sm font-[Hanken_Grotesk,sans-serif]">No questions found. Be the first to ask!</p>
+          <div className="py-16 text-center bg-[#10131b] border border-white/[0.06] rounded-none">
+            <p className="text-white/30 text-sm font-[Outfit,sans-serif]">No questions found. Be the first to ask!</p>
           </div>
         )}
 
         {hasMore && (
           <button
             onClick={onLoadMore}
-            className="w-full py-2.5 bg-[#0f0f0f] border border-white/[0.06] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] text-white/25 hover:text-white/60 hover:bg-white/[0.04] rounded-2xl transition-all"
+            className="w-full py-2.5 bg-[#10131b] border border-white/[0.06] text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] text-white/25 hover:text-white/60 hover:bg-white/[0.04] rounded-none transition-all"
           >
             Load More
           </button>

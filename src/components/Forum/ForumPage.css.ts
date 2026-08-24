@@ -60,7 +60,7 @@ export const brandButton = style({
   alignItems: 'center',
   gap: '10px',
   padding: '8px 6px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   selectors: {
     '&:hover': {
       background: vars.color.surfaceSoft,
@@ -74,7 +74,7 @@ export const brandMark = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.accentWash,
   border: vars.border.accent,
   color: vars.color.accent,
@@ -93,7 +93,7 @@ export const brandTitle = style({
 export const brandMeta = style({
   display: 'block',
   marginTop: '4px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -116,7 +116,7 @@ export const boardNavItem = style({
   gap: '10px',
   alignItems: 'center',
   padding: '7px 8px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   color: vars.color.textMuted,
   textAlign: 'left',
   selectors: {
@@ -139,7 +139,7 @@ export const boardNavIcon = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surfaceSoft,
   color: vars.color.textSoft,
 });
@@ -163,7 +163,7 @@ globalStyle(`${boardNavText} span:last-child`, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.04em',
   color: vars.color.textFaint,
@@ -171,7 +171,7 @@ globalStyle(`${boardNavText} span:last-child`, {
 
 export const boardSlug = style({
   width: '34px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
   color: vars.color.accent,
 });
@@ -199,7 +199,7 @@ export const mobileBoardChip = style({
   border: vars.border.subtle,
   background: vars.color.surface,
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.04em',
 });
@@ -256,7 +256,7 @@ globalStyle(`${feedHeader} h1`, {
 
 export const kicker = style({
   margin: '0 0 6px !important',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px !important',
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
@@ -281,7 +281,7 @@ globalStyle(`${feedHeaderMeta} span`, {
   border: vars.border.subtle,
   background: vars.color.surface,
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.04em',
   textTransform: 'uppercase',
@@ -290,7 +290,7 @@ globalStyle(`${feedHeaderMeta} span`, {
 export const avatar = style({
   width: '38px',
   height: '38px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   objectFit: 'cover',
   flexShrink: 0,
   display: 'inline-flex',
@@ -299,7 +299,7 @@ export const avatar = style({
   border: vars.border.subtle,
   background: vars.color.surfaceSoft,
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
   overflow: 'hidden',
 });
@@ -325,7 +325,7 @@ export const composerCollapsed = style({
   alignItems: 'center',
   gap: '12px',
   padding: '12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
   color: vars.color.textFaint,
@@ -342,7 +342,7 @@ export const composerCollapsed = style({
 
 export const composer = style({
   padding: '12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
   marginBottom: '12px',
@@ -417,7 +417,7 @@ export const selectWrap = style({
   alignItems: 'center',
   gap: '8px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -425,7 +425,7 @@ export const selectWrap = style({
 
 globalStyle(`${selectWrap} select`, {
   minHeight: '32px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surfaceSoft,
   color: vars.color.text,
@@ -439,7 +439,7 @@ export const identityToggle = style({
   gap: '7px',
   minHeight: '32px',
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -452,7 +452,7 @@ globalStyle(`${identityToggle} input`, {
 export const anonInput = style({
   minHeight: '32px',
   minWidth: '150px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surfaceSoft,
   color: vars.color.text,
@@ -503,7 +503,7 @@ export const feedTab = style({
   borderRadius: '999px',
   border: vars.border.subtle,
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -532,7 +532,7 @@ export const feedCard = style({
   gridTemplateColumns: '38px minmax(0, 1fr)',
   gap: '12px',
   padding: '12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
   transition: 'border-color 160ms ease, background 160ms ease',
@@ -601,7 +601,7 @@ export const boardBadge = style({
   border: vars.border.subtle,
   background: vars.color.surfaceSoft,
   color: vars.color.accent,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
 });
 
@@ -622,7 +622,7 @@ export const stateBadge = style({
   borderRadius: '999px',
   border: vars.border.subtle,
   color: vars.color.warning,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   textTransform: 'uppercase',
 });
@@ -653,12 +653,12 @@ export const feedExcerpt = style({
 });
 
 export const greentext = style({
-  color: '#87c887',
+  color: '#2d8a4e',
 });
 
 export const quoteLink = style({
   color: vars.color.accent,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
 });
 
 export const previewFade = style({
@@ -685,7 +685,7 @@ export const feedAction = style({
   padding: '0 8px',
   borderRadius: '999px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   selectors: {
     '&:hover': {
@@ -716,7 +716,7 @@ export const rightRail = style({
 
 export const sidePanel = style({
   padding: '12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
 });
@@ -728,7 +728,7 @@ export const sidePanelHeader = style({
   gap: '10px',
   marginBottom: '10px',
   color: vars.color.text,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -743,7 +743,7 @@ export const statGrid = style({
 globalStyle(`${statGrid} div`, {
   minHeight: '58px',
   padding: '10px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   background: vars.color.surfaceSoft,
   border: vars.border.subtle,
 });
@@ -759,7 +759,7 @@ globalStyle(`${statGrid} span`, {
   display: 'block',
   marginTop: '6px',
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -778,7 +778,7 @@ export const trendingItem = style({
   flexDirection: 'column',
   gap: '5px',
   padding: '9px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   color: vars.color.textFaint,
   textAlign: 'left',
   selectors: {
@@ -821,7 +821,7 @@ export const backButton = style({
   gap: '8px',
   marginBottom: '12px',
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -834,7 +834,7 @@ export const backButton = style({
 
 export const threadDetailPost = style({
   padding: '14px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
 });
@@ -889,7 +889,7 @@ export const replyComposer = style({
   gap: '12px',
   marginTop: '12px',
   padding: '12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
 });
@@ -927,7 +927,7 @@ export const lockedNotice = style({
   gap: '8px',
   marginTop: '12px',
   padding: '0 12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
   color: vars.color.textMuted,
@@ -955,7 +955,7 @@ globalStyle(`${commentsHeader} h2`, {
 
 globalStyle(`${commentsHeader} span`, {
   color: vars.color.textFaint,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
 });
 
@@ -970,7 +970,7 @@ export const commentCard = style({
   gridTemplateColumns: '38px minmax(0, 1fr)',
   gap: '12px',
   padding: '12px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   border: vars.border.subtle,
   background: vars.color.surface,
 });
@@ -1019,7 +1019,7 @@ export const bottomNav = style({
       gridTemplateColumns: 'repeat(4, 1fr)',
       gap: '4px',
       padding: '6px',
-      borderRadius: '8px',
+      borderRadius: '0px',
       border: vars.border.subtle,
       background: 'rgba(9,9,9,0.94)',
       backdropFilter: 'blur(14px)',
@@ -1036,7 +1036,7 @@ globalStyle(`${bottomNav} button, ${bottomNav} a`, {
   alignItems: 'center',
   justifyContent: 'center',
   gap: '3px',
-  borderRadius: '8px',
+  borderRadius: '0px',
   color: vars.color.textMuted,
   fontSize: '10px',
 });

@@ -25,7 +25,7 @@ export const listView = style({ display: 'flex', flexDirection: 'column', gap: v
 export const card = style({ background: vars.color.surface, border: vars.border.subtle, borderRadius: vars.radius.lg, display: 'flex', flexDirection: 'column', transition: 'border-color 180ms ease', selectors: { '&:hover': { borderColor: vars.color.borderAccent } } });
 export const cardList = style({ background: vars.color.surface, border: vars.border.subtle, borderRadius: vars.radius.lg, display: 'flex', transition: 'border-color 180ms ease', selectors: { '&:hover': { borderColor: vars.color.borderAccent } } });
 export const cardBody = style({ padding: vars.space.md, flex: 1 });
-export const cardCategory = style({ fontFamily: vars.font.mono, fontSize: '11px', letterSpacing: '0.06em', color: vars.color.accent, marginBottom: vars.space.xs });
+export const cardCategory = style({ fontFamily: vars.font.label, fontSize: '11px', letterSpacing: '0.06em', color: vars.color.accent, marginBottom: vars.space.xs });
 export const cardTitle = style({ fontSize: '16px', fontWeight: 600, marginBottom: vars.space.xs });
 export const cardDesc = style({ fontSize: '13px', lineHeight: 1.6, color: vars.color.textSoft, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: vars.space.sm });
 export const cardFooter = style({ padding: vars.space.md, borderTop: vars.border.subtle, marginTop: 'auto' });
@@ -33,9 +33,20 @@ export const analyzeBtn = style({ width: '100%', textAlign: 'center', background
 
 export const backBtn = style({ display: 'inline-flex', alignItems: 'center', padding: `${vars.space.xs} ${vars.space.md}`, background: vars.color.surfaceSoft, color: vars.color.text, borderRadius: vars.radius.md, border: 'none', fontSize: '13px', fontFamily: vars.font.body, cursor: 'pointer', marginBottom: vars.space.lg, transition: 'background 140ms ease', selectors: { '&:hover': { background: vars.color.overlay } } });
 export const readerCard = style({ background: vars.color.surface, border: vars.border.subtle, borderRadius: vars.radius.xl, padding: vars.space.lg });
-export const readerTitle = style({ fontFamily: vars.font.display, fontSize: '30px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: vars.space.xs });
-export const readerCategory = style({ color: vars.color.accent, fontSize: '14px', marginBottom: vars.space.lg });
+export const readerTitle = style({ fontFamily: vars.font.display, fontSize: '34px', fontWeight: 500, letterSpacing: '0.01em', lineHeight: 1.1, marginBottom: vars.space.xs });
+export const readerCategory = style({ fontFamily: vars.font.label, fontSize: '10px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.28em', color: vars.color.accentHover, marginBottom: vars.space.lg });
 export const tabRow = style({ borderBottom: vars.border.subtle, marginBottom: vars.space.lg, display: 'flex', gap: vars.space.xl });
 export const tabBtn = style({ padding: `${vars.space.md} ${vars.space.xxs}`, borderBottom: '2px solid transparent', fontSize: '13px', fontWeight: 500, color: vars.color.textMuted, background: 'none', border: 'none', borderBottomWidth: '2px', borderBottomStyle: 'solid', borderBottomColor: 'transparent', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 140ms ease', fontFamily: vars.font.body, selectors: { '&:hover': { color: vars.color.textSoft, borderBottomColor: vars.color.borderStrong } } });
 export const tabBtnActive = style({ color: vars.color.accent, borderBottomColor: vars.color.accent });
-export const contentPane = style({ background: vars.color.surfaceSoft, padding: vars.space.md, borderRadius: vars.radius.md });
+export const contentPane = style({ background: vars.color.surfaceSoft, padding: vars.space.md, borderRadius: vars.radius.md, selectors: {
+  '& > p:first-of-type::first-letter': {
+    fontFamily: vars.font.display,
+    fontWeight: 600,
+    fontSize: '3.2em',
+    float: 'left',
+    lineHeight: 0.8,
+    paddingRight: '0.14em',
+    paddingTop: '0.06em',
+    color: vars.color.accentHover,
+  },
+} });

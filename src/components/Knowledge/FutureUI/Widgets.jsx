@@ -75,10 +75,10 @@ export const Widgets = ({ userId }) => {
   return (
     <>
       {/* ── Creator Panel ── */}
-      <div className="bg-[#0f0f0f] border border-[rgba(200,30,30,0.22)] rounded-2xl p-4 relative overflow-hidden shadow-[0_0_26px_rgba(200,30,30,0.08)]">
+      <div className="bg-[#10131b] border border-[rgba(179, 18, 46,0.22)] rounded-none p-4 relative overflow-hidden shadow-[0_0_26px_rgba(179, 18, 46,0.08)]">
         <div className="flex justify-between items-center mb-3">
           <div className="flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-[#c81e1e]" />
+            <Cpu className="w-3.5 h-3.5 text-[#b3122e]" />
             <span className="font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.08em] text-white/70">
               Creator · Lvl {levelInfo.level}
             </span>
@@ -87,7 +87,7 @@ export const Widgets = ({ userId }) => {
             <span className={`font-[JetBrains_Mono,monospace] text-[9px] px-1.5 py-0.5 rounded-full ${
               userStats.growth > 0
                 ? 'text-emerald-400 bg-emerald-900/20 border border-emerald-900/30'
-                : 'text-[#c81e1e] bg-[rgba(200,30,30,0.1)] border border-[rgba(200,30,30,0.2)]'
+                : 'text-[#b3122e] bg-[rgba(179, 18, 46,0.1)] border border-[rgba(179, 18, 46,0.2)]'
             }`}>
               {userStats.growth > 0 ? '+' : ''}{userStats.growth}%
             </span>
@@ -102,7 +102,7 @@ export const Widgets = ({ userId }) => {
             </div>
             <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#c81e1e] to-[#e02424] transition-all duration-500"
+                className="h-full bg-[#10131b] from-[#b3122e] to-[#d41f3d] transition-all duration-500"
                 style={{ width: `${levelInfo.progress}%` }}
               />
             </div>
@@ -115,32 +115,32 @@ export const Widgets = ({ userId }) => {
             { label: 'Likes',   val: userStats.likes },
             { label: 'Follows', val: userStats.follows },
           ].map(({ label, val }) => (
-            <div key={label} className="bg-white/[0.03] border border-white/[0.06] p-1.5 text-center rounded-xl">
+            <div key={label} className="bg-white/[0.03] border border-white/[0.06] p-1.5 text-center rounded-none">
               <div className="font-[JetBrains_Mono,monospace] text-[8px] uppercase tracking-wider text-white/25">{label}</div>
-              <div className="font-[Hanken_Grotesk,sans-serif] text-[11px] font-semibold text-white/80 mt-0.5">{formatCount(val)}</div>
+              <div className="font-[Outfit,sans-serif] text-[11px] font-semibold text-white/80 mt-0.5">{formatCount(val)}</div>
             </div>
           ))}
         </div>
 
         <Link href="/profile?tab=dashboard"
-          className="w-full bg-[rgba(200,30,30,0.1)] hover:bg-[rgba(200,30,30,0.18)] text-[#c81e1e] border border-[rgba(200,30,30,0.22)] font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.08em] py-2 rounded-xl transition-all block text-center"
+          className="w-full bg-[rgba(179, 18, 46,0.1)] hover:bg-[rgba(179, 18, 46,0.18)] text-[#b3122e] border border-[rgba(179, 18, 46,0.22)] font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.08em] py-2 rounded-none transition-all block text-center"
         >
           Go to Dashboard
         </Link>
       </div>
 
       {/* ── Trending Questions ── */}
-      <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl overflow-hidden">
+      <div className="bg-[#10131b] border border-white/[0.06] rounded-none overflow-hidden">
         <div className="px-3 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
           <h3 className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-white/50 flex items-center gap-1.5">
-            <TrendingUp className="w-3 h-3 text-[#c81e1e]" /> Trending
+            <TrendingUp className="w-3 h-3 text-[#b3122e]" /> Trending
           </h3>
           <span className="font-[JetBrains_Mono,monospace] text-[8px] uppercase tracking-wider text-white/20">Real-time</span>
         </div>
         <div className="divide-y divide-white/[0.04]">
           {loading ? (
             <div className="py-5 flex justify-center">
-              <div className="w-4 h-4 rounded-full border-2 border-white/[0.08] border-t-[#c81e1e] animate-spin" />
+              <div className="w-4 h-4 rounded-full border-2 border-white/[0.08] border-t-[#b3122e] animate-spin" />
             </div>
           ) : trendingQuestions.length > 0 ? (
             trendingQuestions.map((question, index) => (
@@ -150,12 +150,12 @@ export const Widgets = ({ userId }) => {
                 className="px-3 py-2.5 hover:bg-white/[0.03] flex gap-2.5 group block"
               >
                 <div className={`font-[JetBrains_Mono,monospace] text-[10px] font-bold w-4 shrink-0 mt-0.5 ${
-                  index < 3 ? 'text-[#c81e1e]' : 'text-white/20'
+                  index < 3 ? 'text-[#b3122e]' : 'text-white/20'
                 }`}>
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[12px] font-medium text-white/60 truncate group-hover:text-[#c81e1e] transition-colors font-[Hanken_Grotesk,sans-serif]">
+                  <div className="text-[12px] font-medium text-white/60 truncate group-hover:text-[#b3122e] transition-colors font-[Outfit,sans-serif]">
                     {question.title}
                   </div>
                   <div className="font-[JetBrains_Mono,monospace] text-[8px] text-white/20 flex gap-2 mt-0.5">
@@ -168,7 +168,7 @@ export const Widgets = ({ userId }) => {
               </Link>
             ))
           ) : (
-            <div className="py-5 text-center font-[Hanken_Grotesk,sans-serif] text-[11px] text-white/20">
+            <div className="py-5 text-center font-[Outfit,sans-serif] text-[11px] text-white/20">
               No trending questions yet
             </div>
           )}
@@ -176,7 +176,7 @@ export const Widgets = ({ userId }) => {
       </div>
 
       {/* ── Discover Tags ── */}
-      <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-3">
+      <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-3">
         <h3 className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-white/30 mb-2.5">
           Discover
         </h3>
@@ -184,7 +184,7 @@ export const Widgets = ({ userId }) => {
           {['Marxist Theory', 'Economics', 'History', 'Philosophy', 'Politics', 'Science', 'Technology', 'Ethics'].map(tag => (
             <span
               key={tag}
-              className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider bg-white/[0.04] hover:bg-[rgba(200,30,30,0.08)] hover:border-[rgba(200,30,30,0.2)] hover:text-[#c81e1e] text-white/30 px-2.5 py-1 rounded-full cursor-pointer border border-white/[0.06] transition-all"
+              className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-wider bg-white/[0.04] hover:bg-[rgba(179, 18, 46,0.08)] hover:border-[rgba(179, 18, 46,0.2)] hover:text-[#b3122e] text-white/30 px-2.5 py-1 rounded-full cursor-pointer border border-white/[0.06] transition-all"
             >
               {tag}
             </span>

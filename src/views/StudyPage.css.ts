@@ -12,7 +12,7 @@ export const heroOrbLeft = style({
   left: '-120px',
   width: '320px',
   height: '320px',
-  background: 'radial-gradient(circle, rgba(200,30,30,0.22) 0%, rgba(200,30,30,0.02) 70%)',
+  background: 'radial-gradient(circle, rgba(179, 18, 46,0.22) 0%, rgba(179, 18, 46,0.02) 70%)',
 });
 
 export const heroOrbRight = style({
@@ -28,7 +28,7 @@ export const lowerOrb = style({
   left: '45%',
   width: '300px',
   height: '300px',
-  background: 'radial-gradient(circle, rgba(200,30,30,0.12) 0%, rgba(200,30,30,0.02) 70%)',
+  background: 'radial-gradient(circle, rgba(179, 18, 46,0.12) 0%, rgba(179, 18, 46,0.02) 70%)',
 });
 
 export const hero = style({
@@ -72,7 +72,7 @@ export const heroScrim = style({
 export const heroNoise = style({
   position: 'absolute',
   inset: 0,
-  backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(255,255,255,0.05) 0, transparent 22%), radial-gradient(circle at 80% 10%, rgba(200,30,30,0.08) 0, transparent 18%), radial-gradient(circle at 30% 70%, rgba(255,255,255,0.03) 0, transparent 25%)',
+  backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(255,255,255,0.05) 0, transparent 22%), radial-gradient(circle at 80% 10%, rgba(179, 18, 46,0.08) 0, transparent 18%), radial-gradient(circle at 30% 70%, rgba(255,255,255,0.03) 0, transparent 25%)',
   opacity: 0.5,
 });
 
@@ -114,7 +114,7 @@ export const heroBadge = style({
   background: 'rgba(15,15,15,0.75)',
   boxShadow: vars.shadow.glow,
   color: vars.color.textSoft,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
@@ -123,33 +123,52 @@ export const heroBadge = style({
 export const heroCopy = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: vars.space.lg,
+  alignItems: 'center',
+  textAlign: 'center',
+  gap: vars.space.md,
+  margin: '0 auto',
+});
+
+export const heroKicker = style({
+  margin: 0,
+  fontFamily: vars.font.label,
+  fontSize: '10px',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.32em',
+  color: vars.color.accentHover,
+});
+
+export const heroRule = style({
+  width: '44px',
+  height: '2px',
+  background: vars.color.accent,
 });
 
 export const heroTitle = style({
   margin: 0,
   fontFamily: vars.font.display,
-  fontSize: 'clamp(3.8rem, 8vw, 6.8rem)',
-  lineHeight: 0.9,
-  letterSpacing: '-0.05em',
+  fontSize: 'clamp(40px, 6vw, 64px)',
+  lineHeight: 1.02,
+  letterSpacing: '0.01em',
   fontWeight: 500,
   color: vars.color.text,
   textWrap: 'balance',
 });
 
 export const heroQuote = style({
-  margin: 0,
+  margin: '0 auto',
   fontFamily: vars.font.display,
   fontStyle: 'italic',
-  fontSize: 'clamp(1.4rem, 2vw, 2rem)',
-  lineHeight: 1.2,
+  fontSize: 'clamp(1.25rem, 1.8vw, 1.6rem)',
+  lineHeight: 1.35,
   color: 'rgba(255,255,255,0.86)',
-  maxWidth: '900px',
+  maxWidth: '760px',
 });
 
 export const heroLead = style({
-  margin: 0,
-  maxWidth: '760px',
+  margin: '0 auto',
+  maxWidth: '620px',
   fontSize: '15px',
   lineHeight: 1.85,
   fontWeight: 300,
@@ -218,7 +237,7 @@ export const statCard = style([panelInset, {
 
 export const statLabel = style({
   margin: 0,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   textTransform: 'uppercase',
   letterSpacing: '0.14em',
@@ -299,7 +318,7 @@ export const featureListItem = style([panelInset, {
 
 export const featureItemLabel = style({
   margin: 0,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
@@ -532,7 +551,7 @@ export const lectureVisual = style({
   aspectRatio: '16 / 10',
   borderRadius: vars.radius.lg,
   overflow: 'hidden',
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(200,30,30,0.08) 100%)',
+  background: 'transparent',
   border: vars.border.subtle,
 });
 
@@ -685,7 +704,7 @@ export const playerChapters = style({
 
 export const playerChaptersLabel = style({
   margin: 0,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   textTransform: 'uppercase',
   letterSpacing: '0.1em',

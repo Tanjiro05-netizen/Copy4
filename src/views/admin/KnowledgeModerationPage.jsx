@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import Header from '../../components/Header';
 import { knowledgeApiService } from '../../components/Knowledge/api';
 import { CheckCircle, XCircle, Clock, MessageSquare, HelpCircle, User, Loader2, AlertTriangle, Tag } from 'lucide-react';
 import Link from 'next/link';
@@ -74,8 +73,7 @@ const KnowledgeModerationPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
-            <Header />
-            <main className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
+            <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-3xl font-bold">Knowledge Moderation</h1>
@@ -83,13 +81,13 @@ const KnowledgeModerationPage = () => {
                     </div>
                     <div className="flex items-center gap-3">
                         <Link href="/admin/knowledge/topics"
-                            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-none transition-colors text-sm"
                         >
                             <Tag size={16} /> Manage Topics
                         </Link>
                         <button
                             onClick={fetchPending}
-                            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-none transition-colors"
                         >
                             Refresh
                         </button>
@@ -100,7 +98,7 @@ const KnowledgeModerationPage = () => {
                 <div className="flex gap-4 mb-6 border-b border-gray-700 pb-4">
                     <button
                         onClick={() => setActiveTab('questions')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors ${
                             activeTab === 'questions' 
                                 ? 'bg-red-600 text-white' 
                                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -111,7 +109,7 @@ const KnowledgeModerationPage = () => {
                     </button>
                     <button
                         onClick={() => setActiveTab('answers')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors ${
                             activeTab === 'answers' 
                                 ? 'bg-red-600 text-white' 
                                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -133,13 +131,13 @@ const KnowledgeModerationPage = () => {
                         {activeTab === 'questions' && (
                             <div className="space-y-4">
                                 {pendingQuestions.length === 0 ? (
-                                    <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                                    <div className="text-center py-12 bg-gray-800/50 rounded-none">
                                         <CheckCircle size={48} className="mx-auto text-green-500 mb-3" />
                                         <p className="text-gray-400">No pending questions to review</p>
                                     </div>
                                 ) : (
                                     pendingQuestions.map(question => (
-                                        <div key={question.id} className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
+                                        <div key={question.id} className="bg-gray-800/50 rounded-none p-6 border border-gray-700">
                                             <div className="flex items-start justify-between mb-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
@@ -175,7 +173,7 @@ const KnowledgeModerationPage = () => {
                                                 <button
                                                     onClick={() => handleApproveQuestion(question.id)}
                                                     disabled={actionLoading === question.id}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-none transition-colors disabled:opacity-50"
                                                 >
                                                     {actionLoading === question.id ? (
                                                         <Loader2 className="animate-spin" size={18} />
@@ -187,7 +185,7 @@ const KnowledgeModerationPage = () => {
                                                 <button
                                                     onClick={() => setRejectModal({ type: 'question', id: question.id, title: question.title })}
                                                     disabled={actionLoading === question.id}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-none transition-colors disabled:opacity-50"
                                                 >
                                                     <XCircle size={18} />
                                                     Reject
@@ -203,14 +201,14 @@ const KnowledgeModerationPage = () => {
                         {activeTab === 'answers' && (
                             <div className="space-y-4">
                                 {pendingAnswers.length === 0 ? (
-                                    <div className="text-center py-12 bg-gray-800/50 rounded-lg">
+                                    <div className="text-center py-12 bg-gray-800/50 rounded-none">
                                         <CheckCircle size={48} className="mx-auto text-green-500 mb-3" />
                                         <p className="text-gray-400">No pending answers to review</p>
                                     </div>
                                 ) : (
                                     pendingAnswers.map(answer => (
-                                        <div key={answer.id} className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
-                                            <div className="bg-gray-900/50 rounded-lg p-3 mb-4">
+                                        <div key={answer.id} className="bg-gray-800/50 rounded-none p-6 border border-gray-700">
+                                            <div className="bg-gray-900/50 rounded-none p-3 mb-4">
                                                 <span className="text-sm text-gray-500">Answer to:</span>
                                                 <p className="text-red-400 font-medium">{answer.question?.title || 'Unknown question'}</p>
                                             </div>
@@ -244,7 +242,7 @@ const KnowledgeModerationPage = () => {
                                                 <button
                                                     onClick={() => handleApproveAnswer(answer.id)}
                                                     disabled={actionLoading === answer.id}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-none transition-colors disabled:opacity-50"
                                                 >
                                                     {actionLoading === answer.id ? (
                                                         <Loader2 className="animate-spin" size={18} />
@@ -256,7 +254,7 @@ const KnowledgeModerationPage = () => {
                                                 <button
                                                     onClick={() => setRejectModal({ type: 'answer', id: answer.id, title: 'this answer' })}
                                                     disabled={actionLoading === answer.id}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-none transition-colors disabled:opacity-50"
                                                 >
                                                     <XCircle size={18} />
                                                     Reject
@@ -273,7 +271,7 @@ const KnowledgeModerationPage = () => {
                 {/* Reject Modal */}
                 {rejectModal && (
                     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-                        <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full">
+                        <div className="bg-gray-800 rounded-none p-6 max-w-md w-full">
                             <div className="flex items-center gap-2 mb-4 text-red-400">
                                 <AlertTriangle size={24} />
                                 <h3 className="text-xl font-semibold">Reject {rejectModal.type}</h3>
@@ -285,19 +283,19 @@ const KnowledgeModerationPage = () => {
                                 value={rejectReason}
                                 onChange={(e) => setRejectReason(e.target.value)}
                                 placeholder="Reason for rejection (optional)..."
-                                className="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg text-white mb-4 min-h-[100px]"
+                                className="w-full p-3 bg-gray-900 border border-gray-700 rounded-none text-white mb-4 min-h-[100px]"
                             />
                             <div className="flex gap-3">
                                 <button
                                     onClick={rejectModal.type === 'question' ? handleRejectQuestion : handleRejectAnswer}
                                     disabled={actionLoading}
-                                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-none transition-colors disabled:opacity-50"
                                 >
                                     Confirm Reject
                                 </button>
                                 <button
                                     onClick={() => { setRejectModal(null); setRejectReason(''); }}
-                                    className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                                    className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-none transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -305,7 +303,7 @@ const KnowledgeModerationPage = () => {
                         </div>
                     </div>
                 )}
-            </main>
+            </div>
         </div>
     );
 };

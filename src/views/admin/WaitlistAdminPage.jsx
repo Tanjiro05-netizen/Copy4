@@ -134,7 +134,7 @@ const WaitlistAdminPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-white px-4 py-8">
+        <div className="min-h-screen bg-[#0b0d12] text-white px-4 py-8">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-6">
@@ -146,13 +146,13 @@ const WaitlistAdminPage = () => {
 
                 {/* Alerts */}
                 {error && (
-                    <div className="mb-4 bg-red-900/30 border border-red-700 rounded-xl px-4 py-3 flex items-start gap-2">
+                    <div className="mb-4 bg-red-900/30 border border-red-700 rounded-none px-4 py-3 flex items-start gap-2">
                         <AlertTriangle size={16} className="text-red-400 mt-0.5 shrink-0" />
                         <p className="text-sm text-red-300">{error}</p>
                     </div>
                 )}
                 {success && (
-                    <div className="mb-4 bg-green-900/30 border border-green-700 rounded-xl px-4 py-3 flex items-start gap-2">
+                    <div className="mb-4 bg-green-900/30 border border-green-700 rounded-none px-4 py-3 flex items-start gap-2">
                         <CheckCircle size={16} className="text-green-400 mt-0.5 shrink-0" />
                         <p className="text-sm text-green-300">{success}</p>
                     </div>
@@ -160,19 +160,19 @@ const WaitlistAdminPage = () => {
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-[#181A23] border border-gray-800 rounded-2xl p-4">
+                    <div className="bg-[#1a1f2b] border border-gray-800 rounded-none p-4">
                         <div className="flex items-center gap-2 text-gray-400 text-xs uppercase tracking-wide mb-2">
                             <Users size={14} /> Total Subscribers
                         </div>
                         <p className="text-2xl font-bold text-white">{subscribers.length}</p>
                     </div>
-                    <div className="bg-[#181A23] border border-gray-800 rounded-2xl p-4">
+                    <div className="bg-[#1a1f2b] border border-gray-800 rounded-none p-4">
                         <div className="flex items-center gap-2 text-gray-400 text-xs uppercase tracking-wide mb-2">
                             <Clock size={14} /> Last 7 Days
                         </div>
                         <p className="text-2xl font-bold text-white">{recentCount}</p>
                     </div>
-                    <div className="bg-[#181A23] border border-gray-800 rounded-2xl p-4">
+                    <div className="bg-[#1a1f2b] border border-gray-800 rounded-none p-4">
                         <div className="flex items-center gap-2 text-gray-400 text-xs uppercase tracking-wide mb-2">
                             <Mail size={14} /> Notify Preferences
                         </div>
@@ -185,7 +185,7 @@ const WaitlistAdminPage = () => {
                 </div>
 
                 {/* Broadcast Composer */}
-                <section className="mb-6 bg-[#181A23] border border-gray-800 rounded-2xl p-5">
+                <section className="mb-6 bg-[#1a1f2b] border border-gray-800 rounded-none p-5">
                     <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300 mb-4 flex items-center gap-2">
                         <Send size={16} /> Broadcast Email
                     </h2>
@@ -198,7 +198,7 @@ const WaitlistAdminPage = () => {
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
                                 placeholder="e.g. Marxist.info — Invite Codes Now Available"
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-gray-600"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-4 py-2.5 text-white text-sm placeholder:text-gray-600"
                             />
                         </div>
 
@@ -211,7 +211,7 @@ const WaitlistAdminPage = () => {
                                 onChange={(e) => setHtmlBody(e.target.value)}
                                 rows={10}
                                 placeholder={`<h2>Great news, comrade!</h2>\n<p>Invite codes are now available...</p>\n<p><a href="https://marxist.info/login">Claim your spot →</a></p>`}
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-xl px-4 py-3 text-white text-sm font-mono placeholder:text-gray-600 resize-y"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-4 py-3 text-white text-sm font-mono placeholder:text-gray-600 resize-y"
                             />
                         </div>
 
@@ -220,7 +220,7 @@ const WaitlistAdminPage = () => {
                                 type="button"
                                 onClick={() => setShowPreview(!showPreview)}
                                 disabled={!htmlBody.trim()}
-                                className="px-4 py-2 rounded-lg text-sm bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-4 py-2 rounded-none text-sm bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 {showPreview ? 'Hide Preview' : 'Preview'}
                             </button>
@@ -229,7 +229,7 @@ const WaitlistAdminPage = () => {
                                 type="button"
                                 onClick={handleBroadcast}
                                 disabled={sending || !subject.trim() || !htmlBody.trim() || subscribers.length === 0}
-                                className="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+                                className="inline-flex items-center gap-2 px-5 py-2 rounded-none text-sm font-medium bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
                             >
                                 {sending ? (
                                     <>
@@ -246,7 +246,7 @@ const WaitlistAdminPage = () => {
                         </div>
 
                         {showPreview && htmlBody.trim() && (
-                            <div className="mt-4 bg-[#0a0a0f] border border-gray-700 rounded-xl overflow-hidden">
+                            <div className="mt-4 bg-[#0b0d12] border border-gray-700 rounded-none overflow-hidden">
                                 <div className="px-4 py-2 border-b border-gray-700 text-xs text-gray-400 uppercase tracking-wide">
                                     Email Preview
                                 </div>
@@ -261,7 +261,7 @@ const WaitlistAdminPage = () => {
                 </section>
 
                 {/* Subscriber Table */}
-                <section className="bg-[#181A23] border border-gray-800 rounded-2xl p-5">
+                <section className="bg-[#1a1f2b] border border-gray-800 rounded-none p-5">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                         <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300 flex items-center gap-2">
                             <Users size={16} /> Subscribers ({filteredSubscribers.length})
@@ -274,14 +274,14 @@ const WaitlistAdminPage = () => {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Search emails..."
-                                    className="bg-[#0F1118] border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white w-64 placeholder:text-gray-600"
+                                    className="bg-[#10131b] border border-gray-700 rounded-none pl-9 pr-3 py-2 text-sm text-white w-64 placeholder:text-gray-600"
                                 />
                             </div>
                             <button
                                 type="button"
                                 onClick={fetchSubscribers}
                                 disabled={loading}
-                                className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                                className="p-2 rounded-none bg-gray-800 hover:bg-gray-700 disabled:opacity-50 transition-colors"
                                 title="Refresh"
                             >
                                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -312,7 +312,7 @@ const WaitlistAdminPage = () => {
                                 </thead>
                                 <tbody>
                                     {filteredSubscribers.map((sub) => (
-                                        <tr key={sub.id} className="border-b border-gray-800/50 hover:bg-[#0F1118] transition-colors">
+                                        <tr key={sub.id} className="border-b border-gray-800/50 hover:bg-[#10131b] transition-colors">
                                             <td className="py-3 pr-4">
                                                 <span className="text-white font-mono text-xs">{sub.email}</span>
                                             </td>
@@ -334,7 +334,7 @@ const WaitlistAdminPage = () => {
                                                     type="button"
                                                     onClick={() => handleDelete(sub.id)}
                                                     disabled={deletingId === sub.id}
-                                                    className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors"
+                                                    className="p-1.5 rounded-none text-gray-500 hover:text-red-400 hover:bg-red-900/20 disabled:opacity-50 transition-colors"
                                                     title="Remove from waitlist"
                                                 >
                                                     {deletingId === sub.id ? (

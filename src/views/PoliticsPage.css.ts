@@ -11,7 +11,7 @@ export const headerRow = style({ display: 'flex', alignItems: 'flex-end', justif
 export const pageTitle = style({ fontFamily: vars.font.display, fontSize: '48px', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: 0, '@media': { 'screen and (max-width: 640px)': { fontSize: '36px' } } });
 export const pageTitleIcon = style({ marginRight: vars.space.sm, color: vars.color.accent });
 export const subtitle = style({ margin: `${vars.space.sm} 0 0`, fontSize: '14px', lineHeight: 1.7, color: vars.color.textMuted, maxWidth: '600px' });
-export const countBadge = style({ fontFamily: vars.font.mono, fontSize: '11px', letterSpacing: '0.06em', color: vars.color.textFaint, whiteSpace: 'nowrap' });
+export const countBadge = style({ fontFamily: vars.font.label, fontSize: '11px', letterSpacing: '0.06em', color: vars.color.textFaint, whiteSpace: 'nowrap' });
 
 /* ── Toolbar ── */
 export const toolbar = style({ display: 'flex', flexDirection: 'column', gap: vars.space.md, marginBottom: vars.space.xl });
@@ -28,10 +28,10 @@ export const featured = style({ display: 'grid', gridTemplateColumns: '1fr', gap
 export const featuredImage = style({ width: '100%', height: '240px', objectFit: 'cover', '@media': { 'screen and (min-width: 768px)': { height: '100%', minHeight: '320px' } } });
 export const featuredImageFallback = style({ width: '100%', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${vars.color.surfaceSoft}, ${vars.color.surface})`, color: vars.color.textFaint, '@media': { 'screen and (min-width: 768px)': { height: '100%', minHeight: '320px' } } });
 export const featuredBody = style({ padding: vars.space.lg, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: vars.space.sm });
-export const featuredBadge = style({ fontFamily: vars.font.mono, fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: vars.color.accent });
+export const featuredBadge = style({ fontFamily: vars.font.label, fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: vars.color.accent });
 export const featuredTitle = style({ fontFamily: vars.font.display, fontSize: '30px', fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1.15, margin: 0, '@media': { 'screen and (max-width: 640px)': { fontSize: '24px' } } });
 export const featuredExcerpt = style({ fontSize: '14px', lineHeight: 1.75, color: vars.color.textSoft, margin: 0 });
-export const featuredMeta = style({ display: 'flex', alignItems: 'center', gap: vars.space.md, fontSize: '12px', color: vars.color.textFaint, fontFamily: vars.font.mono, letterSpacing: '0.04em' });
+export const featuredMeta = style({ display: 'flex', alignItems: 'center', gap: vars.space.md, fontSize: '12px', color: vars.color.textFaint, fontFamily: vars.font.label, letterSpacing: '0.04em' });
 export const featuredLink = style({ display: 'inline-flex', alignItems: 'center', gap: vars.space.xs, color: vars.color.accent, fontSize: '13px', fontWeight: 600, marginTop: vars.space.xs, transition: 'color 140ms ease', selectors: { '&:hover': { color: vars.color.accentHover } } });
 
 /* ── Card grid ── */
@@ -40,11 +40,11 @@ export const card = style({ background: vars.color.surface, border: vars.border.
 export const cardImage = style({ width: '100%', height: '180px', objectFit: 'cover' });
 export const cardImageFallback = style({ width: '100%', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: vars.color.surfaceSoft, color: vars.color.textFaint });
 export const cardBody = style({ padding: vars.space.md, flex: 1, display: 'flex', flexDirection: 'column', gap: vars.space.xs });
-export const cardBadge = style({ fontFamily: vars.font.mono, fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: vars.color.accent });
+export const cardBadge = style({ fontFamily: vars.font.label, fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: vars.color.accent });
 export const cardTitle = style({ fontSize: '16px', fontWeight: 600, lineHeight: 1.3, margin: 0 });
 export const cardExcerpt = style({ fontSize: '13px', lineHeight: 1.6, color: vars.color.textSoft, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 });
 export const cardFooter = style({ padding: `${vars.space.sm} ${vars.space.md}`, borderTop: vars.border.subtle, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' });
-export const cardMeta = style({ fontSize: '11px', color: vars.color.textFaint, fontFamily: vars.font.mono, letterSpacing: '0.04em' });
+export const cardMeta = style({ fontSize: '11px', color: vars.color.textFaint, fontFamily: vars.font.label, letterSpacing: '0.04em' });
 export const cardLink = style({ display: 'inline-flex', alignItems: 'center', gap: '4px', color: vars.color.accent, fontSize: '12px', fontWeight: 600, transition: 'color 140ms ease', selectors: { '&:hover': { color: vars.color.accentHover } } });
 
 /* ── States ── */

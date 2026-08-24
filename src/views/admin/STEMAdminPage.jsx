@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../supabaseClient';
-import Header from '../../components/Header';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -879,9 +878,8 @@ const STEMAdminPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#12131A]">
-      <Header />
-      <div className="pt-20 px-4 pb-8">
+    <div className="min-h-screen bg-[#0b0d12]">
+      <div className="py-8 px-4">
         <div className="container mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -896,7 +894,7 @@ const STEMAdminPage = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg font-medium capitalize transition-colors ${
+                className={`px-4 py-2 rounded-none font-medium capitalize transition-colors ${
                   activeTab === tab
                     ? 'bg-red-600 text-white'
                     : 'bg-black/30 text-gray-400 hover:bg-black/50'
@@ -918,7 +916,7 @@ const STEMAdminPage = () => {
                       setEditingItem(null);
                       setShowCourseModal(true);
                     }}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-none transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     New
@@ -935,7 +933,7 @@ const STEMAdminPage = () => {
                       <div
                         key={course.id}
                         onClick={() => setSelectedCourse(course)}
-                        className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                        className={`p-4 rounded-none border cursor-pointer transition-all ${
                           selectedCourse?.id === course.id
                             ? 'bg-red-900/20 border-red-500/50'
                             : 'bg-black/40 border-red-900/30 hover:border-red-500/30'
@@ -1000,7 +998,7 @@ const STEMAdminPage = () => {
               {/* Chapter & Lesson Editor */}
               <div className="lg:col-span-2">
                 {selectedCourse ? (
-                  <div className="bg-black/40 rounded-xl border border-red-900/30 p-6">
+                  <div className="bg-black/40 rounded-none border border-red-900/30 p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
                         <h2 className="text-xl font-bold text-white">{selectedCourse.title}</h2>
@@ -1011,7 +1009,7 @@ const STEMAdminPage = () => {
                           setEditingItem(null);
                           setShowChapterModal(true);
                         }}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-none transition-colors"
                       >
                         <Plus className="w-4 h-4" />
                         Add Chapter
@@ -1037,7 +1035,7 @@ const STEMAdminPage = () => {
                             setEditingItem(null);
                             setShowChapterModal(true);
                           }}
-                          className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors"
+                          className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-none transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                           Add First Chapter
@@ -1048,7 +1046,7 @@ const STEMAdminPage = () => {
                         {chapters.map((chapter, chIdx) => (
                           <div
                             key={chapter.id}
-                            className="bg-black/30 rounded-lg border border-gray-800 overflow-hidden"
+                            className="bg-black/30 rounded-none border border-gray-800 overflow-hidden"
                           >
                             {/* Chapter Header */}
                             <div className="flex items-center gap-3 p-4">
@@ -1108,7 +1106,7 @@ const STEMAdminPage = () => {
                                     return (
                                       <div
                                         key={lesson.id}
-                                        className="flex items-center gap-3 p-2 bg-black/20 rounded-lg"
+                                        className="flex items-center gap-3 p-2 bg-black/20 rounded-none"
                                       >
                                         <Icon className="w-4 h-4 text-gray-500" />
                                         <span className="text-gray-300 text-sm flex-1">
@@ -1142,7 +1140,7 @@ const STEMAdminPage = () => {
                                 </div>
                                 {/* Exercise list inline */}
                                 {showExerciseList && chapter.stem_lessons?.some(l => l.id === showExerciseList) && (
-                                  <div className="mt-3 p-3 bg-yellow-900/10 border border-yellow-900/30 rounded-lg">
+                                  <div className="mt-3 p-3 bg-yellow-900/10 border border-yellow-900/30 rounded-none">
                                     <div className="flex items-center justify-between mb-2">
                                       <h4 className="text-yellow-400 text-sm font-medium">Exercises for: {chapter.stem_lessons.find(l => l.id === showExerciseList)?.title}</h4>
                                       <div className="flex items-center gap-2">
@@ -1209,7 +1207,7 @@ const STEMAdminPage = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="bg-black/40 rounded-xl border border-red-900/30 p-12 text-center">
+                  <div className="bg-black/40 rounded-none border border-red-900/30 p-12 text-center">
                     <BookOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                     <p className="text-gray-400">Select a course to manage its content</p>
                   </div>
@@ -1545,7 +1543,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1b23] rounded-xl border border-red-900/30 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#1a1f2b] rounded-none border border-red-900/30 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <div>
             <h3 className="text-lg font-bold text-white">
@@ -1566,7 +1564,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               required
             />
           </div>
@@ -1577,7 +1575,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
               value={formData.slug}
               onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
               placeholder="auto-generated-from-title"
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div>
@@ -1585,7 +1583,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
             <select
               value={formData.subject_id}
               onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               required
             >
               <option value="">Select subject...</option>
@@ -1600,7 +1598,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -1609,7 +1607,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
               <select
                 value={formData.difficulty}
                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -1622,7 +1620,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
                 type="number"
                 value={formData.estimated_hours}
                 onChange={(e) => setFormData({ ...formData, estimated_hours: e.target.value })}
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               />
             </div>
           </div>
@@ -1633,7 +1631,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
               onChange={(e) => setFormData({ ...formData, what_youll_learn: e.target.value })}
               rows={4}
               placeholder="Learn concept A&#10;Master skill B&#10;Understand topic C"
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none"
             />
           </div>
           {saveError && (
@@ -1652,7 +1650,7 @@ const CourseModal = ({ course, subjects, onClose, onSave }) => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-none transition-colors disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save Course Details'}
             </button>
@@ -1697,7 +1695,7 @@ const ChapterModal = ({ chapter, courseId, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1b23] rounded-xl border border-red-900/30 w-full max-w-md">
+      <div className="bg-[#1a1f2b] rounded-none border border-red-900/30 w-full max-w-md">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h3 className="text-lg font-bold text-white">
             {chapter?.id ? 'Edit Chapter' : 'New Chapter'}
@@ -1713,7 +1711,7 @@ const ChapterModal = ({ chapter, courseId, onClose, onSave }) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               required
             />
           </div>
@@ -1723,7 +1721,7 @@ const ChapterModal = ({ chapter, courseId, onClose, onSave }) => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={2}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
@@ -1733,7 +1731,7 @@ const ChapterModal = ({ chapter, courseId, onClose, onSave }) => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-none disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
@@ -1802,7 +1800,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1b23] rounded-xl border border-red-900/30 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#1a1f2b] rounded-none border border-red-900/30 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h3 className="text-lg font-bold text-white">
             {lesson?.id ? 'Edit Lesson' : 'New Lesson'}
@@ -1811,7 +1809,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
-              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+              className={`px-3 py-1 text-sm rounded-none transition-colors ${
                 showPreview ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400 hover:text-white'
               }`}
             >
@@ -1830,7 +1828,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
                 required
               />
             </div>
@@ -1839,7 +1837,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
               <select
                 value={formData.lesson_type}
                 onChange={(e) => setFormData({ ...formData, lesson_type: e.target.value })}
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               >
                 <option value="reading">Reading</option>
                 <option value="video">Video</option>
@@ -1854,7 +1852,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
               type="text"
               value={formData.summary}
               onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div>
@@ -1864,7 +1862,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
               value={formData.video_url}
               onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
               placeholder="https://youtube.com/watch?v=... or direct URL"
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div>
@@ -1899,10 +1897,10 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 rows={16}
                 placeholder="## Lesson Title&#10;&#10;Your lesson content in Markdown..."
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none font-mono text-sm"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none font-mono text-sm"
               />
               {showPreview && (
-                <div className="bg-black/40 rounded-lg p-4 border border-gray-700 overflow-y-auto max-h-[400px]">
+                <div className="bg-black/40 rounded-none p-4 border border-gray-700 overflow-y-auto max-h-[400px]">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm, remarkMath]}
                     rehypePlugins={[rehypeKatex]}
@@ -1916,7 +1914,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
                       li: ({children}) => <li className="text-gray-300">{children}</li>,
                       code: ({inline, children}) => inline
                         ? <code className="bg-red-900/30 px-1.5 py-0.5 rounded text-red-300 text-sm">{children}</code>
-                        : <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto"><code className="text-gray-300 text-sm">{children}</code></pre>,
+                        : <pre className="bg-black/50 p-4 rounded-none overflow-x-auto"><code className="text-gray-300 text-sm">{children}</code></pre>,
                       blockquote: ({children}) => <blockquote className="border-l-4 border-red-500 pl-4 italic text-gray-400">{children}</blockquote>,
                       strong: ({children}) => <strong className="text-white font-semibold">{children}</strong>,
                       em: ({children}) => <em className="text-gray-200">{children}</em>,
@@ -1937,7 +1935,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
               type="number"
               value={formData.xp_reward}
               onChange={(e) => setFormData({ ...formData, xp_reward: e.target.value })}
-              className="w-24 px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-24 px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
@@ -1947,7 +1945,7 @@ const LessonModal = ({ lesson, onClose, onSave }) => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-none disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save Lesson'}
             </button>
@@ -2003,7 +2001,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1b23] rounded-xl border border-red-900/30 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#1a1f2b] rounded-none border border-red-900/30 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h3 className="text-lg font-bold text-white">
             {exercise?.id ? 'Edit Exercise' : 'New Exercise'}
@@ -2019,7 +2017,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
               <select
                 value={formData.exercise_type}
                 onChange={(e) => setFormData({ ...formData, exercise_type: e.target.value })}
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               >
                 <option value="multiple_choice">Multiple Choice</option>
                 <option value="numeric">Numeric</option>
@@ -2032,7 +2030,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
                 type="number"
                 value={formData.order_index}
                 onChange={(e) => setFormData({ ...formData, order_index: e.target.value })}
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               />
             </div>
           </div>
@@ -2042,7 +2040,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
               value={formData.question}
               onChange={(e) => setFormData({ ...formData, question: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none"
               required
             />
           </div>
@@ -2054,7 +2052,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
                 onChange={(e) => setFormData({ ...formData, options: e.target.value })}
                 rows={4}
                 placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"
-                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none"
+                className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none"
               />
             </div>
           )}
@@ -2066,7 +2064,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
               type="text"
               value={formData.correct_answer}
               onChange={(e) => setFormData({ ...formData, correct_answer: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               required
             />
           </div>
@@ -2076,7 +2074,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
               type="text"
               value={formData.hint}
               onChange={(e) => setFormData({ ...formData, hint: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div>
@@ -2085,7 +2083,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
               value={formData.explanation}
               onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
               rows={2}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none resize-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none resize-none"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
@@ -2095,7 +2093,7 @@ const ExerciseModal = ({ exercise, onClose, onSave }) => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-none disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save Exercise'}
             </button>
@@ -2203,7 +2201,7 @@ const ChapterTestModal = ({ chapter, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1b23] rounded-xl border border-red-900/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-[#1a1f2b] rounded-none border border-red-900/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h3 className="text-lg font-bold text-white">Chapter Test: {chapter.title}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
@@ -2219,7 +2217,7 @@ const ChapterTestModal = ({ chapter, onClose, onSave }) => {
               <button
                 onClick={createTest}
                 disabled={isSaving}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-50"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-none disabled:opacity-50"
               >
                 {isSaving ? 'Creating...' : 'Create Chapter Test'}
               </button>
@@ -2236,7 +2234,7 @@ const ChapterTestModal = ({ chapter, onClose, onSave }) => {
                     setEditingQuestion(null);
                     setShowQuestionForm(true);
                   }}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-none"
                 >
                   <Plus className="w-4 h-4" />
                   Add Question
@@ -2244,7 +2242,7 @@ const ChapterTestModal = ({ chapter, onClose, onSave }) => {
               </div>
 
               {questions.map((q, qIdx) => (
-                <div key={q.id} className="p-3 bg-black/30 rounded-lg border border-gray-800">
+                <div key={q.id} className="p-3 bg-black/30 rounded-none border border-gray-800">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <span className="text-gray-500 text-xs">{qIdx + 1}. ({q.question_type.replace('_', ' ')}) — {q.points} pt{q.points !== 1 ? 's' : ''}</span>
@@ -2308,13 +2306,13 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
   });
 
   return (
-    <div className="p-4 bg-purple-900/10 border border-purple-900/30 rounded-lg space-y-3">
+    <div className="p-4 bg-purple-900/10 border border-purple-900/30 rounded-none space-y-3">
       <h4 className="text-purple-400 text-sm font-medium">{question?.id ? 'Edit Question' : 'New Question'}</h4>
       <div className="grid grid-cols-3 gap-3">
         <select
           value={formData.question_type}
           onChange={(e) => setFormData({ ...formData, question_type: e.target.value })}
-          className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+          className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
         >
           <option value="multiple_choice">Multiple Choice</option>
           <option value="true_false">True/False</option>
@@ -2325,14 +2323,14 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
           value={formData.points}
           onChange={(e) => setFormData({ ...formData, points: e.target.value })}
           placeholder="Points"
-          className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+          className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
         />
         <input
           type="number"
           value={formData.order_index}
           onChange={(e) => setFormData({ ...formData, order_index: e.target.value })}
           placeholder="Order"
-          className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+          className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
         />
       </div>
       <textarea
@@ -2340,7 +2338,7 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
         onChange={(e) => setFormData({ ...formData, question: e.target.value })}
         rows={2}
         placeholder="Question text..."
-        className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-none"
+        className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-none"
         required
       />
       {formData.question_type === 'multiple_choice' && (
@@ -2349,7 +2347,7 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
           onChange={(e) => setFormData({ ...formData, options: e.target.value })}
           rows={3}
           placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"
-          className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-none"
+          className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-none"
         />
       )}
       <input
@@ -2357,7 +2355,7 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
         value={formData.correct_answer}
         onChange={(e) => setFormData({ ...formData, correct_answer: e.target.value })}
         placeholder="Correct answer"
-        className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+        className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
         required
       />
       <input
@@ -2365,7 +2363,7 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
         value={formData.explanation}
         onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
         placeholder="Explanation (optional)"
-        className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+        className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
       />
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel} className="px-3 py-1.5 text-gray-400 hover:text-white text-sm">
@@ -2375,7 +2373,7 @@ const TestQuestionForm = ({ question, onSave, onCancel, isSaving }) => {
           type="button"
           onClick={() => onSave(formData)}
           disabled={isSaving || !formData.question || !formData.correct_answer}
-          className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg disabled:opacity-50"
+          className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-none disabled:opacity-50"
         >
           {isSaving ? 'Saving...' : 'Save Question'}
         </button>
@@ -2443,7 +2441,7 @@ const TextbookManager = () => {
             setEditingItem(null);
             setShowModal(true);
           }}
-          className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg"
+          className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm rounded-none"
         >
           <Plus className="w-4 h-4" />
           Upload Textbook
@@ -2459,7 +2457,7 @@ const TextbookManager = () => {
           {textbooks.map((book) => (
             <div
               key={book.id}
-              className="bg-black/40 rounded-lg border border-red-900/30 p-4"
+              className="bg-black/40 rounded-none border border-red-900/30 p-4"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -2552,7 +2550,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1b23] rounded-xl border border-red-900/30 w-full max-w-md">
+      <div className="bg-[#1a1f2b] rounded-none border border-red-900/30 w-full max-w-md">
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           <h3 className="text-lg font-bold text-white">
             {textbook ? 'Edit Textbook' : 'Upload Textbook'}
@@ -2568,7 +2566,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               required
             />
           </div>
@@ -2578,7 +2576,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
               type="text"
               value={formData.author}
               onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div>
@@ -2586,7 +2584,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
             <select
               value={formData.subject_id}
               onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             >
               <option value="">Select subject...</option>
               {subjects.map((s) => (
@@ -2601,7 +2599,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
               value={formData.file_url}
               onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
               placeholder="https://..."
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
               required
             />
           </div>
@@ -2611,7 +2609,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
               type="text"
               value={formData.cover_url}
               onChange={(e) => setFormData({ ...formData, cover_url: e.target.value })}
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div>
@@ -2620,7 +2618,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
               type="number"
               value={formData.page_count}
               onChange={(e) => setFormData({ ...formData, page_count: e.target.value })}
-              className="w-24 px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white focus:border-red-500 focus:outline-none"
+              className="w-24 px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white focus:border-red-500 focus:outline-none"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
@@ -2630,7 +2628,7 @@ const TextbookModal = ({ textbook, subjects, onClose, onSave }) => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-none disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
@@ -2753,7 +2751,7 @@ const AnalyticsDashboard = () => {
           { label: 'Tests Passed', value: stats?.testsPassed, color: 'text-emerald-400', border: 'border-emerald-900/30' },
           { label: 'Pass Rate', value: `${stats?.passRate}%`, color: 'text-orange-400', border: 'border-orange-900/30' },
         ].map((card, idx) => (
-          <div key={idx} className={`bg-black/40 rounded-lg p-4 border ${card.border}`}>
+          <div key={idx} className={`bg-black/40 rounded-none p-4 border ${card.border}`}>
             <p className="text-gray-500 text-xs mb-1">{card.label}</p>
             <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
           </div>
@@ -2761,7 +2759,7 @@ const AnalyticsDashboard = () => {
       </div>
 
       {/* Per-Course Table */}
-      <div className="bg-black/40 rounded-xl border border-red-900/30 overflow-hidden">
+      <div className="bg-black/40 rounded-none border border-red-900/30 overflow-hidden">
         <div className="p-4 border-b border-gray-800">
           <h3 className="text-lg font-bold text-white">Course Performance</h3>
         </div>

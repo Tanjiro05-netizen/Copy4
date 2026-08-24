@@ -23,7 +23,7 @@ export const card = style({ background: vars.color.surface, border: vars.border.
 export const cardHeader = style({ display: 'flex', alignItems: 'center', gap: vars.space.md, marginBottom: vars.space.lg });
 export const cardIconWrap = style({ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(200,134,10,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: vars.color.warning });
 export const cardTitle = style({ fontFamily: vars.font.display, fontSize: '20px', fontWeight: 600 });
-export const cardNumber = style({ fontFamily: vars.font.mono, fontSize: '12px', color: vars.color.textFaint });
+export const cardNumber = style({ fontFamily: vars.font.label, fontSize: '12px', color: vars.color.textFaint });
 
 export const detailStack = style({ display: 'flex', flexDirection: 'column', gap: vars.space.md });
 export const detailRow = style({ display: 'flex', alignItems: 'flex-start', gap: vars.space.sm });

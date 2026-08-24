@@ -28,7 +28,7 @@ const EconomicVisualization = () => {
     return (
         <div className="h-full flex flex-col p-4">
             {/* Control Panel */}
-            <div className="flex flex-wrap gap-4 mb-6 p-4 bg-black/20 rounded-lg">
+            <div className="flex flex-wrap gap-4 mb-6 p-4 bg-black/20 rounded-none">
                 {/* Add Country Selector before Chart Type Selector */}
                 <select
                     value={selectedCountry}
@@ -109,7 +109,7 @@ const EconomicVisualization = () => {
             </div>
 
             {/* Visualization Area */}
-            <div className="flex-1 bg-black/20 rounded-lg p-6">
+            <div className="flex-1 bg-black/20 rounded-none p-6">
                 <div className="h-full flex items-center justify-center">
                     <div className="text-gray-400">
                         Chart visualization will be implemented here using D3.js or Chart.js
@@ -119,15 +119,15 @@ const EconomicVisualization = () => {
 
             {/* Data Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                <div className="bg-black/20 p-4 rounded-lg">
+                <div className="bg-black/20 p-4 rounded-none">
                     <div className="text-sm text-gray-400">Current Value</div>
                     <div className="text-xl text-white mt-1">$24.5T</div>
                 </div>
-                <div className="bg-black/20 p-4 rounded-lg">
+                <div className="bg-black/20 p-4 rounded-none">
                     <div className="text-sm text-gray-400">YoY Change</div>
                     <div className="text-xl text-red-400 mt-1">-2.3%</div>
                 </div>
-                <div className="bg-black/20 p-4 rounded-lg">
+                <div className="bg-black/20 p-4 rounded-none">
                     <div className="text-sm text-gray-400">5Y Average</div>
                     <div className="text-xl text-white mt-1">1.8%</div>
                 </div>

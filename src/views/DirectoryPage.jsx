@@ -7,6 +7,7 @@ import ConceptMapper from '../components/AIFeatures/ConceptMapper';
 import Bibliography from '../components/AIFeatures/Bibliography';
 import CrossReferences from '../components/AIFeatures/CrossReferences';
 import MarxistGlossary from '../components/AIFeatures/MarxistGlossary';
+import PageHeader from '../components/PageHeader';
 import * as s from './DirectoryPage.css.ts';
 
 const RealisticGlobe = dynamic(() => import('../components/Globe/RealisticGlobe'), {
@@ -58,7 +59,11 @@ const DirectoryPage = () => {
     return (
         <div className={s.page}>
             <main className={s.main}>
-                <h1 className={s.pageTitle}>Research Directory</h1>
+                <PageHeader
+                    kicker="Community"
+                    title="Research Directory"
+                    note="Browse and connect with other members of the platform."
+                />
                 
                 <div className={s.layout}>
                     <div className={s.sidebar}>

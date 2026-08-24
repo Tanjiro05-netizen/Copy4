@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import Header from '../components/Header';
 import { gradeScienceQuestion } from '../components/ScienceTechV2/ScienceBlockRenderer';
 import {
   fetchScienceCheckpoint,
@@ -143,32 +142,29 @@ const ChapterTestPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <div className="pt-24 text-center text-gray-400">Loading checkpoint...</div>
+      <div className="min-h-screen bg-[#0b0d12]">
+        <div className="py-24 text-center text-gray-400">Loading checkpoint...</div>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <main className="pt-24 px-4 text-center">
+      <div className="min-h-screen bg-[#0b0d12]">
+        <div className="py-24 px-4 text-center">
           <p className="text-red-300">{error || 'Checkpoint not found.'}</p>
           <Link href={`/science-tech/courses/${courseSlug}`} className="mt-4 inline-flex text-red-400 hover:text-red-300">
             Back to course
           </Link>
-        </main>
+        </div>
       </div>
     );
   }
 
   if (!selectedQuiz || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-[#12131A]">
-        <Header />
-        <main className="pt-24 px-4">
+      <div className="min-h-screen bg-[#0b0d12]">
+        <div className="py-24 px-4">
           <div className="mx-auto max-w-3xl border border-gray-800 bg-black/35 p-8 text-center">
             <HelpCircle className="w-12 h-12 text-gray-600 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white">No checkpoint yet</h1>
@@ -180,15 +176,14 @@ const ChapterTestPage = () => {
               Back to {data.course.title}
             </Link>
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#12131A]">
-      <Header />
-      <main className="pt-20 pb-12">
+    <div className="min-h-screen bg-[#0b0d12]">
+      <div className="pb-12">
         <div className="border-b border-gray-800 bg-black/30">
           <div className="container mx-auto max-w-5xl px-4 py-5">
             <Link href={`/science-tech/courses/${courseSlug}`} className="inline-flex items-center gap-2 text-gray-500 hover:text-white text-sm mb-3">
@@ -347,7 +342,7 @@ const ChapterTestPage = () => {
             </section>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 };

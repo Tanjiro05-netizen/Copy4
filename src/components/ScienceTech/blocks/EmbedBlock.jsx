@@ -28,7 +28,7 @@ const EmbedBlock = ({ block }) => {
   return (
     <div className="my-2">
       {caption && <p className="text-gray-500 text-xs mb-2 italic">{caption}</p>}
-      <div className="rounded-xl overflow-hidden border border-gray-800 bg-black/20"
+      <div className="rounded-none overflow-hidden border border-gray-800 bg-black/20"
         style={{ aspectRatio: aspect_ratio }}>
         {allowed ? (
           <iframe

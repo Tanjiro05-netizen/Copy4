@@ -667,7 +667,7 @@ const ScienceAdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#12131A]">
+    <div className="min-h-screen bg-[#0b0d12]">
       <style>{`
         .input {
           width: 100%;
@@ -893,7 +893,7 @@ const ScienceAdminPage = () => {
                           <div className="flex items-start gap-3">
                             <div
                               className="flex h-9 w-9 shrink-0 items-center justify-center border border-gray-800 bg-black/40"
-                              style={{ color: subject.color || '#ef4444' }}
+                              style={{ color: subject.color || '#d41f3d' }}
                             >
                               <Icon className="h-5 w-5" />
                             </div>

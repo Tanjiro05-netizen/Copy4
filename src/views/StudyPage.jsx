@@ -246,14 +246,10 @@ const StudyPage = () => {
         <div className={styles.heroInner}>
           <div className={styles.heroGrid}>
             <div className={styles.heroContent}>
-              <span className={styles.heroBadge}>
-                <Sparkles size={12} />
-                Revolutionary Theory Center
-              </span>
-
               <div className={styles.heroCopy}>
-                <p className={sectionEyebrow}>Obsidian archive</p>
+                <p className={styles.heroKicker}>Study · Revolutionary Theory Center</p>
                 <h1 className={styles.heroTitle}>Study Center</h1>
+                <div className={styles.heroRule} aria-hidden="true" />
                 <p className={styles.heroQuote}>
                   “Without revolutionary theory there can be no revolutionary movement.”
                 </p>
@@ -396,7 +392,7 @@ const StudyPage = () => {
       {/* AI Study Path Generator Section */}
       {generatedPath && (
         <section className="max-w-4xl mx-auto px-6 py-8">
-          <div className="bg-black/40 border border-red-900/30 rounded-2xl p-6">
+          <div className="bg-black/40 border border-red-900/30 rounded-none p-6">
             <StudyPathGenerator studyPath={generatedPath} onPathGenerated={handlePathGenerated} />
           </div>
         </section>

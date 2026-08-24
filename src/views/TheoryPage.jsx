@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import PageHeader from '../components/PageHeader';
 import * as s from './TheoryPage.css.ts';
 
 const TheoryPage = () => {
@@ -271,8 +272,12 @@ const TheoryPage = () => {
     return (
         <div className={s.page}>
             <main className={s.main}>
+                <PageHeader
+                    kicker="Theory"
+                    title="Revolutionary Theory"
+                    note="Foundational texts, reading guides, and study material, organised by category."
+                />
                 <div className={s.topBar}>
-                    <h1 className={s.pageTitle}>Revolutionary Theory</h1>
                     <div className={s.searchWrap}>
                         <input
                             type="text"

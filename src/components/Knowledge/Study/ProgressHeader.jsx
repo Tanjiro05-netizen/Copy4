@@ -29,25 +29,25 @@ const ProgressHeader = ({ progress, userCell }) => {
     green: 'bg-emerald-500',
     blue: 'bg-blue-500',
     purple: 'bg-purple-500',
-    red: 'bg-[#c81e1e]',
+    red: 'bg-[#b3122e]',
     gold: 'bg-yellow-500',
-  }[rankInfo.color] || 'bg-[#c81e1e]';
+  }[rankInfo.color] || 'bg-[#b3122e]';
 
   const rankTextColor = {
     gray: 'text-white/40',
     green: 'text-emerald-400',
     blue: 'text-blue-400',
     purple: 'text-purple-400',
-    red: 'text-[#c81e1e]',
+    red: 'text-[#b3122e]',
     gold: 'text-yellow-400',
   }[rankInfo.color] || 'text-white/60';
 
   return (
-    <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-4 md:p-5 font-[Hanken_Grotesk,sans-serif]">
+    <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-4 md:p-5 font-[Outfit,sans-serif]">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* Rank & XP */}
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-white/[0.04] flex items-center justify-center text-2xl shrink-0">
+          <div className="w-14 h-14 rounded-none bg-white/[0.04] flex items-center justify-center text-2xl shrink-0">
             {rankInfo.icon}
           </div>
           <div className="flex-1 min-w-0">

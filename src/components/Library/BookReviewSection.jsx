@@ -9,8 +9,8 @@ const StarRating = ({ rating, onRate, interactive = false, size = 16 }) => (
       <Star
         key={star}
         size={size}
-        fill={star <= rating ? '#f59e0b' : 'transparent'}
-        color={star <= rating ? '#f59e0b' : 'rgba(255,255,255,0.2)'}
+        fill={star <= rating ? '#c8860a' : 'transparent'}
+        color={star <= rating ? '#c8860a' : 'rgba(255,255,255,0.2)'}
         style={{ cursor: interactive ? 'pointer' : 'default', transition: 'all 120ms' }}
         onClick={() => interactive && onRate && onRate(star)}
       />
@@ -65,8 +65,8 @@ const BookReviewSection = ({ bookId, canWrite = false }) => {
             onClick={() => setShowForm(!showForm)}
             style={{
               padding: '4px 10px', fontSize: '11px',
-              background: 'rgba(200,30,30,0.15)', border: '1px solid rgba(200,30,30,0.3)',
-              borderRadius: '6px', color: '#f87171', cursor: 'pointer',
+              background: 'rgba(179, 18, 46,0.15)', border: '1px solid rgba(179, 18, 46,0.3)',
+              borderRadius: '6px', color: '#d41f3d', cursor: 'pointer',
             }}
           >
             {t('library.writeReview')}
@@ -101,7 +101,7 @@ const BookReviewSection = ({ bookId, canWrite = false }) => {
               disabled={newRating === 0}
               style={{
                 padding: '5px 14px', fontSize: '11px', fontWeight: 600,
-                background: newRating === 0 ? 'rgba(255,255,255,0.06)' : '#c81e1e',
+                background: newRating === 0 ? 'rgba(255,255,255,0.06)' : '#b3122e',
                 border: 'none', borderRadius: '6px',
                 color: newRating === 0 ? 'rgba(255,255,255,0.3)' : '#fff',
                 cursor: newRating === 0 ? 'not-allowed' : 'pointer',

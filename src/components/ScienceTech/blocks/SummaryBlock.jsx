@@ -15,7 +15,7 @@ const SummaryBlock = ({ block }) => {
   if (points.length === 0) return null;
 
   return (
-    <div className="bg-gradient-to-br from-red-950/30 to-black/40 rounded-xl border border-red-900/30 p-6">
+    <div className="bg-[#10131b] from-red-950/30 to-black/40 rounded-none border border-red-900/30 p-6">
       <h4 className="text-white font-bold text-sm uppercase tracking-wide mb-4 flex items-center gap-2">
         <CheckCircle className="w-4 h-4 text-red-400" />
         Key Takeaways

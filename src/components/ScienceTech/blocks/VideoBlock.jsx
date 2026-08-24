@@ -37,7 +37,7 @@ const VideoBlock = ({ block }) => {
 
   return (
     <div className="my-2">
-      <div className="bg-black/40 rounded-xl overflow-hidden border border-gray-800">
+      <div className="bg-black/40 rounded-none overflow-hidden border border-gray-800">
         {block.caption && (
           <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-2">
             <Play className="w-4 h-4 text-red-400" />

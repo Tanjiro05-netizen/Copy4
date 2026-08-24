@@ -30,7 +30,7 @@ const ProjectileMotion = ({ config }) => {
     const width = canvas.width;
     const height = canvas.height;
 
-    ctx.fillStyle = '#0d0e14';
+    ctx.fillStyle = '#0b0d12';
     ctx.fillRect(0, 0, width, height);
 
     // Ground
@@ -88,7 +88,7 @@ const ProjectileMotion = ({ config }) => {
       const py = height - 40 - y * scale;
 
       if (y >= 0) {
-        ctx.fillStyle = '#ef4444';
+        ctx.fillStyle = '#d41f3d';
         ctx.beginPath();
         ctx.arc(px, py, 6, 0, Math.PI * 2);
         ctx.fill();
@@ -114,7 +114,7 @@ const ProjectileMotion = ({ config }) => {
           const vectorScale = 2;
 
           // vx arrow
-          ctx.strokeStyle = '#3b82f6';
+          ctx.strokeStyle = '#4a7fb5';
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(px, py);
@@ -122,14 +122,14 @@ const ProjectileMotion = ({ config }) => {
           ctx.stroke();
 
           // vy arrow
-          ctx.strokeStyle = '#22c55e';
+          ctx.strokeStyle = '#2d8a4e';
           ctx.beginPath();
           ctx.moveTo(px, py);
           ctx.lineTo(px, py - vyNow * vectorScale);
           ctx.stroke();
 
           // total v
-          ctx.strokeStyle = '#ef4444';
+          ctx.strokeStyle = '#d41f3d';
           ctx.beginPath();
           ctx.moveTo(px, py);
           ctx.lineTo(px + (vxNow / vMag) * vMag * vectorScale, py - (vyNow / vMag) * vMag * vectorScale);
@@ -187,7 +187,7 @@ const ProjectileMotion = ({ config }) => {
   }, []);
 
   return (
-    <div className="bg-black/40 rounded-xl border border-gray-800 p-4">
+    <div className="bg-black/40 rounded-none border border-gray-800 p-4">
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
@@ -260,7 +260,7 @@ const ProjectileMotion = ({ config }) => {
       </div>
 
       <div className="overflow-x-auto">
-        <canvas ref={canvasRef} width={600} height={300} className="rounded-lg" />
+        <canvas ref={canvasRef} width={600} height={300} className="rounded-none" />
       </div>
     </div>
   );

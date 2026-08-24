@@ -388,7 +388,7 @@ const ArticleReaderPage = () => {
         setIsGeneratingPdf(true);
         try {
             const canvas = await html2canvas(contentRef.current, {
-                scale: 2, backgroundColor: '#12131A', useCORS: true,
+                scale: 2, backgroundColor: '#0b0d12', useCORS: true,
                 onclone: (doc) => { doc.querySelectorAll('.no-pdf').forEach(el => el.style.display = 'none'); }
             });
             const imgData = canvas.toDataURL('image/png');
@@ -449,7 +449,7 @@ const ArticleReaderPage = () => {
             <div className={s.page}>
                 <div className="flex flex-col items-center justify-center pt-8 px-4">
                     <p className="text-red-400 text-lg mb-4">{error}</p>
-                    <a href="/theory" className="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors">
+                    <a href="/theory" className="px-5 py-2.5 bg-red-600 hover:bg-red-700 rounded-none text-sm font-medium transition-colors">
                         Browse Theory Articles
                     </a>
                 </div>
@@ -484,7 +484,7 @@ const ArticleReaderPage = () => {
 
                     <div className={`${isStudyMode ? 'lg:col-span-7' : 'lg:col-span-12'} min-w-0`}>
                         {/* Mode indicator banner */}
-                        <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-emerald-900/30 border border-emerald-700/40 rounded-xl no-pdf">
+                        <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-emerald-900/30 border border-emerald-700/40 rounded-none no-pdf">
                             <div className="flex items-center gap-2">
                                 <BookOpen size={16} className="text-emerald-400" />
                                 <span className="text-sm font-medium text-emerald-300">Reading Mode</span>
@@ -492,7 +492,7 @@ const ArticleReaderPage = () => {
                             </div>
                             <button
                                 onClick={() => router.push(`/analysis/text/${slug}`)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white transition-colors"
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-none bg-gray-700/60 text-gray-300 hover:bg-gray-600 hover:text-white transition-colors"
                             >
                                 <BarChart3 size={14} />
                                 Switch to Analysis
@@ -551,7 +551,7 @@ const ArticleReaderPage = () => {
                         )}
 
                         {isSearchVisible && (
-                            <div className="bg-gray-800 border border-gray-700 rounded-lg p-2 flex items-center space-x-2 mb-4 no-pdf">
+                            <div className="bg-gray-800 border border-gray-700 rounded-none p-2 flex items-center space-x-2 mb-4 no-pdf">
                                 <input
                                     type="text"
                                     placeholder="Find in page..."
@@ -583,10 +583,14 @@ const ArticleReaderPage = () => {
                             </div>
                         )}
 
-                        <h1 className="text-4xl font-bold mb-2">{article.title}</h1>
-                        <p className="text-lg text-gray-400 mb-6">{article.author}</p>
+                        <div className="mb-8 text-center">
+                            <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.32em] text-red-500">Digital Library</p>
+                            <h1 className="font-display mb-4 text-4xl font-medium tracking-[0.01em] text-white md:text-5xl">{article.title}</h1>
+                            <div className="mx-auto mb-4 h-[2px] w-11 bg-[#b3122e]" aria-hidden="true" />
+                            <p className="text-sm text-gray-400">{article.author}</p>
+                        </div>
 
-                        <div ref={contentRef} className={`prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-red-400 hover:prose-a:text-red-500 ${!isStudyMode ? 'prose-lg' : ''}`}>
+                        <div ref={contentRef} className={`reader-dropcap prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-red-400 hover:prose-a:text-red-500 ${!isStudyMode ? 'prose-lg' : ''}`}>
                             <HighlightHandler
                                 highlights={highlights}
                                 onAddHighlight={handleAddHighlight}
@@ -624,7 +628,7 @@ const ArticleReaderPage = () => {
                 </div>
             </main>
             {showCopied && (
-                <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+                <div className="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-none shadow-none flex items-center space-x-2">
                     <Check size={20} />
                     <span>Link copied to clipboard!</span>
                 </div>

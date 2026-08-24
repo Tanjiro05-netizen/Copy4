@@ -14,13 +14,24 @@ export const inner = style({
   textAlign: 'center',
 });
 
+export const kicker = style({
+  margin: 0,
+  fontFamily: vars.font.label,
+  fontSize: '10px',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.32em',
+  color: vars.color.accentHover,
+  marginBottom: vars.space.md,
+});
+
 export const title = style({
   fontFamily: vars.font.display,
   fontSize: '56px',
   fontWeight: 500,
-  letterSpacing: '-0.03em',
-  lineHeight: 1,
-  color: vars.color.accent,
+  letterSpacing: '0.01em',
+  lineHeight: 1.02,
+  color: vars.color.text,
   marginBottom: vars.space.md,
   '@media': {
     'screen and (max-width: 640px)': {
@@ -30,8 +41,8 @@ export const title = style({
 });
 
 export const rule = style({
-  width: '96px',
-  height: '1px',
+  width: '44px',
+  height: '2px',
   background: vars.color.accent,
   margin: `0 auto ${vars.space.xl}`,
 });
@@ -165,7 +176,7 @@ export const teaserCard = style({
 });
 
 export const teaserLabel = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',

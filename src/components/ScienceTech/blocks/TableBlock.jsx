@@ -31,7 +31,7 @@ const TableBlock = ({ block }) => {
       {caption && (
         <p className="text-gray-500 text-xs mb-2 italic">{caption}</p>
       )}
-      <div className="overflow-x-auto rounded-lg border border-gray-800">
+      <div className="overflow-x-auto rounded-none border border-gray-800">
         <table className="w-full border-collapse">
           {headers.length > 0 && (
             <thead>

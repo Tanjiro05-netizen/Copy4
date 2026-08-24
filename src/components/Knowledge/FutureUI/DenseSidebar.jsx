@@ -67,27 +67,27 @@ const DenseSidebar = ({ activeItem = 'Feed', onNavigate, userId }) => {
   return (
     <>
       {/* Nav items */}
-      <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-2 space-y-0.5">
+      <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-2 space-y-0.5">
         {menuItems.map((item, idx) => (
           <div
             key={idx}
             onClick={() => !item.disabled && handleItemClick(item.key)}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-medium transition-all ${
+            className={`flex items-center justify-between px-3 py-2 rounded-none text-[11px] font-medium transition-all ${
               item.disabled
                 ? 'text-white/20 cursor-not-allowed'
                 : 'cursor-pointer hover:bg-white/[0.05]'
             } ${
               activeItem === item.key && !item.disabled
-                ? 'text-[#c81e1e] bg-[rgba(200,30,30,0.1)]'
+                ? 'text-[#b3122e] bg-[rgba(179, 18, 46,0.1)]'
                 : item.disabled ? '' : 'text-white/50'
             }`}
           >
             <div className="flex items-center gap-2.5">
               <item.icon className={`w-3.5 h-3.5 ${
-                activeItem === item.key && !item.disabled ? 'text-[#c81e1e]' :
-                item.live && !item.disabled ? 'text-[#c81e1e] animate-pulse' : ''
+                activeItem === item.key && !item.disabled ? 'text-[#b3122e]' :
+                item.live && !item.disabled ? 'text-[#b3122e] animate-pulse' : ''
               }`} />
-              <span className="font-[Hanken_Grotesk,sans-serif]">{item.label}</span>
+              <span className="font-[Outfit,sans-serif]">{item.label}</span>
               {item.disabled && <Lock className="w-2.5 h-2.5 text-white/15" />}
             </div>
             {item.count && (
@@ -100,7 +100,7 @@ const DenseSidebar = ({ activeItem = 'Feed', onNavigate, userId }) => {
       </div>
 
       {/* Shortcuts */}
-      <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-3">
+      <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-3">
         <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-white/[0.06]">
           <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-white/30">
             My Shortcuts
@@ -125,7 +125,7 @@ const DenseSidebar = ({ activeItem = 'Feed', onNavigate, userId }) => {
               );
             })
           ) : (
-            <div className="text-[10px] text-white/20 py-1 font-[Hanken_Grotesk,sans-serif]">
+            <div className="text-[10px] text-white/20 py-1 font-[Outfit,sans-serif]">
               Follow topics to add shortcuts
             </div>
           )}

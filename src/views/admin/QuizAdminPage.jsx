@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import Header from '../../components/Header';
 import { studyApiService } from '../../components/Knowledge/api/study';
 import QuizEditor from '../../components/Knowledge/Admin/QuizEditor';
 import QuestionEditor from '../../components/Knowledge/Admin/QuestionEditor';
@@ -182,8 +181,7 @@ const QuizAdminPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Header />
-      <main className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 pt-24">
+      <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Quiz Management</h1>
@@ -192,14 +190,14 @@ const QuizAdminPage = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={fetchQuizzes}
-              className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 bg-gray-800 hover:bg-gray-700 rounded-none transition-colors"
               title="Refresh"
             >
               <RefreshCw className="w-5 h-5 text-gray-400" />
             </button>
             <button
               onClick={handleCreateQuiz}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 rounded-none transition-colors"
             >
               <Plus className="w-5 h-5" />
               Create Quiz
@@ -208,7 +206,7 @@ const QuizAdminPage = () => {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg flex items-center gap-3">
+          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-none flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-red-400" />
             <span className="text-red-300">{error}</span>
             <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-300">
@@ -223,7 +221,7 @@ const QuizAdminPage = () => {
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-none text-sm font-medium transition-colors ${
                 filterType === type
                   ? 'bg-red-600 text-white'
                   : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
@@ -244,7 +242,7 @@ const QuizAdminPage = () => {
             <p>No quizzes found.</p>
             <button
               onClick={handleCreateQuiz}
-              className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg transition-colors"
+              className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-500 rounded-none transition-colors"
             >
               Create Your First Quiz
             </button>
@@ -252,11 +250,11 @@ const QuizAdminPage = () => {
         ) : (
           <div className="space-y-3">
             {filteredQuizzes.map(quiz => (
-              <div key={quiz.id} className="bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
+              <div key={quiz.id} className="bg-gray-800/50 border border-gray-700 rounded-none overflow-hidden">
                 <div className="flex items-center p-4">
                   <button
                     onClick={() => handleExpandQuiz(quiz.id)}
-                    className="p-2 hover:bg-gray-700 rounded-lg transition-colors mr-2"
+                    className="p-2 hover:bg-gray-700 rounded-none transition-colors mr-2"
                   >
                     {expandedQuiz === quiz.id ? (
                       <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -307,7 +305,7 @@ const QuizAdminPage = () => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleToggleActive(quiz)}
-                      className={`p-2 rounded-lg transition-colors ${
+                      className={`p-2 rounded-none transition-colors ${
                         quiz.is_active
                           ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30'
                           : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
@@ -318,14 +316,14 @@ const QuizAdminPage = () => {
                     </button>
                     <button
                       onClick={() => handleEditQuiz(quiz)}
-                      className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                      className="p-2 bg-gray-700 hover:bg-gray-600 rounded-none transition-colors"
                       title="Edit Quiz"
                     >
                       <Pencil className="w-4 h-4 text-gray-400" />
                     </button>
                     <button
                       onClick={() => setDeleteConfirm({ type: 'quiz', id: quiz.id, title: quiz.title })}
-                      className="p-2 bg-gray-700 hover:bg-red-600/30 rounded-lg transition-colors"
+                      className="p-2 bg-gray-700 hover:bg-red-600/30 rounded-none transition-colors"
                       title="Delete Quiz"
                     >
                       <Trash2 className="w-4 h-4 text-red-400" />
@@ -339,7 +337,7 @@ const QuizAdminPage = () => {
                       <h4 className="text-sm font-bold text-gray-300">Questions</h4>
                       <button
                         onClick={() => handleCreateQuestion(quiz.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 rounded-lg text-sm transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-500 rounded-none text-sm transition-colors"
                       >
                         <Plus className="w-4 h-4" />
                         Add Question
@@ -359,7 +357,7 @@ const QuizAdminPage = () => {
                         {quizQuestions[quiz.id].map((question, index) => (
                           <div
                             key={question.id}
-                            className="flex items-start gap-3 p-3 bg-gray-800 rounded-lg"
+                            className="flex items-start gap-3 p-3 bg-gray-800 rounded-none"
                           >
                             <div className="flex items-center gap-2 pt-0.5">
                               <GripVertical className="w-4 h-4 text-gray-600" />
@@ -404,7 +402,7 @@ const QuizAdminPage = () => {
             ))}
           </div>
         )}
-      </main>
+      </div>
 
       {showQuizEditor && (
         <QuizEditor
@@ -433,7 +431,7 @@ const QuizAdminPage = () => {
 
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 max-w-md w-full">
+          <div className="bg-gray-900 border border-gray-700 rounded-none p-6 max-w-md w-full">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 bg-red-600/20 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-red-400" />
@@ -447,14 +445,14 @@ const QuizAdminPage = () => {
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-none transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteQuiz(deleteConfirm.id)}
                 disabled={saving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-none transition-colors"
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

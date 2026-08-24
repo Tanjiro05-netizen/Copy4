@@ -19,7 +19,7 @@ const ReadingListPanel = ({ onClose, onNavigateToBook }) => {
     <div style={{
       position: 'fixed', top: 0, right: 0, bottom: 0,
       width: '340px', maxWidth: '90vw',
-      background: '#0d0d0d', borderLeft: '1px solid rgba(255,255,255,0.08)',
+      background: '#0b0d12', borderLeft: '1px solid rgba(255,255,255,0.08)',
       zIndex: 10000, display: 'flex', flexDirection: 'column',
       boxShadow: '-8px 0 32px rgba(0,0,0,0.5)',
     }}>
@@ -71,7 +71,7 @@ const ReadingListPanel = ({ onClose, onNavigateToBook }) => {
           style={{
             display: 'flex', alignItems: 'center', gap: '4px',
             padding: '6px 10px', fontSize: '11px', fontWeight: 600,
-            background: newName.trim() ? '#c81e1e' : 'rgba(255,255,255,0.04)',
+            background: newName.trim() ? '#b3122e' : 'rgba(255,255,255,0.04)',
             border: 'none', borderRadius: '6px',
             color: newName.trim() ? '#fff' : 'rgba(255,255,255,0.2)',
             cursor: newName.trim() ? 'pointer' : 'default',

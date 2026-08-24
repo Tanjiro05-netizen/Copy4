@@ -800,13 +800,13 @@ const PoliticsUploadPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-white px-4 py-8">
+        <div className="min-h-screen bg-[#0b0d12] text-white px-4 py-8">
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <section className="lg:col-span-3 bg-[#181A23] border border-gray-800 rounded-2xl p-6">
+                <section className="lg:col-span-3 bg-[#1a1f2b] border border-gray-800 rounded-none p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <button
                             onClick={navigateBackToPolitics}
-                            className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
+                            className="p-2 rounded-none hover:bg-gray-800 transition-colors"
                             aria-label="Back to politics page"
                         >
                             <ArrowLeft size={18} />
@@ -818,21 +818,21 @@ const PoliticsUploadPage = () => {
                     </div>
 
                     {success && (
-                        <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-lg flex items-center gap-2 text-emerald-300 text-sm">
+                        <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-none flex items-center gap-2 text-emerald-300 text-sm">
                             <Check size={16} />
                             {success}
                         </div>
                     )}
 
                     {error && (
-                        <div className="mb-4 p-3 bg-red-900/40 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-300 text-sm">
+                        <div className="mb-4 p-3 bg-red-900/40 border border-red-500/30 rounded-none flex items-center gap-2 text-red-300 text-sm">
                             <AlertTriangle size={16} />
                             {error}
                         </div>
                     )}
 
                     {autosaveRecovery && (
-                        <div className="mb-4 p-3 bg-sky-900/30 border border-sky-500/30 rounded-lg text-sky-200 text-sm">
+                        <div className="mb-4 p-3 bg-sky-900/30 border border-sky-500/30 rounded-none text-sky-200 text-sm">
                             <p>
                                 Found an autosaved draft
                                 {autosaveRecovery.savedAt ? ` from ${formatAutosaveTime(autosaveRecovery.savedAt)}` : ''}.
@@ -841,14 +841,14 @@ const PoliticsUploadPage = () => {
                                 <button
                                     type="button"
                                     onClick={restoreAutosavedDraft}
-                                    className="px-3 py-1.5 rounded-md bg-sky-600 hover:bg-sky-500 text-white text-xs"
+                                    className="px-3 py-1.5 rounded-none bg-sky-600 hover:bg-sky-500 text-white text-xs"
                                 >
                                     Restore draft
                                 </button>
                                 <button
                                     type="button"
                                     onClick={dismissAutosavedDraft}
-                                    className="px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-xs"
+                                    className="px-3 py-1.5 rounded-none bg-gray-800 hover:bg-gray-700 text-xs"
                                 >
                                     Dismiss
                                 </button>
@@ -864,7 +864,7 @@ const PoliticsUploadPage = () => {
                                 name="title"
                                 value={formData.title}
                                 onChange={handleInputChange}
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 placeholder="Front-page headline"
                                 required
                             />
@@ -878,7 +878,7 @@ const PoliticsUploadPage = () => {
                                 name="slug"
                                 value={formData.slug}
                                 onChange={handleSlugChange}
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-sm"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white font-mono text-sm"
                                 placeholder="headline-slug"
                                 required
                             />
@@ -917,7 +917,7 @@ const PoliticsUploadPage = () => {
                                 value={formData.excerpt}
                                 onChange={handleInputChange}
                                 rows={3}
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white resize-y"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white resize-y"
                                 placeholder="Short summary used in the newspaper cards"
                             />
                             <p className={`text-xs mt-1 ${fitToneClassName[excerptFit.tone]}`}>{excerptFit.text}</p>
@@ -930,7 +930,7 @@ const PoliticsUploadPage = () => {
                                 value={formData.content}
                                 onChange={handleInputChange}
                                 rows={12}
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white resize-y"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white resize-y"
                                 placeholder="Full dispatch text (Markdown supported in reader page)"
                             />
                         </div>
@@ -942,7 +942,7 @@ const PoliticsUploadPage = () => {
                                     name="category"
                                     value={formData.category}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 >
                                     {CATEGORY_OPTIONS.map((option) => (
                                         <option key={option} value={option}>
@@ -958,7 +958,7 @@ const PoliticsUploadPage = () => {
                                     name="digest_type"
                                     value={formData.digest_type}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 >
                                     {DIGEST_OPTIONS.map((option) => (
                                         <option key={option} value={option}>
@@ -974,7 +974,7 @@ const PoliticsUploadPage = () => {
                                     name="placement"
                                     value={formData.placement}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 >
                                     {PLACEMENT_OPTIONS.map((option) => (
                                         <option key={option} value={option}>
@@ -990,7 +990,7 @@ const PoliticsUploadPage = () => {
                                     name="status"
                                     value={formData.status}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 >
                                     {STATUS_OPTIONS.map((option) => (
                                         <option key={option} value={option}>
@@ -1007,7 +1007,7 @@ const PoliticsUploadPage = () => {
                                     name="published_at"
                                     value={formData.published_at || ''}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 />
 
                                 {hasInvalidPublishDate && (
@@ -1028,7 +1028,7 @@ const PoliticsUploadPage = () => {
                                     name="edition_date"
                                     value={formData.edition_date || ''}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 />
                             </div>
 
@@ -1039,7 +1039,7 @@ const PoliticsUploadPage = () => {
                                     name="source"
                                     value={formData.source}
                                     onChange={handleInputChange}
-                                    className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                    className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 />
                             </div>
                         </div>
@@ -1051,14 +1051,14 @@ const PoliticsUploadPage = () => {
                                 name="image_url"
                                 value={formData.image_url || ''}
                                 onChange={handleInputChange}
-                                className="w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white"
                                 placeholder="https://..."
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm text-gray-400 mb-2">Upload image to politics-images bucket</label>
-                            <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-gray-700 hover:border-red-500/60 cursor-pointer text-sm text-gray-300">
+                            <label className="flex items-center gap-2 px-3 py-2 rounded-none border border-dashed border-gray-700 hover:border-red-500/60 cursor-pointer text-sm text-gray-300">
                                 <ImageIcon size={16} />
                                 {imageFile ? imageFile.name : 'Choose image file'}
                                 <input
@@ -1074,7 +1074,7 @@ const PoliticsUploadPage = () => {
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-none text-sm font-medium transition-colors"
                             >
                                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                 {formData.id ? 'Update dispatch' : 'Create dispatch'}
@@ -1083,7 +1083,7 @@ const PoliticsUploadPage = () => {
                             <button
                                 type="button"
                                 onClick={resetForm}
-                                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors"
+                                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-none text-sm transition-colors"
                             >
                                 Clear editor
                             </button>
@@ -1100,12 +1100,12 @@ const PoliticsUploadPage = () => {
                 </section>
 
                 <aside className="lg:col-span-2 space-y-6">
-                    <section className="bg-[#181A23] border border-gray-800 rounded-2xl p-5">
+                    <section className="bg-[#1a1f2b] border border-gray-800 rounded-none p-5">
                         <h2 className="text-lg font-semibold mb-4 inline-flex items-center gap-2">
                             <Eye size={18} /> Live Newspaper Card Preview
                         </h2>
 
-                        <article className="border border-gray-700 rounded-xl overflow-hidden bg-[#0F1118]">
+                        <article className="border border-gray-700 rounded-none overflow-hidden bg-[#10131b]">
                             {(imagePreview || formData.image_url) && (
                                 <img
                                     src={imagePreview || formData.image_url}
@@ -1128,7 +1128,7 @@ const PoliticsUploadPage = () => {
                         </article>
                     </section>
 
-                    <section className="bg-[#181A23] border border-gray-800 rounded-2xl p-5">
+                    <section className="bg-[#1a1f2b] border border-gray-800 rounded-none p-5">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold inline-flex items-center gap-2">
                                 <FileText size={18} /> Recent Dispatches
@@ -1141,13 +1141,13 @@ const PoliticsUploadPage = () => {
                                 value={listSearchQuery}
                                 onChange={(event) => setListSearchQuery(event.target.value)}
                                 placeholder="Search title or slug"
-                                className="bg-[#0F1118] border border-gray-700 rounded-md px-2.5 py-2 text-xs text-white"
+                                className="bg-[#10131b] border border-gray-700 rounded-none px-2.5 py-2 text-xs text-white"
                             />
 
                             <select
                                 value={listStatusFilter}
                                 onChange={(event) => setListStatusFilter(event.target.value)}
-                                className="bg-[#0F1118] border border-gray-700 rounded-md px-2.5 py-2 text-xs text-white"
+                                className="bg-[#10131b] border border-gray-700 rounded-none px-2.5 py-2 text-xs text-white"
                             >
                                 <option value="all">All statuses</option>
                                 {STATUS_OPTIONS.map((statusOption) => (
@@ -1160,7 +1160,7 @@ const PoliticsUploadPage = () => {
                             <select
                                 value={listPlacementFilter}
                                 onChange={(event) => setListPlacementFilter(event.target.value)}
-                                className="bg-[#0F1118] border border-gray-700 rounded-md px-2.5 py-2 text-xs text-white"
+                                className="bg-[#10131b] border border-gray-700 rounded-none px-2.5 py-2 text-xs text-white"
                             >
                                 <option value="all">All placements</option>
                                 {PLACEMENT_OPTIONS.map((placementOption) => (
@@ -1183,7 +1183,7 @@ const PoliticsUploadPage = () => {
                                     const statusMeta = getDispatchStatusMeta(article);
 
                                     return (
-                                    <div key={article.id} className="border border-gray-700 rounded-lg p-3 bg-[#0F1118]">
+                                    <div key={article.id} className="border border-gray-700 rounded-none p-3 bg-[#10131b]">
                                         <p className={`text-xs uppercase tracking-wide mb-1 ${statusMeta.className}`}>
                                             {statusMeta.label}
                                             {statusMeta.detail ? ` • ${statusMeta.detail}` : ''}
@@ -1199,7 +1199,7 @@ const PoliticsUploadPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => handleEdit(article)}
-                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
+                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-none transition-colors"
                                             >
                                                 <Pencil size={13} /> Edit
                                             </button>
@@ -1207,7 +1207,7 @@ const PoliticsUploadPage = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => togglePublishStatus(article)}
-                                                className="px-2.5 py-1.5 text-xs bg-red-600/80 hover:bg-red-600 rounded-md transition-colors"
+                                                className="px-2.5 py-1.5 text-xs bg-red-600/80 hover:bg-red-600 rounded-none transition-colors"
                                             >
                                                 {article.status === 'published' ? 'Move to draft' : 'Publish'}
                                             </button>
@@ -1216,7 +1216,7 @@ const PoliticsUploadPage = () => {
                                                 type="button"
                                                 onClick={() => handleDelete(article.id)}
                                                 disabled={isDeleting}
-                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-md transition-colors disabled:opacity-60"
+                                                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-none transition-colors disabled:opacity-60"
                                             >
                                                 <Trash2 size={13} /> Delete
                                             </button>

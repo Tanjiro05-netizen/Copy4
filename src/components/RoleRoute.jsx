@@ -7,7 +7,7 @@ const RoleRoute = ({ children, allowedEditorialRoles = [], allowAdmin = true }) 
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#12131A] flex items-center justify-center">
+            <div className="min-h-screen bg-[#0b0d12] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                     <span className="text-gray-400 text-sm">Checking permissions...</span>

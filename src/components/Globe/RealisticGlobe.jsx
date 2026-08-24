@@ -280,7 +280,7 @@ const RealisticGlobe = () => {
           onCreated={() => setLoaded(true)}
           onPointerMissed={() => setSelected(null)}
         >
-          <color attach="background" args={['#050508']} />
+          <color attach="background" args={['#08090d']} />
           <GlobeScene
             events={allEvents}
             connections={allConnections}

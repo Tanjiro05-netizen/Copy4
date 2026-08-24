@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { Download, Eye, CheckCircle, XCircle, AlertTriangle, Trash2, Loader2 } from 'lucide-react';
-import Header from '../components/Header';
 import ConfirmationModal from '../components/ConfirmationModal';
 
 const AdminSubmissionsPage = () => {
@@ -346,9 +345,8 @@ const AdminSubmissionsPage = () => {
     if (!isAdmin) return null;
     
     return (
-        <div className="min-h-screen bg-[#12131A] text-white">
-            <Header />
-            <main className="pt-24 pb-16 max-w-7xl mx-auto px-4">
+        <div className="min-h-screen bg-[#0b0d12] text-white">
+            <div className="py-8 max-w-7xl mx-auto px-4">
                 <h1 className="text-4xl font-bold mb-8">Article Submissions</h1>
                 
                 {loading ? (
@@ -356,12 +354,12 @@ const AdminSubmissionsPage = () => {
                         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
                     </div>
                 ) : error ? (
-                    <div className="bg-red-900/20 p-4 rounded-lg text-red-400 flex items-center">
+                    <div className="bg-red-900/20 p-4 rounded-none text-red-400 flex items-center">
                         <AlertTriangle className="w-5 h-5 mr-2" />
                         <span>{error}</span>
                     </div>
                 ) : submissions.length === 0 ? (
-                    <div className="bg-black/30 p-8 rounded-lg text-center">
+                    <div className="bg-black/30 p-8 rounded-none text-center">
                         <p className="text-gray-400">No submissions to review at this time.</p>
                     </div>
                 ) : (
@@ -458,7 +456,7 @@ const AdminSubmissionsPage = () => {
                         </table>
                     </div>
                 )}
-            </main>
+            </div>
             
             <ConfirmationModal 
                 isOpen={showConfirmModal}

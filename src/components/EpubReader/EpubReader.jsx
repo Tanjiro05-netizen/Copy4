@@ -27,8 +27,8 @@ const ToolbarBtn = ({ icon: Icon, active, onClick, title }) => (
       width: '36px',
       height: '36px',
       borderRadius: '50%',
-      background: active ? 'rgba(239, 68, 68, 0.15)' : 'transparent',
-      color: active ? '#ef4444' : 'rgba(255,255,255,0.6)',
+      background: active ? 'rgba(179, 18, 46, 0.18)' : 'transparent',
+      color: active ? '#d41f3d' : 'rgba(255,255,255,0.6)',
       border: 'none',
       cursor: 'pointer',
       transition: 'color 0.2s',
@@ -61,11 +61,11 @@ const NavButtonArea = ({ direction, onClick, disabled }) => (
       style={{ 
         width: '56px', height: '56px', 
         borderRadius: '50%', 
-        background: 'rgba(20,20,22,0.5)', 
+        background: 'rgba(11,13,18,0.6)', 
         backdropFilter: 'blur(12px)', 
         WebkitBackdropFilter: 'blur(12px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', 
-        color: '#fff', border: '1px solid rgba(255,255,255,0.05)',
+        color: '#fff', border: '1px solid #262a35',
         boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
         transition: 'background 0.2s'
       }}
@@ -508,9 +508,9 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
     renditionRef.current = rendition;
 
     const bodyStyles = {
-      'background': '#050505 !important',
-      'color': '#d6d3cd !important',
-      'font-family': 'Georgia, "Times New Roman", serif !important',
+      'background': '#08090d !important',
+      'color': '#c9c5b8 !important',
+      'font-family': 'Newsreader, Georgia, "Times New Roman", serif !important',
       'line-height': '1.9 !important',
     };
 
@@ -527,26 +527,26 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
 
     rendition.themes.default({
       'html': {
-        'background': '#050505 !important',
+        'background': '#08090d !important',
       },
       'body': bodyStyles,
 
       // Chapter/section headings — .calibre7, .H, .H1, etc. all use color:windowtext
       'h1, h2, h3, h4, h5, h6': {
-        'color': '#f4f4f5 !important',
-        'font-family': 'Georgia, "Times New Roman", serif !important',
-        'font-weight': '700 !important',
+        'color': '#ece9e0 !important',
+        'font-family': 'Cormorant Garamond, Georgia, serif !important',
+        'font-weight': '500 !important',
         'margin-top': '2em !important',
         'margin-bottom': '0.8em !important',
         'line-height': '1.3 !important',
       },
       '.H, .H1, .calibre7, .calibre28, .calibre35': {
-        'color': '#f4f4f5 !important',
+        'color': '#ece9e0 !important',
       },
 
       // Body paragraphs
       'p, .MsoNormal': {
-        'color': '#d6d3cd !important',
+        'color': '#c9c5b8 !important',
         'line-height': '1.9 !important',
         'margin-bottom': '1.1em !important',
         'margin-top': '0 !important',
@@ -555,21 +555,21 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
 
       // Table of contents entries
       '.MsoToc, .MsoToc1, .MsoToc2': {
-        'color': '#c4c0b8 !important',
+        'color': '#c9c5b8 !important',
       },
 
       // Block-indented quotes (.indentb) and quotations (.quoteb)
       '.indentb': {
-        'color': '#c9c3b8 !important',
-        'border-left': '3px solid rgba(239, 68, 68, 0.4) !important',
+        'color': '#c9c5b8 !important',
+        'border-left': '2px solid #b3122e !important',
         'padding-left': '1.4em !important',
         'margin-left': '0 !important',
         'margin-right': '0 !important',
         'font-style': 'italic !important',
       },
       '.quoteb': {
-        'color': '#c9c3b8 !important',
-        'border-left': '3px solid rgba(239, 68, 68, 0.4) !important',
+        'color': '#c9c5b8 !important',
+        'border-left': '2px solid #b3122e !important',
         'padding-left': '1.4em !important',
         'margin-left': '0 !important',
         'margin-right': '0 !important',
@@ -577,9 +577,9 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
 
       // Links
       'a': {
-        'color': '#ef4444 !important',
+        'color': '#d41f3d !important',
         'text-decoration': 'none !important',
-        'border-bottom': '1px solid rgba(239, 68, 68, 0.25) !important',
+        'border-bottom': '1px solid rgba(212, 31, 61, 0.3) !important',
       },
 
       // Italic spans used heavily throughout Marx's text
@@ -596,7 +596,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
 
       // Endnote superscript references
       '.enote': {
-        'color': '#f87171 !important',
+        'color': '#d41f3d !important',
         'font-size': '0.78em !important',
         'font-weight': 'bold !important',
         'font-family': 'inherit !important',
@@ -610,7 +610,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
 
       // Defined terms
       '.term': {
-        'color': '#93c5fd !important',
+        'color': '#4a7fb5 !important',
         'font-weight': 'bold !important',
         'font-family': 'inherit !important',
       },
@@ -618,18 +618,18 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       // Calibre utility color classes — all use dark/navy/gray colors invisible on dark bg
       '.calibre10': { 'color': 'rgba(255,255,255,0.38) !important' },
       '.calibre11': { 'color': 'rgba(255,255,255,0.5) !important' },
-      '.calibre12': { 'color': '#d6d3cd !important' },
+      '.calibre12': { 'color': '#c9c5b8 !important' },
       '.calibre17': { 'color': 'rgba(255,255,255,0.38) !important' },
-      '.calibre19': { 'color': '#93c5fd !important' },
-      '.calibre20': { 'color': '#d6d3cd !important' },
+      '.calibre19': { 'color': '#7ba3c9 !important' },
+      '.calibre20': { 'color': '#c9c5b8 !important' },
       '.calibre21': { 'color': 'rgba(255,255,255,0.5) !important' },
       '.calibre22': { 'color': 'rgba(255,255,255,0.5) !important' },
-      '.calibre23': { 'color': '#93c5fd !important' },
-      '.calibre25': { 'color': '#d6d3cd !important' },
+      '.calibre23': { 'color': '#7ba3c9 !important' },
+      '.calibre25': { 'color': '#c9c5b8 !important' },
       '.calibre26': { 'color': 'rgba(255,255,255,0.5) !important', 'font-size': '0.75em !important' },
 
       '::selection': {
-        'background': 'rgba(239, 68, 68, 0.4) !important',
+        'background': 'rgba(179, 18, 46, 0.55) !important',
       },
 
       'hr': {
@@ -641,10 +641,13 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       'img': {
         'max-width': '100% !important',
         'height': 'auto !important',
-        'border-radius': '8px',
+        'border-radius': '0px',
         'margin': '2em auto !important',
         'display': 'block !important',
-        'box-shadow': '0 4px 20px rgba(0,0,0,0.5) !important',
+        'box-shadow': 'none !important',
+        'border': '1px solid #262a35 !important',
+        'padding': '6px !important',
+        'background': '#10131b !important',
       },
     });
 
@@ -767,8 +770,8 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      background: '#050505',
-      borderRadius: '16px',
+      background: '#08090d',
+      borderRadius: '0px',
       overflow: isScrolledMode ? 'auto' : 'hidden',
       fontFamily: 'Outfit, Inter, system-ui, sans-serif'
     }}>
@@ -786,11 +789,11 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
           alignItems: 'center',
           gap: '8px',
           padding: '6px 10px',
-          background: 'rgba(20, 20, 22, 0.65)',
+          background: 'rgba(11, 13, 18, 0.88)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '100px',
+          border: '1px solid #262a35',
+          borderRadius: '2px',
           boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
           pointerEvents: (showUI || showToc || showSettings) ? 'auto' : 'none',
         }}
@@ -862,11 +865,11 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               top: '84px',
               left: '50%',
               zIndex: 51,
-              background: 'rgba(20, 20, 22, 0.85)',
+              background: 'rgba(16, 19, 27, 0.94)',
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
               border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '20px',
+              borderRadius: '2px',
               padding: '20px',
               display: 'flex',
               flexDirection: 'column',
@@ -882,14 +885,14 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setViewMode('paginated'); localStorage.setItem('epub-viewmode', 'paginated'); }}
-                  style={{ flex: 1, padding: '10px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: viewMode === 'paginated' ? 'rgba(255,255,255,0.1)' : 'transparent', color: viewMode === 'paginated' ? '#fff' : 'rgba(255,255,255,0.5)', border: 'none', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '13px', fontWeight: 500 }}
+                  style={{ flex: 1, padding: '10px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: viewMode === 'paginated' ? 'rgba(255,255,255,0.1)' : 'transparent', color: viewMode === 'paginated' ? '#fff' : 'rgba(255,255,255,0.5)', border: 'none', borderRadius: '0px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '13px', fontWeight: 500 }}
                 >
                   <MoveHorizontal size={16} /> {t('book.pagesLayout')}
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setViewMode(SCROLLED_VIEW_MODE); localStorage.setItem('epub-viewmode', SCROLLED_VIEW_MODE); }}
-                  style={{ flex: 1, padding: '10px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: isScrolledMode ? 'rgba(255,255,255,0.1)' : 'transparent', color: isScrolledMode ? '#fff' : 'rgba(255,255,255,0.5)', border: 'none', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '13px', fontWeight: 500 }}
+                  style={{ flex: 1, padding: '10px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: isScrolledMode ? 'rgba(255,255,255,0.1)' : 'transparent', color: isScrolledMode ? '#fff' : 'rgba(255,255,255,0.5)', border: 'none', borderRadius: '0px', cursor: 'pointer', transition: 'all 0.2s', fontSize: '13px', fontWeight: 500 }}
                 >
                   <MoveVertical size={16} /> {t('book.scrollLayout')}
                 </motion.button>
@@ -899,10 +902,10 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
             {/* Typography Segment */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>{t('book.typography')}</span>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', padding: '8px 12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', padding: '8px 12px', borderRadius: '0px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <button
                   onClick={() => setFontSize(s => { const n = Math.max(60, s - 10); localStorage.setItem('epub-fontsize', String(n)); return n; })}
-                  style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '8px', color: 'rgba(255,255,255,0.8)', cursor: 'pointer' }}
+                  style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '0px', color: 'rgba(255,255,255,0.8)', cursor: 'pointer' }}
                 >
                   <Minus size={16} />
                 </button>
@@ -912,7 +915,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 </div>
                 <button
                   onClick={() => setFontSize(s => { const n = Math.min(200, s + 10); localStorage.setItem('epub-fontsize', String(n)); return n; })}
-                  style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '8px', color: 'rgba(255,255,255,0.8)', cursor: 'pointer' }}
+                  style={{ padding: '6px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '0px', color: 'rgba(255,255,255,0.8)', cursor: 'pointer' }}
                 >
                   <Plus size={16} />
                 </button>
@@ -950,9 +953,9 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                   top: 0, left: 0, bottom: 0,
                   width: '320px',
                   maxWidth: '85vw',
-                  background: 'rgba(12, 12, 14, 0.95)',
+                  background: 'rgba(11, 13, 18, 0.97)',
                   backdropFilter: 'blur(30px)',
-                  borderRight: '1px solid rgba(255,255,255,0.08)',
+                  borderRight: '1px solid #262a35',
                   zIndex: 61,
                   display: 'flex',
                   flexDirection: 'column',
@@ -960,7 +963,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 }}
               >
                 <div style={{ padding: '24px', paddingBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#f4f4f5', letterSpacing: '-0.01em' }}>
+                  <span style={{ fontSize: '16px', fontWeight: 600, color: '#ece9e0', letterSpacing: '-0.01em' }}>
                     {t('book.tableOfContents')}
                   </span>
                   <button onClick={() => setShowToc(false)} style={{ background: 'rgba(255,255,255,0.05)', padding: '6px', borderRadius: '50%', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
@@ -981,9 +984,9 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                         style={{
                           display: 'block', width: '100%', textAlign: 'left',
                           padding: `10px 16px 10px ${16 + depth * 14}px`,
-                          background: isActive ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
-                          border: 'none', borderRadius: '12px',
-                          color: isActive ? '#ef4444' : depth === 0 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.45)',
+                          background: isActive ? 'rgba(179, 18, 46, 0.12)' : 'transparent',
+                          border: 'none', borderRadius: '0px',
+                          color: isActive ? '#d41f3d' : depth === 0 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.45)',
                           fontWeight: isActive ? 600 : depth === 0 ? 500 : 400,
                           fontSize: depth === 0 ? '14px' : '12.5px',
                           lineHeight: '1.5', cursor: 'pointer',
@@ -1010,11 +1013,11 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
         {!isRendered && !loadError && (
           <div data-testid="epub-loading" style={{
             position: 'absolute', inset: 0, zIndex: 20,
-            background: '#050505',
+            background: '#08090d',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexDirection: 'column', gap: '12px',
           }}>
-            <Loader size={26} className="animate-spin" style={{ color: '#ef4444' }} />
+            <Loader size={26} className="animate-spin" style={{ color: '#d41f3d' }} />
             <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '13px', fontFamily: 'Outfit, Inter, system-ui, sans-serif' }}>Loading…</span>
           </div>
         )}
@@ -1023,11 +1026,11 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
         {loadError && (
           <div data-testid="epub-error" style={{
             position: 'absolute', inset: 0, zIndex: 20,
-            background: '#050505',
+            background: '#08090d',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexDirection: 'column', gap: '12px',
           }}>
-            <AlertCircle size={26} style={{ color: '#ef4444' }} />
+            <AlertCircle size={26} style={{ color: '#d41f3d' }} />
             <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: '13px', fontFamily: 'Outfit, Inter, system-ui, sans-serif', textAlign: 'center', maxWidth: '240px' }}>
               {loadError}
             </span>
@@ -1039,10 +1042,10 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 style={{
                   marginTop: '4px',
                   padding: '8px 12px',
-                  borderRadius: '10px',
-                  background: 'rgba(239, 68, 68, 0.16)',
-                  border: '1px solid rgba(239, 68, 68, 0.32)',
-                  color: '#fca5a5',
+                  borderRadius: '0px',
+                  background: 'rgba(179, 18, 46, 0.16)',
+                  border: '1px solid rgba(179, 18, 46, 0.45)',
+                  color: '#e8354f',
                   fontSize: '12px',
                   fontWeight: 600,
                 }}
@@ -1066,7 +1069,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               zIndex: 1,
               overflowY: 'auto',
               WebkitOverflowScrolling: 'touch',
-              background: '#050505',
+              background: '#08090d',
               padding: '80px 8% 120px',
             }}
           >
@@ -1084,9 +1087,9 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               .epub-full-section {
                 max-width: 680px;
                 margin: 0 auto;
-                color: #d6d3cd;
-                font-family: Georgia, "Times New Roman", serif;
-                line-height: 1.9;
+                color: #c9c5b8;
+                font-family: 'Newsreader', Georgia, "Times New Roman", serif;
+                line-height: 1.95;
               }
               .epub-full-section + .epub-full-section {
                 margin-top: 3.5rem;
@@ -1099,33 +1102,36 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               .epub-full-section h4,
               .epub-full-section h5,
               .epub-full-section h6 {
-                color: #f4f4f5;
-                font-family: Georgia, "Times New Roman", serif;
-                font-weight: 700;
+                color: #ece9e0;
+                font-family: 'Cormorant Garamond', Georgia, serif;
+                font-weight: 500;
                 margin-top: 2em;
                 margin-bottom: 0.8em;
                 line-height: 1.3;
               }
               .epub-full-section p,
               .epub-full-section .MsoNormal {
-                color: #d6d3cd;
+                color: #c9c5b8;
                 line-height: 1.9;
                 margin-top: 0;
                 margin-bottom: 1.1em;
                 text-align: left;
               }
               .epub-full-section a {
-                color: #ef4444;
+                color: #d41f3d;
                 text-decoration: none;
-                border-bottom: 1px solid rgba(239,68,68,0.25);
+                border-bottom: 1px solid rgba(212,31,61,0.3);
               }
               .epub-full-section img {
                 max-width: 100%;
                 height: auto;
-                border-radius: 8px;
+                border-radius: 0;
                 margin: 2em auto;
                 display: block;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                border: 1px solid #262a35;
+                padding: 6px;
+                background: #10131b;
+                box-shadow: none;
               }
               .epub-full-section svg {
                 display: block;
@@ -1136,8 +1142,8 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               }
               .epub-full-section .indentb,
               .epub-full-section .quoteb {
-                color: #c9c3b8;
-                border-left: 3px solid rgba(239,68,68,0.4);
+                color: #c9c5b8;
+                border-left: 2px solid #b3122e;
                 padding-left: 1.4em;
                 margin-left: 0;
                 margin-right: 0;
@@ -1150,7 +1156,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               .epub-full-section .calibre7,
               .epub-full-section .calibre28,
               .epub-full-section .calibre35 {
-                color: #f4f4f5;
+                color: #ece9e0;
               }
               .epub-full-section .calibre10,
               .epub-full-section .calibre17,
@@ -1166,12 +1172,12 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
               .epub-full-section .calibre19,
               .epub-full-section .calibre23,
               .epub-full-section .term {
-                color: #93c5fd;
+                color: #4a7fb5;
               }
               .epub-full-section .calibre12,
               .epub-full-section .calibre20,
               .epub-full-section .calibre25 {
-                color: #d6d3cd;
+                color: #c9c5b8;
               }
               .epub-full-section em,
               .epub-full-section i,
@@ -1181,7 +1187,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 color: inherit;
               }
               .epub-full-section .enote {
-                color: #f87171;
+                color: #d41f3d;
                 font-size: 0.78em;
                 font-weight: bold;
                 font-family: inherit;
@@ -1192,7 +1198,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
                 margin: 3em 0;
               }
               .epub-full-section ::selection {
-                background: rgba(239,68,68,0.4);
+                background: rgba(179,18,46,0.55);
               }
             `}</style>
           </div>
@@ -1214,7 +1220,7 @@ const EpubReader = ({ url, title, onProgressChange, onToggleFullscreen, isFullsc
       {/* Reading progress bar */}
       {readingProgress > 0 && (
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px', background: 'rgba(255,255,255,0.04)', zIndex: 30 }}>
-          <div style={{ height: '100%', width: `${readingProgress}%`, background: 'rgba(239,68,68,0.7)', transition: 'width 0.5s ease' }} />
+          <div style={{ height: '100%', width: `${readingProgress}%`, background: '#b3122e', transition: 'width 0.5s ease' }} />
         </div>
       )}
     </div>

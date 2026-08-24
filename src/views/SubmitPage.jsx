@@ -262,7 +262,9 @@ const SubmitPage = () => {
                 <div className={s.heroGrid} />
                 <div className={s.heroContent}>
                     <div className={s.heroCopy}>
+                        <p className={s.heroKicker}>Writers' Collective</p>
                         <h1 className={s.heroTitle}>Submit Your Work</h1>
+                        <div className={s.heroRule} aria-hidden="true" />
                         <p className={s.heroQuote}>
                             "Every social class creates its own organic intellectuals."
                         </p>
@@ -314,11 +316,11 @@ const SubmitPage = () => {
                                 classNamePrefix="select"
                                 placeholder="Select tags..."
                                 styles={{
-                                    control: (base) => ({ ...base, backgroundColor: '#1a1a1a', borderColor: 'rgba(255,255,255,0.06)', color: 'white' }),
-                                    multiValue: (base) => ({ ...base, backgroundColor: '#c81e1e' }),
+                                    control: (base) => ({ ...base, backgroundColor: '#1a1f2b', borderColor: 'rgba(255,255,255,0.06)', color: 'white' }),
+                                    multiValue: (base) => ({ ...base, backgroundColor: '#b3122e' }),
                                     multiValueLabel: (base) => ({ ...base, color: 'white' }),
-                                    option: (base, { isFocused, isSelected }) => ({ ...base, backgroundColor: isSelected ? '#c81e1e' : isFocused ? '#1f1f1f' : '#0f0f0f', color: 'white' }),
-                                    menu: (base) => ({ ...base, backgroundColor: '#0f0f0f', border: '1px solid rgba(255,255,255,0.06)' }),
+                                    option: (base, { isFocused, isSelected }) => ({ ...base, backgroundColor: isSelected ? '#b3122e' : isFocused ? '#151924' : '#10131b', color: 'white' }),
+                                    menu: (base) => ({ ...base, backgroundColor: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }),
                                     input: (base) => ({ ...base, color: 'white' }),
                                     singleValue: (base) => ({ ...base, color: 'white' }),
                                 }}

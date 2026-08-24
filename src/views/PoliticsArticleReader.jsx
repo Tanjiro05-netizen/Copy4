@@ -192,7 +192,7 @@ const PoliticsArticleReader = () => {
     if (error || !article) {
         return (
             <div className={s.page}>
-                <div className={s.main} style={{background:'#181A23',border:'1px solid rgba(255,255,255,0.06)',borderRadius:18,padding:32}}>
+                <div className={s.main} style={{background:'#1a1f2b',border:'1px solid rgba(255,255,255,0.06)',borderRadius:18,padding:32}}>
                     <h1 className="text-2xl font-semibold mb-3">Dispatch unavailable</h1>
                     <p className="text-gray-400 mb-6">{error || 'This dispatch is unavailable right now.'}</p>
                     <Link href={backToFeedHref}

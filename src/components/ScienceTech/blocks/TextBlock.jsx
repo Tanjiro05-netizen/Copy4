@@ -23,7 +23,7 @@ const markdownComponents = {
         {lang && (
           <span className="absolute top-2 right-3 text-xs text-gray-500 uppercase tracking-wide">{lang}</span>
         )}
-        <pre className="bg-black/60 p-4 rounded-lg overflow-x-auto border border-gray-800">
+        <pre className="bg-black/60 p-4 rounded-none overflow-x-auto border border-gray-800">
           <code className="text-gray-300 text-sm">{children}</code>
         </pre>
       </div>
@@ -50,7 +50,7 @@ const markdownComponents = {
   td: ({ children }) => <td className="text-gray-300 px-3 py-2 border-t border-gray-700/50">{children}</td>,
   img: ({ src, alt }) => (
     <figure className="my-4">
-      <img src={src} alt={alt || ''} className="rounded-lg max-w-full" loading="lazy" />
+      <img src={src} alt={alt || ''} className="rounded-none max-w-full" loading="lazy" />
       {alt && <figcaption className="text-gray-500 text-xs mt-2 text-center">{alt}</figcaption>}
     </figure>
   ),

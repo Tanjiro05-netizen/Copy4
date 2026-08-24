@@ -4,15 +4,15 @@ import Link from 'next/link';
 
 const KnowledgeLayout = ({ children, sidebar, widgets, searchQuery = '', onSearchChange }) => {
   return (
-    <div className="min-h-screen bg-[#090909] text-white font-[Hanken_Grotesk,sans-serif] selection:bg-[rgba(200,30,30,0.3)] selection:text-white">
+    <div className="min-h-screen bg-[#0b0d12] text-white font-[Outfit,sans-serif] selection:bg-[rgba(179, 18, 46,0.3)] selection:text-white">
 
       {/* --- Action Toolbar (Sub-Header) --- */}
-      <div className="sticky top-16 z-40 bg-[#090909]/95 backdrop-blur border-b border-white/[0.06] py-2.5 mb-6 shadow-[0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="sticky top-16 z-40 bg-[#0b0d12]/95 backdrop-blur border-b border-white/[0.06] py-2.5 mb-6 shadow-[0_1px_0_rgba(255,255,255,0.04)]">
         <div className="w-full max-w-[1380px] mx-auto px-4 md:px-6 flex items-center justify-between gap-3 md:gap-4">
 
           {/* Eyebrow / Breadcrumb */}
           <div className="hidden md:flex flex-col shrink-0">
-            <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#c81e1e] opacity-70">
+            <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.16em] text-[#b3122e] opacity-70">
               Knowledge Q&amp;A
             </span>
             <span className="text-[11px] text-white/40 leading-none mt-0.5">Community knowledge base</span>
@@ -25,14 +25,14 @@ const KnowledgeLayout = ({ children, sidebar, widgets, searchQuery = '', onSearc
               value={searchQuery}
               onChange={e => onSearchChange?.(e.target.value)}
               placeholder="Search questions and answers..."
-              className="w-full bg-[#0f0f0f] border border-white/[0.06] rounded-xl px-4 py-2 pl-9 text-xs focus:outline-none focus:border-[rgba(200,30,30,0.4)] transition-all duration-200 text-white/80 placeholder-white/25 font-[Hanken_Grotesk,sans-serif]"
+              className="w-full bg-[#10131b] border border-white/[0.06] rounded-none px-4 py-2 pl-9 text-xs focus:outline-none focus:border-[rgba(179, 18, 46,0.4)] transition-all duration-200 text-white/80 placeholder-white/25 font-[Outfit,sans-serif]"
             />
-            <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-white/25 group-focus-within:text-[#c81e1e] transition-colors" />
+            <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-white/25 group-focus-within:text-[#b3122e] transition-colors" />
           </div>
 
           {/* Ask Question CTA */}
           <Link href="/knowledge/ask"
-            className="flex items-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white px-4 md:px-5 py-2 rounded-xl text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] shadow-[0_0_20px_rgba(200,30,30,0.22)] transition-all hover:shadow-[0_0_28px_rgba(200,30,30,0.38)] shrink-0"
+            className="flex items-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white px-4 md:px-5 py-2 rounded-none text-[11px] font-[JetBrains_Mono,monospace] uppercase tracking-[0.08em] shadow-[0_0_20px_rgba(179, 18, 46,0.22)] transition-all hover:shadow-[0_0_28px_rgba(179, 18, 46,0.38)] shrink-0"
           >
             <Zap className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Ask Question</span>
@@ -61,7 +61,7 @@ const KnowledgeLayout = ({ children, sidebar, widgets, searchQuery = '', onSearc
 
       {/* Mobile FAB */}
       <Link href="/knowledge/ask"
-        className="md:hidden fixed bottom-6 right-6 bg-[#c81e1e] hover:bg-[#e02424] text-white p-4 rounded-full shadow-[0_4px_24px_rgba(200,30,30,0.4)] z-50 transition-all hover:scale-105"
+        className="md:hidden fixed bottom-6 right-6 bg-[#b3122e] hover:bg-[#d41f3d] text-white p-4 rounded-full shadow-[0_4px_24px_rgba(179, 18, 46,0.4)] z-50 transition-all hover:scale-105"
       >
         <Zap className="w-5 h-5" />
       </Link>

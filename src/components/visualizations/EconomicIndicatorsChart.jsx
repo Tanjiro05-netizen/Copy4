@@ -99,29 +99,29 @@ const EconomicIndicatorsChart = ({
                     data={chartData}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#262a35" />
                     <XAxis
                         dataKey="year"
-                        stroke="#9ca3af"
-                        tick={{ fill: '#9ca3af' }}
+                        stroke="#a5a194"
+                        tick={{ fill: '#a5a194' }}
                     />
                     <YAxis
-                        stroke="#9ca3af"
-                        tick={{ fill: '#9ca3af' }}
+                        stroke="#a5a194"
+                        tick={{ fill: '#a5a194' }}
                     />
                     <Tooltip
                         contentStyle={{
-                            backgroundColor: '#1f2937',
-                            border: '1px solid #374151',
+                            backgroundColor: '#10131b',
+                            border: '1px solid #262a35',
                             borderRadius: '0.375rem'
                         }}
-                        labelStyle={{ color: '#f3f4f6' }}
-                        itemStyle={{ color: '#f3f4f6' }}
+                        labelStyle={{ color: '#ece9e0' }}
+                        itemStyle={{ color: '#ece9e0' }}
                     />
                     <Legend
                         wrapperStyle={{
                             paddingTop: '1rem',
-                            color: '#f3f4f6'
+                            color: '#ece9e0'
                         }}
                     />
                     {selectedIndicators.map(indicator => 

@@ -5,6 +5,7 @@ import ArticleAnalysis from '../components/ArticleAnalysis';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { BookText, Loader, Search, List, Grid, BookOpen } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import * as s from './AnalysisPage.css.ts';
 
 const AnalysisPage = () => {
@@ -229,15 +230,11 @@ const AnalysisPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div style={{marginBottom:32}}>
-                            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
-                                <h1 className={s.pageTitle}>
-                                    <BookText size={36} className={s.pageTitleIcon} />
-                                    Analysis
-                                </h1>
-                                <div className={s.pageCount}>{filteredArticles.length} papers available</div>
-                            </div>
-                        </div>
+                        <PageHeader
+                            kicker="Theory · Close Reading"
+                            title="Analysis"
+                            note={`${filteredArticles.length} papers — annotated texts, commentary, and companion analysis.`}
+                        />
 
                         <div className={s.searchRow}>
                             <div className={s.searchWrap}>

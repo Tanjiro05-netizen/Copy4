@@ -70,7 +70,7 @@ const DailyChallenge = ({ userId }) => {
 
   if (loading) {
     return (
-      <div className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-4 animate-pulse">
+      <div className="bg-[#10131b] border border-white/[0.06] rounded-none p-4 animate-pulse">
         <div className="h-3 bg-white/[0.06] rounded w-1/2 mb-3"></div>
         <div className="h-3 bg-white/[0.06] rounded w-3/4 mb-4"></div>
         <div className="h-8 bg-white/[0.06] rounded"></div>
@@ -79,12 +79,12 @@ const DailyChallenge = ({ userId }) => {
   }
 
   return (
-    <div className="bg-[#0f0f0f] border border-[rgba(200,30,30,0.22)] rounded-2xl overflow-hidden">
+    <div className="bg-[#10131b] border border-[rgba(179, 18, 46,0.22)] rounded-none overflow-hidden">
       {/* Header */}
-      <div className="bg-[rgba(200,30,30,0.1)] border-b border-[rgba(200,30,30,0.18)] px-3 py-2 flex items-center justify-between">
+      <div className="bg-[rgba(179, 18, 46,0.1)] border-b border-[rgba(179, 18, 46,0.18)] px-3 py-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Zap className="w-3.5 h-3.5 text-[#c81e1e]" />
-          <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#c81e1e]">
+          <Zap className="w-3.5 h-3.5 text-[#b3122e]" />
+          <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.12em] text-[#b3122e]">
             Daily Dialectic
           </span>
         </div>
@@ -103,11 +103,11 @@ const DailyChallenge = ({ userId }) => {
           <div className="font-[JetBrains_Mono,monospace] text-[8px] uppercase tracking-[0.12em] text-white/25 mb-1">
             {getDayName()}
           </div>
-          <div className="font-[Hanken_Grotesk,sans-serif] text-[13px] font-semibold text-white/85 leading-snug">
+          <div className="font-[Outfit,sans-serif] text-[13px] font-semibold text-white/85 leading-snug">
             {challenge?.title || 'No challenge today'}
           </div>
           {challenge?.description && (
-            <p className="font-[Hanken_Grotesk,sans-serif] text-[11px] text-white/35 mt-1 line-clamp-2 leading-relaxed">
+            <p className="font-[Outfit,sans-serif] text-[11px] text-white/35 mt-1 line-clamp-2 leading-relaxed">
               {challenge.description}
             </p>
           )}
@@ -134,7 +134,7 @@ const DailyChallenge = ({ userId }) => {
           </div>
           <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-[#c81e1e] to-orange-500 transition-all duration-500"
+              className="h-full bg-[#10131b] from-[#b3122e] to-orange-500 transition-all duration-500"
               style={{ width: `${xpPercentage}%` }}
             />
           </div>
@@ -142,13 +142,13 @@ const DailyChallenge = ({ userId }) => {
 
         {/* CTA */}
         {completed ? (
-          <div className="flex items-center justify-center gap-2 bg-emerald-900/20 text-emerald-400 border border-emerald-800/30 py-2 rounded-xl font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider">
+          <div className="flex items-center justify-center gap-2 bg-emerald-900/20 text-emerald-400 border border-emerald-800/30 py-2 rounded-none font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-wider">
             <Trophy className="w-3.5 h-3.5" />
             Completed Today
           </div>
         ) : (
           <Link href="/knowledge/study"
-            className="flex items-center justify-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white py-2.5 rounded-xl font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.08em] transition-all hover:shadow-[0_0_20px_rgba(200,30,30,0.3)] group"
+            className="flex items-center justify-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white py-2.5 rounded-none font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.08em] transition-all hover:shadow-[0_0_20px_rgba(179, 18, 46,0.3)] group"
           >
             <Zap className="w-3.5 h-3.5" />
             Start Challenge
@@ -162,7 +162,7 @@ const DailyChallenge = ({ userId }) => {
         <div className="bg-white/[0.02] border-t border-white/[0.06] px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm">{studyApiService.getRankInfo(progress.current_rank).icon}</span>
-            <span className="font-[Hanken_Grotesk,sans-serif] text-[11px] text-white/35 capitalize">{progress.current_rank}</span>
+            <span className="font-[Outfit,sans-serif] text-[11px] text-white/35 capitalize">{progress.current_rank}</span>
           </div>
           <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">{progress.total_xp} XP</span>
         </div>

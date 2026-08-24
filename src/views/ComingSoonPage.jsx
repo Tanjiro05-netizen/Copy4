@@ -49,9 +49,9 @@ const FEATURE_CONFIG = {
 };
 
 const CLASS_DATA = [
-    { name: 'Working Class', value: 60, color: '#c81e1e' },
-    { name: 'Middle Class', value: 30, color: '#ffb800' },
-    { name: 'Capitalist Class', value: 10, color: '#2ed573' },
+    { name: 'Working Class', value: 60, color: '#b3122e' },
+    { name: 'Middle Class', value: 30, color: '#d8c79f' },
+    { name: 'Capitalist Class', value: 10, color: '#2d8a4e' },
 ];
 
 const GINI_DATA = [
@@ -85,7 +85,7 @@ const VisualizationTeaser = () => (
                                 <Cell key={i} fill={entry.color} />
                             ))}
                         </Pie>
-                        <Tooltip contentStyle={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, color: '#fff', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ background: '#151924', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, color: '#fff', fontSize: 12 }} />
                     </PieChart>
                 </ResponsiveContainer>
             </div>
@@ -103,8 +103,8 @@ const VisualizationTeaser = () => (
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                         <XAxis dataKey="year" tick={{ fill: '#666', fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis domain={[0.25, 0.50]} tick={{ fill: '#666', fontSize: 11 }} axisLine={false} tickLine={false} />
-                        <Line type="monotone" dataKey="gini" stroke="#c81e1e" strokeWidth={2} dot={{ fill: '#c81e1e', r: 3 }} />
-                        <Tooltip contentStyle={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, color: '#fff', fontSize: 12 }} />
+                        <Line type="monotone" dataKey="gini" stroke="#b3122e" strokeWidth={2} dot={{ fill: '#b3122e', r: 3 }} />
+                        <Tooltip contentStyle={{ background: '#151924', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, color: '#fff', fontSize: 12 }} />
                     </ReLineChart>
                 </ResponsiveContainer>
             </div>
@@ -128,6 +128,7 @@ const ComingSoonPage = () => {
                     </div>
                 )}
 
+                <p className={s.kicker}>In Preparation</p>
                 <h1 className={s.title}>{feature ? feature.title : 'Coming Soon'}</h1>
                 <div className={s.rule} />
 

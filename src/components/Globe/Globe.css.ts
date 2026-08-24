@@ -11,7 +11,7 @@ export const globeContainer = style({
   width: '100%',
   height: '100%',
   minHeight: '600px',
-  background: 'radial-gradient(ellipse at center, #0a0a12 0%, #050508 100%)',
+  background: 'radial-gradient(ellipse at center, #0b0d12 0%, #08090d 100%)',
   borderRadius: vars.radius.xl,
   overflow: 'hidden',
   border: vars.border.subtle,
@@ -41,7 +41,7 @@ export const overlayTitle = style({
 });
 
 export const overlaySubtitle = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -97,20 +97,20 @@ export const loadingWrap = style({
   justifyContent: 'center',
   gap: vars.space.md,
   zIndex: 5,
-  background: 'radial-gradient(ellipse at center, #0a0a12 0%, #050508 100%)',
+  background: 'radial-gradient(ellipse at center, #0b0d12 0%, #08090d 100%)',
 });
 
 export const spinner = style({
   width: '32px',
   height: '32px',
-  border: '2px solid rgba(200,30,30,0.2)',
+  border: '2px solid rgba(179, 18, 46,0.2)',
   borderTopColor: vars.color.accent,
   borderRadius: '50%',
   animation: 'spin 0.8s linear infinite',
 });
 
 export const loadingText = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -122,7 +122,7 @@ export const hint = style({
   bottom: vars.space.lg,
   left: vars.space.lg,
   zIndex: 10,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.06em',
   color: vars.color.textFaint,
@@ -153,7 +153,7 @@ export const legendItem = style({
   WebkitBackdropFilter: 'blur(12px)',
   border: vars.border.subtle,
   color: vars.color.textSoft,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.06em',
   textTransform: 'uppercase',
@@ -197,7 +197,7 @@ export const infoPanel = style({
 });
 
 export const infoCategory = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.1em',
   textTransform: 'uppercase',
@@ -217,7 +217,7 @@ export const infoTitle = style({
 });
 
 export const infoYear = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
   color: vars.color.textMuted,
 });

@@ -9,7 +9,7 @@ const demoSubject = {
   slug: 'physics',
   description: 'Mechanics, waves, fields, matter, and experiments.',
   icon_name: 'atom',
-  color: '#3b82f6',
+  color: '#4a7fb5',
   order_index: 1,
 };
 

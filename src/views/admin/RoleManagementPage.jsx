@@ -569,7 +569,7 @@ const RoleManagementPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-white px-4 py-8">
+        <div className="min-h-screen bg-[#0b0d12] text-white px-4 py-8">
             <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold inline-flex items-center gap-2">
@@ -584,12 +584,12 @@ const RoleManagementPage = () => {
                         type="text"
                         value={searchQuery}
                         onChange={(event) => setSearchQuery(event.target.value)}
-                        className="w-full bg-[#181A23] border border-gray-700 rounded-xl pl-10 pr-3 py-2.5 text-white"
+                        className="w-full bg-[#1a1f2b] border border-gray-700 rounded-none pl-10 pr-3 py-2.5 text-white"
                         placeholder="Search by username, id, role, or tags..."
                     />
                 </div>
 
-                <section className="mb-6 bg-[#181A23] border border-gray-800 rounded-2xl p-4">
+                <section className="mb-6 bg-[#1a1f2b] border border-gray-800 rounded-none p-4">
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
@@ -605,7 +605,7 @@ const RoleManagementPage = () => {
                             <button
                                 type="button"
                                 onClick={toggleSelectAllFiltered}
-                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs bg-gray-800 hover:bg-gray-700 transition-colors"
+                                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-none text-xs bg-gray-800 hover:bg-gray-700 transition-colors"
                             >
                                 {allFilteredSelected ? <CheckSquare size={14} /> : <Square size={14} />}
                                 {allFilteredSelected
@@ -616,7 +616,7 @@ const RoleManagementPage = () => {
                                 type="button"
                                 onClick={saveSelectedProfiles}
                                 disabled={selectedDirtyCount === 0 || isSavingSelected}
-                                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-xs bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+                                className="inline-flex items-center gap-2 px-3 py-2 rounded-none text-xs bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
                             >
                                 {isSavingSelected ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                                 {isSavingSelected
@@ -629,12 +629,12 @@ const RoleManagementPage = () => {
                     </div>
 
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                        <div className="bg-[#0F1118] border border-gray-700 rounded-xl p-3 space-y-2">
+                        <div className="bg-[#10131b] border border-gray-700 rounded-none p-3 space-y-2">
                             <p className="text-xs text-gray-400 uppercase tracking-wide">Base role</p>
                             <select
                                 value={bulkBaseRole}
                                 onChange={(event) => setBulkBaseRole(event.target.value)}
-                                className="w-full bg-[#0A0B11] border border-gray-700 rounded-lg px-2.5 py-2 text-xs"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-2.5 py-2 text-xs"
                             >
                                 {BASE_ROLE_OPTIONS.map((roleOption) => (
                                     <option key={`bulk-base-${roleOption}`} value={roleOption}>
@@ -646,19 +646,19 @@ const RoleManagementPage = () => {
                                 type="button"
                                 onClick={applyBulkBaseRole}
                                 disabled={selectedProfileCount === 0}
-                                className="w-full px-3 py-2 rounded-lg text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 rounded-none text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 Apply to selected
                             </button>
                         </div>
 
-                        <div className="bg-[#0F1118] border border-gray-700 rounded-xl p-3 space-y-2">
+                        <div className="bg-[#10131b] border border-gray-700 rounded-none p-3 space-y-2">
                             <p className="text-xs text-gray-400 uppercase tracking-wide">Editorial roles</p>
                             <div className="grid grid-cols-2 gap-2">
                                 <select
                                     value={bulkEditorialAction}
                                     onChange={(event) => setBulkEditorialAction(event.target.value)}
-                                    className="bg-[#0A0B11] border border-gray-700 rounded-lg px-2 py-2 text-xs"
+                                    className="bg-[#10131b] border border-gray-700 rounded-none px-2 py-2 text-xs"
                                 >
                                     <option value="add">Add</option>
                                     <option value="remove">Remove</option>
@@ -666,7 +666,7 @@ const RoleManagementPage = () => {
                                 <select
                                     value={bulkEditorialRole}
                                     onChange={(event) => setBulkEditorialRole(event.target.value)}
-                                    className="bg-[#0A0B11] border border-gray-700 rounded-lg px-2 py-2 text-xs"
+                                    className="bg-[#10131b] border border-gray-700 rounded-none px-2 py-2 text-xs"
                                 >
                                     {EDITORIAL_ROLE_OPTIONS.map((roleOption) => (
                                         <option key={`bulk-editorial-${roleOption}`} value={roleOption}>
@@ -679,19 +679,19 @@ const RoleManagementPage = () => {
                                 type="button"
                                 onClick={applyBulkEditorialRole}
                                 disabled={selectedProfileCount === 0}
-                                className="w-full px-3 py-2 rounded-lg text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 rounded-none text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 Apply to selected
                             </button>
                         </div>
 
-                        <div className="bg-[#0F1118] border border-gray-700 rounded-xl p-3 space-y-2">
+                        <div className="bg-[#10131b] border border-gray-700 rounded-none p-3 space-y-2">
                             <p className="text-xs text-gray-400 uppercase tracking-wide">Expertise roles</p>
                             <div className="grid grid-cols-2 gap-2">
                                 <select
                                     value={bulkExpertiseAction}
                                     onChange={(event) => setBulkExpertiseAction(event.target.value)}
-                                    className="bg-[#0A0B11] border border-gray-700 rounded-lg px-2 py-2 text-xs"
+                                    className="bg-[#10131b] border border-gray-700 rounded-none px-2 py-2 text-xs"
                                 >
                                     <option value="add">Add</option>
                                     <option value="remove">Remove</option>
@@ -699,7 +699,7 @@ const RoleManagementPage = () => {
                                 <select
                                     value={bulkExpertiseRole}
                                     onChange={(event) => setBulkExpertiseRole(event.target.value)}
-                                    className="bg-[#0A0B11] border border-gray-700 rounded-lg px-2 py-2 text-xs"
+                                    className="bg-[#10131b] border border-gray-700 rounded-none px-2 py-2 text-xs"
                                 >
                                     {EXPERTISE_PRESETS.map((roleOption) => (
                                         <option key={`bulk-expertise-${roleOption}`} value={roleOption}>
@@ -712,18 +712,18 @@ const RoleManagementPage = () => {
                                 type="button"
                                 onClick={applyBulkExpertiseRole}
                                 disabled={selectedProfileCount === 0}
-                                className="w-full px-3 py-2 rounded-lg text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 rounded-none text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 Apply to selected
                             </button>
                         </div>
 
-                        <div className="bg-[#0F1118] border border-gray-700 rounded-xl p-3 space-y-2">
+                        <div className="bg-[#10131b] border border-gray-700 rounded-none p-3 space-y-2">
                             <p className="text-xs text-gray-400 uppercase tracking-wide">Certification</p>
                             <select
                                 value={bulkCertifiedState}
                                 onChange={(event) => setBulkCertifiedState(event.target.value)}
-                                className="w-full bg-[#0A0B11] border border-gray-700 rounded-lg px-2.5 py-2 text-xs"
+                                className="w-full bg-[#10131b] border border-gray-700 rounded-none px-2.5 py-2 text-xs"
                             >
                                 <option value="certified">Set certified</option>
                                 <option value="not_certified">Set not certified</option>
@@ -732,7 +732,7 @@ const RoleManagementPage = () => {
                                 type="button"
                                 onClick={applyBulkCertification}
                                 disabled={selectedProfileCount === 0}
-                                className="w-full px-3 py-2 rounded-lg text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                                className="w-full px-3 py-2 rounded-none text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 Apply to selected
                             </button>
@@ -740,7 +740,7 @@ const RoleManagementPage = () => {
                     </div>
                 </section>
 
-                <section className="mb-6 bg-[#181A23] border border-gray-800 rounded-2xl p-4">
+                <section className="mb-6 bg-[#1a1f2b] border border-gray-800 rounded-none p-4">
                     <div className="flex items-center justify-between gap-3 mb-3">
                         <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300 inline-flex items-center gap-2">
                             <History size={16} /> Recent role change audit
@@ -749,7 +749,7 @@ const RoleManagementPage = () => {
                             type="button"
                             onClick={refreshRoleAudit}
                             disabled={loadingAudit}
-                            className="px-3 py-1.5 rounded-lg text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="px-3 py-1.5 rounded-none text-xs bg-gray-800 hover:bg-gray-700 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             {loadingAudit ? 'Refreshing...' : 'Refresh'}
                         </button>
@@ -764,7 +764,7 @@ const RoleManagementPage = () => {
                     ) : (
                         <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
                             {recentRoleAudit.map((entry) => (
-                                <div key={entry.id} className="bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2">
+                                <div key={entry.id} className="bg-[#10131b] border border-gray-700 rounded-none px-3 py-2">
                                     <p className="text-xs text-gray-200">
                                         Target <span className="font-mono">{entry.target_profile_id}</span>
                                     </p>
@@ -781,27 +781,27 @@ const RoleManagementPage = () => {
                 </section>
 
                 {dirtyProfileIds.size > 0 && (
-                    <div className="mb-4 p-3 bg-amber-900/30 border border-amber-500/40 rounded-lg text-amber-200 text-sm">
+                    <div className="mb-4 p-3 bg-amber-900/30 border border-amber-500/40 rounded-none text-amber-200 text-sm">
                         {dirtyProfileIds.size} profile{dirtyProfileIds.size === 1 ? '' : 's'} with unsaved changes.
                     </div>
                 )}
 
                 {success && (
-                    <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-lg text-emerald-300 text-sm">
+                    <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-none text-emerald-300 text-sm">
                         {success}
                     </div>
                 )}
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-900/40 border border-red-500/30 rounded-lg text-red-300 text-sm inline-flex items-center gap-2">
+                    <div className="mb-4 p-3 bg-red-900/40 border border-red-500/30 rounded-none text-red-300 text-sm inline-flex items-center gap-2">
                         <AlertTriangle size={15} /> {error}
                     </div>
                 )}
 
                 {loading ? (
-                    <div className="bg-[#181A23] border border-gray-800 rounded-2xl p-8 text-gray-400">Loading members...</div>
+                    <div className="bg-[#1a1f2b] border border-gray-800 rounded-none p-8 text-gray-400">Loading members...</div>
                 ) : filteredProfiles.length === 0 ? (
-                    <div className="bg-[#181A23] border border-gray-800 rounded-2xl p-8 text-gray-400">No matching members found.</div>
+                    <div className="bg-[#1a1f2b] border border-gray-800 rounded-none p-8 text-gray-400">No matching members found.</div>
                 ) : (
                     <div className="space-y-4">
                         {filteredProfiles.map((profile) => {
@@ -811,7 +811,7 @@ const RoleManagementPage = () => {
                             return (
                                 <article
                                     key={profile.id}
-                                    className={`bg-[#181A23] border rounded-2xl p-5 ${
+                                    className={`bg-[#1a1f2b] border rounded-none p-5 ${
                                         profileIsSelected ? 'border-sky-500/60' : 'border-gray-800'
                                     }`}
                                 >
@@ -847,7 +847,7 @@ const RoleManagementPage = () => {
                                                 onChange={(event) =>
                                                     patchProfileState(profile.id, { role: event.target.value })
                                                 }
-                                                className="bg-[#0F1118] border border-gray-700 rounded-lg px-2.5 py-1.5 text-sm"
+                                                className="bg-[#10131b] border border-gray-700 rounded-none px-2.5 py-1.5 text-sm"
                                             >
                                                 {BASE_ROLE_OPTIONS.map((roleOption) => (
                                                     <option key={`${profile.id}-${roleOption}`} value={roleOption}>
@@ -874,7 +874,7 @@ const RoleManagementPage = () => {
                                                         className={`px-3 py-1.5 rounded-full text-xs transition-colors border ${
                                                             isEnabled
                                                                 ? 'bg-red-600/30 border-red-500 text-red-200'
-                                                                : 'bg-[#0F1118] border-gray-700 text-gray-300 hover:border-gray-500'
+                                                                : 'bg-[#10131b] border-gray-700 text-gray-300 hover:border-gray-500'
                                                         }`}
                                                     >
                                                         {roleOption}
@@ -892,7 +892,7 @@ const RoleManagementPage = () => {
                                                         is_certified: event.target.checked,
                                                     })
                                                 }
-                                                className="rounded border-gray-600 bg-[#0F1118]"
+                                                className="rounded border-gray-600 bg-[#10131b]"
                                             />
                                             <UserCheck size={14} /> Certified
                                         </label>
@@ -914,7 +914,7 @@ const RoleManagementPage = () => {
                                                         className={`px-3 py-1.5 rounded-full text-xs transition-colors border ${
                                                             isEnabled
                                                                 ? 'bg-sky-600/30 border-sky-500 text-sky-200'
-                                                                : 'bg-[#0F1118] border-gray-700 text-gray-300 hover:border-gray-500'
+                                                                : 'bg-[#10131b] border-gray-700 text-gray-300 hover:border-gray-500'
                                                         }`}
                                                     >
                                                         {preset}
@@ -953,12 +953,12 @@ const RoleManagementPage = () => {
                                                     }))
                                                 }
                                                 placeholder="Add custom tag"
-                                                className="flex-1 bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                                                className="flex-1 bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-sm"
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => addCustomTag(profile.id)}
-                                                className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm bg-gray-800 hover:bg-gray-700 transition-colors"
+                                                className="inline-flex items-center gap-1 px-3 py-2 rounded-none text-sm bg-gray-800 hover:bg-gray-700 transition-colors"
                                             >
                                                 <Plus size={14} /> Add
                                             </button>
@@ -971,7 +971,7 @@ const RoleManagementPage = () => {
                                         type="button"
                                         onClick={() => saveProfile(profile)}
                                         disabled={savingId === profile.id || isSavingSelected || !profileIsDirty}
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-none text-sm font-medium disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
                                     >
                                         {savingId === profile.id ? (
                                             <Loader2 size={14} className="animate-spin" />

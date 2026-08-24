@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import * as d3 from 'd3';
 
-const DEFAULT_COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#a855f7', '#f59e0b'];
+const DEFAULT_COLORS = ['#d41f3d', '#4a7fb5', '#2d8a4e', '#8a84b8', '#c8860a'];
 const MARGIN = { top: 20, right: 30, bottom: 40, left: 50 };
 
 const FunctionPlotter = ({ config }) => {
@@ -162,7 +162,7 @@ const FunctionPlotter = ({ config }) => {
   }, [funcStrings, xRange, computedYRange, params, parseFunction, innerWidth, innerHeight]);
 
   return (
-    <div className="bg-black/40 rounded-xl border border-gray-800 p-4">
+    <div className="bg-black/40 rounded-none border border-gray-800 p-4">
       <div className="flex items-center gap-4 mb-3 flex-wrap">
         {funcStrings.map((str, idx) => (
           <span key={idx} className="flex items-center gap-2 text-sm">

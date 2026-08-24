@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
-import Header from '../../components/Header';
 import { useAuth } from '../../context/AuthContext';
 import { Plus, Edit, Trash, Tag, Folder, Check, X } from 'lucide-react';
 
@@ -208,12 +207,11 @@ const TagManagementPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
-            <Header />
-            <main className="max-w-4xl mx-auto p-8">
+            <div className="max-w-4xl mx-auto p-8">
                 <h1 className="text-3xl font-bold mb-8">Manage Categories & Tags</h1>
 
                 {/* Categories Section */}
-                <div className="bg-gray-800/50 p-6 rounded-lg">
+                <div className="bg-gray-800/50 p-6 rounded-none">
                     <h2 className="text-2xl font-semibold mb-4 flex items-center"><Folder className="mr-3"/>Categories</h2>
                     
                     <form onSubmit={handleAddCategory} className="flex gap-4 mb-6">
@@ -222,23 +220,23 @@ const TagManagementPage = () => {
                             value={newCategoryName}
                             onChange={(e) => setNewCategoryName(e.target.value)}
                             placeholder="New category name"
-                            className="flex-grow bg-gray-900/70 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="flex-grow bg-gray-900/70 border border-gray-700 rounded-none px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
-                        <button type="submit" className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md flex items-center">
+                        <button type="submit" className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-none flex items-center">
                             <Plus size={18} className="mr-2"/> Add
                         </button>
                     </form>
 
                     <div className="space-y-3">
                         {categories.map(category => (
-                            <div key={category.id} className="flex justify-between items-center bg-gray-900/50 p-3 rounded-md">
+                            <div key={category.id} className="flex justify-between items-center bg-gray-900/50 p-3 rounded-none">
                                 {editingCategoryId === category.id ? (
                                     <form onSubmit={handleUpdateCategory} className="flex-grow flex items-center gap-4">
                                         <input
                                             type="text"
                                             value={editingCategoryName}
                                             onChange={(e) => setEditingCategoryName(e.target.value)}
-                                            className="flex-grow bg-gray-700 border border-gray-600 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                            className="flex-grow bg-gray-700 border border-gray-600 rounded-none px-3 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
                                             autoFocus
                                             onKeyDown={(e) => e.key === 'Escape' && handleCancelEdit()}
                                         />
@@ -260,7 +258,7 @@ const TagManagementPage = () => {
                 </div>
 
                 {/* Tags Section */}
-                <div className="bg-gray-800/50 p-6 rounded-lg mt-8">
+                <div className="bg-gray-800/50 p-6 rounded-none mt-8">
                     <h2 className="text-2xl font-semibold mb-4 flex items-center"><Tag className="mr-3"/>Tags</h2>
                     
                     <form onSubmit={handleAddTag} className="flex gap-4 mb-6">
@@ -269,16 +267,16 @@ const TagManagementPage = () => {
                             value={newTagName}
                             onChange={(e) => setNewTagName(e.target.value)}
                             placeholder="New tag name"
-                            className="flex-grow bg-gray-900/70 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="flex-grow bg-gray-900/70 border border-gray-700 rounded-none px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
-                        <button type="submit" className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md flex items-center">
+                        <button type="submit" className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-none flex items-center">
                             <Plus size={18} className="mr-2"/> Add
                         </button>
                     </form>
 
                     <div className="space-y-3">
                         {tags.map(tag => (
-                            <div key={tag.id} className="flex justify-between items-center bg-gray-900/50 p-3 rounded-md">
+                            <div key={tag.id} className="flex justify-between items-center bg-gray-900/50 p-3 rounded-none">
                                 {deletingTagId === tag.id ? (
                                     <div className="flex-grow flex items-center justify-between">
                                         <span className="text-red-400 font-semibold">Are you sure?</span>
@@ -293,7 +291,7 @@ const TagManagementPage = () => {
                                             type="text"
                                             value={editingTagName}
                                             onChange={(e) => setEditingTagName(e.target.value)}
-                                            className="flex-grow bg-gray-700 border border-gray-600 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                            className="flex-grow bg-gray-700 border border-gray-600 rounded-none px-3 py-1 focus:outline-none focus:ring-2 focus:ring-red-500"
                                             autoFocus
                                             onKeyDown={(e) => e.key === 'Escape' && handleCancelEditTag()}
                                         />
@@ -313,7 +311,7 @@ const TagManagementPage = () => {
                         ))}
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     );
 };

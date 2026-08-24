@@ -34,7 +34,7 @@ const TextCard = ({ text, variant = 'grid', isAdmin = false, onDelete }) => {
         return (
             <div
                 onClick={handleClick}
-                className="bg-gray-900/50 hover:bg-gray-900/80 border border-gray-800 hover:border-red-500/30 rounded-xl p-4 cursor-pointer transition-all duration-200 group"
+                className="bg-gray-900/50 hover:bg-gray-900/80 border border-gray-800 hover:border-red-500/30 rounded-none p-4 cursor-pointer transition-all duration-200 group"
             >
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex-1">
@@ -90,7 +90,7 @@ const TextCard = ({ text, variant = 'grid', isAdmin = false, onDelete }) => {
     return (
         <div
             onClick={handleClick}
-            className="bg-gray-900/50 hover:bg-gray-900/80 border border-gray-800 hover:border-red-500/30 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 group flex flex-col"
+            className="bg-gray-900/50 hover:bg-gray-900/80 border border-gray-800 hover:border-red-500/30 rounded-none overflow-hidden cursor-pointer transition-all duration-200 group flex flex-col"
         >
             {/* Card Header */}
             <div className="p-5 flex-1">

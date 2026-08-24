@@ -37,7 +37,7 @@ const BlockRenderer = ({ blocks }) => {
         if (!Component) {
           if (process.env.NODE_ENV === 'development') {
             return (
-              <div key={index} className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-4 text-yellow-300 text-sm">
+              <div key={index} className="bg-yellow-900/20 border border-yellow-700/40 rounded-none p-4 text-yellow-300 text-sm">
                 Unknown block type: <code className="bg-black/30 px-1 rounded">{block.type}</code>
               </div>
             );

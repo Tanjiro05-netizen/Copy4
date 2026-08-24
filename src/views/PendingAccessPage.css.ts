@@ -126,7 +126,7 @@ export const input = style({
   border: vars.border.subtle,
   borderRadius: vars.radius.md,
   color: vars.color.text,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '16px',
   letterSpacing: '0.12em',
   textTransform: 'uppercase',

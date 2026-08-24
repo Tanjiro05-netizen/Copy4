@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Image as ImageIcon, Newspaper, Search } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 import * as s from './PoliticsPage.css.ts';
 
 const categories = [
@@ -55,20 +56,12 @@ const PoliticsPage = () => {
     <div className={s.page}>
       <main className={s.main}>
         {/* ── Header ── */}
-        <div className={s.header}>
-          <div className={s.headerRow}>
-            <div>
-              <h1 className={s.pageTitle}>
-                <Newspaper size={36} className={s.pageTitleIcon} />
-                Current Affairs
-              </h1>
-              <p className={s.subtitle}>
-                Political analysis, movement reports, and international dispatches.
-              </p>
-            </div>
-            <span className={s.countBadge}>{filtered.length} articles</span>
-          </div>
-        </div>
+        <PageHeader
+          kicker="Politics"
+          title="Current Affairs"
+          note="Political analysis, movement reports, and international dispatches."
+          actions={<span className={s.countBadge}>{filtered.length} articles</span>}
+        />
 
         {/* ── Toolbar ── */}
         <div className={s.toolbar}>

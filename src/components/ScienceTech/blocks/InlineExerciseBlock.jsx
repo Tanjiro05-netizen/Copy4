@@ -58,7 +58,7 @@ const InlineExerciseBlock = ({ block }) => {
   };
 
   return (
-    <div className="bg-purple-950/20 rounded-xl border border-purple-800/30 p-5">
+    <div className="bg-purple-950/20 rounded-none border border-purple-800/30 p-5">
       <div className="mb-4">
         <span className="text-xs text-purple-400 uppercase tracking-wide font-medium">Practice Exercise</span>
         <div className="text-white mt-1 text-sm">
@@ -93,7 +93,7 @@ const InlineExerciseBlock = ({ block }) => {
                   key={idx}
                   onClick={() => !isSubmitted && setSelectedAnswer(option)}
                   disabled={isSubmitted}
-                  className={`w-full text-left p-3 rounded-lg border transition-colors flex items-center gap-3 ${bgClass}`}
+                  className={`w-full text-left p-3 rounded-none border transition-colors flex items-center gap-3 ${bgClass}`}
                 >
                   <span className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs ${
                     isSelected
@@ -122,7 +122,7 @@ const InlineExerciseBlock = ({ block }) => {
               onChange={(e) => setNumericAnswer(e.target.value)}
               disabled={isSubmitted}
               placeholder="Enter your answer..."
-              className={`flex-1 px-4 py-3 rounded-lg border bg-black/30 text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${
+              className={`flex-1 px-4 py-3 rounded-none border bg-black/30 text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${
                 isSubmitted
                   ? isCorrect()
                     ? 'border-green-500 focus:ring-green-500'
@@ -131,7 +131,7 @@ const InlineExerciseBlock = ({ block }) => {
               }`}
             />
             {isSubmitted && (
-              <div className={`px-4 py-3 rounded-lg flex items-center gap-2 ${
+              <div className={`px-4 py-3 rounded-none flex items-center gap-2 ${
                 isCorrect() ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'
               }`}>
                 {isCorrect() ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
@@ -149,7 +149,7 @@ const InlineExerciseBlock = ({ block }) => {
               onChange={(e) => setFillAnswer(e.target.value)}
               disabled={isSubmitted}
               placeholder="Fill in the blank..."
-              className={`flex-1 px-4 py-3 rounded-lg border bg-black/30 text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${
+              className={`flex-1 px-4 py-3 rounded-none border bg-black/30 text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${
                 isSubmitted
                   ? isCorrect()
                     ? 'border-green-500 focus:ring-green-500'
@@ -158,7 +158,7 @@ const InlineExerciseBlock = ({ block }) => {
               }`}
             />
             {isSubmitted && !isCorrect() && (
-              <div className="px-4 py-3 rounded-lg bg-green-900/30 text-green-400 flex items-center">
+              <div className="px-4 py-3 rounded-none bg-green-900/30 text-green-400 flex items-center">
                 {correct_answer}
               </div>
             )}
@@ -178,14 +178,14 @@ const InlineExerciseBlock = ({ block }) => {
         </button>
       )}
       {showHint && (
-        <div className="mb-3 p-3 rounded-lg bg-yellow-900/20 border border-yellow-900/30 text-yellow-200 text-sm">
+        <div className="mb-3 p-3 rounded-none bg-yellow-900/20 border border-yellow-900/30 text-yellow-200 text-sm">
           {hint}
         </div>
       )}
 
       {/* Explanation */}
       {isSubmitted && explanation && (
-        <div className="mb-4 p-3 rounded-lg bg-blue-900/20 border border-blue-900/30">
+        <div className="mb-4 p-3 rounded-none bg-blue-900/20 border border-blue-900/30">
           <p className="text-blue-300 text-sm font-medium mb-1">Explanation:</p>
           <p className="text-gray-300 text-sm">{explanation}</p>
         </div>
@@ -197,7 +197,7 @@ const InlineExerciseBlock = ({ block }) => {
           <button
             onClick={checkAnswer}
             disabled={!canSubmit()}
-            className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Check Answer
           </button>

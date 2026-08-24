@@ -66,7 +66,7 @@ const ConceptMapper = () => {
     };
 
     return (
-        <div className="bg-black/30 backdrop-blur-sm p-6 rounded-lg border border-gray-800/50">
+        <div className="bg-black/30 backdrop-blur-sm p-6 rounded-none border border-gray-800/50">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
                 <div>
                     <h2 className="text-2xl text-white">Concept Visualization</h2>

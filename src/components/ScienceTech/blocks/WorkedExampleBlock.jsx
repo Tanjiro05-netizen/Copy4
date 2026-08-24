@@ -10,7 +10,7 @@ const stepComponents = {
   code: ({ inline, children }) =>
     inline
       ? <code className="bg-black/30 px-1.5 py-0.5 rounded text-sm text-cyan-300">{children}</code>
-      : <pre className="bg-black/50 p-3 rounded-lg overflow-x-auto my-2"><code className="text-gray-300 text-sm">{children}</code></pre>,
+      : <pre className="bg-black/50 p-3 rounded-none overflow-x-auto my-2"><code className="text-gray-300 text-sm">{children}</code></pre>,
   ul: ({ children }) => <ul className="list-disc list-inside text-gray-300 space-y-1 ml-1">{children}</ul>,
   ol: ({ children }) => <ol className="list-decimal list-inside text-gray-300 space-y-1 ml-1">{children}</ol>,
 };
@@ -33,13 +33,13 @@ const WorkedExampleBlock = ({ block }) => {
   const allRevealed = revealedCount >= steps.length;
 
   return (
-    <div className="bg-cyan-950/20 rounded-xl border border-cyan-800/30 overflow-hidden">
+    <div className="bg-cyan-950/20 rounded-none border border-cyan-800/30 overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center gap-3 p-4 text-left hover:bg-cyan-950/10 transition-colors"
       >
-        <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-none bg-cyan-500/20 flex items-center justify-center shrink-0">
           <BookOpen className="w-4 h-4 text-cyan-400" />
         </div>
         <div className="flex-1 min-w-0">
@@ -68,7 +68,7 @@ const WorkedExampleBlock = ({ block }) => {
                     isRevealed ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
                   }`}
                 >
-                  <div className="flex items-start gap-3 bg-black/20 rounded-lg p-3">
+                  <div className="flex items-start gap-3 bg-black/20 rounded-none p-3">
                     <span className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
                       {idx + 1}
                     </span>
@@ -99,7 +99,7 @@ const WorkedExampleBlock = ({ block }) => {
             <div className="px-4 pb-4 flex items-center gap-3">
               <button
                 onClick={revealNext}
-                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium rounded-none transition-colors flex items-center gap-2"
               >
                 <Eye className="w-4 h-4" />
                 Show Step {revealedCount + 1}

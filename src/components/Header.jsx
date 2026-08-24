@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, HelpCircle, ChevronDown, Newspaper, Radio } from 'lucide-react';
+import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, HelpCircle, ChevronDown, Newspaper, Radio, Search, Sun } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -53,114 +53,135 @@ const Header = () => {
     
     return (
         <header className={s.header}>
-            <div className={s.headerInner}>
-                <Link href="/home" className={s.logo}>
-                    Marxist.info
+            {/* Masthead — centered, scrolls away */}
+            <div className={s.masthead}>
+                <Link href="/home" className={s.mastheadLink}>
+                    <span className={s.mastheadWord}>
+                        Marxists<span className={s.mastheadDot}>.</span>Info
+                    </span>
+                    <span className={s.mastheadRule} aria-hidden="true" />
                 </Link>
-                
-                {/* Desktop Navigation */}
-                <div className={s.desktopNav}>
-                    <nav className={s.navRow}>
-                        {navItems.map((item) => {
-                            const isRestricted = !user && !item.guestAccessible;
+            </div>
 
-                            if (item.children) {
-                                const anyChildActive = item.children.some(c => isActive(c.path));
-                                return (
-                                    <div key={item.label} className={s.dropdownWrap}>
-                                        <button
-                                            className={`${s.dropdownTrigger} ${isRestricted ? s.navLinkRestricted : anyChildActive ? s.dropdownTriggerActive : ''}`}
-                                        >
-                                            <span>{item.label}</span>
-                                            <ChevronDown size={14} style={{ marginLeft: 4 }} />
-                                            {isRestricted && <span className={s.restrictedMark}>✦</span>}
-                                        </button>
-                                        <div className={s.dropdownMenu}>
-                                                {item.children.map(child => (
-                                                    <Link
-                                                        key={child.path}
-                                                        href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
-                                                        className={`${s.dropdownItem} ${isActive(child.path) ? s.dropdownItemActive : ''}`}
-                                                    >
-                                                        <span className={s.dropdownItemLabel}>{child.label}</span>
-                                                        {child.description && (
-                                                            <span className={s.dropdownItemDesc}>{child.description}</span>
-                                                        )}
-                                                    </Link>
-                                                ))}
-                                        </div>
-                                    </div>
-                                );
-                            }
-
-                            return (
-                                <Link 
-                                    key={item.path}
-                                    href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
-                                    className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : ''}`}
-                                    title={isRestricted ? t('nav.membersOnly') : ''}
-                                >
-                                    <span>{item.label}</span>
-                                    {isRestricted && <span className={s.restrictedMark}>✦</span>}
-                                </Link>
-                            );
-                        })}
-                        {canEditPolitics && !isAdminUser && (
-                            <div className={s.dropdownWrap}>
-                                <div className={s.dropdownTrigger}>
-                                    <FileText size={16} style={{ marginRight: 8 }} />
-                                    <span>Editorial</span>
-                                </div>
-                                <div className={s.dropdownMenu}>
-                                        <Link href="/admin/politics/upload"
-                                            className={`${s.dropdownItem} ${isActive('/admin/politics/upload') ? s.dropdownItemActive : ''}`}
-                                        >
-                                            Politics Upload
-                                        </Link>
-                                </div>
-                            </div>
-                        )}
-
-                        {isAdminUser && (
-                            <div className={s.dropdownWrap}>
-                                <div className={s.dropdownTrigger}>
-                                    <Shield size={16} style={{ marginRight: 8 }} />
-                                    <span>Admin</span>
-                                </div>
-                                <div className={s.dropdownMenu}>
-                                        {[
-                                            { to: '/admin/tags', label: 'Category & Tag Management' },
-                                            { to: '/admin/roles', label: 'User Role Management' },
-                                            { to: '/admin/submissions', label: 'Review Submissions' },
-                                            { to: '/admin/knowledge', label: 'Knowledge Moderation' },
-                                            { to: '/admin/quizzes', label: 'Quiz Management' },
-                                            { to: '/admin/scenarios', label: 'Scenario Management' },
-                                            { to: '/admin/world-sim', label: 'World Sim' },
-                                            { to: '/admin/analysis/upload', label: 'Upload Analysis Text' },
-                                            { to: '/admin/library/upload', label: 'Library Upload' },
-                                            { to: '/admin/politics/upload', label: 'Politics Upload' },
-                                            { to: '/admin/stem', label: 'STEM Courses' },
-                                        ].map((link) => (
-                                            <Link
-                                                key={link.to}
-                                                href={link.to}
-                                                className={`${s.dropdownItem} ${isActive(link.to) ? s.dropdownItemActive : ''}`}
-                                            >
-                                                {link.label}
-                                            </Link>
-                                        ))}
-                                </div>
-                            </div>
-                        )}
-                        {user && (
-                            <Link href="/profile" className={s.navLink}>
-                                {t('nav.profile')}
-                            </Link>
-                        )}
-                    </nav>
-                    
-                    <div className={s.actionsRow}>
+            {/* Paper navband — sticky */}
+            <div className={s.navband}>
+                <div className={s.navbandInner}>
+                    <div className={s.bandSlot}>
+                        <Link href="/digital-library" className={s.bandIconLink} title="Search the library">
+                            <Search size={15} strokeWidth={1.8} />
+                        </Link>
                         <LanguageSwitcher />
+                    </div>
+
+                    {/* Desktop Navigation */}
+                    <div className={s.desktopNav}>
+                        <nav className={s.navRow}>
+                            {navItems.map((item) => {
+                                const isRestricted = !user && !item.guestAccessible;
+
+                                if (item.children) {
+                                    const anyChildActive = item.children.some(c => isActive(c.path));
+                                    return (
+                                        <div key={item.label} className={s.dropdownWrap}>
+                                            <button
+                                                className={`${s.dropdownTrigger} ${isRestricted ? s.navLinkRestricted : anyChildActive ? s.dropdownTriggerActive : ''}`}
+                                            >
+                                                <span>{item.label}</span>
+                                                <ChevronDown size={14} style={{ marginLeft: 4 }} />
+                                                {isRestricted && <span className={s.restrictedMark}>✦</span>}
+                                            </button>
+                                            <div className={s.dropdownMenu}>
+                                                    {item.children.map(child => (
+                                                        <Link
+                                                            key={child.path}
+                                                            href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : child.path}
+                                                            className={`${s.dropdownItem} ${isActive(child.path) ? s.dropdownItemActive : ''}`}
+                                                        >
+                                                            <span className={s.dropdownItemLabel}>{child.label}</span>
+                                                            {child.description && (
+                                                                <span className={s.dropdownItemDesc}>{child.description}</span>
+                                                            )}
+                                                        </Link>
+                                                    ))}
+                                            </div>
+                                        </div>
+                                    );
+                                }
+
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
+                                        className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : s.navLinkIdle}`}
+                                        title={isRestricted ? t('nav.membersOnly') : ''}
+                                    >
+                                        <span>{item.label}</span>
+                                        {isRestricted && <span className={s.restrictedMark}>✦</span>}
+                                    </Link>
+                                );
+                            })}
+                            {canEditPolitics && !isAdminUser && (
+                                <div className={s.dropdownWrap}>
+                                    <div className={s.dropdownTrigger}>
+                                        <FileText size={16} style={{ marginRight: 8 }} />
+                                        <span>Editorial</span>
+                                    </div>
+                                    <div className={s.dropdownMenu}>
+                                            <Link href="/admin/politics/upload"
+                                                className={`${s.dropdownItem} ${isActive('/admin/politics/upload') ? s.dropdownItemActive : ''}`}
+                                            >
+                                                Politics Upload
+                                            </Link>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isAdminUser && (
+                                <div className={s.dropdownWrap}>
+                                    <div className={s.dropdownTrigger}>
+                                        <Shield size={16} style={{ marginRight: 8 }} />
+                                        <span>Admin</span>
+                                    </div>
+                                    <div className={s.dropdownMenu}>
+                                            {[
+                                                { to: '/admin/tags', label: 'Category & Tag Management' },
+                                                { to: '/admin/roles', label: 'User Role Management' },
+                                                { to: '/admin/submissions', label: 'Review Submissions' },
+                                                { to: '/admin/knowledge', label: 'Knowledge Moderation' },
+                                                { to: '/admin/quizzes', label: 'Quiz Management' },
+                                                { to: '/admin/scenarios', label: 'Scenario Management' },
+                                                { to: '/admin/world-sim', label: 'World Sim' },
+                                                { to: '/admin/analysis/upload', label: 'Upload Analysis Text' },
+                                                { to: '/admin/library/upload', label: 'Library Upload' },
+                                                { to: '/admin/politics/upload', label: 'Politics Upload' },
+                                                { to: '/admin/stem', label: 'STEM Courses' },
+                                            ].map((link) => (
+                                                <Link
+                                                    key={link.to}
+                                                    href={link.to}
+                                                    className={`${s.dropdownItem} ${isActive(link.to) ? s.dropdownItemActive : ''}`}
+                                                >
+                                                    {link.label}
+                                                </Link>
+                                            ))}
+                                    </div>
+                                </div>
+                            )}
+                            {user && (
+                                <Link
+                                    href="/profile"
+                                    className={`${s.navLink} ${isActive('/profile') ? s.navLinkActive : s.navLinkIdle}`}
+                                >
+                                    {t('nav.profile')}
+                                </Link>
+                            )}
+                        </nav>
+                    </div>
+
+                    <div className={`${s.bandSlot} ${s.bandSlotRight}`}>
+                        <span className={s.bandMark} aria-hidden="true">
+                            <Sun size={15} strokeWidth={1.8} />
+                        </span>
                         {user ? (
                             <button
                                 onClick={handleLogout}
@@ -174,24 +195,23 @@ const Header = () => {
                                 {t('nav.login')}
                             </Link>
                         )}
+                        {/* Mobile Menu Button */}
+                        <button
+                            className={s.mobileMenuBtn}
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        >
+                            <Menu size={22} />
+                        </button>
                     </div>
                 </div>
-                
-                {/* Mobile Menu Button */}
-                <button 
-                    className={s.mobileMenuBtn}
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                    <Menu size={22} />
-                </button>
             </div>
-            
+
             {/* Mobile Menu */}
             {mobileMenuOpen && (
                 <div className={s.mobileOverlay}>
                     <div className={s.mobileInner}>
                         <div className={s.mobileCloseRow}>
-                            <button className={s.iconButton} onClick={() => setMobileMenuOpen(false)}>
+                            <button className={s.mobileCloseButton} onClick={() => setMobileMenuOpen(false)}>
                                 <Menu size={22} />
                             </button>
                         </div>

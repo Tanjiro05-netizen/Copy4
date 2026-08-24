@@ -122,11 +122,11 @@ export default function Providers({ children, initialAuth }) {
 
     console.log(
       '%cStop!',
-      'color: #991b1b; font-size: 48px; font-weight: bold; -webkit-text-stroke: 2px black;'
+      'color: #b3122e; font-size: 48px; font-weight: bold; -webkit-text-stroke: 2px black;'
     );
     console.log(
       "%cThis is a browser feature intended for developers. If someone told you to copy-paste something here, it is a scam.\n\nThis site's source code is proprietary and protected. Unauthorised reproduction is prohibited.",
-      'color: #fff; font-size: 14px; background: #111; padding: 8px 12px; border-left: 4px solid #991b1b;'
+      'color: #fff; font-size: 14px; background: #111; padding: 8px 12px; border-left: 4px solid #b3122e;'
     );
   }, []);
 

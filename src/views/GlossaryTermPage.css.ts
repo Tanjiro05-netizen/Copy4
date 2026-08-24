@@ -25,7 +25,7 @@ export const backLink = style({
   alignItems: 'center',
   gap: vars.space.xs,
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -36,15 +36,15 @@ export const backLink = style({
 
 export const typeBadge = style({
   display: 'inline-block',
-  padding: `2px ${vars.space.sm}`,
-  borderRadius: vars.radius.pill,
-  background: vars.color.accentWash,
-  border: `1px solid ${vars.color.borderAccent}`,
-  fontFamily: vars.font.mono,
+  padding: `3px ${vars.space.sm}`,
+  borderRadius: vars.radius.tiny,
+  background: 'transparent',
+  border: vars.border.accent,
+  fontFamily: vars.font.label,
   fontSize: '10px',
-  letterSpacing: '0.1em',
+  letterSpacing: '0.24em',
   textTransform: 'uppercase',
-  color: vars.color.accent,
+  color: vars.color.accentHover,
   flexShrink: 0,
 });
 
@@ -53,14 +53,15 @@ export const termTitle = style({
   fontSize: '42px',
   fontWeight: 500,
   lineHeight: 1.1,
-  letterSpacing: '-0.03em',
+  letterSpacing: '0.01em',
   color: vars.color.text,
-  marginBottom: vars.space.lg,
+  marginBottom: vars.space.md,
 });
 
 export const divider = style({
-  height: '1px',
-  background: `linear-gradient(90deg, ${vars.color.borderAccent}, transparent)`,
+  width: '44px',
+  height: '2px',
+  background: vars.color.accent,
   marginBottom: vars.space.lg,
   border: 'none',
 });
@@ -78,7 +79,7 @@ export const relatedSection = style({
 });
 
 export const relatedHeading = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.14em',
   textTransform: 'uppercase',
@@ -118,7 +119,7 @@ export const loadingWrap = style({
   alignItems: 'center',
   minHeight: '300px',
   color: vars.color.textMuted,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '12px',
   letterSpacing: '0.08em',
   textTransform: 'uppercase',

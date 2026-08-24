@@ -31,7 +31,7 @@ const UnitConverter = ({ config }) => {
   const result = value * (units[fromUnit] || 1) / (units[toUnit] || 1);
 
   return (
-    <div className="bg-black/40 rounded-xl border border-gray-800 p-4">
+    <div className="bg-black/40 rounded-none border border-gray-800 p-4">
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <select
           value={category}
@@ -48,7 +48,7 @@ const UnitConverter = ({ config }) => {
         </select>
       </div>
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 bg-black/30 rounded-none px-3 py-2">
           <input
             type="number" step="any" value={value}
             onChange={(e) => setValue(parseFloat(e.target.value) || 0)}
@@ -60,7 +60,7 @@ const UnitConverter = ({ config }) => {
           </select>
         </div>
         <span className="text-gray-500 text-lg">=</span>
-        <div className="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 bg-black/30 rounded-none px-3 py-2">
           <span className="text-green-400 text-lg font-mono w-24 truncate">
             {Number.isFinite(result) ? result.toPrecision(6) : '---'}
           </span>

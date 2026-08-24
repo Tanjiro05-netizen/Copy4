@@ -17,7 +17,7 @@ const AccordionIcon = ({ isOpen }) => (
 // Reusable Accordion Item Component
 const AccordionItem = ({ title, children, isOpen, onClick }) => {
     return (
-        <div className="bg-stone-900 border border-red-900/50 rounded-lg">
+        <div className="bg-stone-900 border border-red-900/50 rounded-none">
             <div className="flex justify-between items-center p-4 cursor-pointer" onClick={onClick}>
                 <h2 className="text-xl font-semibold text-red-300">{title}</h2>
                 <AccordionIcon isOpen={isOpen} />
@@ -240,13 +240,13 @@ const SubmissionGuidelines = ({ isOpen, onClose }) => {
 
     if (!isOpen) return null;
 
-    const commonButtonStyles = "px-4 py-2 rounded-md transition-colors duration-200";
+    const commonButtonStyles = "px-4 py-2 rounded-none transition-colors duration-200";
     const activeButtonStyles = "bg-red-500 text-white";
     const inactiveButtonStyles = "bg-stone-800 text-gray-300 hover:bg-stone-700";
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 backdrop-blur-sm">
-            <div className="bg-black border border-red-900/50 rounded-lg shadow-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div className="bg-black border border-red-900/50 rounded-none shadow-none p-6 w-full max-w-4xl max-h-[90vh] flex flex-col">
                 <div className="flex justify-end mb-4">
                     <button onClick={onClose} className="text-gray-400 hover:text-red-500">
                         <X size={24} />
@@ -255,7 +255,7 @@ const SubmissionGuidelines = ({ isOpen, onClose }) => {
                 
                 <div className="flex-grow overflow-y-auto pr-4" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <div className="max-w-4xl mx-auto">
-                        <div className="flex justify-center mb-8 bg-stone-900 border border-red-900/50 p-2 rounded-lg space-x-2">
+                        <div className="flex justify-center mb-8 bg-stone-900 border border-red-900/50 p-2 rounded-none space-x-2">
                             <button 
                                 onClick={() => setActiveView('methodological')} 
                                 className={`${commonButtonStyles} ${activeView === 'methodological' ? activeButtonStyles : inactiveButtonStyles}`}

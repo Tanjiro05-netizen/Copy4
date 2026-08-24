@@ -1,8 +1,9 @@
 'use client';
 
 import ProtectedRoute from '@/src/components/ProtectedRoute.jsx';
+import MainLayout from '@/src/components/MainLayout.jsx';
 import ChapterTestPage from '@/src/views/ChapterTestPage.jsx';
 
 export default function Page() {
-  return <ProtectedRoute><ChapterTestPage /></ProtectedRoute>;
+  return <ProtectedRoute><MainLayout><ChapterTestPage /></MainLayout></ProtectedRoute>;
 }

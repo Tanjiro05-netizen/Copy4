@@ -144,7 +144,7 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-[#c81e1e]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#b3122e]" />
       </div>
     );
   }
@@ -156,7 +156,7 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
         <p className="text-sm">Scenario not found or has no content.</p>
         <button
           onClick={onBack}
-          className="mt-4 px-4 py-2 bg-white/[0.06] hover:bg-white/[0.1] rounded-xl text-white/60 text-sm transition-colors"
+          className="mt-4 px-4 py-2 bg-white/[0.06] hover:bg-white/[0.1] rounded-none text-white/60 text-sm transition-colors"
         >
           Go Back
         </button>
@@ -169,7 +169,7 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
     : null;
 
   return (
-    <div className="max-w-3xl mx-auto font-[Hanken_Grotesk,sans-serif]">
+    <div className="max-w-3xl mx-auto font-[Outfit,sans-serif]">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <button
@@ -192,21 +192,21 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
         </div>
         <div className="h-0.5 bg-white/[0.05] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#c81e1e] transition-all duration-500"
+            className="h-full bg-[#b3122e] transition-all duration-500"
             style={{ width: `${Math.min((choicesMade.length / 5) * 100, 100)}%` }}
           />
         </div>
       </div>
 
       {/* Story Card */}
-      <div className={`rounded-2xl overflow-hidden border ${
+      <div className={`rounded-none overflow-hidden border ${
         endingStyle
           ? endingStyle.border === 'border-green-500/50'
             ? 'bg-emerald-900/10 border-emerald-800/30'
             : endingStyle.border === 'border-yellow-500/50'
               ? 'bg-yellow-900/10 border-yellow-800/30'
-              : 'bg-[rgba(200,30,30,0.06)] border-[rgba(200,30,30,0.2)]'
-          : 'bg-[#0f0f0f] border-white/[0.07]'
+              : 'bg-[rgba(179, 18, 46,0.06)] border-[rgba(179, 18, 46,0.2)]'
+          : 'bg-[#10131b] border-white/[0.07]'
       }`}>
         {/* Node Title */}
         {currentNode.title && (
@@ -215,7 +215,7 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
               endingStyle?.color ||
               (endingStyle?.border === 'border-green-500/50' ? 'text-emerald-400' :
                endingStyle?.border === 'border-yellow-500/50' ? 'text-yellow-400' :
-               endingStyle ? 'text-[#c81e1e]' : 'text-white')
+               endingStyle ? 'text-[#b3122e]' : 'text-white')
             }`}>
               {endingStyle ? `${endingStyle.icon} ${endingStyle.title}` : currentNode.title}
             </h2>
@@ -237,7 +237,7 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
 
           {/* Ending Insight */}
           {isEnding && currentNode.ending_insight && (
-            <div className="p-4 bg-white/[0.03] rounded-xl border border-white/[0.06] mb-4">
+            <div className="p-4 bg-white/[0.03] rounded-none border border-white/[0.06] mb-4">
               <h4 className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.1em] text-white/25 mb-2 flex items-center gap-2">
                 <Star size={11} /> Historical Insight
               </h4>
@@ -261,10 +261,10 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
                 <button
                   key={choice.id}
                   onClick={() => handleChoice(choice)}
-                  className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.07] hover:border-[rgba(200,30,30,0.3)] rounded-xl transition-all group"
+                  className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.07] hover:border-[rgba(179, 18, 46,0.3)] rounded-none transition-all group"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="shrink-0 w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center font-[JetBrains_Mono,monospace] text-[10px] font-bold text-white/30 group-hover:bg-[#c81e1e] group-hover:text-white transition-colors">
+                    <span className="shrink-0 w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center font-[JetBrains_Mono,monospace] text-[10px] font-bold text-white/30 group-hover:bg-[#b3122e] group-hover:text-white transition-colors">
                       {String.fromCharCode(65 + index)}
                     </span>
                     <div className="flex-1">
@@ -275,7 +275,7 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
                         <p className="text-[11px] text-white/25 mt-1 italic">{choice.consequence_preview}</p>
                       )}
                     </div>
-                    <ChevronRight size={15} className="text-white/20 group-hover:text-[#c81e1e] transition-colors shrink-0 mt-0.5" />
+                    <ChevronRight size={15} className="text-white/20 group-hover:text-[#b3122e] transition-colors shrink-0 mt-0.5" />
                   </div>
                 </button>
               ))}
@@ -287,13 +287,13 @@ const ScenarioPlayer = ({ scenario, onBack, onComplete }) => {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={handleRestart}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] rounded-xl text-white/50 text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] rounded-none text-white/50 text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors"
               >
                 <RefreshCw size={14} /> Try Again
               </button>
               <button
                 onClick={() => onComplete?.(xpEarned)}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#c81e1e] hover:bg-[#e02424] rounded-xl text-white text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#b3122e] hover:bg-[#d41f3d] rounded-none text-white text-[12px] font-[JetBrains_Mono,monospace] uppercase tracking-wider transition-colors"
               >
                 <Trophy size={14} /> Continue
               </button>

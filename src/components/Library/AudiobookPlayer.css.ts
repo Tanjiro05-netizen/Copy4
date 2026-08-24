@@ -24,7 +24,7 @@ export const player = style([panelBase, {
   flexDirection: 'column',
   gap: vars.space.xl,
   borderColor: vars.color.borderAccent,
-  boxShadow: `${vars.shadow.panel}, ${vars.shadow.glow}, 0 0 80px rgba(200,30,30,0.06)`,
+  boxShadow: `${vars.shadow.panel}, ${vars.shadow.glow}, 0 0 80px rgba(179, 18, 46,0.06)`,
   background: `linear-gradient(180deg, rgba(25,12,12,1) 0%, ${vars.color.surface} 100%)`,
   marginBottom: vars.space.xxxl,
   '@media': {
@@ -75,7 +75,7 @@ export const playerCoverFallback = style({
   height: '120px',
   borderRadius: vars.radius.lg,
   border: vars.border.accent,
-  background: `linear-gradient(135deg, ${vars.color.surfaceSoft} 0%, rgba(200,30,30,0.12) 100%)`,
+  background: `linear-gradient(135deg, ${vars.color.surfaceSoft} 0%, rgba(179, 18, 46,0.12) 100%)`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -95,7 +95,7 @@ export const playerCoverGlow = style({
   position: 'absolute',
   inset: '-8px',
   borderRadius: vars.radius.xl,
-  background: 'radial-gradient(circle, rgba(200,30,30,0.3) 0%, transparent 70%)',
+  background: 'radial-gradient(circle, rgba(179, 18, 46,0.3) 0%, transparent 70%)',
   animation: `${glowPulse} 2s ease-in-out infinite`,
   zIndex: 0,
   pointerEvents: 'none',
@@ -119,12 +119,12 @@ export const nowPlayingDot = style({
   height: '8px',
   borderRadius: '50%',
   background: vars.color.accent,
-  boxShadow: '0 0 8px rgba(200,30,30,0.6)',
+  boxShadow: '0 0 8px rgba(179, 18, 46,0.6)',
   animation: `${pulse} 1.5s ease-in-out infinite`,
 });
 
 export const nowPlayingLabel = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
@@ -214,7 +214,7 @@ export const chapters = style({
 
 export const chaptersLabel = style({
   margin: 0,
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   textTransform: 'uppercase',
   letterSpacing: '0.14em',
@@ -260,7 +260,7 @@ export const chapterIndex = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '10px',
   color: vars.color.textFaint,
   flexShrink: 0,

@@ -249,27 +249,27 @@ const AudiobookUploadForm = ({ editId }) => {
         }
     };
 
-    const inputClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none';
+    const inputClass = 'w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none';
     const labelClass = 'block text-sm text-gray-400 mb-1';
 
     return (
         <div>
             {success && (
-                <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-xl flex items-center gap-3">
+                <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-none flex items-center gap-3">
                     <Check className="text-green-400" />
                     <span className="text-green-300">{success}</span>
                 </div>
             )}
 
             {error && (
-                <div className="mb-6 p-4 bg-red-900/50 border border-red-500/50 rounded-xl flex items-center gap-3">
+                <div className="mb-6 p-4 bg-red-900/50 border border-red-500/50 rounded-none flex items-center gap-3">
                     <AlertTriangle className="text-red-400" />
                     <span className="text-red-300">{error}</span>
                 </div>
             )}
 
             {loading && (
-                <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700/50 rounded-xl flex items-center gap-3 text-gray-300">
+                <div className="mb-6 p-4 bg-gray-900/50 border border-gray-700/50 rounded-none flex items-center gap-3 text-gray-300">
                     <Loader2 className="animate-spin" size={18} />
                     <span>Loading audiobook data...</span>
                 </div>
@@ -278,13 +278,13 @@ const AudiobookUploadForm = ({ editId }) => {
             <form onSubmit={handleSaveAudiobook} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Audio Upload */}
-                    <div className="bg-gray-900/50 rounded-xl p-6">
+                    <div className="bg-gray-900/50 rounded-none p-6">
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                             <Headphones className="text-red-500" size={20} />
                             Audio Source *
                         </h3>
                         {audiobookForm.audio_url ? (
-                            <div className="flex items-center gap-2 text-sm bg-gray-800 p-3 rounded-lg">
+                            <div className="flex items-center gap-2 text-sm bg-gray-800 p-3 rounded-none">
                                 {audiobookForm.audio_url.includes('archive.org/download/') ? (
                                     <>
                                         <Globe size={18} className="text-blue-400 flex-shrink-0" />
@@ -304,25 +304,25 @@ const AudiobookUploadForm = ({ editId }) => {
                             </div>
                         ) : (
                             <>
-                                <div className="flex gap-2 mb-4 bg-gray-800 rounded-lg p-1 border border-gray-700/50">
+                                <div className="flex gap-2 mb-4 bg-gray-800 rounded-none p-1 border border-gray-700/50">
                                     <button
                                         type="button"
                                         onClick={() => setAudioSourceMode('upload')}
-                                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${audioSourceMode === 'upload' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-none text-sm font-medium transition-colors ${audioSourceMode === 'upload' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'}`}
                                     >
                                         <Upload size={16} /> Upload MP3
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setAudioSourceMode('archive')}
-                                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${audioSourceMode === 'archive' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                                        className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-none text-sm font-medium transition-colors ${audioSourceMode === 'archive' ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'}`}
                                     >
                                         <Globe size={16} /> Internet Archive
                                     </button>
                                 </div>
 
                                 {audioSourceMode === 'upload' ? (
-                                    <div className={`border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-red-500/50 transition-colors ${uploadingAudio ? 'opacity-60 pointer-events-none' : ''}`}>
+                                    <div className={`border-2 border-dashed border-gray-700 rounded-none p-6 text-center hover:border-red-500/50 transition-colors ${uploadingAudio ? 'opacity-60 pointer-events-none' : ''}`}>
                                         <input type="file" accept="audio/*" onChange={handleAudioFileChange} className="hidden" id="audio-upload" />
                                         <label htmlFor="audio-upload" className="cursor-pointer">
                                             {uploadingAudio ? <Loader2 className="w-10 h-10 mx-auto text-red-500 mb-2 animate-spin" /> : <Upload className="w-10 h-10 mx-auto text-gray-500 mb-2" />}
@@ -344,7 +344,7 @@ const AudiobookUploadForm = ({ editId }) => {
                                                 type="button"
                                                 onClick={handleArchiveUrl}
                                                 disabled={!archiveUrl.trim()}
-                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0"
+                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 rounded-none text-sm font-medium transition-colors flex items-center gap-2 flex-shrink-0"
                                             >
                                                 <Link size={16} /> Use Link
                                             </button>
@@ -359,20 +359,20 @@ const AudiobookUploadForm = ({ editId }) => {
                     </div>
 
                     {/* Cover Image Upload */}
-                    <div className="bg-gray-900/50 rounded-xl p-6">
+                    <div className="bg-gray-900/50 rounded-none p-6">
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                             <Upload className="text-red-500" size={20} />
                             Cover Image
                         </h3>
                         {audiobookForm.cover_url ? (
                             <div className="relative">
-                                <img src={audiobookForm.cover_url} alt="Cover preview" className="w-full h-32 object-contain bg-gray-800 rounded-lg" />
+                                <img src={audiobookForm.cover_url} alt="Cover preview" className="w-full h-32 object-contain bg-gray-800 rounded-none" />
                                 <button type="button" onClick={() => setAudiobookForm((p) => ({ ...p, cover_url: '' }))} className="absolute top-2 right-2 p-1 bg-gray-900/80 rounded-full text-gray-400 hover:text-red-400">
                                     <X size={18} />
                                 </button>
                             </div>
                         ) : (
-                            <div className={`border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-red-500/50 transition-colors ${uploadingCover ? 'opacity-60 pointer-events-none' : ''}`}>
+                            <div className={`border-2 border-dashed border-gray-700 rounded-none p-6 text-center hover:border-red-500/50 transition-colors ${uploadingCover ? 'opacity-60 pointer-events-none' : ''}`}>
                                 <input type="file" accept="image/*" onChange={handleCoverFileChange} className="hidden" id="audiobook-cover-upload" />
                                 <label htmlFor="audiobook-cover-upload" className="cursor-pointer">
                                     {uploadingCover ? <Loader2 className="w-10 h-10 mx-auto text-red-500 mb-2 animate-spin" /> : <Upload className="w-10 h-10 mx-auto text-gray-500 mb-2" />}
@@ -384,7 +384,7 @@ const AudiobookUploadForm = ({ editId }) => {
                 </div>
 
                 {/* Metadata Form */}
-                <div className="bg-gray-900/50 rounded-xl p-6 space-y-4">
+                <div className="bg-gray-900/50 rounded-none p-6 space-y-4">
                     <h3 className="text-lg font-semibold">Audiobook Information</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -434,20 +434,20 @@ const AudiobookUploadForm = ({ editId }) => {
                 </div>
 
                 {/* Chapters */}
-                <div className="bg-gray-900/50 rounded-xl p-6">
+                <div className="bg-gray-900/50 rounded-none p-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold">Chapters</h3>
-                        <button type="button" onClick={addChapter} className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm text-white transition-colors">
+                        <button type="button" onClick={addChapter} className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-none text-sm text-white transition-colors">
                             <Plus size={14} /> Add Chapter
                         </button>
                     </div>
                     
                     {(audiobookForm.chapters || []).length === 0 ? (
-                        <p className="text-sm text-gray-500 py-4 text-center border border-dashed border-gray-700 rounded-lg">No chapters added yet. You can add chapters to allow users to navigate the audiobook easily.</p>
+                        <p className="text-sm text-gray-500 py-4 text-center border border-dashed border-gray-700 rounded-none">No chapters added yet. You can add chapters to allow users to navigate the audiobook easily.</p>
                     ) : (
                         <div className="space-y-3">
                             {audiobookForm.chapters.map((ch, i) => (
-                                <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                                <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-gray-800/50 p-3 rounded-none border border-gray-700">
                                     <span className="text-sm font-medium text-gray-400 w-6 flex-shrink-0">{i + 1}.</span>
                                     <input
                                         type="text"
@@ -464,7 +464,7 @@ const AudiobookUploadForm = ({ editId }) => {
                                             placeholder="Start (seconds)"
                                             className={`${inputClass} w-full sm:w-32`}
                                         />
-                                        <button type="button" onClick={() => removeChapter(i)} className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors">
+                                        <button type="button" onClick={() => removeChapter(i)} className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-none transition-colors">
                                             <X size={18} />
                                         </button>
                                     </div>
@@ -478,7 +478,7 @@ const AudiobookUploadForm = ({ editId }) => {
                 <button
                     type="submit"
                     disabled={saving || !audiobookForm.title || !audiobookForm.audio_url || uploadingAudio || uploadingCover}
-                    className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-none font-medium transition-colors flex items-center justify-center gap-2"
                 >
                     {saving ? (
                         <>
@@ -496,7 +496,7 @@ const AudiobookUploadForm = ({ editId }) => {
                     <button
                         type="button"
                         onClick={() => router.push('/digital-library')}
-                        className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-medium transition-colors text-gray-300"
+                        className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-none font-medium transition-colors text-gray-300"
                     >
                         Cancel
                     </button>

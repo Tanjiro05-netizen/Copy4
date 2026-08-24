@@ -44,10 +44,10 @@ const AddToListButton = ({ bookId }) => {
         style={{
           display: 'flex', alignItems: 'center', gap: '4px',
           padding: '4px 8px', fontSize: '11px',
-          background: bookLists.length > 0 ? 'rgba(200,30,30,0.12)' : 'rgba(255,255,255,0.06)',
-          border: `1px solid ${bookLists.length > 0 ? 'rgba(200,30,30,0.25)' : 'rgba(255,255,255,0.08)'}`,
+          background: bookLists.length > 0 ? 'rgba(179, 18, 46,0.12)' : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${bookLists.length > 0 ? 'rgba(179, 18, 46,0.25)' : 'rgba(255,255,255,0.08)'}`,
           borderRadius: '6px',
-          color: bookLists.length > 0 ? '#f87171' : 'rgba(255,255,255,0.5)',
+          color: bookLists.length > 0 ? '#d41f3d' : 'rgba(255,255,255,0.5)',
           cursor: 'pointer', transition: 'all 120ms',
         }}
         title={t('library.addToList')}
@@ -82,7 +82,7 @@ const AddToListButton = ({ bookId }) => {
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 width: '100%', padding: '5px 8px', background: 'none', border: 'none',
-                color: isInList(list.id) ? '#f87171' : 'rgba(255,255,255,0.6)',
+                color: isInList(list.id) ? '#d41f3d' : 'rgba(255,255,255,0.6)',
                 fontSize: '12px', cursor: 'pointer', borderRadius: '5px',
                 textAlign: 'left', transition: 'background 100ms',
               }}
@@ -117,9 +117,9 @@ const AddToListButton = ({ bookId }) => {
               disabled={!newName.trim()}
               aria-label={t('library.createAndAddToList')}
               style={{
-                padding: '4px', background: newName.trim() ? 'rgba(200,30,30,0.2)' : 'rgba(255,255,255,0.04)',
+                padding: '4px', background: newName.trim() ? 'rgba(179, 18, 46,0.2)' : 'rgba(255,255,255,0.04)',
                 border: 'none', borderRadius: '4px',
-                color: newName.trim() ? '#f87171' : 'rgba(255,255,255,0.2)',
+                color: newName.trim() ? '#d41f3d' : 'rgba(255,255,255,0.2)',
                 cursor: newName.trim() ? 'pointer' : 'default',
               }}
             >

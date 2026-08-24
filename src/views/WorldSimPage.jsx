@@ -308,7 +308,7 @@ Skills: ${Object.entries(state.avatar?.skills || {}).map(([k, v]) => `${k}:${v}`
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] p-4">
+    <div className="min-h-screen bg-[#10131b] p-4">
       <Link href="/" 
         className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white mb-2 transition-colors"
       >

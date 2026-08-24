@@ -289,7 +289,7 @@ const AnalysisUploadPage = () => {
                 <div className="flex items-center gap-4 mb-8">
                     <button
                         onClick={() => router.push('/theory')}
-                        className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                        className="p-2 hover:bg-gray-800 rounded-none transition-colors"
                     >
                         <ArrowLeft size={20} />
                     </button>
@@ -300,10 +300,10 @@ const AnalysisUploadPage = () => {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex gap-2 mb-6 bg-gray-900/50 rounded-xl p-2">
+                <div className="flex gap-2 mb-6 bg-gray-900/50 rounded-none p-2">
                     <button
                         onClick={() => setActiveTab('json')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-none font-medium transition-colors
                             ${activeTab === 'json' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
                     >
                         <FileJson size={18} />
@@ -311,7 +311,7 @@ const AnalysisUploadPage = () => {
                     </button>
                     <button
                         onClick={() => setActiveTab('form')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors
+                        className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-none font-medium transition-colors
                             ${activeTab === 'form' ? 'bg-red-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
                     >
                         <FileText size={18} />
@@ -321,7 +321,7 @@ const AnalysisUploadPage = () => {
 
                 {/* Success Message */}
                 {saveSuccess && (
-                    <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-xl flex items-center gap-3">
+                    <div className="mb-6 p-4 bg-green-900/50 border border-green-500/50 rounded-none flex items-center gap-3">
                         <Check className="text-green-400" />
                         <span className="text-green-300">Text saved successfully! Redirecting...</span>
                     </div>
@@ -329,7 +329,7 @@ const AnalysisUploadPage = () => {
 
                 {/* Error Message */}
                 {saveError && (
-                    <div className="mb-6 p-4 bg-red-900/50 border border-red-500/50 rounded-xl flex items-center gap-3">
+                    <div className="mb-6 p-4 bg-red-900/50 border border-red-500/50 rounded-none flex items-center gap-3">
                         <AlertTriangle className="text-red-400" />
                         <span className="text-red-300">{saveError}</span>
                     </div>
@@ -339,7 +339,7 @@ const AnalysisUploadPage = () => {
                 {activeTab === 'json' && (
                     <div className="space-y-6">
                         {/* File Upload */}
-                        <div className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center hover:border-red-500/50 transition-colors">
+                        <div className="border-2 border-dashed border-gray-700 rounded-none p-8 text-center hover:border-red-500/50 transition-colors">
                             <input
                                 type="file"
                                 accept=".json"
@@ -363,13 +363,13 @@ const AnalysisUploadPage = () => {
                                 value={jsonInput}
                                 onChange={(e) => setJsonInput(e.target.value)}
                                 placeholder='{"metadata": {...}, "sections": [...]}'
-                                className="w-full h-64 bg-gray-900 border border-gray-700 rounded-xl p-4 font-mono text-sm text-gray-300 placeholder-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-y"
+                                className="w-full h-64 bg-gray-900 border border-gray-700 rounded-none p-4 font-mono text-sm text-gray-300 placeholder-gray-600 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none resize-y"
                             />
                         </div>
 
                         {/* Parse Error */}
                         {parseError && (
-                            <div className="p-4 bg-red-900/30 border border-red-500/30 rounded-xl flex items-start gap-3">
+                            <div className="p-4 bg-red-900/30 border border-red-500/30 rounded-none flex items-start gap-3">
                                 <AlertTriangle className="text-red-400 flex-shrink-0 mt-0.5" size={18} />
                                 <div>
                                     <p className="text-red-300 font-medium">Parse Error</p>
@@ -381,7 +381,7 @@ const AnalysisUploadPage = () => {
                         {/* Parse Button */}
                         <button
                             onClick={handleJsonParse}
-                            className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-none font-medium transition-colors flex items-center justify-center gap-2"
                         >
                             <Eye size={18} />
                             Preview & Validate
@@ -389,7 +389,7 @@ const AnalysisUploadPage = () => {
 
                         {/* Preview */}
                         {parsedData && (
-                            <div className="bg-gray-900/50 rounded-xl p-6 space-y-4">
+                            <div className="bg-gray-900/50 rounded-none p-6 space-y-4">
                                 <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                                     <Check className="text-green-400" size={20} />
                                     Valid JSON - Preview
@@ -429,7 +429,7 @@ const AnalysisUploadPage = () => {
                                         type="text"
                                         value={parsedData.slug}
                                         onChange={(e) => setParsedData(prev => ({ ...prev, slug: e.target.value }))}
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-sm"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white font-mono text-sm"
                                     />
                                 </div>
 
@@ -448,7 +448,7 @@ const AnalysisUploadPage = () => {
                                 <button
                                     onClick={() => handleSave(parsedData)}
                                     disabled={saving}
-                                    className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                                    className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-none font-medium transition-colors flex items-center justify-center gap-2"
                                 >
                                     {saving ? (
                                         <>Saving...</>
@@ -468,7 +468,7 @@ const AnalysisUploadPage = () => {
                 {activeTab === 'form' && (
                     <div className="space-y-6">
                         {/* Basic Info */}
-                        <div className="bg-gray-900/50 rounded-xl p-6 space-y-4">
+                        <div className="bg-gray-900/50 rounded-none p-6 space-y-4">
                             <h3 className="text-lg font-semibold text-white">Basic Information</h3>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -479,7 +479,7 @@ const AnalysisUploadPage = () => {
                                         value={formData.slug}
                                         onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                                         placeholder="auto-generated-from-title"
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-sm"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white font-mono text-sm"
                                     />
                                 </div>
                                 <div>
@@ -487,7 +487,7 @@ const AnalysisUploadPage = () => {
                                     <select
                                         value={formData.primary_language}
                                         onChange={(e) => setFormData(prev => ({ ...prev, primary_language: e.target.value }))}
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                     >
                                         {SUPPORTED_LANGUAGES.map(lang => (
                                             <option key={lang.code} value={lang.code}>{lang.name}</option>
@@ -501,7 +501,7 @@ const AnalysisUploadPage = () => {
                                         value={formData.category}
                                         onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                                         placeholder="e.g., Philosophy, Economics"
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                     />
                                 </div>
                                 <div>
@@ -514,14 +514,14 @@ const AnalysisUploadPage = () => {
                                             tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean)
                                         }))}
                                         placeholder="marxism, theory, economics"
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Metadata */}
-                        <div className="bg-gray-900/50 rounded-xl p-6 space-y-4">
+                        <div className="bg-gray-900/50 rounded-none p-6 space-y-4">
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                                 <Languages size={20} />
                                 Metadata ({SUPPORTED_LANGUAGES.find(l => l.code === formData.primary_language)?.name})
@@ -534,7 +534,7 @@ const AnalysisUploadPage = () => {
                                         type="text"
                                         value={formData.metadata[formData.primary_language]?.title || ''}
                                         onChange={(e) => updateFormMetadata(formData.primary_language, 'title', e.target.value)}
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                     />
                                 </div>
                                 <div>
@@ -547,7 +547,7 @@ const AnalysisUploadPage = () => {
                                             e.target.value.split('\n').filter(Boolean)
                                         )}
                                         rows={2}
-                                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white resize-y"
+                                        className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white resize-y"
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -557,7 +557,7 @@ const AnalysisUploadPage = () => {
                                             type="number"
                                             value={formData.metadata[formData.primary_language]?.year || ''}
                                             onChange={(e) => updateFormMetadata(formData.primary_language, 'year', parseInt(e.target.value) || '')}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                            className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                         />
                                     </div>
                                     <div>
@@ -566,7 +566,7 @@ const AnalysisUploadPage = () => {
                                             type="number"
                                             value={formData.metadata[formData.primary_language]?.wordCount || ''}
                                             onChange={(e) => updateFormMetadata(formData.primary_language, 'wordCount', parseInt(e.target.value) || '')}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                            className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                         />
                                     </div>
                                     <div>
@@ -575,7 +575,7 @@ const AnalysisUploadPage = () => {
                                             type="number"
                                             value={formData.metadata[formData.primary_language]?.readingTimeMinutes || ''}
                                             onChange={(e) => updateFormMetadata(formData.primary_language, 'readingTimeMinutes', parseInt(e.target.value) || '')}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                            className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                         />
                                     </div>
                                     <div>
@@ -584,7 +584,7 @@ const AnalysisUploadPage = () => {
                                             type="text"
                                             value={formData.metadata[formData.primary_language]?.source || ''}
                                             onChange={(e) => updateFormMetadata(formData.primary_language, 'source', e.target.value)}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                                            className="w-full bg-gray-800 border border-gray-700 rounded-none px-3 py-2 text-white"
                                         />
                                     </div>
                                 </div>
@@ -592,12 +592,12 @@ const AnalysisUploadPage = () => {
                         </div>
 
                         {/* Sections */}
-                        <div className="bg-gray-900/50 rounded-xl p-6 space-y-4">
+                        <div className="bg-gray-900/50 rounded-none p-6 space-y-4">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-lg font-semibold text-white">Sections</h3>
                                 <button
                                     onClick={addSection}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors"
+                                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-none text-sm transition-colors"
                                 >
                                     <Plus size={16} />
                                     Add Section
@@ -606,7 +606,7 @@ const AnalysisUploadPage = () => {
 
                             <div className="space-y-3">
                                 {formData.sections.map((section, index) => (
-                                    <div key={index} className="bg-gray-800/50 rounded-lg border border-gray-700">
+                                    <div key={index} className="bg-gray-800/50 rounded-none border border-gray-700">
                                         <div 
                                             className="flex items-center justify-between p-3 cursor-pointer"
                                             onClick={() => toggleSectionExpanded(index)}
@@ -680,7 +680,7 @@ const AnalysisUploadPage = () => {
                         </div>
 
                         {/* Publish & Save */}
-                        <div className="flex items-center justify-between bg-gray-900/50 rounded-xl p-4">
+                        <div className="flex items-center justify-between bg-gray-900/50 rounded-none p-4">
                             <label className="flex items-center gap-3 cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -694,7 +694,7 @@ const AnalysisUploadPage = () => {
                             <button
                                 onClick={handleFormSave}
                                 disabled={saving || !formData.metadata[formData.primary_language]?.title}
-                                className="px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-medium transition-colors flex items-center gap-2"
+                                className="px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-none font-medium transition-colors flex items-center gap-2"
                             >
                                 {saving ? (
                                     <>Saving...</>

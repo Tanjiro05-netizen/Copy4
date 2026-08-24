@@ -108,19 +108,19 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
               const isSelected = selectedAnswer === option;
               const isCorrectAnswer = option.toLowerCase() === currentQuestion.correct_answer.toLowerCase();
               
-              let buttonClass = 'w-full p-4 rounded-xl border text-left transition-all ';
+              let buttonClass = 'w-full p-4 rounded-none border text-left transition-all ';
               
               if (showFeedback) {
                 if (isCorrectAnswer) {
                   buttonClass += 'bg-emerald-900/15 border-emerald-700/40 text-emerald-400';
                 } else if (isSelected && !isCorrectAnswer) {
-                  buttonClass += 'bg-[rgba(200,30,30,0.08)] border-[rgba(200,30,30,0.35)] text-[#c81e1e]';
+                  buttonClass += 'bg-[rgba(179, 18, 46,0.08)] border-[rgba(179, 18, 46,0.35)] text-[#b3122e]';
                 } else {
                   buttonClass += 'bg-white/[0.02] border-white/[0.05] text-white/20';
                 }
               } else {
                 buttonClass += isSelected
-                  ? 'bg-[rgba(200,30,30,0.1)] border-[rgba(200,30,30,0.4)] text-white'
+                  ? 'bg-[rgba(179, 18, 46,0.1)] border-[rgba(179, 18, 46,0.4)] text-white'
                   : 'bg-white/[0.03] border-white/[0.07] text-white/60 hover:bg-white/[0.06] hover:border-white/[0.12]';
               }
 
@@ -144,19 +144,19 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
               const isSelected = selectedAnswer === option;
               const isCorrectAnswer = option.toLowerCase() === currentQuestion.correct_answer.toLowerCase();
               
-              let buttonClass = 'flex-1 p-6 rounded-xl border text-center transition-all ';
+              let buttonClass = 'flex-1 p-6 rounded-none border text-center transition-all ';
               
               if (showFeedback) {
                 if (isCorrectAnswer) {
                   buttonClass += 'bg-emerald-900/15 border-emerald-700/40 text-emerald-400';
                 } else if (isSelected && !isCorrectAnswer) {
-                  buttonClass += 'bg-[rgba(200,30,30,0.08)] border-[rgba(200,30,30,0.35)] text-[#c81e1e]';
+                  buttonClass += 'bg-[rgba(179, 18, 46,0.08)] border-[rgba(179, 18, 46,0.35)] text-[#b3122e]';
                 } else {
                   buttonClass += 'bg-white/[0.02] border-white/[0.05] text-white/20';
                 }
               } else {
                 buttonClass += isSelected
-                  ? 'bg-[rgba(200,30,30,0.1)] border-[rgba(200,30,30,0.4)] text-white'
+                  ? 'bg-[rgba(179, 18, 46,0.1)] border-[rgba(179, 18, 46,0.4)] text-white'
                   : 'bg-white/[0.03] border-white/[0.07] text-white/60 hover:bg-white/[0.06]';
               }
 
@@ -179,7 +179,7 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
             <input
               type="text"
               placeholder="Type your answer..."
-              className="w-full p-4 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-[rgba(200,30,30,0.5)] transition-colors"
+              className="w-full p-4 bg-white/[0.04] border border-white/[0.08] rounded-none text-white placeholder-white/25 focus:outline-none focus:border-[rgba(179, 18, 46,0.5)] transition-colors"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && e.target.value && !showFeedback) {
                   handleAnswer(e.target.value);
@@ -199,21 +199,21 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
               const isSelected = selectedAnswer === option;
               const isCorrectAnswer = option.toLowerCase() === currentQuestion.correct_answer.toLowerCase();
               
-              let buttonClass = 'flex-1 p-6 rounded-xl border text-center transition-all ';
+              let buttonClass = 'flex-1 p-6 rounded-none border text-center transition-all ';
               const isRevolutionary = option.toLowerCase() === 'revolutionary';
               
               if (showFeedback) {
                 if (isCorrectAnswer) {
                   buttonClass += 'bg-emerald-900/15 border-emerald-700/40 text-emerald-400';
                 } else if (isSelected && !isCorrectAnswer) {
-                  buttonClass += 'bg-[rgba(200,30,30,0.08)] border-[rgba(200,30,30,0.35)] text-[#c81e1e]';
+                  buttonClass += 'bg-[rgba(179, 18, 46,0.08)] border-[rgba(179, 18, 46,0.35)] text-[#b3122e]';
                 } else {
                   buttonClass += 'bg-white/[0.02] border-white/[0.05] text-white/20';
                 }
               } else {
                 buttonClass += isRevolutionary
                   ? 'bg-emerald-900/15 border-emerald-800/30 text-emerald-400 hover:bg-emerald-900/25'
-                  : 'bg-[rgba(200,30,30,0.06)] border-[rgba(200,30,30,0.2)] text-[#c81e1e]/80 hover:bg-[rgba(200,30,30,0.1)]';
+                  : 'bg-[rgba(179, 18, 46,0.06)] border-[rgba(179, 18, 46,0.2)] text-[#b3122e]/80 hover:bg-[rgba(179, 18, 46,0.1)]';
               }
 
               return (
@@ -236,8 +236,8 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
   // Results screen
   if (quizComplete && results) {
     return (
-      <div className="fixed inset-0 bg-[#090909]/95 backdrop-blur flex items-center justify-center z-50 p-4">
-        <div className="bg-[#0f0f0f] border border-white/[0.08] rounded-2xl max-w-md w-full p-6 relative">
+      <div className="fixed inset-0 bg-[#0b0d12]/95 backdrop-blur flex items-center justify-center z-50 p-4">
+        <div className="bg-[#10131b] border border-white/[0.08] rounded-none max-w-md w-full p-6 relative">
           <CollectButton
             results={results}
             quiz={quiz}
@@ -251,10 +251,10 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-[#090909]/95 backdrop-blur flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0f0f0f] border border-white/[0.08] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto font-[Hanken_Grotesk,sans-serif]">
+    <div className="fixed inset-0 bg-[#0b0d12]/95 backdrop-blur flex items-center justify-center z-50 p-4">
+      <div className="bg-[#10131b] border border-white/[0.08] rounded-none max-w-2xl w-full max-h-[90vh] overflow-y-auto font-[Outfit,sans-serif]">
         {/* Header */}
-        <div className="sticky top-0 bg-[#0f0f0f] border-b border-white/[0.05] p-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-[#10131b] border-b border-white/[0.05] p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-[0.1em] text-white/30">
               Q {currentIndex + 1}/{totalQuestions}
@@ -266,7 +266,7 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-white/[0.05] rounded-xl transition-colors"
+            className="p-1.5 hover:bg-white/[0.05] rounded-none transition-colors"
           >
             <X size={16} className="text-white/30" />
           </button>
@@ -275,7 +275,7 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
         {/* Progress Bar */}
         <div className="h-0.5 bg-white/[0.05]">
           <div
-            className="h-full bg-[#c81e1e] transition-all duration-300"
+            className="h-full bg-[#b3122e] transition-all duration-300"
             style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
           />
         </div>
@@ -287,19 +287,19 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
 
         {/* Feedback */}
         {showFeedback && currentQuestion && (
-          <div className={`mx-5 mb-4 p-4 rounded-xl border ${
+          <div className={`mx-5 mb-4 p-4 rounded-none border ${
             isCorrect
               ? 'bg-emerald-900/10 border-emerald-800/30'
-              : 'bg-[rgba(200,30,30,0.06)] border-[rgba(200,30,30,0.2)]'
+              : 'bg-[rgba(179, 18, 46,0.06)] border-[rgba(179, 18, 46,0.2)]'
           }`}>
             <div className="flex items-start gap-3">
               {isCorrect ? (
                 <CheckCircle size={16} className="text-emerald-400 shrink-0 mt-0.5" />
               ) : (
-                <XCircle size={16} className="text-[#c81e1e] shrink-0 mt-0.5" />
+                <XCircle size={16} className="text-[#b3122e] shrink-0 mt-0.5" />
               )}
               <div>
-                <p className={`text-[12px] font-medium ${ isCorrect ? 'text-emerald-400' : 'text-[#c81e1e]'}`}>
+                <p className={`text-[12px] font-medium ${ isCorrect ? 'text-emerald-400' : 'text-[#b3122e]'}`}>
                   {isCorrect ? 'Correct!' : `Incorrect — Answer: ${currentQuestion.correct_answer}`}
                 </p>
                 {currentQuestion.explanation && (
@@ -315,7 +315,7 @@ const QuizPlayer = ({ quiz, userId, onComplete, onClose }) => {
           <div className="p-4 border-t border-white/[0.05]">
             <button
               onClick={handleNext}
-              className="w-full flex items-center justify-center gap-2 bg-[#c81e1e] hover:bg-[#e02424] text-white py-3 rounded-xl font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.08em] transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-[#b3122e] hover:bg-[#d41f3d] text-white py-3 rounded-none font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.08em] transition-all"
             >
               {currentIndex + 1 >= totalQuestions ? 'See Results' : 'Next Question'}
               <ChevronRight size={14} />

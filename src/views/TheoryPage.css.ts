@@ -204,7 +204,7 @@ export const cardFooter = style({
 });
 
 export const cardMeta = style({
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   fontSize: '11px',
   color: vars.color.textFaint,
   letterSpacing: '0.04em',
@@ -350,7 +350,7 @@ export const communityTag = style({
   color: vars.color.accent,
   borderRadius: vars.radius.pill,
   fontSize: '11px',
-  fontFamily: vars.font.mono,
+  fontFamily: vars.font.label,
   marginBottom: vars.space.xs,
 });
 

@@ -108,7 +108,7 @@ const CrossReferencesPanel = ({
 
             {/* Create Form */}
             {showCreateForm && (
-                <div className="bg-gray-800/50 rounded-lg p-3 space-y-3">
+                <div className="bg-gray-800/50 rounded-none p-3 space-y-3">
                     <p className="text-xs text-gray-400">
                         Create reference from §{currentSectionId}
                     </p>

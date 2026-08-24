@@ -331,16 +331,16 @@ const StudyAdminPage = () => {
         }
     };
 
-    const inputClass = 'w-full bg-[#0F1118] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm';
+    const inputClass = 'w-full bg-[#10131b] border border-gray-700 rounded-none px-3 py-2 text-white text-sm';
     const labelClass = 'block text-sm text-gray-400 mb-1';
 
     return (
-        <div className="min-h-screen bg-[#12131A] text-white px-4 py-8">
+        <div className="min-h-screen bg-[#0b0d12] text-white px-4 py-8">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
                     <button
                         onClick={() => router.push('/study')}
-                        className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
+                        className="p-2 rounded-none hover:bg-gray-800 transition-colors"
                         aria-label="Back to study page"
                     >
                         <ArrowLeft size={18} />
@@ -352,13 +352,13 @@ const StudyAdminPage = () => {
                 </div>
 
                 {success && (
-                    <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-lg flex items-center gap-2 text-emerald-300 text-sm">
+                    <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-500/30 rounded-none flex items-center gap-2 text-emerald-300 text-sm">
                         <Check size={16} /> {success}
                     </div>
                 )}
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-900/40 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-300 text-sm">
+                    <div className="mb-4 p-3 bg-red-900/40 border border-red-500/30 rounded-none flex items-center gap-2 text-red-300 text-sm">
                         <AlertTriangle size={16} /> {error}
                     </div>
                 )}
@@ -380,12 +380,12 @@ const StudyAdminPage = () => {
                 </div>
 
                 {loading ? (
-                    <div className="bg-[#181A23] border border-gray-800 rounded-2xl p-8 text-gray-400 flex items-center gap-2">
+                    <div className="bg-[#1a1f2b] border border-gray-800 rounded-none p-8 text-gray-400 flex items-center gap-2">
                         <Loader2 size={18} className="animate-spin" /> Loading study data...
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                        <section className="lg:col-span-3 bg-[#181A23] border border-gray-800 rounded-2xl p-6">
+                        <section className="lg:col-span-3 bg-[#1a1f2b] border border-gray-800 rounded-none p-6">
                             {activeTab === 'resources' && (
                                 <form onSubmit={handleSaveResource} className="space-y-4">
                                     <h2 className="text-lg font-semibold mb-2">{resourceForm.id ? 'Edit Resource' : 'New Resource'}</h2>
@@ -446,17 +446,17 @@ const StudyAdminPage = () => {
                                     </div>
 
                                     <label className="inline-flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
-                                        <input type="checkbox" checked={resourceForm.is_featured} onChange={(e) => setResourceForm((p) => ({ ...p, is_featured: e.target.checked }))} className="rounded border-gray-600 bg-[#0F1118]" />
+                                        <input type="checkbox" checked={resourceForm.is_featured} onChange={(e) => setResourceForm((p) => ({ ...p, is_featured: e.target.checked }))} className="rounded border-gray-600 bg-[#10131b]" />
                                         Featured resource
                                     </label>
 
                                     <div className="flex gap-3 pt-2">
-                                        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 rounded-lg text-sm font-medium transition-colors">
+                                        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 rounded-none text-sm font-medium transition-colors">
                                             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                             {resourceForm.id ? 'Update' : 'Create'}
                                         </button>
                                         {resourceForm.id && (
-                                            <button type="button" onClick={() => setResourceForm(emptyResource)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm">Cancel</button>
+                                            <button type="button" onClick={() => setResourceForm(emptyResource)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-none text-sm">Cancel</button>
                                         )}
                                     </div>
                                 </form>
@@ -500,12 +500,12 @@ const StudyAdminPage = () => {
                                     </div>
 
                                     <div className="flex gap-3 pt-2">
-                                        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 rounded-lg text-sm font-medium transition-colors">
+                                        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 rounded-none text-sm font-medium transition-colors">
                                             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                             {conceptForm.id ? 'Update' : 'Create'}
                                         </button>
                                         {conceptForm.id && (
-                                            <button type="button" onClick={() => setConceptForm(emptyConcept)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm">Cancel</button>
+                                            <button type="button" onClick={() => setConceptForm(emptyConcept)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-none text-sm">Cancel</button>
                                         )}
                                     </div>
                                 </form>
@@ -548,12 +548,12 @@ const StudyAdminPage = () => {
                                     </div>
 
                                     <div className="flex gap-3 pt-2">
-                                        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 rounded-lg text-sm font-medium transition-colors">
+                                        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 rounded-none text-sm font-medium transition-colors">
                                             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                             {milestoneForm.id ? 'Update' : 'Create'}
                                         </button>
                                         {milestoneForm.id && (
-                                            <button type="button" onClick={() => setMilestoneForm(emptyMilestone)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm">Cancel</button>
+                                            <button type="button" onClick={() => setMilestoneForm(emptyMilestone)} className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-none text-sm">Cancel</button>
                                         )}
                                     </div>
                                 </form>
@@ -568,13 +568,13 @@ const StudyAdminPage = () => {
 
                             <div className="space-y-3 max-h-[720px] overflow-y-auto pr-1">
                                 {activeTab === 'resources' && resources.map((item) => (
-                                    <div key={item.id} className="border border-gray-700 rounded-lg p-3 bg-[#0F1118]">
+                                    <div key={item.id} className="border border-gray-700 rounded-none p-3 bg-[#10131b]">
                                         <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">{item.type}{item.is_featured ? ' • Featured' : ''}</p>
                                         <h3 className="font-medium text-sm text-white mb-1">{item.title}</h3>
                                         <p className="text-xs text-gray-400 line-clamp-2 mb-3">{item.excerpt || 'No excerpt'}</p>
                                         <div className="flex gap-2">
-                                            <button type="button" onClick={() => setResourceForm({ ...item, digital_library_book_id: item.digital_library_book_id || '' })} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-md"><Pencil size={13} /> Edit</button>
-                                            <button type="button" onClick={() => handleDeleteResource(item.id)} disabled={deleting} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-md disabled:opacity-60"><Trash2 size={13} /> Delete</button>
+                                            <button type="button" onClick={() => setResourceForm({ ...item, digital_library_book_id: item.digital_library_book_id || '' })} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-none"><Pencil size={13} /> Edit</button>
+                                            <button type="button" onClick={() => handleDeleteResource(item.id)} disabled={deleting} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-none disabled:opacity-60"><Trash2 size={13} /> Delete</button>
                                         </div>
                                     </div>
                                 ))}
@@ -582,7 +582,7 @@ const StudyAdminPage = () => {
                                 {activeTab === 'concepts' && concepts.map((item) => {
                                     const IconComp = ICON_MAP[item.icon_name] || BookOpen;
                                     return (
-                                        <div key={item.id} className="border border-gray-700 rounded-lg p-3 bg-[#0F1118]">
+                                        <div key={item.id} className="border border-gray-700 rounded-none p-3 bg-[#10131b]">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <IconComp size={14} className="text-red-400" />
                                                 <h3 className="font-medium text-sm text-white">{item.term}</h3>
@@ -590,8 +590,8 @@ const StudyAdminPage = () => {
                                             </div>
                                             <p className="text-xs text-gray-400 line-clamp-2 mb-3">{item.explanation}</p>
                                             <div className="flex gap-2">
-                                                <button type="button" onClick={() => setConceptForm(item)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-md"><Pencil size={13} /> Edit</button>
-                                                <button type="button" onClick={() => handleDeleteConcept(item.id)} disabled={deleting} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-md disabled:opacity-60"><Trash2 size={13} /> Delete</button>
+                                                <button type="button" onClick={() => setConceptForm(item)} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-none"><Pencil size={13} /> Edit</button>
+                                                <button type="button" onClick={() => handleDeleteConcept(item.id)} disabled={deleting} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-none disabled:opacity-60"><Trash2 size={13} /> Delete</button>
                                             </div>
                                         </div>
                                     );
@@ -600,14 +600,14 @@ const StudyAdminPage = () => {
                                 {activeTab === 'milestones' && milestones.map((item) => {
                                     const linkedResource = resources.find((r) => r.id === item.resource_id);
                                     return (
-                                        <div key={item.id} className="border border-gray-700 rounded-lg p-3 bg-[#0F1118]">
+                                        <div key={item.id} className="border border-gray-700 rounded-none p-3 bg-[#10131b]">
                                             <h3 className="font-medium text-sm text-white mb-1">{item.title}</h3>
                                             {item.chinese_title && <p className="text-xs text-gray-500 mb-1">{item.chinese_title}</p>}
                                             {linkedResource && <p className="text-xs text-sky-400 mb-1">Linked: {linkedResource.title}</p>}
                                             <p className="text-xs text-gray-400 line-clamp-2 mb-3">{item.description || 'No description'}</p>
                                             <div className="flex gap-2">
-                                                <button type="button" onClick={() => setMilestoneForm({ ...item, resource_id: item.resource_id || '' })} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-md"><Pencil size={13} /> Edit</button>
-                                                <button type="button" onClick={() => handleDeleteMilestone(item.id)} disabled={deleting} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-md disabled:opacity-60"><Trash2 size={13} /> Delete</button>
+                                                <button type="button" onClick={() => setMilestoneForm({ ...item, resource_id: item.resource_id || '' })} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 rounded-none"><Pencil size={13} /> Edit</button>
+                                                <button type="button" onClick={() => handleDeleteMilestone(item.id)} disabled={deleting} className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs bg-red-900/60 hover:bg-red-900 rounded-none disabled:opacity-60"><Trash2 size={13} /> Delete</button>
                                             </div>
                                         </div>
                                     );

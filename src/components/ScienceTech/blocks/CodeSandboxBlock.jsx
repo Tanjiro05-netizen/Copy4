@@ -25,7 +25,7 @@ print("Hello, World!")`;
 const JAVASCRIPT_STYLES = {
   width: '100%',
   height: '100%',
-  backgroundColor: '#1a1b23',
+  backgroundColor: '#1a1f2b',
   borderRadius: '0.5rem',
   border: '1px solid rgba(127, 29, 29, 0.3)',
 };
@@ -94,7 +94,7 @@ const CodeSandboxBlock = ({ block }) => {
   };
 
   return (
-    <div className="bg-black/40 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-black/40 rounded-none border border-gray-800 overflow-hidden">
       {instructions && (
         <div className="px-4 py-3 border-b border-gray-800 bg-red-950/10">
           <p className="text-gray-300 text-sm">{instructions}</p>
@@ -135,7 +135,7 @@ const CodeSandboxBlock = ({ block }) => {
               <textarea
                 value={pythonCode}
                 onChange={(e) => setPythonCode(e.target.value)}
-                className="flex-1 bg-[#0d0e14] text-gray-300 font-mono text-sm p-4 resize-none focus:outline-none focus:ring-0"
+                className="flex-1 bg-[#0b0d12] text-gray-300 font-mono text-sm p-4 resize-none focus:outline-none focus:ring-0"
                 spellCheck={false}
               />
             </div>
@@ -175,7 +175,7 @@ const CodeSandboxBlock = ({ block }) => {
         </div>
 
         {/* Output / Preview */}
-        <div className="flex-1 min-h-[200px] border-t lg:border-t-0 lg:border-l border-gray-800 bg-[#0d0e14]">
+        <div className="flex-1 min-h-[200px] border-t lg:border-t-0 lg:border-l border-gray-800 bg-[#0b0d12]">
           {isPython ? (
             <div className="h-full flex flex-col">
               <div className="px-3 py-2 bg-black/60 border-b border-gray-800 flex items-center gap-2">
@@ -203,7 +203,7 @@ const CodeSandboxBlock = ({ block }) => {
                       width: '100%',
                       height: '100%',
                       border: 'none',
-                      backgroundColor: '#0d0e14',
+                      backgroundColor: '#0b0d12',
                     }}
                   />
                 </SandpackProvider>
@@ -232,7 +232,7 @@ const CodeSandboxBlock = ({ block }) => {
           </button>
           {showSolution && (
             <div className="px-4 pb-4">
-              <pre className="bg-black/60 p-3 rounded-lg overflow-x-auto border border-gray-800">
+              <pre className="bg-black/60 p-3 rounded-none overflow-x-auto border border-gray-800">
                 <code className="text-gray-300 text-sm font-mono">{solution}</code>
               </pre>
             </div>

@@ -113,7 +113,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
               onChange={(e) => updateBlock(idx, { content: e.target.value })}
               rows={6}
               placeholder="## Heading&#10;&#10;Paragraph with **bold** and $math$."
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y"
             />
           </div>
         );
@@ -126,7 +126,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
               <select
                 value={block.variant}
                 onChange={(e) => updateBlock(idx, { variant: e.target.value })}
-                className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+                className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
               >
                 {VARIANTS.map(v => <option key={v} value={v}>{v.replace('_', ' ')}</option>)}
               </select>
@@ -134,7 +134,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
                 value={block.title}
                 onChange={(e) => updateBlock(idx, { title: e.target.value })}
                 placeholder="Title"
-                className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+                className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
               />
             </div>
             <textarea
@@ -142,7 +142,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
               onChange={(e) => updateBlock(idx, { content: e.target.value })}
               rows={3}
               placeholder="Callout content (Markdown + KaTeX supported)"
-              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-y"
+              className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-y"
             />
           </div>
         );
@@ -156,12 +156,12 @@ const BlockBuilder = ({ blocks, onChange }) => {
                 value={block.url}
                 onChange={(e) => updateBlock(idx, { url: e.target.value })}
                 placeholder="Image URL"
-                className="flex-1 px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none"
+                className="flex-1 px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none"
               />
               <button
                 onClick={() => fileRef.current?.click()}
                 disabled={uploadingIdx === idx}
-                className="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-lg flex items-center gap-1.5 disabled:opacity-50"
+                className="px-3 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm rounded-none flex items-center gap-1.5 disabled:opacity-50"
               >
                 {uploadingIdx === idx ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                 Upload
@@ -177,9 +177,9 @@ const BlockBuilder = ({ blocks, onChange }) => {
                 }}
               />
             </div>
-            {block.url && <img src={block.url} alt="preview" className="max-h-24 rounded-lg border border-gray-800" />}
-            <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Caption" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
-            <input value={block.alt} onChange={(e) => updateBlock(idx, { alt: e.target.value })} placeholder="Alt text (accessibility)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            {block.url && <img src={block.url} alt="preview" className="max-h-24 rounded-none border border-gray-800" />}
+            <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Caption" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
+            <input value={block.alt} onChange={(e) => updateBlock(idx, { alt: e.target.value })} placeholder="Alt text (accessibility)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
           </div>
         );
 
@@ -187,11 +187,11 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <input value={block.url} onChange={(e) => updateBlock(idx, { url: e.target.value })} placeholder="YouTube or video URL" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            <input value={block.url} onChange={(e) => updateBlock(idx, { url: e.target.value })} placeholder="YouTube or video URL" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
             <div className="grid grid-cols-3 gap-2">
-              <input type="number" value={block.start ?? ''} onChange={(e) => updateBlock(idx, { start: e.target.value ? parseInt(e.target.value) : null })} placeholder="Start (sec)" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
-              <input type="number" value={block.end ?? ''} onChange={(e) => updateBlock(idx, { end: e.target.value ? parseInt(e.target.value) : null })} placeholder="End (sec)" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
-              <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Caption" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+              <input type="number" value={block.start ?? ''} onChange={(e) => updateBlock(idx, { start: e.target.value ? parseInt(e.target.value) : null })} placeholder="Start (sec)" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
+              <input type="number" value={block.end ?? ''} onChange={(e) => updateBlock(idx, { end: e.target.value ? parseInt(e.target.value) : null })} placeholder="End (sec)" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
+              <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Caption" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
             </div>
           </div>
         );
@@ -200,7 +200,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <input value={block.title} onChange={(e) => updateBlock(idx, { title: e.target.value })} placeholder="Example title" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            <input value={block.title} onChange={(e) => updateBlock(idx, { title: e.target.value })} placeholder="Example title" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
             {block.steps.map((step, sIdx) => (
               <div key={sIdx} className="flex gap-2 items-start">
                 <span className="text-gray-500 text-xs mt-2">{sIdx + 1}.</span>
@@ -208,12 +208,12 @@ const BlockBuilder = ({ blocks, onChange }) => {
                   const steps = [...block.steps];
                   steps[sIdx] = { ...steps[sIdx], label: e.target.value };
                   updateBlock(idx, { steps });
-                }} placeholder="Step label" className="w-32 px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+                }} placeholder="Step label" className="w-32 px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
                 <textarea value={step.content} onChange={(e) => {
                   const steps = [...block.steps];
                   steps[sIdx] = { ...steps[sIdx], content: e.target.value };
                   updateBlock(idx, { steps });
-                }} placeholder="Step content (Markdown + KaTeX)" rows={2} className="flex-1 px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
+                }} placeholder="Step content (Markdown + KaTeX)" rows={2} className="flex-1 px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
                 <button onClick={() => updateBlock(idx, { steps: block.steps.filter((_, i) => i !== sIdx) })} className="p-1 text-gray-500 hover:text-red-400 mt-1"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             ))}
@@ -225,16 +225,16 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <select value={block.exercise_type} onChange={(e) => updateBlock(idx, { exercise_type: e.target.value })} className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none">
+            <select value={block.exercise_type} onChange={(e) => updateBlock(idx, { exercise_type: e.target.value })} className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none">
               {EXERCISE_TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
             </select>
-            <textarea value={block.question} onChange={(e) => updateBlock(idx, { question: e.target.value })} rows={2} placeholder="Question (Markdown + KaTeX)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
+            <textarea value={block.question} onChange={(e) => updateBlock(idx, { question: e.target.value })} rows={2} placeholder="Question (Markdown + KaTeX)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
             {block.exercise_type === 'multiple_choice' && (
-              <textarea value={Array.isArray(block.options) ? block.options.join('\n') : ''} onChange={(e) => updateBlock(idx, { options: e.target.value.split('\n').filter(Boolean) })} rows={3} placeholder="Options (one per line)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
+              <textarea value={Array.isArray(block.options) ? block.options.join('\n') : ''} onChange={(e) => updateBlock(idx, { options: e.target.value.split('\n').filter(Boolean) })} rows={3} placeholder="Options (one per line)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
             )}
-            <input value={block.correct_answer} onChange={(e) => updateBlock(idx, { correct_answer: e.target.value })} placeholder="Correct answer" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
-            <textarea value={block.hint} onChange={(e) => updateBlock(idx, { hint: e.target.value })} rows={2} placeholder="Hint (optional)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
-            <textarea value={block.explanation} onChange={(e) => updateBlock(idx, { explanation: e.target.value })} rows={2} placeholder="Explanation (shown after answer)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
+            <input value={block.correct_answer} onChange={(e) => updateBlock(idx, { correct_answer: e.target.value })} placeholder="Correct answer" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
+            <textarea value={block.hint} onChange={(e) => updateBlock(idx, { hint: e.target.value })} rows={2} placeholder="Hint (optional)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
+            <textarea value={block.explanation} onChange={(e) => updateBlock(idx, { explanation: e.target.value })} rows={2} placeholder="Explanation (shown after answer)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none resize-y" />
           </div>
         );
 
@@ -242,12 +242,12 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <select value={block.language} onChange={(e) => updateBlock(idx, { language: e.target.value })} className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none">
+            <select value={block.language} onChange={(e) => updateBlock(idx, { language: e.target.value })} className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none">
               {CODE_LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
-            <textarea value={block.starter_code} onChange={(e) => updateBlock(idx, { starter_code: e.target.value })} rows={4} placeholder="Starter code" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y" />
-            <textarea value={block.solution} onChange={(e) => updateBlock(idx, { solution: e.target.value })} rows={3} placeholder="Solution (shown when revealed)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y" />
-            <input value={block.instructions} onChange={(e) => updateBlock(idx, { instructions: e.target.value })} placeholder="Instructions for student" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            <textarea value={block.starter_code} onChange={(e) => updateBlock(idx, { starter_code: e.target.value })} rows={4} placeholder="Starter code" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y" />
+            <textarea value={block.solution} onChange={(e) => updateBlock(idx, { solution: e.target.value })} rows={3} placeholder="Solution (shown when revealed)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y" />
+            <input value={block.instructions} onChange={(e) => updateBlock(idx, { instructions: e.target.value })} placeholder="Instructions for student" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
           </div>
         );
 
@@ -255,12 +255,12 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <select value={block.widget_type} onChange={(e) => updateBlock(idx, { widget_type: e.target.value })} className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none">
+            <select value={block.widget_type} onChange={(e) => updateBlock(idx, { widget_type: e.target.value })} className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none">
               {WIDGET_TYPES.map(w => <option key={w} value={w}>{w.replace('_', ' ')}</option>)}
             </select>
             <textarea value={JSON.stringify(block.config || {}, null, 2)} onChange={(e) => {
               try { updateBlock(idx, { config: JSON.parse(e.target.value) }); } catch {}
-            }} rows={6} placeholder='{"default_angle": 45, "default_velocity": 30}' className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y" />
+            }} rows={6} placeholder='{"default_angle": 45, "default_velocity": 30}' className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm font-mono focus:border-red-500 focus:outline-none resize-y" />
             <p className="text-gray-500 text-xs">Edit config as JSON. Each widget type has different parameters.</p>
           </div>
         );
@@ -275,7 +275,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
                   const points = [...block.points];
                   points[pIdx] = e.target.value;
                   updateBlock(idx, { points });
-                }} placeholder={`Takeaway ${pIdx + 1}`} className="flex-1 px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+                }} placeholder={`Takeaway ${pIdx + 1}`} className="flex-1 px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
                 <button onClick={() => updateBlock(idx, { points: block.points.filter((_, i) => i !== pIdx) })} className="p-1 text-gray-500 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
             ))}
@@ -287,7 +287,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <input value={block.label} onChange={(e) => updateBlock(idx, { label: e.target.value })} placeholder="Divider label (optional)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            <input value={block.label} onChange={(e) => updateBlock(idx, { label: e.target.value })} placeholder="Divider label (optional)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
           </div>
         );
 
@@ -329,7 +329,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
               </div>
             ))}
             <button onClick={() => updateBlock(idx, { rows: [...block.rows, Array(block.headers.length).fill('')] })} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"><Plus className="w-3 h-3" /> Add Row</button>
-            <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Table caption" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Table caption" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
           </div>
         );
 
@@ -337,10 +337,10 @@ const BlockBuilder = ({ blocks, onChange }) => {
         return (
           <div className="space-y-2">
             {common}
-            <input value={block.url} onChange={(e) => updateBlock(idx, { url: e.target.value })} placeholder="Embed URL (Desmos, GeoGebra, etc.)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+            <input value={block.url} onChange={(e) => updateBlock(idx, { url: e.target.value })} placeholder="Embed URL (Desmos, GeoGebra, etc.)" className="w-full px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
             <div className="grid grid-cols-2 gap-2">
-              <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Caption" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
-              <input value={block.aspect_ratio} onChange={(e) => updateBlock(idx, { aspect_ratio: e.target.value })} placeholder="Aspect ratio (16/9)" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-lg text-white text-sm focus:border-red-500 focus:outline-none" />
+              <input value={block.caption} onChange={(e) => updateBlock(idx, { caption: e.target.value })} placeholder="Caption" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
+              <input value={block.aspect_ratio} onChange={(e) => updateBlock(idx, { aspect_ratio: e.target.value })} placeholder="Aspect ratio (16/9)" className="px-3 py-2 bg-black/50 border border-gray-700 rounded-none text-white text-sm focus:border-red-500 focus:outline-none" />
             </div>
           </div>
         );
@@ -359,7 +359,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
             <button
               key={type}
               onClick={() => addBlock(type)}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-xs rounded-lg transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-xs rounded-none transition-colors"
             >
               <Icon className="w-3.5 h-3.5" />
               {label}
@@ -368,7 +368,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
         </div>
         <button
           onClick={() => setPreviewMode(!previewMode)}
-          className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+          className={`flex items-center gap-1 px-3 py-1.5 text-xs rounded-none transition-colors ${
             previewMode ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
           }`}
         >
@@ -379,7 +379,7 @@ const BlockBuilder = ({ blocks, onChange }) => {
 
       {/* Content */}
       {previewMode ? (
-        <div className="bg-black/20 rounded-xl border border-gray-800 p-4">
+        <div className="bg-black/20 rounded-none border border-gray-800 p-4">
           {blocks.length === 0 ? (
             <p className="text-gray-500 text-sm text-center">No blocks to preview</p>
           ) : (
@@ -389,12 +389,12 @@ const BlockBuilder = ({ blocks, onChange }) => {
       ) : (
         <div className="space-y-3">
           {blocks.length === 0 && (
-            <div className="text-center py-8 border-2 border-dashed border-gray-800 rounded-xl">
+            <div className="text-center py-8 border-2 border-dashed border-gray-800 rounded-none">
               <p className="text-gray-500 text-sm">No blocks yet. Click a block type above to add one.</p>
             </div>
           )}
           {blocks.map((block, idx) => (
-            <div key={idx} className="bg-black/30 rounded-lg border border-gray-800 p-3">
+            <div key={idx} className="bg-black/30 rounded-none border border-gray-800 p-3">
               {renderBlockEditor(block, idx)}
             </div>
           ))}

@@ -12,7 +12,7 @@ const SpringMass = ({ config }) => {
     if (!c) return;
     const ctx = c.getContext('2d');
     const w = c.width, h = c.height;
-    ctx.fillStyle = '#0d0e14';
+    ctx.fillStyle = '#0b0d12';
     ctx.fillRect(0, 0, w, h);
 
     const cx = w / 2, eqY = h / 2, scale = 60;
@@ -31,7 +31,7 @@ const SpringMass = ({ config }) => {
 
     // Spring
     const top = 30, bot = eqY + xPx - 15;
-    ctx.strokeStyle = '#ef4444';
+    ctx.strokeStyle = '#d41f3d';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(cx, top);
@@ -46,7 +46,7 @@ const SpringMass = ({ config }) => {
 
     // Mass
     const mS = Math.max(15, 10 + mass * 5);
-    ctx.fillStyle = '#3b82f6';
+    ctx.fillStyle = '#4a7fb5';
     ctx.fillRect(cx - mS / 2, eqY + xPx - mS / 2, mS, mS);
     ctx.fillStyle = '#fff';
     ctx.font = '10px sans-serif';
@@ -83,7 +83,7 @@ const SpringMass = ({ config }) => {
   }, [isRunning, draw]);
 
   return (
-    <div className="bg-black/40 rounded-xl border border-gray-800 p-4">
+    <div className="bg-black/40 rounded-none border border-gray-800 p-4">
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span className="text-gray-400 text-xs">Mass</span>
@@ -107,7 +107,7 @@ const SpringMass = ({ config }) => {
         </button>
       </div>
       <div className="overflow-x-auto">
-        <canvas ref={canvasRef} width={500} height={280} className="rounded-lg" />
+        <canvas ref={canvasRef} width={500} height={280} className="rounded-none" />
       </div>
     </div>
   );

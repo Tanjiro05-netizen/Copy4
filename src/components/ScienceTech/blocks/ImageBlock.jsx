@@ -9,17 +9,17 @@ const ImageBlock = ({ block }) => {
   return (
     <>
       <figure className="my-2">
-        <div className="relative group rounded-lg overflow-hidden bg-black/30 border border-gray-800 inline-block max-w-full">
+        <div className="relative group rounded-none overflow-hidden bg-black/30 border border-gray-800 inline-block max-w-full">
           <img
             src={block.url}
             alt={block.alt || block.caption || ''}
-            className="max-w-full rounded-lg cursor-zoom-in"
+            className="max-w-full rounded-none cursor-zoom-in"
             loading="lazy"
             onClick={() => setZoomed(true)}
           />
           <button
             onClick={() => setZoomed(true)}
-            className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute top-3 right-3 p-1.5 bg-black/60 rounded-none text-white opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Zoom in"
           >
             <ZoomIn className="w-4 h-4" />
@@ -47,7 +47,7 @@ const ImageBlock = ({ block }) => {
           <img
             src={block.url}
             alt={block.alt || block.caption || ''}
-            className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+            className="max-w-[90vw] max-h-[90vh] object-contain rounded-none"
           />
         </div>
       )}
