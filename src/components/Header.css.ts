@@ -141,7 +141,7 @@ const navFill = {
   background: bandHighlight,
   transform: 'scaleY(0)',
   transformOrigin: 'bottom',
-  transition: 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)',
+  transition: 'transform 360ms cubic-bezier(0.22, 1, 0.36, 1)',
 };
 
 const navFillMotionOff = {
