@@ -6,6 +6,8 @@ const bandInk = '#14161d';
 const bandInkFaint = 'rgba(20, 22, 29, 0.72)';
 const bandHairline = 'rgba(20, 22, 29, 0.16)';
 const bandAccent = '#b3122e';
+/* Parchment gold — the warm tan plate that marks hovered/active selectors */
+const bandHighlight = '#e0ccaa';
 
 export const header = style({
   position: 'relative',
@@ -112,10 +114,11 @@ export const navRow = style({
 });
 
 /* Link states are split into idle / active / restricted variants so exactly
-   one underline rule is ever applied per link. */
+   one highlight-plate rule is ever applied per link. */
 
 export const navLink = style({
   position: 'relative',
+  zIndex: 0,
   display: 'inline-flex',
   alignItems: 'center',
   height: '46px',
@@ -130,38 +133,39 @@ export const navLink = style({
   transition: 'color 180ms ease',
 });
 
-const navUnderline = {
+const navFill = {
   content: '""',
   position: 'absolute',
-  left: '9px',
-  right: '9px',
-  bottom: '10px',
-  height: '1px',
-  background: bandAccent,
-  transform: 'scaleX(0)',
-  transformOrigin: 'left center',
+  inset: 0,
+  zIndex: -1,
+  background: bandHighlight,
+  transform: 'scaleY(0)',
+  transformOrigin: 'bottom',
   transition: 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)',
+};
+
+const navFillMotionOff = {
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      selectors: {
+        '&::before': { transition: 'none' },
+      },
+    },
+  },
 };
 
 export const navLinkIdle = style({
   selectors: {
-    '&::after': navUnderline,
-    '&:hover': {
-      color: bandAccent,
-    },
-    '&:hover::after': {
-      transform: 'scaleX(1)',
-    },
+    '&::before': navFill,
+    '&:hover::before': { transform: 'scaleY(1)' },
+    '&:focus-visible::before': { transform: 'scaleY(1)' },
   },
+  ...navFillMotionOff,
 });
 
 export const navLinkActive = style({
-  color: bandAccent,
   selectors: {
-    '&::after': {
-      ...navUnderline,
-      transform: 'scaleX(1)',
-    },
+    '&::before': { ...navFill, transform: 'scaleY(1)' },
   },
 });
 
@@ -187,6 +191,8 @@ export const dropdownWrap = style({
 });
 
 export const dropdownTrigger = style({
+  position: 'relative',
+  zIndex: 0,
   display: 'flex',
   alignItems: 'center',
   height: '46px',
@@ -201,16 +207,18 @@ export const dropdownTrigger = style({
   border: 'none',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
-  transition: 'color 180ms ease',
   selectors: {
-    '&:hover': {
-      color: bandAccent,
-    },
+    '&::before': navFill,
+    '&:hover::before': { transform: 'scaleY(1)' },
+    '&:focus-visible::before': { transform: 'scaleY(1)' },
   },
+  ...navFillMotionOff,
 });
 
 export const dropdownTriggerActive = style({
-  color: bandAccent,
+  selectors: {
+    '&::before': { ...navFill, transform: 'scaleY(1)' },
+  },
 });
 
 export const dropdownMenu = style({
