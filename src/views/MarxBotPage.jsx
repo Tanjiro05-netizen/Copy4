@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import './MarxBotPage.css';
 
 const CONSOLE_LINES = [
     { delay: 1200, text: '> boot marxbot v0.0.1-alpha ...' },

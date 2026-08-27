@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, LogOut, BarChart, BookOpen, FileText, Home, BookMarked, LineChart, Users, Shield, HelpCircle, ChevronDown, Newspaper, Radio, Search, Sun } from 'lucide-react';
 import Link from 'next/link';
+import { prefetchRouteData, prefetchAllRoutesWhenIdle } from '../lib/routePrefetch';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -16,6 +17,12 @@ const Header = () => {
 
     const isAdminUser = isAdmin();
     const canEditPolitics = canManagePolitics();
+
+    // After first paint, warm every route's data during idle time so any
+    // navigation lands on a hot cache.
+    useEffect(() => {
+        prefetchAllRoutesWhenIdle();
+    }, []);
 
     const isActive = (path) => pathname === path || pathname.startsWith(`${path}/`);
 
@@ -114,6 +121,8 @@ const Header = () => {
                                         href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                         className={`${s.navLink} ${isRestricted ? s.navLinkRestricted : isActive(item.path) ? s.navLinkActive : s.navLinkIdle}`}
                                         title={isRestricted ? t('nav.membersOnly') : ''}
+                                        onMouseEnter={() => prefetchRouteData(item.path)}
+                                        onFocus={() => prefetchRouteData(item.path)}
                                     >
                                         <span>{item.label}</span>
                                         {isRestricted && <span className={s.restrictedMark}>✦</span>}
@@ -247,6 +256,9 @@ const Header = () => {
                                         key={item.path}
                                         href={isRestricted ? `/coming-soon?feature=${item.featureKey || ''}` : item.path}
                                         className={`${s.mobileLink} ${isRestricted ? s.mobileLinkRestricted : isActive(item.path) ? s.mobileLinkActive : ''}`}
+                                        onMouseEnter={() => prefetchRouteData(item.path)}
+                                        onFocus={() => prefetchRouteData(item.path)}
+                                        onTouchStart={() => prefetchRouteData(item.path)}
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <span>{item.label}</span>

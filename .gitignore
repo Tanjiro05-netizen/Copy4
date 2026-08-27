@@ -21,3 +21,7 @@ docs/
 
 # Local Claude worktrees
 .claude/worktrees/
+
+# Agent/tool artifacts
+.zcode/
+next-env.d.ts

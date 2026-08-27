@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, HelpCircle, Plus, Save, Trash2, X, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import './worldsim.css';
 
 const Terminal = ({ 
   output, 

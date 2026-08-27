@@ -8,7 +8,7 @@
     color: #ece9e0;
     overflow: hidden;
     cursor: crosshair;
-    font-family: 'Newsreader', Georgia, serif;
+    font-family: var(--ff-body), Georgia, serif;
 }
 
 /* Scanline overlay — retired */
@@ -75,7 +75,7 @@
 
 /* Masthead-scale title — engraved plate, no glitch */
 .marxbot-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--ff-display), Georgia, serif;
     font-size: clamp(3rem, 10vw, 7rem);
     font-weight: 500;
     letter-spacing: 0.06em;
@@ -95,7 +95,7 @@
 
 /* TM badge */
 .marxbot-tm {
-    font-family: 'Outfit', system-ui, sans-serif;
+    font-family: var(--ff-label), system-ui, sans-serif;
     font-size: 0.18em;
     vertical-align: super;
     color: #d41f3d;
@@ -107,7 +107,7 @@
 .marxbot-subtitle {
     text-align: center;
     margin-top: 2rem;
-    font-family: 'Outfit', system-ui, sans-serif;
+    font-family: var(--ff-label), system-ui, sans-serif;
     color: #a5a194;
     font-size: 0.72rem;
     font-weight: 500;
@@ -206,7 +206,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: 'Outfit', system-ui, sans-serif;
+    font-family: var(--ff-label), system-ui, sans-serif;
     font-size: 0.62rem;
     font-weight: 500;
     letter-spacing: 0.22em;
@@ -242,7 +242,7 @@
     color: #6f6c61;
     font-size: 0.68rem;
     font-weight: 500;
-    font-family: 'Outfit', system-ui, sans-serif;
+    font-family: var(--ff-label), system-ui, sans-serif;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     text-decoration: none;
@@ -281,7 +281,7 @@
     border: 1px solid #262a35;
     border-radius: 0;
     background: #10131b;
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-family: var(--ff-mono), 'Courier New', monospace;
     font-size: 0.7rem;
     color: #a5a194;
     letter-spacing: 0.05em;

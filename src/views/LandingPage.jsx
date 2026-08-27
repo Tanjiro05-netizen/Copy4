@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import MarxBg from '../assets/Marx.jpg';
 import DonationModal from '../components/DonationModal';
+import './LandingPage.css';
 
 const marxBgUrl = typeof MarxBg === 'string' ? MarxBg : MarxBg.src;
 

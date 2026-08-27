@@ -679,25 +679,27 @@ class KnowledgeApiService {
       const twoWeeksAgo = new Date()
       twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
 
-      // Get all user's questions
-      const { data: questions } = await supabase
-        .from('knowledge_questions')
-        .select('view_count, upvote_count, created_at')
-        .eq('author_id', userId)
-        .eq('status', 'approved')
-
-      // Get all user's answers
-      const { data: answers } = await supabase
-        .from('knowledge_answers')
-        .select('upvote_count, created_at')
-        .eq('author_id', userId)
-        .eq('status', 'approved')
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('follower_count')
-        .eq('id', userId)
-        .maybeSingle()
+      // All three stats sources are independent — fetch in parallel
+      const [questionsRes, answersRes, profileRes] = await Promise.all([
+        supabase
+          .from('knowledge_questions')
+          .select('view_count, upvote_count, created_at')
+          .eq('author_id', userId)
+          .eq('status', 'approved'),
+        supabase
+          .from('knowledge_answers')
+          .select('upvote_count, created_at')
+          .eq('author_id', userId)
+          .eq('status', 'approved'),
+        supabase
+          .from('profiles')
+          .select('follower_count')
+          .eq('id', userId)
+          .maybeSingle(),
+      ])
+      const { data: questions } = questionsRes
+      const { data: answers } = answersRes
+      const { data: profile } = profileRes
 
       // Calculate current totals
       const totalViews = (questions || []).reduce((sum, q) => sum + (q.view_count || 0), 0)
@@ -750,22 +752,23 @@ class KnowledgeApiService {
       // Hot questions count (high engagement in last 24h)
       const oneDayAgo = new Date()
       oneDayAgo.setDate(oneDayAgo.getDate() - 1)
-      
-      const { count: hotCount } = await supabase
-        .from('knowledge_questions')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'approved')
-        .gte('created_at', oneDayAgo.toISOString())
 
-      // User's favorites count
-      let favCount = 0
-      if (userId) {
-        const { count } = await supabase
-          .from('knowledge_favorites')
+      // Both counts are independent — fetch in parallel
+      const [hotRes, favRes] = await Promise.all([
+        supabase
+          .from('knowledge_questions')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', userId)
-        favCount = count || 0
-      }
+          .eq('status', 'approved')
+          .gte('created_at', oneDayAgo.toISOString()),
+        userId
+          ? supabase
+              .from('knowledge_favorites')
+              .select('*', { count: 'exact', head: true })
+              .eq('user_id', userId)
+          : Promise.resolve(null),
+      ])
+      const hotCount = hotRes.count
+      const favCount = favRes?.count || 0
 
       return {
         hotList: hotCount || 0,

@@ -1,21 +1,10 @@
 import React, { createContext, useContext, useEffect } from 'react';
 
-const FONT_LINK_ID = 'marxist-google-fonts';
-const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap';
+/* Fonts are self-hosted via next/font in app/layout.jsx (variables on <html>,
+   consumed as --ff-* in theme.css). This provider only carries the theme and
+   sets the document-level theme attributes. */
 
 const ThemeContext = createContext();
-
-const ensureFontLink = () => {
-    if (typeof document === 'undefined') return;
-    const existing = document.getElementById(FONT_LINK_ID);
-    if (!existing) {
-        const link = document.createElement('link');
-        link.id = FONT_LINK_ID;
-        link.rel = 'stylesheet';
-        link.href = FONT_HREF;
-        document.head.appendChild(link);
-    }
-};
 
 export const ThemeProvider = ({ children }) => {
     const theme = 'dark';
@@ -24,7 +13,6 @@ export const ThemeProvider = ({ children }) => {
         document.documentElement.setAttribute('data-theme', 'dark');
         document.body.classList.add('dark-theme');
         document.body.classList.remove('light-theme');
-        ensureFontLink();
     }, []);
 
     return (

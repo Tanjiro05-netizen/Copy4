@@ -23,6 +23,7 @@ import {
   Lock,
   Target,
 } from 'lucide-react';
+import 'katex/dist/katex.min.css';
 
 const levelLabel = {
   beginner: 'Beginner',

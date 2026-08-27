@@ -114,6 +114,9 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
     const [user, setUser] = useState(initialUser);
     const [profile, setProfile] = useState(initialProfile);
     const [loading, setLoading] = useState(!initialAuthResolved);
+    // True once a profile fetch has settled for the current user (or user is
+    // null) — lets ProtectedRoute render content while the invite check lands.
+    const [profileReady, setProfileReady] = useState(false);
     const latestUserRef = useRef(initialUser);
     const lastResumeSessionSyncAtRef = useRef(0);
     const resumeSessionSyncPromiseRef = useRef(null);
@@ -131,6 +134,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
     const fetchProfile = useCallback(async (userId) => {
         if (!userId) {
             setProfile(null);
+            setProfileReady(true);
             return;
         }
         try {
@@ -147,7 +151,20 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
         } catch (error) {
             console.error('Error fetching profile:', error);
             setProfile(await fetchRoleFallbackProfile(userId));
+        } finally {
+            setProfileReady(true);
         }
+    }, []);
+
+    /* Keep `user` referentially stable when the identity hasn't changed:
+     * tab-focus re-syncs produce new session objects, and every effect
+     * keyed on `user` (view query chains) would otherwise re-run. */
+    const applyUser = useCallback((nextUser) => {
+        setUser(prev => {
+            if (prev === nextUser) return prev;
+            if (prev && nextUser && prev.id === nextUser.id) return prev;
+            return nextUser;
+        });
     }, []);
 
     const syncSession = useCallback(async ({ refresh = false, clearOnFailure = true } = {}) => {
@@ -168,11 +185,12 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
                 throw response.error;
             }
 
-            setUser(session?.user ?? null);
+            applyUser(session?.user ?? null);
             if (session?.user) {
                 await withTimeout(fetchProfile(session.user.id), SESSION_TIMEOUT_MS, 'Profile loading timed out.');
             } else {
                 setProfile(null);
+                setProfileReady(true);
             }
         } catch (error) {
             console.warn('Auth session unavailable; continuing with the current session state.', error);
@@ -183,7 +201,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
         } finally {
             setLoading(false);
         }
-    }, [applyLocalDevAuth, fetchProfile]);
+    }, [applyLocalDevAuth, applyUser, fetchProfile]);
 
     useEffect(() => {
         syncSession();
@@ -194,7 +212,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
                 applyLocalDevAuth();
                 return;
             }
-            setUser(session?.user ?? null);
+            applyUser(session?.user ?? null);
             if (session?.user) {
                 setTimeout(() => {
                     fetchProfile(session.user.id);
@@ -317,6 +335,7 @@ export const AuthProvider = ({ children, initialUser = null, initialProfile = nu
         },
         user,
         profile,
+        profileReady,
         loading,
         isAdmin,
         hasEditorialRole,

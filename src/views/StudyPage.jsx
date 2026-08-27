@@ -19,6 +19,7 @@ import StudyPathGenerator from "../components/AIFeatures/StudyPathGenerator";
 import marxBackground from "../assets/Marx.jpg";
 import ConceptAnalysis from "../components/StudyPage/ConceptAnalysis";
 import { supabase } from "../supabaseClient";
+import { prefetchQuery, invalidateQuery } from "../lib/queryCache";
 import { useAuth } from "../context/AuthContext";
 import * as styles from "./StudyPage.css.ts";
 import {
@@ -50,6 +51,9 @@ const NAV_ITEMS = [
 const StudyPage = () => {
   const { user, canManageStudy } = useAuth();
   const showAdminLink = canManageStudy();
+  // Key data effects on the stable id — user object churn (tab focus
+  // re-syncs) must not re-run the query chain.
+  const userId = user?.id;
   const [generatedPath, setGeneratedPath] = useState(null);
 
   const [resources, setResources] = useState([]);
@@ -68,65 +72,82 @@ const StudyPage = () => {
 
 
   useEffect(() => {
-    const fetchResources = async () => {
+    let cancelled = false;
+    (async () => {
       setLoadingResources(true);
       try {
-        const { data, error } = await supabase
-          .from("study_resources")
-          .select("*")
-          .order("sort_order");
-        if (error) throw error;
-        setResources(data || []);
+        const data = await prefetchQuery("study:resources", async () => {
+          const { data, error } = await supabase
+            .from("study_resources")
+            .select("*")
+            .order("sort_order");
+          if (error) throw error;
+          return data || [];
+        });
+        if (!cancelled) setResources(data);
       } catch (err) {
         console.error("Error fetching study resources:", err);
       } finally {
         setLoadingResources(false);
       }
-    };
-
-    fetchResources();
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    const fetchConcepts = async () => {
+    let cancelled = false;
+    (async () => {
       setLoadingConcepts(true);
       try {
-        const { data, error } = await supabase
-          .from("study_concepts")
-          .select("*")
-          .order("sort_order");
-        if (error) throw error;
-        setConcepts(data || []);
+        const data = await prefetchQuery("study:concepts", async () => {
+          const { data, error } = await supabase
+            .from("study_concepts")
+            .select("*")
+            .order("sort_order");
+          if (error) throw error;
+          return data || [];
+        });
+        if (!cancelled) setConcepts(data);
       } catch (err) {
         console.error("Error fetching study concepts:", err);
       } finally {
         setLoadingConcepts(false);
       }
-    };
-
-    fetchConcepts();
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    const fetchMilestones = async () => {
+    let cancelled = false;
+    (async () => {
       setLoadingMilestones(true);
       try {
-        const { data: milestoneData, error: milestoneError } = await supabase
-          .from("study_milestones")
-          .select("*")
-          .order("sort_order");
-        if (milestoneError) throw milestoneError;
-        setMilestones(milestoneData || []);
+        const [milestoneData, progressData] = await Promise.all([
+          prefetchQuery("study:milestones", async () => {
+            const { data, error } = await supabase
+              .from("study_milestones")
+              .select("*")
+              .order("sort_order");
+            if (error) throw error;
+            return data || [];
+          }),
+          userId && userId !== "dev-admin"
+            ? prefetchQuery(`study:progress:${userId}`, async () => {
+                const { data, error } = await supabase
+                  .from("study_user_progress")
+                  .select("*")
+                  .eq("user_id", userId);
+                if (error) throw error;
+                return data || [];
+              })
+            : Promise.resolve(null),
+        ]);
+        if (cancelled) return;
+        setMilestones(milestoneData);
 
-        if (user && user.id !== "dev-admin") {
-          const { data: progressData, error: progressError } = await supabase
-            .from("study_user_progress")
-            .select("*")
-            .eq("user_id", user.id);
-          if (progressError) throw progressError;
-
+        if (progressData) {
           const progressMap = {};
-          (progressData || []).forEach((row) => {
+          progressData.forEach((row) => {
             progressMap[row.milestone_id] = row;
           });
           setUserProgress(progressMap);
@@ -136,10 +157,9 @@ const StudyPage = () => {
       } finally {
         setLoadingMilestones(false);
       }
-    };
-
-    fetchMilestones();
-  }, [user]);
+    })();
+    return () => { cancelled = true; };
+  }, [userId]);
 
   const handleToggleMilestone = useCallback(async (milestoneId, shouldComplete) => {
     if (!user || user.id === "dev-admin") return;
@@ -177,6 +197,9 @@ const StudyPage = () => {
       }
     } catch (err) {
       console.error("Error toggling milestone:", err);
+    } finally {
+      // Keep the per-user cache honest for the next mount
+      invalidateQuery(`study:progress:${user.id}`);
     }
   }, [user]);
 

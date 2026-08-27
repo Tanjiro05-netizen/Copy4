@@ -18,6 +18,7 @@ import {
   Target,
   Trophy,
 } from 'lucide-react';
+import 'katex/dist/katex.min.css';
 
 const subjectIcons = {
   Physics: Atom,

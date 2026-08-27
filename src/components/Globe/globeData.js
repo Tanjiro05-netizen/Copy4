@@ -163,12 +163,45 @@ export const LOCATION_COORDS = {
 
 /* Match a free-text location string to coordinates. Returns [lat, lng] or null. */
 export function matchLocation(location) {
+  return resolveLocation(location)?.coords || null;
+}
+
+/* Gazetteer keys → ISO 3166-1 alpha-2 country codes (for World Bank lookups) */
+export const LOCATION_COUNTRIES = {
+  trier: 'DE', bonn: 'DE', berlin: 'DE', jena: 'DE', cologne: 'DE', munich: 'DE', bremen: 'DE', hamburg: 'DE', germany: 'DE',
+  paris: 'FR', france: 'FR',
+  brussels: 'BE',
+  london: 'GB', manchester: 'GB', england: 'GB',
+  amsterdam: 'NL', 'the hague': 'NL',
+  vienna: 'AT',
+  zurich: 'CH', geneva: 'CH',
+  petrograd: 'RU', 'st. petersburg': 'RU', 'saint petersburg': 'RU', moscow: 'RU', russia: 'RU',
+  helsinki: 'FI',
+  budapest: 'HU', hungary: 'HU',
+  turin: 'IT', milan: 'IT', rome: 'IT',
+  madrid: 'ES', barcelona: 'ES', lisbon: 'PT',
+  warsaw: 'PL', prague: 'CZ', belgrade: 'RS', athens: 'GR', istanbul: 'TR',
+  shanghai: 'CN', beijing: 'CN', peking: 'CN', 'yan\u2019an': 'CN', yanan: 'CN', china: 'CN',
+  hanoi: 'VN', saigon: 'VN', 'ho chi minh': 'VN', vietnam: 'VN',
+  pyongyang: 'KP', seoul: 'KR', tokyo: 'JP', ulaanbaatar: 'MN',
+  havana: 'CU', cuba: 'CU', 'mexico city': 'MX',
+  'new york': 'US', chicago: 'US',
+  'buenos aires': 'AR', santiago: 'CL', caracas: 'VE', managua: 'NI',
+  algiers: 'DZ', cairo: 'EG', johannesburg: 'ZA', 'cape town': 'ZA', addis: 'ET', luanda: 'AO', maputo: 'MZ',
+  delhi: 'IN', calcutta: 'IN', kolkata: 'IN',
+  jakarta: 'ID', manila: 'PH',
+};
+
+/* Resolve a free-text location to coordinates AND its gazetteer key.
+   Returns { coords: [lat, lng], key } or null. */
+export function resolveLocation(location) {
   if (!location) return null;
   const lower = location.toLowerCase();
-  // Prefer longer (more specific) keys first
   const keys = Object.keys(LOCATION_COORDS).sort((a, b) => b.length - a.length);
   for (const key of keys) {
-    if (lower.includes(key)) return LOCATION_COORDS[key];
+    if (lower.includes(key)) {
+      return { coords: LOCATION_COORDS[key], key };
+    }
   }
   return null;
 }

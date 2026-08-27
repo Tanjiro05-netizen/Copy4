@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { BarChart3, Users, TrendingUp, Map, BarChart, LineChart, PieChart, Sliders, SplitSquareVertical, Download, FileDown } from 'lucide-react';
 import { exportToCSV, exportToPNG } from '../utils/exportData';
-import EnhancedChart from '../components/visualizations/EnhancedChart';
-import WhatIfAnalysis from '../components/visualizations/WhatIfAnalysis';
-import SplitView from '../components/visualizations/SplitView';
 import EconomicVisualization from '../components/visualizations/EconomicVisualization';
-import ClassVisualization from '../components/visualizations/ClassVisualization';
-import TrendsVisualization from '../components/visualizations/TrendsVisualization';
-import MovementsVisualization from '../components/visualizations/MovementsVisualization';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/PageHeader';
 import * as s from './DataVisualizationPage.css.ts';
+
+/* Alternate tabs and toolbar modes are code-split so recharts/d3 only ship
+   with what the default view needs. EconomicVisualization (the default tab)
+   stays static. */
+const EnhancedChart = dynamic(() => import('../components/visualizations/EnhancedChart'), { ssr: false });
+const WhatIfAnalysis = dynamic(() => import('../components/visualizations/WhatIfAnalysis'), { ssr: false });
+const SplitView = dynamic(() => import('../components/visualizations/SplitView'), { ssr: false });
+const ClassVisualization = dynamic(() => import('../components/visualizations/ClassVisualization'), { ssr: false });
+const TrendsVisualization = dynamic(() => import('../components/visualizations/TrendsVisualization'), { ssr: false });
+const MovementsVisualization = dynamic(() => import('../components/visualizations/MovementsVisualization'), { ssr: false });
 
 const DataVisualizationPage = () => {
     const { t } = useTranslation();
@@ -22,6 +27,8 @@ const DataVisualizationPage = () => {
     const [showWhatIf, setShowWhatIf] = useState(false);
     const [viewMode, setViewMode] = useState('standard'); // 'standard', 'split'
     const chartRef = useRef(null);
+    const liveDataRef = useRef([]);
+    const handleLiveDataChange = useCallback((rows) => { liveDataRef.current = rows || []; }, []);
 
     const handleExportPNG = useCallback(() => {
         if (chartRef.current) {
@@ -57,6 +64,13 @@ const DataVisualizationPage = () => {
             ],
         };
         const vizName = visualizations.find(v => v.id === activeView)?.name || 'data';
+        // Live data published by the active visualization (World Bank series,
+        // map events); fall back to sample data for tabs without real data yet.
+        const liveRows = liveDataRef.current;
+        if (liveRows.length > 0) {
+            exportToCSV(liveRows, vizName.replace(/\s+/g, '-').toLowerCase());
+            return;
+        }
         exportToCSV(sampleData[activeView] || [], vizName.replace(/\s+/g, '-').toLowerCase());
     }, [activeView]);
 
@@ -121,13 +135,13 @@ const DataVisualizationPage = () => {
     const renderVisualization = () => {
         switch (activeView) {
             case 'economic':
-                return <EconomicVisualization />;
+                return <EconomicVisualization onDataChange={handleLiveDataChange} />;
             case 'class':
                 return <ClassVisualization />;
             case 'trends':
                 return <TrendsVisualization />;
             case 'movements':
-                return <MovementsVisualization />;
+                return <MovementsVisualization onDataChange={handleLiveDataChange} />;
             default:
                 return (
                     <div className="flex flex-col items-center justify-center h-full">

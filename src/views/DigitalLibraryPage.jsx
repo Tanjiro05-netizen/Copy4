@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../supabaseClient';
+import { prefetchQuery } from '../lib/queryCache';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 
@@ -399,35 +400,43 @@ const DigitalLibraryPage = () => {
     const [activeLanguage, setActiveLanguage] = useState('all');
     const [books, setBooks] = useState([]);
     const [allBooks, setAllBooks] = useState([]); // Store all books for stats
+    const [audiobooks, setAudiobooks] = useState([]);
     const { playAudiobook } = useAudioPlayer();
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showReadingLists, setShowReadingLists] = useState(false);
 
+    // Fetch once (cached across visits). Filtering is derived client-side
+    // so search/filters never re-trigger network round-trips.
     useEffect(() => {
-        const fetchData = async () => {
+        let cancelled = false;
+        (async () => {
             setIsLoading(true);
             setError(null);
             try {
-                // Fetch all books, categories and audiobooks in parallel
-                const [booksResponse, categoriesResponse, audiobooksResponse] = await Promise.all([
-                    supabase.from('digital_library_books').select('*'),
-                    supabase.from('digital_library_books').select('category'),
-                    supabase.from('audiobooks').select('*')
-                ]);
+                const { allData, categoriesData, audiobooksData } = await prefetchQuery('library:all', async () => {
+                    const [booksResponse, categoriesResponse, audiobooksResponse] = await Promise.all([
+                        supabase.from('digital_library_books').select('*'),
+                        supabase.from('digital_library_books').select('category'),
+                        supabase.from('audiobooks').select('*')
+                    ]);
+                    if (booksResponse.error) throw booksResponse.error;
+                    if (categoriesResponse.error) throw categoriesResponse.error;
+                    if (audiobooksResponse.error) throw audiobooksResponse.error;
+                    return {
+                        allData: booksResponse.data || [],
+                        categoriesData: categoriesResponse.data || [],
+                        audiobooksData: audiobooksResponse.data || [],
+                    };
+                });
+                if (cancelled) return;
 
-                if (booksResponse.error) throw booksResponse.error;
-                if (categoriesResponse.error) throw categoriesResponse.error;
-                if (audiobooksResponse.error) throw audiobooksResponse.error;
-
-                const allData = booksResponse.data || [];
                 setAllBooks(allData);
-                
-                const allAudiobooks = (audiobooksResponse.data || []).map(ab => ({...ab, isAudiobook: true, category: AUDIOBOOKS_SECTION}));
+                setAudiobooks(audiobooksData.map(ab => ({ ...ab, isAudiobook: true, category: AUDIOBOOKS_SECTION })));
 
                 // Generate dynamic categories
-                const distinctCategories = [...new Set(categoriesResponse.data
+                const distinctCategories = [...new Set(categoriesData
                     .map(item => item.category)
                     .filter(category => category && ![PDF_DOWNLOADS_SECTION, LEGACY_PDF_DOWNLOADS_SECTION, AUDIOBOOKS_SECTION].includes(category)))];
                 const dynamicCategories = distinctCategories.map(name => ({
@@ -441,41 +450,42 @@ const DigitalLibraryPage = () => {
                     { id: PDF_DOWNLOADS_SECTION, name: PDF_DOWNLOADS_SECTION, icon: categoryIcons[PDF_DOWNLOADS_SECTION] },
                     { id: AUDIOBOOKS_SECTION, name: AUDIOBOOKS_SECTION, icon: categoryIcons[AUDIOBOOKS_SECTION] }
                 ]);
-
-                // Apply filters
-                let filteredData = allData;
-                if (activeCategory === AUDIOBOOKS_SECTION) {
-                    filteredData = allAudiobooks;
-                } else if (activeCategory === PDF_DOWNLOADS_SECTION) {
-                    filteredData = allData.filter(isPurePdfBook);
-                }
-                
-                if (debouncedSearchQuery) {
-                    filteredData = filteredData.filter(book => 
-                        (book.title && book.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())) ||
-                        (book.author && book.author.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
-                    );
-                }
-                if (activeCategory !== 'all' && activeCategory !== AUDIOBOOKS_SECTION && activeCategory !== PDF_DOWNLOADS_SECTION) {
-                    filteredData = filteredData.filter(book => book.category === activeCategory);
-                }
-                if (activeEra !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
-                    filteredData = filteredData.filter(book => book.era === activeEra);
-                }
-                if (activeLanguage !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
-                    filteredData = filteredData.filter(book => book.language === activeLanguage);
-                }
-
-                setBooks(filteredData);
             } catch (error) {
                 setError('Error fetching data: ' + error.message);
             } finally {
                 setIsLoading(false);
             }
-        };
+        })();
+        return () => { cancelled = true; };
+    }, []);
 
-        fetchData();
-    }, [debouncedSearchQuery, activeCategory, activeEra, activeLanguage]);
+    // Derive the visible list from filters client-side — instant
+    useEffect(() => {
+        let filteredData = allBooks;
+        if (activeCategory === AUDIOBOOKS_SECTION) {
+            filteredData = audiobooks;
+        } else if (activeCategory === PDF_DOWNLOADS_SECTION) {
+            filteredData = allBooks.filter(isPurePdfBook);
+        }
+
+        if (debouncedSearchQuery) {
+            filteredData = filteredData.filter(book =>
+                (book.title && book.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase())) ||
+                (book.author && book.author.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+            );
+        }
+        if (activeCategory !== 'all' && activeCategory !== AUDIOBOOKS_SECTION && activeCategory !== PDF_DOWNLOADS_SECTION) {
+            filteredData = filteredData.filter(book => book.category === activeCategory);
+        }
+        if (activeEra !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
+            filteredData = filteredData.filter(book => book.era === activeEra);
+        }
+        if (activeLanguage !== 'all' && activeCategory !== AUDIOBOOKS_SECTION) {
+            filteredData = filteredData.filter(book => book.language === activeLanguage);
+        }
+
+        setBooks(filteredData);
+    }, [allBooks, audiobooks, debouncedSearchQuery, activeCategory, activeEra, activeLanguage]);
 
     const handleDeleteBook = async (id, isAudiobook) => {
         if (!window.confirm("Are you sure you want to delete this item?")) return;

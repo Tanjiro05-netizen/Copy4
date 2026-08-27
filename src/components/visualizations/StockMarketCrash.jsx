@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './StockMarketCrash.css';
 
 const StockMarketCrash = ({ show = true }) => {
     const [key, setKey] = useState(0);

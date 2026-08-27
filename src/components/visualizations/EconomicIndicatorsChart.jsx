@@ -10,7 +10,16 @@ import {
     ResponsiveContainer
 } from 'recharts';
 import { motion } from 'framer-motion';
-import { INDICATOR_LABELS, INDICATOR_COLORS } from '../../services/api/imf';
+import { INDICATORS } from '../../services/worldBankApi';
+
+// Indicator labels/colors derived from the World Bank indicator catalog
+const INDICATOR_LABELS = Object.fromEntries(
+    Object.entries(INDICATORS).map(([key, ind]) => [key, ind.name])
+);
+const INDICATOR_PALETTE = ['#d41f3d', '#4a7fb5', '#2d8a4e', '#c8860a', '#8a84b8', '#14b8a6'];
+const INDICATOR_COLORS = Object.fromEntries(
+    Object.keys(INDICATORS).map((key, i) => [key, INDICATOR_PALETTE[i % INDICATOR_PALETTE.length]])
+);
 
 // Add console logs to debug data flow
 const EconomicIndicatorsChart = ({ 
@@ -113,7 +122,7 @@ const EconomicIndicatorsChart = ({
                         contentStyle={{
                             backgroundColor: '#10131b',
                             border: '1px solid #262a35',
-                            borderRadius: '0.375rem'
+                            borderRadius: '0'
                         }}
                         labelStyle={{ color: '#ece9e0' }}
                         itemStyle={{ color: '#ece9e0' }}

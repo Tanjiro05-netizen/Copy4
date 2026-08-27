@@ -22,6 +22,7 @@ import {
   Menu,
   Target,
 } from 'lucide-react';
+import 'katex/dist/katex.min.css';
 
 const blockSignals = {
   rich_text: { label: 'Reading', icon: BookOpen },

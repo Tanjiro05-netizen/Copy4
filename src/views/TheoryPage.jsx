@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { prefetchQuery, invalidateQuery } from '../lib/queryCache';
 import PageHeader from '../components/PageHeader';
 import * as s from './TheoryPage.css.ts';
 
@@ -12,13 +13,17 @@ const TheoryPage = () => {
 
     const { user, isAdmin } = useAuth();
     const router = useRouter();
+    // Key data effects on the stable id string — not the user object, which
+    // is re-created on every session re-sync (tab focus) and would re-run
+    // the whole query chain.
+    const userId = user?.id;
 
     // State for data, loading, and errors
     const [categories, setCategories] = useState([]);
     const [articles, setArticles] = useState([]);
     const [activeCategory, setActiveCategory] = useState(null);
     const [loadingCategories, setLoadingCategories] = useState(true);
-    const [loadingArticles, setLoadingArticles] = useState(false);
+    const [loadingArticles, setLoadingArticles] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,18 +33,21 @@ const TheoryPage = () => {
     const [savedTextIds, setSavedTextIds] = useState(new Set());
     const [savingTextId, setSavingTextId] = useState(null);
 
-    // Fetch categories once on component mount
+    // Fetch categories once on component mount (cached — instant on revisit)
     useEffect(() => {
-        const fetchCategories = async () => {
+        let cancelled = false;
+        (async () => {
             setLoadingCategories(true);
             try {
-                const { data, error } = await supabase
-                    .from('theory_categories')
-                    .select('id, name')
-                    .order('name', { ascending: true });
-
-                if (error) throw error;
-
+                const data = await prefetchQuery('theory:categories', async () => {
+                    const { data, error } = await supabase
+                        .from('theory_categories')
+                        .select('id, name')
+                        .order('name', { ascending: true });
+                    if (error) throw error;
+                    return data;
+                });
+                if (cancelled) return;
                 setCategories(data);
                 // Set the first category as active by default
                 if (data.length > 0) {
@@ -51,58 +59,59 @@ const TheoryPage = () => {
             } finally {
                 setLoadingCategories(false);
             }
-        };
-
-        fetchCategories();
+        })();
+        return () => { cancelled = true; };
     }, []);
 
-    // Fetch articles when the active category changes
+    // Fetch articles when the active category changes (cached base rows;
+    // user progress/bookmarks come from a per-user cache — one round each,
+    // instant on revisit)
     useEffect(() => {
         if (!activeCategory) return;
 
-        const fetchArticles = async () => {
+        let cancelled = false;
+        (async () => {
             setLoadingArticles(true);
             setError(null);
             try {
-                // Fetch articles for the active category
-                const { data: articlesData, error: articlesError } = await supabase
-                    .from('theory_articles')
-                    .select('id, title, slug, excerpt, estimated_time_min, collection, is_featured, category_id')
-                    .eq('category_id', activeCategory);
+                const base = await prefetchQuery(`theory:articles:${activeCategory}`, async () => {
+                    const { data, error } = await supabase
+                        .from('theory_articles')
+                        .select('id, title, slug, excerpt, estimated_time_min, collection, is_featured, category_id')
+                        .eq('category_id', activeCategory);
+                    if (error) throw error;
+                    return data;
+                });
+                if (cancelled) return;
 
-                if (articlesError) throw articlesError;
+                if (userId && userId !== 'dev-admin') {
+                    const meta = await prefetchQuery(`theory:usermeta:${userId}`, async () => {
+                        const [progressRes, bookmarksRes] = await Promise.all([
+                            supabase
+                                .from('user_article_progress')
+                                .select('article_id, progress_percentage')
+                                .eq('user_id', userId),
+                            supabase
+                                .from('user_article_bookmarks')
+                                .select('article_id')
+                                .eq('user_id', userId),
+                        ]);
+                        return { progressRes, bookmarksRes };
+                    });
+                    if (cancelled) return;
+                    if (meta.progressRes.error) console.error('Error fetching progress:', meta.progressRes.error);
+                    if (meta.bookmarksRes.error) console.error('Error fetching bookmarks:', meta.bookmarksRes.error);
 
-                // Fetch user progress for these articles
-                if (user && articlesData.length > 0 && user.id !== 'dev-admin') {
-                    const articleIds = articlesData.map(a => a.id);
+                    const progressMap = new Map(meta.progressRes.data?.map(p => [p.article_id, p.progress_percentage]) || []);
+                    const bookmarkedSet = new Set(meta.bookmarksRes.data?.map(b => b.article_id) || []);
 
-                    // Fetch progress
-                    const { data: progressData, error: progressError } = await supabase
-                        .from('user_article_progress')
-                        .select('article_id, progress_percentage')
-                        .eq('user_id', user.id)
-                        .in('article_id', articleIds);
-                    if (progressError) console.error('Error fetching progress:', progressError);
-
-                    // Fetch bookmarks
-                    const { data: bookmarksData, error: bookmarksError } = await supabase
-                        .from('user_article_bookmarks')
-                        .select('article_id')
-                        .eq('user_id', user.id)
-                        .in('article_id', articleIds);
-                    if (bookmarksError) console.error('Error fetching bookmarks:', bookmarksError);
-
-                    const progressMap = new Map(progressData?.map(p => [p.article_id, p.progress_percentage]) || []);
-                    const bookmarkedSet = new Set(bookmarksData?.map(b => b.article_id) || []);
-
-                    const articlesWithExtras = articlesData.map(article => ({
+                    setArticles(base.map(article => ({
                         ...article,
                         progress: progressMap.get(article.id) || 0,
                         isBookmarked: bookmarkedSet.has(article.id),
-                    }));
-                    setArticles(articlesWithExtras);
+                    })));
                 } else {
-                    setArticles(articlesData.map(a => ({ ...a, progress: 0, isBookmarked: false })));
+                    setArticles(base.map(a => ({ ...a, progress: 0, isBookmarked: false })));
                 }
             } catch (err) {
                 setError(err.message);
@@ -110,44 +119,50 @@ const TheoryPage = () => {
             } finally {
                 setLoadingArticles(false);
             }
-        };
+        })();
 
-        fetchArticles();
-    }, [activeCategory, user]);
+        return () => { cancelled = true; };
+    }, [activeCategory, userId]);
 
     // Fetch community writings (analysis_texts) and user's saved library
     useEffect(() => {
-        const fetchCommunityTexts = async () => {
+        let cancelled = false;
+        (async () => {
             setLoadingCommunity(true);
             try {
-                const { data, error: fetchError } = await supabase
-                    .from('analysis_texts')
-                    .select('id, slug, primary_language, metadata, category, tags, created_at')
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false });
-
-                if (fetchError) throw fetchError;
-                setCommunityTexts(data || []);
+                const data = await prefetchQuery('theory:community', async () => {
+                    const { data, error } = await supabase
+                        .from('analysis_texts')
+                        .select('id, slug, primary_language, metadata, category, tags, created_at')
+                        .eq('is_published', true)
+                        .order('created_at', { ascending: false });
+                    if (error) throw error;
+                    return data || [];
+                });
+                if (cancelled) return;
+                setCommunityTexts(data);
 
                 // Fetch user's saved texts
-                if (user && user.id !== 'dev-admin') {
-                    const { data: savedData, error: savedError } = await supabase
-                        .from('user_analysis_library')
-                        .select('text_id')
-                        .eq('user_id', user.id);
-
-                    if (savedError) console.error('Error fetching saved texts:', savedError);
-                    setSavedTextIds(new Set(savedData?.map(s => s.text_id) || []));
+                if (userId && userId !== 'dev-admin') {
+                    const saved = await prefetchQuery(`theory:communitylib:${userId}`, async () => {
+                        const { data, error } = await supabase
+                            .from('user_analysis_library')
+                            .select('text_id')
+                            .eq('user_id', userId);
+                        if (error) throw error;
+                        return data || [];
+                    });
+                    if (cancelled) return;
+                    setSavedTextIds(new Set(saved.map(s => s.text_id)));
                 }
             } catch (err) {
                 console.error('Error fetching community texts:', err);
             } finally {
                 setLoadingCommunity(false);
             }
-        };
-
-        fetchCommunityTexts();
-    }, [user]);
+        })();
+        return () => { cancelled = true; };
+    }, [userId]);
 
     const handleSaveToAnalysis = useCallback(async (textId) => {
         if (!user || user.id === 'dev-admin') return;
@@ -174,6 +189,8 @@ const TheoryPage = () => {
                 if (error) throw error;
                 setSavedTextIds(prev => new Set([...prev, textId]));
             }
+            // Keep the cache honest for the next mount
+            invalidateQuery(`theory:communitylib:${user.id}`);
         } catch (err) {
             console.error('Error toggling save:', err);
             alert('Failed to update your analysis library.');

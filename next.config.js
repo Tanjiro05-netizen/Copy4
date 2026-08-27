@@ -31,6 +31,16 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Static map geometry — effectively immutable, cache hard
+        source: '/topo/:file*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
   },
   webpack: (config, { dev, webpack }) => {
@@ -55,8 +65,11 @@ const nextConfig = {
         'knowledge',
       ];
 
+      // Route groups like src/app/(app)/theory/page.jsx must still match:
+      // allow an optional group segment after app/. Parens are matched via
+      // character classes to avoid backslash-escaping pitfalls.
       const blockedPattern = new RegExp(
-        `src[\\\\/]app[\\\\/](${blockedFolders.join('|')})[\\\\/].*page\\.(jsx|js)$`
+        `src[\\\\/]app[\\\\/](?:[(][^)]+[)][\\\\/])?(?:${blockedFolders.join('|')})[\\\\/].*page\\.(jsx|js)$`
       );
 
       config.plugins.push(

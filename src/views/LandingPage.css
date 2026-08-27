@@ -259,7 +259,7 @@
 
 /* Obsidian modal headings */
 .modal-panel h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--ff-display), Georgia, serif;
     letter-spacing: -0.03em;
 }
 
@@ -315,7 +315,7 @@
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ff-label), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #ece9e0;
 }
 .modal-backdrop {
@@ -384,7 +384,7 @@
     outline: none;
 }
 .modal-panel h2 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--ff-display), Georgia, serif;
     font-weight: 500;
     letter-spacing: 0.02em;
 }
@@ -393,7 +393,7 @@
     color: #ffffff;
     border: none;
     border-radius: 0;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ff-label), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -412,7 +412,7 @@
     color: #a5a194;
     border: 1px solid #262a35;
     border-radius: 0;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--ff-label), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;

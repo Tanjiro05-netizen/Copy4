@@ -273,7 +273,7 @@ export const sectionRow = style({
   alignItems: 'baseline',
   justifyContent: 'space-between',
   gap: vars.space.md,
-  marginBottom: vars.space.lg,
+  marginBottom: vars.space.xl,
 });
 
 export const sectionLabel = style({
@@ -327,6 +327,7 @@ export const iconFrame = style({
   justifyContent: 'center',
   width: '40px',
   height: '40px',
+  marginTop: '2px',
   borderRadius: vars.radius.tiny,
   background: vars.color.accentWash,
   border: vars.border.accent,
@@ -341,8 +342,9 @@ export const cellBody = style({
 export const cellHeader = style({
   display: 'flex',
   alignItems: 'baseline',
-  gap: vars.space.xs,
-  marginBottom: vars.space.xxs,
+  gap: vars.space.sm,
+  marginBottom: vars.space.xs,
+  minWidth: 0,
 });
 
 export const cellIndex = style({
@@ -355,27 +357,37 @@ export const cellIndex = style({
 });
 
 export const cellTitle = style({
-  fontFamily: vars.font.body,
-  fontSize: '17px',
+  fontFamily: vars.font.display,
+  fontSize: '19px',
   fontWeight: 500,
-  lineHeight: 1.3,
+  lineHeight: 1.25,
+  letterSpacing: '0.01em',
   color: vars.color.text,
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 });
 
 export const cellTag = style({
+  marginLeft: 'auto',
+  alignSelf: 'center',
+  padding: '3px 8px',
   fontFamily: vars.font.label,
   fontSize: '9px',
   letterSpacing: '0.18em',
   textTransform: 'uppercase',
   color: vars.color.textFaint,
   whiteSpace: 'nowrap',
+  border: vars.border.subtle,
+  borderRadius: vars.radius.tiny,
+  flexShrink: 0,
 });
 
 export const cellDesc = style({
   fontFamily: vars.font.body,
-  fontSize: '13px',
-  lineHeight: 1.7,
-  color: vars.color.textMuted,
+  fontSize: '13.5px',
+  lineHeight: 1.75,
+  color: vars.color.textSoft,
 });
 
 export const cellArrow = style({

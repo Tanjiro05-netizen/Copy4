@@ -15,6 +15,12 @@ export default function Page() {
     return () => clearTimeout(id);
   }, [loading]);
 
+  // Known session → redirect immediately; don't wait for the profile fetch
+  // (which is part of `loading`) to finish.
+  if (user) {
+    return <RedirectTo href="/home" replace />;
+  }
+
   // Wait for auth to resolve before deciding
   if (loading && !timedOut) {
     return (
@@ -27,9 +33,5 @@ export default function Page() {
     );
   }
 
-  if (!user) {
-    return <RedirectTo href="/login" replace />;
-  }
-
-  return <RedirectTo href="/home" replace />;
+  return <RedirectTo href="/login" replace />;
 }

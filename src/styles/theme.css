@@ -1,3 +1,12 @@
+/* Font indirection: next/font variables set on <html> (see app/layout.jsx),
+   falling back to the original families if unavailable. */
+:root {
+  --ff-display: var(--font-cormorant, 'Cormorant Garamond');
+  --ff-body: var(--font-newsreader, 'Newsreader');
+  --ff-label: var(--font-outfit, 'Outfit');
+  --ff-mono: var(--font-jetbrains, 'JetBrains Mono');
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    theme.css — global tokens & base
    Ink page, warm paper text, crimson accent, hairline rules, paper navband.
@@ -48,7 +57,7 @@ body {
   margin: 0;
   background-color: var(--ink);
   color: var(--paper);
-  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+  font-family: var(--ff-body), Georgia, 'Times New Roman', serif;
   font-weight: 300;
   font-size: 17px;
   -webkit-font-smoothing: antialiased;
@@ -75,7 +84,7 @@ body::after {
 /* Reader drop cap — a crimson serif initial on the first paragraph */
 .reader-dropcap > p:first-of-type::first-letter,
 .reader-dropcap > p:first-child::first-letter {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--ff-display), Georgia, serif;
   font-weight: 600;
   font-size: 3.4em;
   float: left;

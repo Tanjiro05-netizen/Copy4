@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '../supabaseClient';
 import { ArrowLeft, Download, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
 import * as s from './TextbookReaderPage.css.ts';
+import 'katex/dist/katex.min.css';
 
 const TextbookReaderPage = () => {
   const { id } = useParams();

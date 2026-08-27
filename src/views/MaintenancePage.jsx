@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import './MaintenancePage.css';
 
 const PARTICLE_COUNT = 25;
 

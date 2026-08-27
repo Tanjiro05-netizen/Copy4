@@ -19,6 +19,7 @@ import {
   Target,
   X,
 } from 'lucide-react';
+import 'katex/dist/katex.min.css';
 
 const normalizeOptions = (question) => {
   if (question?.question_type === 'true_false') return ['True', 'False'];

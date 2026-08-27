@@ -10,7 +10,8 @@ import { studyThemeClass } from '../styles/obsidianTheme.css.ts';
 
 const MainLayout = ({ children, hideHeader = false, hideFab = false }) => {
     const pathname = usePathname();
-    const isMarxBotPage = pathname === '/marxbot';
+    // Routes that render their own full-height surface (chat / social feed)
+    const hideFabForRoute = pathname === '/marxbot' || pathname === '/feed/social';
 
     return (
         <div className={`${studyThemeClass} ${s.shell}`}>
@@ -21,8 +22,8 @@ const MainLayout = ({ children, hideHeader = false, hideFab = false }) => {
 
             <Footer />
 
-            {/* Floating MarxBot button — hidden on /marxbot page itself */}
-            {!hideFab && !isMarxBotPage && (
+            {/* Floating MarxBot button — hidden on routes with their own full-height surface */}
+            {!hideFab && !hideFabForRoute && (
                 <Link href="/marxbot" className={s.fab} title="MarxBot — Public Preview">
                     <div className={s.fabCircle}>
                         <Bot size={18} />

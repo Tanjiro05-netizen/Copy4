@@ -1,16 +1,44 @@
 import '@/src/index.css';
 import '@/src/styles/theme.css';
-import 'katex/dist/katex.min.css';
-import '@/src/views/MaintenancePage.css';
-import '@/src/views/LandingPage.css';
-import '@/src/views/MarxBotPage.css';
-import '@/src/components/WorldSim/worldsim.css';
-import '@/src/components/visualizations/EnhancedChart.css';
-import '@/src/components/visualizations/SplitView.css';
-import '@/src/components/visualizations/StockMarketCrash.css';
-import '@/src/components/visualizations/WhatIfAnalysis.css';
-import '@/src/components/visualizations/DynamicBackground.css';
+import { Cormorant_Garamond, Outfit, JetBrains_Mono } from 'next/font/google';
 import Providers from './providers.jsx';
+
+/* Self-hosted, preloaded fonts (same families/weights the theme expects).
+   Replaces the post-hydration Google CDN link — no render-blocking fetch,
+   no FOUT on navigation. Variables are consumed via --ff-* in theme.css.
+   Newsreader has an optical-size axis next/font can't handle, so it loads
+   via a server-rendered stylesheet link below (still static, not runtime). */
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-cormorant',
+  display: 'swap',
+});
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
+
+const NEWSREADER_HREF =
+  'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&display=swap';
+
+/* Open the TLS connection to Supabase while HTML streams, so the first
+   data query after hydration doesn't pay the handshake. */
+const SUPABASE_HOST = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).host;
+  } catch {
+    return null;
+  }
+})();
 
 
 const description =
@@ -58,7 +86,18 @@ export default function RootLayout({ children }) {
   const initialAuth = { user: null, profile: null, resolved: false };
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${cormorant.variable} ${outfit.variable} ${jetbrains.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href={NEWSREADER_HREF} />
+        {SUPABASE_HOST && (
+          <>
+            <link rel="preconnect" href={`https://${SUPABASE_HOST}`} />
+            <link rel="dns-prefetch" href={`https://${SUPABASE_HOST}`} />
+          </>
+        )}
+      </head>
       <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <Providers initialAuth={initialAuth}>{children}</Providers>

@@ -43,7 +43,7 @@ export const INDICATORS = {
   POPULATION_GROWTH: { id: 'SP.POP.GROW', name: 'Population growth (annual %)', format: 'percent', unit: '%' },
 };
 
-// Country code mapping for World Bank API (uses ISO 3166-1 alpha-2 but some exceptions)
+// Country code mapping for World Bank API (ISO 3166-1 alpha-2 → alpha-3)
 const COUNTRY_CODE_MAP = {
   'US': 'USA',
   'GB': 'GBR',
@@ -55,6 +55,20 @@ const COUNTRY_CODE_MAP = {
   'IN': 'IND',
   'BR': 'BRA',
   'KR': 'KOR',
+  'CA': 'CAN',
+  'AU': 'AUS',
+  'IT': 'ITA',
+  'ES': 'ESP',
+  'MX': 'MEX',
+  'ID': 'IDN',
+  'NL': 'NLD',
+  'SA': 'SAU',
+  'TR': 'TUR',
+  'CH': 'CHE',
+  'PL': 'POL',
+  'SE': 'SWE',
+  'ZA': 'ZAF',
+  'NG': 'NGA',
   'WORLD': 'WLD',
 };
 
