@@ -134,15 +134,16 @@ const TextEditionPanel = ({ sections, source, onSectionsChange, onSourceChange, 
             </div>
 
             <p className="text-xs text-gray-500">
-                The reflowable reading edition for books without an EPUB. Upload or paste a markdown/text file
-                (preferred — headings become sections), or extract the PDF text layer as a fallback.
+                The reflowable reading edition — separate from the EPUB readers and the PDF download.
+                Upload or paste a text file (.txt or .md — preferred; # headings become sections), or
+                extract the PDF text layer as a fallback.
             </p>
 
             {/* Import controls */}
             <div className="flex flex-wrap items-center gap-3">
                 <label className="flex items-center gap-2 px-4 py-2 text-sm bg-red-600 hover:bg-red-700 transition-colors cursor-pointer rounded-none font-medium">
                     <FileText size={16} />
-                    Upload .md / .txt
+                    Upload .txt / .md
                     <input
                         type="file"
                         accept=".md,.markdown,.txt,text/markdown,text/plain"

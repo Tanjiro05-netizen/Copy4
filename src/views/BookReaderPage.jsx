@@ -46,7 +46,7 @@ const BookReaderPage = () => {
             try {
                 const { data: bookData, error: dbError } = await supabase
                     .from('digital_library_books')
-                    .select('id, title, author, year, pages, description, cover_image_url, epub_filename, pdf_filename, text_edition, category')
+                    .select('id, title, author, year, pages, description, cover_image_url, epub_filename, pdf_filename, text_edition, category, era, language')
                     .eq('id', bookId)
                     .single();
 
@@ -305,10 +305,17 @@ const BookReaderPage = () => {
                         view === 'read' || !pdfDownloadUrl ? (
                             <div data-testid="book-reader-text-edition">
                                 <TextEditionReader
+                                    book={{
+                                        title: book.title,
+                                        author: book.author,
+                                        year: book.year,
+                                        category: book.category,
+                                        era: book.era,
+                                        language: book.language,
+                                    }}
                                     edition={textEdition}
                                     onProgressChange={handleAutoProgress}
-                                    fallbackUrl={pdfDownloadUrl}
-                                    fallbackLabel="Open the PDF directly"
+                                    pdfUrl={pdfDownloadUrl}
                                 />
                             </div>
                         ) : (
