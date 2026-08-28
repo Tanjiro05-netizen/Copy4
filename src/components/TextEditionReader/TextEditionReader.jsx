@@ -41,7 +41,11 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
         if (onProgressRef.current) onProgressRef.current(pct);
 
         const nodes = Array.from(scroller.querySelectorAll('[data-section-canonical]'));
-        const active = nodes.filter((n) => n.offsetTop <= scroller.scrollTop + 200).pop() || nodes[0];
+        // At the very top the first section is always current, however short
+        // it is — the lookahead below would otherwise flip to the next one.
+        const active = scroller.scrollTop <= 2
+            ? nodes[0]
+            : nodes.filter((n) => n.offsetTop <= scroller.scrollTop + 200).pop() || nodes[0];
         if (active) setActiveId(active.getAttribute('data-section-canonical'));
     }, []);
 
