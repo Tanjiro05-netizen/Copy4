@@ -116,7 +116,7 @@ const run = async () => {
             const edition = { ...book.text_edition };
             const cols = ['title', 'language', 'is_official', 'text_edition'];
             const vals = [sqlLiteral(book.title), sqlLiteral(book.language), book.is_official, sqlJsonb(edition)];
-            return `insert into public.digital_library_books (${cols.join(', ')})\nvalues (${vals.join(', ')});`;
+            return `insert into public.digital_library_books (${cols.join(', ')})\nselect ${vals.join(', ')}\nwhere not exists (select 1 from public.digital_library_books b where b.title = ${sqlLiteral(book.title)});`;
         });
         await writeFile(sqlOut, statements.join('\n\n') + '\n');
         console.log(`SQL written to ${sqlOut} — run it in the Supabase SQL editor after the migration.`);

@@ -15,11 +15,13 @@ VALUES (
 -- =============================================
 -- STORAGE POLICIES
 -- =============================================
+DROP POLICY IF EXISTS "Avatar images are publicly viewable" ON storage.objects;
 CREATE POLICY "Avatar images are publicly viewable"
     ON storage.objects FOR SELECT
     TO public
     USING (bucket_id = 'avatars');
 
+DROP POLICY IF EXISTS "Users can upload their own avatar/banner images" ON storage.objects;
 CREATE POLICY "Users can upload their own avatar/banner images"
     ON storage.objects FOR INSERT
     TO authenticated
@@ -28,6 +30,7 @@ CREATE POLICY "Users can upload their own avatar/banner images"
         AND (storage.foldername(name))[1] = auth.uid()::text
     );
 
+DROP POLICY IF EXISTS "Users can update their own avatar/banner images" ON storage.objects;
 CREATE POLICY "Users can update their own avatar/banner images"
     ON storage.objects FOR UPDATE
     TO authenticated
@@ -40,6 +43,7 @@ CREATE POLICY "Users can update their own avatar/banner images"
         AND (storage.foldername(name))[1] = auth.uid()::text
     );
 
+DROP POLICY IF EXISTS "Users can delete their own avatar/banner images" ON storage.objects;
 CREATE POLICY "Users can delete their own avatar/banner images"
     ON storage.objects FOR DELETE
     TO authenticated

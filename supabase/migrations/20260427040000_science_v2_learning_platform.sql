@@ -403,9 +403,13 @@ DROP POLICY IF EXISTS "Admins manage science quizzes" ON public.science_quizzes;
 DROP POLICY IF EXISTS "Admins manage science quiz questions" ON public.science_quiz_questions;
 DROP POLICY IF EXISTS "Admins issue science certificates" ON public.science_certificates;
 
+DROP POLICY IF EXISTS "Science subjects are readable" ON public.science_subjects;
 CREATE POLICY "Science subjects are readable" ON public.science_subjects FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science tracks are readable" ON public.science_tracks;
 CREATE POLICY "Science tracks are readable" ON public.science_tracks FOR SELECT USING (is_published = true OR public.is_admin());
+DROP POLICY IF EXISTS "Science courses are readable" ON public.science_courses;
 CREATE POLICY "Science courses are readable" ON public.science_courses FOR SELECT USING (status = 'published' OR public.is_admin());
+DROP POLICY IF EXISTS "Science modules are readable" ON public.science_modules;
 CREATE POLICY "Science modules are readable" ON public.science_modules FOR SELECT USING (
   public.is_admin() OR EXISTS (
     SELECT 1 FROM public.science_courses
@@ -414,6 +418,7 @@ CREATE POLICY "Science modules are readable" ON public.science_modules FOR SELEC
       AND science_modules.is_published = true
   )
 );
+DROP POLICY IF EXISTS "Science lessons are readable" ON public.science_lessons;
 CREATE POLICY "Science lessons are readable" ON public.science_lessons FOR SELECT USING (
   public.is_admin() OR EXISTS (
     SELECT 1
@@ -425,6 +430,7 @@ CREATE POLICY "Science lessons are readable" ON public.science_lessons FOR SELEC
       AND science_lessons.is_published = true
   )
 );
+DROP POLICY IF EXISTS "Science blocks are readable" ON public.science_lesson_blocks;
 CREATE POLICY "Science blocks are readable" ON public.science_lesson_blocks FOR SELECT USING (
   public.is_admin() OR EXISTS (
     SELECT 1
@@ -437,13 +443,21 @@ CREATE POLICY "Science blocks are readable" ON public.science_lesson_blocks FOR 
       AND science_lessons.is_published = true
   )
 );
+DROP POLICY IF EXISTS "Science public assets are readable" ON public.science_assets;
 CREATE POLICY "Science public assets are readable" ON public.science_assets FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science skills are readable" ON public.science_skills;
 CREATE POLICY "Science skills are readable" ON public.science_skills FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science skill edges are readable" ON public.science_skill_edges;
 CREATE POLICY "Science skill edges are readable" ON public.science_skill_edges FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science content skills are readable" ON public.science_content_skills;
 CREATE POLICY "Science content skills are readable" ON public.science_content_skills FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science questions are readable" ON public.science_questions;
 CREATE POLICY "Science questions are readable" ON public.science_questions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science question banks are readable" ON public.science_question_banks;
 CREATE POLICY "Science question banks are readable" ON public.science_question_banks FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Science quizzes are readable" ON public.science_quizzes;
 CREATE POLICY "Science quizzes are readable" ON public.science_quizzes FOR SELECT USING (is_published = true OR public.is_admin());
+DROP POLICY IF EXISTS "Science quiz questions are readable" ON public.science_quiz_questions;
 CREATE POLICY "Science quiz questions are readable" ON public.science_quiz_questions FOR SELECT USING (
   public.is_admin() OR EXISTS (
     SELECT 1 FROM public.science_quizzes
@@ -452,34 +466,59 @@ CREATE POLICY "Science quiz questions are readable" ON public.science_quiz_quest
   )
 );
 
+DROP POLICY IF EXISTS "Users can view own science enrollments" ON public.science_enrollments;
 CREATE POLICY "Users can view own science enrollments" ON public.science_enrollments FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
+DROP POLICY IF EXISTS "Users can enroll in science courses" ON public.science_enrollments;
 CREATE POLICY "Users can enroll in science courses" ON public.science_enrollments FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own science enrollment" ON public.science_enrollments;
 CREATE POLICY "Users can update own science enrollment" ON public.science_enrollments FOR UPDATE USING (auth.uid() = user_id OR public.is_admin()) WITH CHECK (auth.uid() = user_id OR public.is_admin());
 
+DROP POLICY IF EXISTS "Users can view own science progress" ON public.science_activity_progress;
 CREATE POLICY "Users can view own science progress" ON public.science_activity_progress FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
+DROP POLICY IF EXISTS "Users can insert own science progress" ON public.science_activity_progress;
 CREATE POLICY "Users can insert own science progress" ON public.science_activity_progress FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own science progress" ON public.science_activity_progress;
 CREATE POLICY "Users can update own science progress" ON public.science_activity_progress FOR UPDATE USING (auth.uid() = user_id OR public.is_admin()) WITH CHECK (auth.uid() = user_id OR public.is_admin());
 
+DROP POLICY IF EXISTS "Users can view own science quiz attempts" ON public.science_quiz_attempts;
 CREATE POLICY "Users can view own science quiz attempts" ON public.science_quiz_attempts FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
+DROP POLICY IF EXISTS "Users can insert own science quiz attempts" ON public.science_quiz_attempts;
 CREATE POLICY "Users can insert own science quiz attempts" ON public.science_quiz_attempts FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view own science certificates" ON public.science_certificates;
 CREATE POLICY "Users can view own science certificates" ON public.science_certificates FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
+DROP POLICY IF EXISTS "Public can verify science certificates" ON public.science_certificates;
 CREATE POLICY "Public can verify science certificates" ON public.science_certificates FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Admins manage science subjects" ON public.science_subjects;
 CREATE POLICY "Admins manage science subjects" ON public.science_subjects FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science tracks" ON public.science_tracks;
 CREATE POLICY "Admins manage science tracks" ON public.science_tracks FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science courses" ON public.science_courses;
 CREATE POLICY "Admins manage science courses" ON public.science_courses FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science modules" ON public.science_modules;
 CREATE POLICY "Admins manage science modules" ON public.science_modules FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science lessons" ON public.science_lessons;
 CREATE POLICY "Admins manage science lessons" ON public.science_lessons FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science blocks" ON public.science_lesson_blocks;
 CREATE POLICY "Admins manage science blocks" ON public.science_lesson_blocks FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science assets" ON public.science_assets;
 CREATE POLICY "Admins manage science assets" ON public.science_assets FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science skills" ON public.science_skills;
 CREATE POLICY "Admins manage science skills" ON public.science_skills FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science skill edges" ON public.science_skill_edges;
 CREATE POLICY "Admins manage science skill edges" ON public.science_skill_edges FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science content skills" ON public.science_content_skills;
 CREATE POLICY "Admins manage science content skills" ON public.science_content_skills FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science question banks" ON public.science_question_banks;
 CREATE POLICY "Admins manage science question banks" ON public.science_question_banks FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science questions" ON public.science_questions;
 CREATE POLICY "Admins manage science questions" ON public.science_questions FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science quizzes" ON public.science_quizzes;
 CREATE POLICY "Admins manage science quizzes" ON public.science_quizzes FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins manage science quiz questions" ON public.science_quiz_questions;
 CREATE POLICY "Admins manage science quiz questions" ON public.science_quiz_questions FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+DROP POLICY IF EXISTS "Admins issue science certificates" ON public.science_certificates;
 CREATE POLICY "Admins issue science certificates" ON public.science_certificates FOR INSERT WITH CHECK (public.is_admin());
 
 INSERT INTO public.science_subjects (name, slug, description, icon_name, color, order_index)

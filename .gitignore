@@ -25,3 +25,6 @@ docs/
 # Agent/tool artifacts
 .zcode/
 next-env.d.ts
+
+# Bulk data migration kept local (already applied; 14MB of book text)
+supabase/migrations/20260828130000_ingest_pure_theory.sql

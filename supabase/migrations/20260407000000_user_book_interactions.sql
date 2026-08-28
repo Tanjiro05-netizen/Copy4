@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS "public"."user_book_bookmarks" (
 ALTER TABLE "public"."user_book_bookmarks" OWNER TO "postgres";
 ALTER TABLE "public"."user_book_bookmarks" ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage their own book bookmarks" ON "public"."user_book_bookmarks";
 CREATE POLICY "Users can manage their own book bookmarks"
     ON "public"."user_book_bookmarks"
     FOR ALL
@@ -36,6 +37,7 @@ CREATE TABLE IF NOT EXISTS "public"."user_book_progress" (
 ALTER TABLE "public"."user_book_progress" OWNER TO "postgres";
 ALTER TABLE "public"."user_book_progress" ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage their own book progress" ON "public"."user_book_progress";
 CREATE POLICY "Users can manage their own book progress"
     ON "public"."user_book_progress"
     FOR ALL
