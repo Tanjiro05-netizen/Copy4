@@ -101,8 +101,10 @@ const buildBookPayload = (book, { includeEpub = false, requireReadableFile = fal
     payload.text_edition = sanitizeTextEdition(book?.text_edition);
   }
 
-  if (requireReadableFile && !payload.epub_filename && !payload.pdf_filename) {
-    throw new Error('EPUB or PDF file is required.');
+  // A stored text edition is a readable edition in its own right — books can
+  // exist with no EPUB/PDF at all (text-only ingest; covers follow later).
+  if (requireReadableFile && !payload.epub_filename && !payload.pdf_filename && !payload.text_edition) {
+    throw new Error('EPUB, PDF or text edition is required.');
   }
 
   return payload;
@@ -178,7 +180,7 @@ export async function PATCH(request) {
   const supabase = createClient();
   const { data: existingBook, error: fetchError } = await supabase
     .from('digital_library_books')
-    .select('id, epub_filename, pdf_filename, cover_image_url')
+    .select('id, epub_filename, pdf_filename, cover_image_url, text_edition')
     .eq('id', bookId)
     .single();
 
@@ -187,8 +189,9 @@ export async function PATCH(request) {
   }
 
   const nextEpub = hasOwn(payload, 'epub_filename') ? payload.epub_filename : existingBook.epub_filename;
-  if (!nextEpub && !payload.pdf_filename) {
-    return json({ message: 'A readable EPUB or PDF file is required.' }, 400);
+  const nextTextEdition = hasOwn(payload, 'text_edition') ? payload.text_edition : existingBook.text_edition;
+  if (!nextEpub && !payload.pdf_filename && !nextTextEdition) {
+    return json({ message: 'A readable EPUB, PDF or text edition is required.' }, 400);
   }
 
   const oldPdfToRemove =

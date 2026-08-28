@@ -1,8 +1,10 @@
+'use client';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { AlertCircle, Minus, Plus } from 'lucide-react';
 import { editorialProseCss } from '../EditorialReader/editorialProseCss';
+import { FRONT_MATTER_TITLE } from '../../utils/textEdition';
 import * as s from '../EditorialReader/EditorialReader.css.ts';
 
 /**
@@ -143,6 +145,9 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
                                     data-section-canonical={sec.id}
                                     data-editorial-section="true"
                                 >
+                                    {(i > 0 || sec.title !== FRONT_MATTER_TITLE) && sec.title && (
+                                        sec.level >= 3 ? <h3>{sec.title}</h3> : <h2>{sec.title}</h2>
+                                    )}
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{sec.md || ''}</ReactMarkdown>
                                 </section>
                                 {i < sections.length - 1 && (

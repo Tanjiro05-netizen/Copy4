@@ -195,7 +195,10 @@ const LibraryUploadPage = () => {
     const isPdfBookForm = uploadType === 'book' && (bookFormat === 'pdf' || isPdfOnlyUpload);
     const hasEpubAttachment = !!epubFile || (isEditingBook && !!existingBook?.epub_filename);
     const hasPdfAttachment = !!pdfFile || (isEditingBook && !!existingBook?.pdf_filename && !removeExistingPdf);
-    const hasReadableFile = hasEpubAttachment || hasPdfAttachment;
+    const hasTextEdition =
+        (isEditingBook && !!existingBook?.text_edition?.sections?.length) ||
+        (textEditionDirty && textSections.length > 0);
+    const hasReadableFile = hasEpubAttachment || hasPdfAttachment || hasTextEdition;
     const shouldShowPages = isPdfBookForm || hasPdfAttachment;
     const canSubmitBook = !!formData.title.trim() && (
         isEditingBook
@@ -471,7 +474,7 @@ const LibraryUploadPage = () => {
         }
 
         if (isEditingBook && !hasReadableFile) {
-            setError('A readable EPUB or PDF file is required');
+            setError('A readable EPUB, PDF or text edition is required');
             return;
         }
 

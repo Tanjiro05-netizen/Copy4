@@ -5,6 +5,7 @@ import {
     detectKind,
     buildEdition,
     escapeMarkdownLineStarts,
+    parseSourceFile,
 } from './textEdition';
 
 describe('splitMarkdown', () => {
@@ -102,6 +103,58 @@ describe('splitPlainText', () => {
     it('keeps normal punctuation lines untouched', () => {
         const body = splitPlainText('Chapter 1\n\nLabour is the substance of value.')[0].md;
         expect(body).toBe('Labour is the substance of value.');
+    });
+
+    it('nests Chapters under Parts (level 2) and Sections deeper (level 3)', () => {
+        const src = [
+            'Part I: Commodities and Money',
+            'Chapter One: Commodities',
+            'Body of chapter one.',
+            'Section 1: The Two Factors of the Commodity',
+            'Body of section one.',
+        ].join('\n');
+        const sections = splitPlainText(src);
+        expect(sections.map((s) => [s.title, s.level])).toEqual([
+            ['Part I: Commodities and Money', 1],
+            ['Chapter One: Commodities', 2],
+            ['Section 1: The Two Factors of the Commodity', 3],
+        ]);
+    });
+
+    it('detects standalone title-case subheadings between blank lines', () => {
+        const src = ['Prefaces', '', 'The 1872 German Edition', '', 'The Communist League commissioned us.'].join('\n');
+        const sections = splitPlainText(src);
+        expect(sections.map((s) => s.title)).toEqual(['Prefaces', 'The 1872 German Edition']);
+        expect(sections[1].md).toBe('The Communist League commissioned us.');
+    });
+
+    it('does not treat sentence prose as a standalone subheading', () => {
+        const src = ['This line ends with a period.', '', 'Next paragraph here.'].join('\n');
+        const sections = splitPlainText(src);
+        expect(sections).toHaveLength(1);
+        expect(sections[0].title).toBe('Front matter');
+    });
+
+    it('drops communist-left ====== divider lines from the body', () => {
+        const body = splitPlainText('Chapter 1\n\n======\n\nReal body.')[0].md;
+        expect(body).toBe('Real body.');
+    });
+});
+
+describe('parseSourceFile', () => {
+    it('extracts title, source URL and body from the scrape header', () => {
+        const raw = 'Manifesto of the Communist Party\nSource: https://communist-left.org/texts/manifesto.html\n======================\n\nA spectre is haunting Europe.';
+        const parsed = parseSourceFile(raw);
+        expect(parsed.title).toBe('Manifesto of the Communist Party');
+        expect(parsed.sourceUrl).toBe('https://communist-left.org/texts/manifesto.html');
+        expect(parsed.body.trim()).toBe('A spectre is haunting Europe.');
+    });
+
+    it('passes through files without the header block', () => {
+        const parsed = parseSourceFile('Just some prose.\nMore prose.');
+        expect(parsed.title).toBeNull();
+        expect(parsed.sourceUrl).toBeNull();
+        expect(parsed.body).toBe('Just some prose.\nMore prose.');
     });
 });
 
