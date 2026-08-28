@@ -7,14 +7,20 @@ import { editorialProseCss } from '../EditorialReader/editorialProseCss';
 import { FRONT_MATTER_TITLE } from '../../utils/textEdition';
 import * as s from '../EditorialReader/EditorialReader.css.ts';
 
+/* The sticky chrome sits directly under the app navband (46px + hairlines). */
+const STICKY_TOP = 47;
+/* Room for navband + sticky toolbar when jumping to a section. */
+const SECTION_JUMP_OFFSET = 110;
+
 /**
- * The text-edition reading surface — the whole book as one typeset markdown
- * column with a chapter rail and a crimson progress rule. Companion to
- * EditorialReader, but fed from digital_library_books.text_edition (sections
- * of markdown) instead of an epubjs archive. Used for books that have no EPUB.
+ * The text-edition reading surface — one fullscreen editorial column with a
+ * sticky chapter rail, in the manner of the communist-left.org text pages.
+ * The page itself scrolls: progress and scroll-spy run on the document, so
+ * keyboard scrolling, find-in-page and mobile behave natively. Sections come
+ * from digital_library_books.text_edition.
  */
 const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLabel }) => {
-    const scrollRef = useRef(null);
+    const rootRef = useRef(null);
     const onProgressRef = useRef(onProgressChange);
     onProgressRef.current = onProgressChange;
 
@@ -33,31 +39,50 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
         }
     }, [sections, activeId]);
 
-    const handleScroll = useCallback(() => {
-        const scroller = scrollRef.current;
-        if (!scroller) return;
+    /* The page is the scroller: progress and rail highlight follow the document. */
+    useEffect(() => {
+        if (!sections.length) return undefined;
 
-        const maxScroll = scroller.scrollHeight - scroller.clientHeight;
-        const pct = maxScroll > 0 ? Math.round((scroller.scrollTop / maxScroll) * 100) : 0;
-        setProgress(pct);
-        if (onProgressRef.current) onProgressRef.current(pct);
+        const handleScroll = () => {
+            const root = rootRef.current;
+            if (!root) return;
 
-        const nodes = Array.from(scroller.querySelectorAll('[data-section-canonical]'));
-        // At the very top the first section is always current, however short
-        // it is — the lookahead below would otherwise flip to the next one.
-        const active = scroller.scrollTop <= 2
-            ? nodes[0]
-            : nodes.filter((n) => n.offsetTop <= scroller.scrollTop + 200).pop() || nodes[0];
-        if (active) setActiveId(active.getAttribute('data-section-canonical'));
-    }, []);
+            const rect = root.getBoundingClientRect();
+            const scrollable = rect.height - window.innerHeight;
+            const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(scrollable, 0));
+            const pct = scrollable > 0 ? Math.round((scrolled / scrollable) * 100) : 0;
+            setProgress(pct);
+            if (onProgressRef.current) onProgressRef.current(pct);
+
+            const nodes = Array.from(root.querySelectorAll('[data-section-canonical]'));
+            if (!nodes.length) return;
+
+            // At the very top the first section is always current, however
+            // short it is — the lookahead below would otherwise flip early.
+            let active;
+            if (window.scrollY <= 2) {
+                active = nodes[0];
+            } else {
+                const marker = STICKY_TOP + 60;
+                active = nodes.filter((n) => n.getBoundingClientRect().top <= marker).pop() || nodes[0];
+            }
+            setActiveId(active.getAttribute('data-section-canonical'));
+        };
+
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('resize', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleScroll);
+        };
+    }, [sections.length]);
 
     const scrollToSection = useCallback((id) => {
-        const scroller = scrollRef.current;
-        if (!scroller || !id) return;
-        const target = scroller.querySelector(`[data-section-canonical="${id}"]`);
-        if (target) {
-            scroller.scrollTo({ top: Math.max(0, target.offsetTop - 24), behavior: 'smooth' });
-        }
+        const node = rootRef.current?.querySelector(`[data-section-canonical="${id}"]`);
+        if (!node) return;
+        const top = node.getBoundingClientRect().top + window.scrollY - SECTION_JUMP_OFFSET;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }, []);
 
     const adjustFont = (delta) => {
@@ -70,14 +95,16 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
 
     if (!sections.length) {
         return (
-            <div className={s.errorBox} data-testid="text-edition-reader-empty">
-                <AlertCircle size={26} style={{ color: '#d41f3d' }} />
-                <span className={s.errorText}>This text edition is empty.</span>
-                {fallbackUrl && (
-                    <a className={s.fallbackLink} href={fallbackUrl} target="_blank" rel="noopener noreferrer">
-                        {fallbackLabel || 'Open the file directly'}
-                    </a>
-                )}
+            <div className={s.root} data-testid="text-edition-reader-empty">
+                <div className={s.errorBox}>
+                    <AlertCircle size={26} style={{ color: '#d41f3d' }} />
+                    <span className={s.errorText}>This text edition is empty.</span>
+                    {fallbackUrl && (
+                        <a className={s.fallbackLink} href={fallbackUrl} target="_blank" rel="noopener noreferrer">
+                            {fallbackLabel || 'Open the file directly'}
+                        </a>
+                    )}
+                </div>
             </div>
         );
     }
@@ -88,7 +115,7 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
     const proseSize = Math.round(18 * (fontSize / 100));
 
     return (
-        <div className={s.root} data-testid="text-edition-reader">
+        <div className={s.root} ref={rootRef} data-testid="text-edition-reader">
             {/* Chapter rail */}
             <nav className={s.rail} aria-label="Contents">
                 <div className={s.railHeader}>Contents</div>
@@ -96,17 +123,43 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
                     <button
                         key={sec.id || idx}
                         className={`${s.railItem} ${sec.id === activeId ? s.railItemActive : ''}`}
-                        style={sec.level > 1 ? { paddingLeft: 'calc(16px + 12px)' } : undefined}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'baseline',
+                            gap: '8px',
+                            ...(sec.level > 1 ? { paddingLeft: 'calc(16px + 12px)' } : {}),
+                        }}
                         onClick={() => scrollToSection(sec.id)}
                     >
-                        {sec.title || `Section ${idx + 1}`}
+                        <span
+                            style={{
+                                fontFamily: "'Outfit', system-ui, sans-serif",
+                                fontSize: '10px',
+                                letterSpacing: '0.08em',
+                                fontVariantNumeric: 'tabular-nums',
+                                color: '#b3122e',
+                                opacity: 0.75,
+                                flexShrink: 0,
+                            }}
+                        >
+                            {String(idx + 1).padStart(2, '0')}
+                        </span>
+                        <span>{sec.title || `Section ${idx + 1}`}</span>
                     </button>
                 ))}
             </nav>
 
             <div>
-                {/* Toolbar: current chapter + index + reading time + type controls */}
-                <div className={s.toolbar}>
+                {/* Sticky reading header: current chapter + index + type controls,
+                    with the crimson progress rule riding its top edge. */}
+                <div
+                    className={s.toolbar}
+                    style={{ position: 'sticky', top: STICKY_TOP, zIndex: 6, background: '#0b0d12' }}
+                    data-testid="text-edition-reader-toolbar"
+                >
+                    <div className={s.progressTrack} style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 }}>
+                        <div className={s.progressFill} style={{ width: `${progress}%` }} />
+                    </div>
                     <div className={s.chapterMeta}>
                         <span className={s.chapterLabel}>{currentSection?.title || 'Reading'}</span>
                         <span className={s.chapterIndex}>
@@ -127,40 +180,29 @@ const TextEditionReader = ({ edition, onProgressChange, fallbackUrl, fallbackLab
                     </div>
                 </div>
 
-                {/* Scroll shell with progress rule */}
-                <div
-                    className={s.shell}
-                    ref={scrollRef}
-                    onScroll={handleScroll}
-                    data-testid="text-edition-reader-scroll"
-                >
-                    <div className={s.progressTrack}>
-                        <div className={s.progressFill} style={{ width: `${progress}%` }} />
-                    </div>
-
-                    <div className={s.column} style={{ fontSize: `${proseSize}px` }} data-testid="text-edition-reader-column">
-                        {sections.map((sec, i) => (
-                            <React.Fragment key={sec.id || `sec-${i}`}>
-                                <section
-                                    data-section-canonical={sec.id}
-                                    data-editorial-section="true"
-                                >
-                                    {(i > 0 || sec.title !== FRONT_MATTER_TITLE) && sec.title && (
-                                        sec.level >= 3 ? <h3>{sec.title}</h3> : <h2>{sec.title}</h2>
-                                    )}
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{sec.md || ''}</ReactMarkdown>
-                                </section>
-                                {i < sections.length - 1 && (
-                                    <div className={s.sectionRule} aria-hidden="true">
-                                        <span style={{ flex: 1, height: '1px', background: '#262a35' }} />
-                                        <span style={{ width: '6px', height: '6px', background: '#b3122e', transform: 'rotate(45deg)' }} />
-                                        <span style={{ flex: 1, height: '1px', background: '#262a35' }} />
-                                    </div>
+                {/* The fullscreen column — the document itself scrolls */}
+                <div className={s.column} style={{ fontSize: `${proseSize}px` }} data-testid="text-edition-reader-column">
+                    {sections.map((sec, i) => (
+                        <React.Fragment key={sec.id || `sec-${i}`}>
+                            <section
+                                data-section-canonical={sec.id}
+                                data-editorial-section="true"
+                            >
+                                {(i > 0 || sec.title !== FRONT_MATTER_TITLE) && sec.title && (
+                                    sec.level >= 3 ? <h3>{sec.title}</h3> : <h2>{sec.title}</h2>
                                 )}
-                            </React.Fragment>
-                        ))}
-                        <style>{editorialProseCss}</style>
-                    </div>
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{sec.md || ''}</ReactMarkdown>
+                            </section>
+                            {i < sections.length - 1 && (
+                                <div className={s.sectionRule} aria-hidden="true">
+                                    <span style={{ flex: 1, height: '1px', background: '#262a35' }} />
+                                    <span style={{ width: '6px', height: '6px', background: '#b3122e', transform: 'rotate(45deg)' }} />
+                                    <span style={{ flex: 1, height: '1px', background: '#262a35' }} />
+                                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                    <style>{editorialProseCss}</style>
                 </div>
             </div>
         </div>

@@ -34,8 +34,8 @@ describe('TextEditionReader', () => {
         render(<TextEditionReader edition={edition} />);
 
         expect(screen.getByRole('navigation', { name: 'Contents' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Front matter' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Chapter One' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /front matter/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /chapter one/i })).toBeInTheDocument();
 
         const markdownBlocks = screen.getAllByTestId('markdown');
         expect(markdownBlocks).toHaveLength(2);
@@ -68,16 +68,21 @@ describe('TextEditionReader', () => {
         );
     });
 
-    it('reports scroll progress through the callback', () => {
+    it('reports document-scroll progress through the callback', () => {
         const onProgressChange = jest.fn();
         render(<TextEditionReader edition={edition} onProgressChange={onProgressChange} />);
 
-        const scroller = screen.getByTestId('text-edition-reader-scroll');
-        // jsdom has no layout: offsetTop/scrollTop are 0, so progress resolves to 0
-        Object.defineProperty(scroller, 'scrollHeight', { value: 1000, configurable: true });
-        Object.defineProperty(scroller, 'clientHeight', { value: 500, configurable: true });
-        fireEvent.scroll(scroller);
-
+        // jsdom has no layout: rects are zero, so progress resolves to 0
+        fireEvent.scroll(window);
         expect(onProgressChange).toHaveBeenCalledWith(0);
+    });
+
+    it('shows the sticky reading toolbar with counter and font controls', () => {
+        render(<TextEditionReader edition={edition} />);
+        const toolbar = screen.getByTestId('text-edition-reader-toolbar');
+        expect(toolbar).toHaveStyle({ position: 'sticky' });
+        expect(screen.getByRole('button', { name: 'Smaller text' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Larger text' })).toBeInTheDocument();
+        expect(screen.getByText('01 / 02 · 3 min')).toBeInTheDocument();
     });
 });
