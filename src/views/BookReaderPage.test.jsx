@@ -25,6 +25,16 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('../components/EpubReader/EpubReader', () => () => <div data-testid="mock-epub-reader">EPUB reader</div>);
+/* TextEditionReader pulls in react-markdown/remark-gfm (ESM) — mocked per
+   project convention (see PoliticsArticleReader.test.jsx). */
+jest.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }) => <div data-testid="markdown">{children}</div>,
+}));
+jest.mock('remark-gfm', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 jest.mock('../components/Library/AddToListButton', () => () => <button>Add to list</button>);
 jest.mock('../components/Library/BookReviewSection', () => () => <div>Reviews</div>);
 

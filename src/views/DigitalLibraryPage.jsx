@@ -349,7 +349,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                             data-testid="ebook-read-link"
                             className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors text-sm font-bold"
                         >
-                            {isPdfBook ? 'Open PDF' : 'Read Now'}
+                            {isPdfBook ? (book.text_edition?.sections?.length ? 'Read Now' : 'Open PDF') : 'Read Now'}
                         </Link>
                      )}
                     {!isAudiobook && externalViewerUrl && (

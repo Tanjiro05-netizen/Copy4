@@ -48,6 +48,33 @@ const getCoverStoragePath = (coverUrl) => {
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
 
+/* Validate + normalize the stored text edition ({ sections: [{id, title, level, md}] }). */
+const sanitizeTextEdition = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  if (typeof value !== 'object' || !Array.isArray(value.sections)) {
+    throw new Error('text_edition must be an object with a sections array.');
+  }
+
+  const sections = value.sections.slice(0, 2000).map((section, idx) => ({
+    id: nullableString(section?.id) || `s${idx + 1}`,
+    title: nullableString(section?.title) || `Section ${idx + 1}`,
+    level: Number.isFinite(section?.level)
+      ? Math.min(6, Math.max(1, Math.round(section.level)))
+      : 1,
+    md: `${section?.md || ''}`,
+  }));
+
+  const words = sections.reduce((sum, sec) => sum + sec.md.split(/\s+/).filter(Boolean).length, 0);
+  const source = ['md', 'txt', 'extracted', 'manual'].includes(value.source) ? value.source : 'manual';
+
+  return {
+    sections,
+    reading_minutes: nullableInteger(value.reading_minutes) || Math.max(1, Math.round(words / 200)),
+    source,
+    generated_at: nullableString(value.generated_at) || new Date().toISOString(),
+  };
+};
+
 const buildBookPayload = (book, { includeEpub = false, requireReadableFile = false } = {}) => {
   const title = nullableString(book?.title);
   if (!title) throw new Error('Title is required.');
@@ -68,6 +95,10 @@ const buildBookPayload = (book, { includeEpub = false, requireReadableFile = fal
 
   if (includeEpub || hasOwn(book, 'epub_filename')) {
     payload.epub_filename = nullableString(book?.epub_filename);
+  }
+
+  if (hasOwn(book, 'text_edition')) {
+    payload.text_edition = sanitizeTextEdition(book?.text_edition);
   }
 
   if (requireReadableFile && !payload.epub_filename && !payload.pdf_filename) {

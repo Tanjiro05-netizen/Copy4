@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import EpubReader from '../components/EpubReader/EpubReader';
 import EditorialReader from '../components/EditorialReader/EditorialReader';
+import TextEditionReader from '../components/TextEditionReader/TextEditionReader';
 import BookReviewSection from '../components/Library/BookReviewSection';
 import AddToListButton from '../components/Library/AddToListButton';
 import * as s from './BookReaderPage.css.ts';
@@ -45,7 +46,7 @@ const BookReaderPage = () => {
             try {
                 const { data: bookData, error: dbError } = await supabase
                     .from('digital_library_books')
-                    .select('id, title, author, year, pages, description, cover_image_url, epub_filename, pdf_filename, category')
+                    .select('id, title, author, year, pages, description, cover_image_url, epub_filename, pdf_filename, text_edition, category')
                     .eq('id', bookId)
                     .single();
 
@@ -176,6 +177,12 @@ const BookReaderPage = () => {
         book.pages ? `${book.pages} pp.` : null,
     ].filter(Boolean);
 
+    // PDF-only books with a stored text edition still get a reading surface
+    const textEdition =
+        book.text_edition && Array.isArray(book.text_edition.sections) && book.text_edition.sections.length > 0
+            ? book.text_edition
+            : null;
+
     return (
         <div className={s.page}>
             <div className={s.inner}>
@@ -222,7 +229,7 @@ const BookReaderPage = () => {
 
                 {/* ── Toolbar: view toggle + actions ── */}
                 <div className={s.toolbar}>
-                    {epubUrl && (
+                    {(epubUrl || textEdition) && (
                         <div className={s.viewTabs} role="tablist" aria-label="Reading view">
                             <button
                                 className={`${s.viewTab} ${view === 'read' ? s.viewTabActive : ''}`}
@@ -232,14 +239,16 @@ const BookReaderPage = () => {
                             >
                                 Read
                             </button>
-                            <button
-                                className={`${s.viewTab} ${view === 'ebook' ? s.viewTabActive : ''}`}
-                                onClick={() => setView('ebook')}
-                                role="tab"
-                                aria-selected={view === 'ebook'}
-                            >
-                                Ebook
-                            </button>
+                            {(epubUrl || pdfDownloadUrl) && (
+                                <button
+                                    className={`${s.viewTab} ${view === (epubUrl ? 'ebook' : 'pdf') ? s.viewTabActive : ''}`}
+                                    onClick={() => setView(epubUrl ? 'ebook' : 'pdf')}
+                                    role="tab"
+                                    aria-selected={view === (epubUrl ? 'ebook' : 'pdf')}
+                                >
+                                    {epubUrl ? 'Ebook' : 'PDF'}
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -289,6 +298,26 @@ const BookReaderPage = () => {
                                     onToggleFullscreen={() => setIsFullscreen(f => !f)}
                                     isFullscreen={isFullscreen}
                                     fallbackUrl={pdfDownloadUrl}
+                                />
+                            </div>
+                        )
+                    ) : textEdition ? (
+                        view === 'read' || !pdfDownloadUrl ? (
+                            <div data-testid="book-reader-text-edition">
+                                <TextEditionReader
+                                    edition={textEdition}
+                                    onProgressChange={handleAutoProgress}
+                                    fallbackUrl={pdfDownloadUrl}
+                                    fallbackLabel="Open the PDF directly"
+                                />
+                            </div>
+                        ) : (
+                            <div data-testid="book-reader-pdf" className={s.iframeWrap} style={isFullscreen ? { position: 'fixed', inset: 0, zIndex: 100, height: '100vh', minHeight: '100vh', border: 'none' } : undefined}>
+                                <iframe
+                                    src={pdfDownloadUrl}
+                                    className={s.iframe}
+                                    title={book.title}
+                                    allowFullScreen
                                 />
                             </div>
                         )

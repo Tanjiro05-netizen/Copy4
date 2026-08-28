@@ -7,6 +7,8 @@ import {
     Trash2, Headphones, ChevronDown, ChevronUp, Pencil
 } from 'lucide-react';
 import AudiobookUploadForm from './AudiobookUploadForm';
+import TextEditionPanel from './TextEditionPanel';
+import { buildEdition } from '../../utils/textEdition';
 
 const CATEGORIES = [
     'Political Economy',
@@ -183,6 +185,12 @@ const LibraryUploadPage = () => {
     const [existingBook, setExistingBook] = useState(null);
     const [removeExistingPdf, setRemoveExistingPdf] = useState(false);
     const [removeExistingCover, setRemoveExistingCover] = useState(false);
+
+    // Text edition (markdown sections for the PDF-less reader). Dirty flag
+    // guards the PATCH so an untouched edition is never overwritten.
+    const [textSections, setTextSections] = useState([]);
+    const [textSource, setTextSource] = useState('manual');
+    const [textEditionDirty, setTextEditionDirty] = useState(false);
     const isPdfOnlyUpload = !isEditingBook && uploadType === 'book' && !!pdfFile && !epubFile;
     const isPdfBookForm = uploadType === 'book' && (bookFormat === 'pdf' || isPdfOnlyUpload);
     const hasEpubAttachment = !!epubFile || (isEditingBook && !!existingBook?.epub_filename);
@@ -235,7 +243,7 @@ const LibraryUploadPage = () => {
             try {
                 const { data, error: fetchError } = await supabase
                     .from('digital_library_books')
-                    .select('id, title, author, year, description, category, era, language, pages, is_official, epub_filename, pdf_filename, cover_image_url')
+                    .select('id, title, author, year, description, category, era, language, pages, is_official, epub_filename, pdf_filename, cover_image_url, text_edition')
                     .eq('id', editId)
                     .single();
 
@@ -244,6 +252,9 @@ const LibraryUploadPage = () => {
 
                 setExistingBook(data);
                 setBookFormat(data.epub_filename ? 'epub' : 'pdf');
+                setTextSections(data.text_edition?.sections || []);
+                setTextSource(data.text_edition?.source || 'manual');
+                setTextEditionDirty(false);
                 setFormData({
                     title: data.title || '',
                     author: data.author || '',
@@ -568,6 +579,10 @@ const LibraryUploadPage = () => {
 
             if (!isEditingBook) {
                 payload.epub_filename = epubFilename;
+            }
+
+            if (isEditingBook && textEditionDirty) {
+                payload.text_edition = textSections.length > 0 ? buildEdition(textSections, textSource) : null;
             }
 
             setUploadStep('Saving to database...');
@@ -943,6 +958,23 @@ const LibraryUploadPage = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Text Edition (markdown sections for the reader) */}
+                    {isEditingBook && !existingBook?.epub_filename && (
+                        <TextEditionPanel
+                            sections={textSections}
+                            source={textSource}
+                            onSectionsChange={setTextSections}
+                            onSourceChange={setTextSource}
+                            onDirty={setTextEditionDirty}
+                            pdfFile={pdfFile}
+                            pdfUrl={
+                                existingBook?.pdf_filename
+                                    ? supabase.storage.from('library').getPublicUrl(existingBook.pdf_filename).data?.publicUrl
+                                    : null
+                            }
+                        />
+                    )}
 
                     {/* Submit Button */}
                     <button
