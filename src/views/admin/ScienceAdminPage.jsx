@@ -735,7 +735,7 @@ const ScienceAdminPage = () => {
         }
       `}</style>
       <div className="border-b border-gray-800 bg-black/40">
-        <div className="container mx-auto max-w-7xl px-4 py-6">
+        <div className="container mx-auto max-w-[1760px] px-4 py-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-red-500 text-sm font-semibold uppercase tracking-wide">Science & Technology V2</p>
@@ -754,7 +754,8 @@ const ScienceAdminPage = () => {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-7xl px-4 py-6">
+      {/* Wide workspace: the 280px tree + 300px rail leave the forms room to breathe */}
+      <div className="container mx-auto max-w-[1760px] px-4 py-6">
         <div className="flex gap-2 overflow-x-auto pb-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -910,12 +911,12 @@ const ScienceAdminPage = () => {
                 </div>
 
                 <div className="border border-gray-800 bg-black/35 p-5">
-                  <div className="mb-5 flex items-center justify-between gap-3">
+                  <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h2 className="text-white font-semibold">Course Shell</h2>
                       <p className="text-sm text-gray-500">Identity, catalog metadata, duration, and publication state.</p>
                     </div>
-                    <button type="button" onClick={() => { setSelectedCourseId(''); setCourseForm(emptyCourseForm); setOutline([]); }} className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300">
+                    <button type="button" onClick={() => { setSelectedCourseId(''); setCourseForm(emptyCourseForm); setOutline([]); }} className="inline-flex shrink-0 items-center gap-2 text-sm text-red-400 hover:text-red-300">
                       <Plus className="h-4 w-4" />
                       New shell
                     </button>
