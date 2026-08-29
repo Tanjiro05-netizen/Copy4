@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { supabase } from '../supabaseClient';
@@ -7,6 +8,7 @@ import * as s from './TextbookReaderPage.css.ts';
 import 'katex/dist/katex.min.css';
 
 const TextbookReaderPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [textbook, setTextbook] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,7 +59,7 @@ const TextbookReaderPage = () => {
   if (isLoading) {
     return (
       <div className={s.page}>
-        <div className={s.loadingWrap}>Loading textbook...</div>
+        <div className={s.loadingWrap}>{t('science.loadingTextbook')}</div>
       </div>
     );
   }
@@ -66,9 +68,9 @@ const TextbookReaderPage = () => {
     return (
       <div className={s.page}>
         <div className={s.notFoundWrap}>
-          <p className={s.notFoundText}>Textbook not found</p>
+          <p className={s.notFoundText}>{t('science.textbookNotFound')}</p>
           <Link href="/science-tech" className={s.notFoundLink}>
-            ← Back to Science & Tech
+            ← {t('science.backToScience')}
           </Link>
         </div>
       </div>
@@ -86,6 +88,7 @@ const TextbookReaderPage = () => {
             <div className="flex items-center gap-4">
               <Link href="/science-tech"
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                aria-label={t('science.backToScience')}
               >
                 <ArrowLeft className="w-4 h-4" />
               </Link>
@@ -105,15 +108,17 @@ const TextbookReaderPage = () => {
                 <button 
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   className="p-1.5 text-gray-400 hover:text-white transition-colors"
+                  aria-label={t('science.previousPage')}
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="text-gray-400 text-sm">
-                  Page {currentPage} of {textbook.page_count}
+                  {t('science.pageProgress', { current: currentPage, total: textbook.page_count })}
                 </span>
                 <button 
                   onClick={() => setCurrentPage(p => Math.min(textbook.page_count, p + 1))}
                   className="p-1.5 text-gray-400 hover:text-white transition-colors"
+                  aria-label={t('science.nextPage')}
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -125,7 +130,7 @@ const TextbookReaderPage = () => {
               <button 
                 onClick={handleZoomOut}
                 className="p-2 text-gray-400 hover:text-white transition-colors"
-                title="Zoom Out"
+                title={t('science.zoomOut')}
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
@@ -133,14 +138,14 @@ const TextbookReaderPage = () => {
               <button 
                 onClick={handleZoomIn}
                 className="p-2 text-gray-400 hover:text-white transition-colors"
-                title="Zoom In"
+                title={t('science.zoomIn')}
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
               <button 
                 onClick={toggleFullscreen}
                 className="p-2 text-gray-400 hover:text-white transition-colors"
-                title="Toggle Fullscreen"
+                title={t('science.toggleFullscreen')}
               >
                 {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
               </button>
@@ -149,7 +154,7 @@ const TextbookReaderPage = () => {
                   href={textbook.file_url}
                   download
                   className="p-2 text-gray-400 hover:text-white transition-colors"
-                  title="Download PDF"
+                  title={t('science.downloadPdf')}
                 >
                   <Download className="w-4 h-4" />
                 </a>
@@ -176,7 +181,7 @@ const TextbookReaderPage = () => {
             </div>
           ) : (
             <div className="text-center py-20">
-              <p className="text-gray-400">No PDF file available for this textbook.</p>
+              <p className="text-gray-400">{t('science.noTextbookPdf')}</p>
             </div>
           )}
         </div>
@@ -186,7 +191,7 @@ const TextbookReaderPage = () => {
       {textbook.description && (
         <div className="fixed bottom-4 right-4 max-w-xs">
           <div className="bg-black/80 backdrop-blur-lg rounded-none p-4 border border-red-900/30">
-            <h3 className="text-white font-semibold text-sm mb-2">About this textbook</h3>
+            <h3 className="text-white font-semibold text-sm mb-2">{t('science.aboutTextbook')}</h3>
             <p className="text-gray-400 text-xs line-clamp-3">{textbook.description}</p>
           </div>
         </div>
