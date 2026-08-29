@@ -30,10 +30,6 @@ const jetbrains = JetBrains_Mono({
 const NEWSREADER_HREF =
   'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..700;1,6..72,200..600&display=swap';
 
-/* CJK fallback families for zh — Google serves these as unicode-range slices,
-   so browsers only download the glyph ranges a page actually uses. */
-const CJK_FONTS_HREF =
-  'https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap';
 
 /* Open the TLS connection to Supabase while HTML streams, so the first
    data query after hydration doesn't pay the handshake. */
@@ -96,7 +92,6 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href={NEWSREADER_HREF} />
-        <link rel="stylesheet" href={CJK_FONTS_HREF} />
         {SUPABASE_HOST && (
           <>
             <link rel="preconnect" href={`https://${SUPABASE_HOST}`} />

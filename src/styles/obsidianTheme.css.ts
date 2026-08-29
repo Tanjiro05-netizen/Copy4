@@ -92,10 +92,10 @@ export const studyThemeClass = createTheme(vars, {
     info: '#4a7fb5',
   },
   font: {
-    display: 'var(--font-cormorant, \'Cormorant Garamond\'), Georgia, "Times New Roman", \'Noto Serif SC\', serif',
-    body: 'var(--font-newsreader, \'Newsreader\'), Georgia, "Times New Roman", \'Noto Serif SC\', serif',
+    display: 'var(--font-cormorant, \'Cormorant Garamond\'), Georgia, "Times New Roman", serif',
+    body: 'var(--font-newsreader, \'Newsreader\'), Georgia, "Times New Roman", serif',
     mono: 'var(--font-jetbrains, \'JetBrains Mono\'), \'Fira Code\', SFMono-Regular, Menlo, monospace',
-    label: 'var(--font-outfit, \'Outfit\'), system-ui, -apple-system, \'Noto Sans SC\', sans-serif',
+    label: 'var(--font-outfit, \'Outfit\'), system-ui, -apple-system, sans-serif',
   },
   space: {
     xxs: '4px',
