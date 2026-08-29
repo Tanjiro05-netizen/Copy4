@@ -69,10 +69,14 @@ export const navband = style({
 });
 
 export const navbandInner = style({
-  maxWidth: vars.layout.maxWidth,
+  // Wider than the content layout: the band must hold 13 uppercase nav items
+  // plus both flanks, and the flanks keep min-content width, so every pixel
+  // of track pressure otherwise lands between the search/EN slot and HOME.
+  maxWidth: '1680px',
   margin: '0 auto',
   display: 'grid',
   gridTemplateColumns: '1fr auto 1fr',
+  columnGap: vars.space.md,
   alignItems: 'center',
   minHeight: '46px',
   padding: `0 ${vars.space.md}`,
@@ -122,15 +126,22 @@ export const navLink = style({
   display: 'inline-flex',
   alignItems: 'center',
   height: '46px',
-  padding: '0 9px',
+  padding: '0 7px',
   fontFamily: vars.font.label,
   fontSize: '10.5px',
   fontWeight: 500,
   textTransform: 'uppercase',
-  letterSpacing: '0.22em',
+  letterSpacing: '0.18em',
   color: bandInk,
   whiteSpace: 'nowrap',
   transition: 'color 180ms ease',
+  '@media': {
+    'screen and (max-width: 1365px)': {
+      fontSize: '10px',
+      letterSpacing: '0.12em',
+      padding: '0 5px',
+    },
+  },
 });
 
 const navFill = {
@@ -196,17 +207,24 @@ export const dropdownTrigger = style({
   display: 'flex',
   alignItems: 'center',
   height: '46px',
-  padding: '0 9px',
+  padding: '0 7px',
   fontFamily: vars.font.label,
   fontSize: '10.5px',
   fontWeight: 500,
   textTransform: 'uppercase',
-  letterSpacing: '0.22em',
+  letterSpacing: '0.18em',
   color: bandInk,
   background: 'none',
   border: 'none',
   cursor: 'pointer',
   whiteSpace: 'nowrap',
+  '@media': {
+    'screen and (max-width: 1365px)': {
+      fontSize: '10px',
+      letterSpacing: '0.12em',
+      padding: '0 5px',
+    },
+  },
   selectors: {
     '&::before': navFill,
     '&:hover::before': { transform: 'scaleY(1)' },
