@@ -26,6 +26,7 @@ docs/
 .zcode/
 next-env.d.ts
 HANDOFF.md
+HANDOFF-I18N.md
 
 # Bulk data migration kept local (already applied; 14MB of book text)
 supabase/migrations/20260828130000_ingest_pure_theory.sql
