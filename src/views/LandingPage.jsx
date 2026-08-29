@@ -11,12 +11,14 @@ import {
 } from 'lucide-react';
 import MarxBg from '../assets/Marx.jpg';
 import DonationModal from '../components/DonationModal';
+import { useTranslation } from 'react-i18next';
 import './LandingPage.css';
 
 const marxBgUrl = typeof MarxBg === 'string' ? MarxBg : MarxBg.src;
 
 const LandingPage = () => {
     const router = useRouter();
+    const { t } = useTranslation();
     const { login, signUp } = useAuth();
     
     // Modal states
@@ -28,30 +30,30 @@ const LandingPage = () => {
         () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('donated') === 'true'
     );
 
-    // Login modal is now only opened by explicit user click on "Log In" buttons
+    // Login modal is now only opened by explicit user click on "{t('landing.logIn')}" buttons
     
     // Login form
-    const [loginEmail, setLoginEmail] = useState('');
-    const [loginPassword, setLoginPassword] = useState('');
+    const [login{t('landing.emailLabel')}, setLogin{t('landing.emailLabel')}] = useState('');
+    const [login{t('landing.passwordLabel')}, setLogin{t('landing.passwordLabel')}] = useState('');
     const [loginError, setLoginError] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
     
     // Register form
-    const [registerData, setRegisterData] = useState({
+    const [registerData, setregisterData] = useState({
         username: '',
         email: '',
         password: '',
-        confirmPassword: '',
+        confirm{t('landing.passwordLabel')}: '',
         inviteCode: '',
         betaReason: ''
     });
-    const [registerError, setRegisterError] = useState('');
-    const [registerLoading, setRegisterLoading] = useState(false);
-    const [registerSuccess, setRegisterSuccess] = useState(false);
+    const [registerError, setregisterError] = useState('');
+    const [registerLoading, setregisterLoading] = useState(false);
+    const [registerSuccess, setregisterSuccess] = useState(false);
     const [hasInviteCode, setHasInviteCode] = useState(false);
     
-    // Email signup (waitlist)
-    const [waitlistEmail, setWaitlistEmail] = useState('');
+    // {t('landing.emailLabel')} signup (waitlist)
+    const [waitlist{t('landing.emailLabel')}, setWaitlist{t('landing.emailLabel')}] = useState('');
     const [waitlistLoading, setWaitlistLoading] = useState(false);
     const [waitlistSuccess, setWaitlistSuccess] = useState(false);
     const [waitlistError, setWaitlistError] = useState('');
@@ -190,14 +192,14 @@ const LandingPage = () => {
         };
     }, [viewMode]);
 
-    // Feature card data (cinematic view)
+    // Feature card data (cinematic view) — shares wording with the normal view
     const features = [
-        { icon: GraduationCap, title: 'Study Center', desc: 'Structured learning paths, curated reading lists, and progress tracking for members.' },
-        { icon: FlaskConical, title: 'Science & Technology', desc: 'Courses and reference material spanning the natural sciences, mathematics, and technology.' },
-        { icon: BookOpen, title: 'Digital Library', desc: 'An expanding collection of texts, articles, and analyses, organised for accessibility.' },
-        { icon: BarChart3, title: 'Data & Visualizations', desc: 'Interactive charts and dashboards covering economic and social indicators.' },
-        { icon: PenTool, title: "Writers' Section", desc: 'A space for members to publish analysis, commentary, and research.' },
-        { icon: MessageSquare, title: 'Forum', desc: 'A space for discussion, debate, and collaborative reading.' },
+        { icon: GraduationCap, title: t('landing.featStudyTitle'), desc: t('landing.featStudyDesc') },
+        { icon: FlaskConical, title: t('nav.scienceTech'), desc: t('landing.featScienceDesc') },
+        { icon: BookOpen, title: t('nav.library'), desc: t('landing.featLibraryDesc') },
+        { icon: BarChart3, title: t('nav.data'), desc: t('landing.featDataDesc') },
+        { icon: PenTool, title: t('landing.featWritersTitle'), desc: t('landing.featWritersDesc') },
+        { icon: MessageSquare, title: t('landing.featForumTitle'), desc: t('landing.featForumDesc') },
     ];
 
     const handleLogin = async (e) => {
@@ -206,7 +208,7 @@ const LandingPage = () => {
         setLoginLoading(true);
 
         try {
-            const result = await login({ email: loginEmail, password: loginPassword });
+            const result = await login({ email: login{t('landing.emailLabel')}, password: login{t('landing.passwordLabel')} });
 
             if (result.error) {
                 setLoginError(result.error.message);
@@ -215,7 +217,7 @@ const LandingPage = () => {
                 router.push('/home');
             }
         } catch (err) {
-            setLoginError(err.message || 'Login failed. Please try again.');
+            setLoginError(err.message || t('landing.errLoginFailed'));
         } finally {
             setLoginLoading(false);
         }
@@ -223,19 +225,19 @@ const LandingPage = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        setRegisterError('');
+        setregisterError('');
         
-        if (registerData.password !== registerData.confirmPassword) {
-            setRegisterError('Passwords do not match');
+        if (registerData.password !== registerData.confirm{t('landing.passwordLabel')}) {
+            setregisterError('{t('landing.passwordLabel')}s do not match');
             return;
         }
         
         if (registerData.username.length < 3) {
-            setRegisterError('Username must be at least 3 characters');
+            setregisterError('{t('landing.usernameLabel')} must be at least 3 characters');
             return;
         }
 
-        setRegisterLoading(true);
+        setregisterLoading(true);
         
         // Pre-validate invite code via secure RPC before signup
         if (hasInviteCode && registerData.inviteCode) {
@@ -243,8 +245,8 @@ const LandingPage = () => {
                 p_code: registerData.inviteCode
             });
             if (valError || !validation?.valid) {
-                setRegisterError('Invalid or already used invite code');
-                setRegisterLoading(false);
+                setregisterError(t('landing.errInvalidInvite'));
+                setregisterLoading(false);
                 return;
             }
         }
@@ -258,11 +260,11 @@ const LandingPage = () => {
         });
         
         if (result.error) {
-            setRegisterError(result.error.message);
+            setregisterError(result.error.message);
         } else {
-            setRegisterSuccess(true);
+            setregisterSuccess(true);
         }
-        setRegisterLoading(false);
+        setregisterLoading(false);
     };
 
     const handleWaitlistSignup = async (e) => {
@@ -273,24 +275,24 @@ const LandingPage = () => {
         try {
             const { data, error } = await supabase.functions.invoke('waitlist-signup', {
                 body: {
-                    email: waitlistEmail.trim().toLowerCase(),
+                    email: waitlist{t('landing.emailLabel')}.trim().toLowerCase(),
                     notify_invite_codes: notifyInvites,
                     notify_public_beta: notifyBeta,
                 },
             });
 
             if (error) {
-                setWaitlistError('Failed to join. Please try again.');
+                setWaitlistError(t('landing.errJoinFailed'));
             } else if (data?.alreadyExists) {
-                setWaitlistError('This email is already on the list.');
+                setWaitlistError(t('landing.errAlreadyList'));
             } else if (data?.error) {
                 setWaitlistError(data.error);
             } else {
                 setWaitlistSuccess(true);
-                setRegisterSuccess(true);
+                setregisterSuccess(true);
             }
         } catch (err) {
-            setWaitlistError('Failed to join. Please try again.');
+            setWaitlistError(t('landing.errJoinFailed'));
         }
         setWaitlistLoading(false);
     };
@@ -304,10 +306,10 @@ const LandingPage = () => {
         <button
             onClick={() => setViewMode(v => v === 'cinematic' ? 'normal' : 'cinematic')}
             className="fixed top-5 left-5 z-[200] flex items-center gap-2 px-4 py-2.5 rounded-none bg-[#0b0d12]/90 border border-[#262a35] font-[Outfit,sans-serif] text-[10px] font-medium uppercase tracking-[0.22em] text-[#a5a194] hover:text-[#ece9e0] hover:border-[#d41f3d] transition-colors"
-            title={viewMode === 'cinematic' ? 'Switch to Normal View' : 'Switch to Cinematic View'}
+            title={viewMode === 'cinematic' ? t('landing.switchNormal') : t('landing.switchCinematic')}
         >
             <Layers size={13} strokeWidth={1.8} />
-            {viewMode === 'cinematic' ? 'Normal View' : 'Cinematic View'}
+            {viewMode === 'cinematic' ? t('landing.normalView') : t('landing.cinematicView')}
         </button>
     );
 
@@ -353,7 +355,7 @@ const LandingPage = () => {
                             </h1>
 
                             <p className="text-lg md:text-2xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                                A platform for the new generation<br />of Marxist theorists and researchers
+                                {t('landing.heroNew')}
                             </p>
 
                             <div className="flex flex-wrap justify-center gap-4 mb-6">
@@ -363,7 +365,7 @@ const LandingPage = () => {
                                     ref={registerHighlightable}
                                 >
                                     <Eye size={20} />
-                                    Browse as Guest
+                                    {t('landing.browseGuest')}
                                 </button>
                                 <button
                                     onClick={() => setShowLoginModal(true)}
@@ -371,7 +373,7 @@ const LandingPage = () => {
                                     ref={registerHighlightable}
                                 >
                                     <LogIn size={20} />
-                                    Log In
+                                    {t('landing.logIn')}
                                 </button>
                                 <button
                                     onClick={() => setShowRegisterModal(true)}
@@ -379,7 +381,7 @@ const LandingPage = () => {
                                     ref={registerHighlightable}
                                 >
                                     <UserPlus size={20} />
-                                    Register
+                                    {t('landing.register')}
                                 </button>
                             </div>
                             <button
@@ -387,28 +389,23 @@ const LandingPage = () => {
                                 className="landing-highlightable text-gray-500 hover:text-white transition text-sm font-medium tracking-wide"
                                 ref={registerHighlightable}
                             >
-                                About the Project
+                                {t('landing.aboutProject')}
                             </button>
                         </div>
                     </section>
 
-                    {/* The Vision */}
+                    {/* {t('landing.visionTitle')} */}
                     <section className="max-w-3xl mx-auto px-4 pb-24">
                         <div className="landing-parallax glass-card p-8 md:p-10" data-parallax="0.01" ref={registerParallax}>
-                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">The Vision</h2>
+                            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white">{t('landing.visionTitle')}</h2>
                             <p className="text-gray-300 mb-5 leading-relaxed">
-                                I am Leninistwarrior, as many know me across various platforms. Since November, I have been 
-                                dedicated to creating this platform with a singular vision: to revitalize authentic Marxist 
-                                analysis and provide a hub for writers with revolutionary potential.
+                                {t('landing.visionP1')}
                             </p>
                             <p className="text-gray-300 mb-5 leading-relaxed">
-                                In the latter part of the century, Marxism has been neglected and perverted beyond recognition. This site 
-                                aims to correct this trajectory by returning to scientific principles while addressing 
-                                contemporary conditions.
+                                {t('landing.visionP2')}
                             </p>
                             <p className="text-gray-300 mb-8 leading-relaxed">
-                                This site will primarily function as a writers' collective and community hub. As time progresses
-                                and our means increase, the digital library will be filled with essential texts and analysis.
+                                {t('landing.visionP3')}
                             </p>
                             <div className="flex flex-wrap items-center gap-4">
                                 <a 
@@ -419,7 +416,7 @@ const LandingPage = () => {
                                     ref={registerHighlightable}
                                 >
                                     <ExternalLink size={16} />
-                                    @Leninistwarrior on Twitter
+                                    {t('landing.twitter')}
                                 </a>
                                 <a
                                     href="https://JinbuJYG.com"
@@ -437,16 +434,16 @@ const LandingPage = () => {
                                     ref={registerHighlightable}
                                 >
                                     <Heart size={18} />
-                                    Support the Project
+                                    {t('landing.supportProject')}
                                 </button>
                             </div>
                         </div>
                     </section>
 
-                    {/* Platform Features */}
+                    {/* {t('landing.featuresTitle')} */}
                     <section className="max-w-6xl mx-auto px-4 pb-24">
                         <div className="landing-parallax" data-parallax="0.008" ref={registerParallax}>
-                            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-white">Platform Features</h2>
+                            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-white">{t('landing.featuresTitle')}</h2>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {features.map((f, i) => {
                                     const Icon = f.icon;
@@ -462,30 +459,30 @@ const LandingPage = () => {
                         </div>
                     </section>
 
-                    {/* Stay Updated */}
+                    {/* {t('landing.stayUpdatedTitle')} */}
                     <section className="max-w-xl mx-auto px-4 pb-24">
                         <div className="landing-parallax glass-card p-8" data-parallax="0.01" ref={registerParallax}>
                             <div className="flex items-center gap-2 mb-4">
                                 <Mail className="text-red-700" size={24} />
-                                <h2 className="text-2xl font-bold text-white">Stay Updated</h2>
+                                <h2 className="text-2xl font-bold text-white">{t('landing.stayUpdatedTitle')}</h2>
                             </div>
                             <p className="text-gray-400 mb-6">
-                                Join our notification list to be informed when new invite codes are available or when we launch public beta.
+                                {t('landing.stayUpdatedDesc')}
                             </p>
                             
                             {waitlistSuccess ? (
                                 <div className="text-center py-4">
                                     <CheckCircle size={48} className="mx-auto text-green-500 mb-3" />
-                                    <p className="text-green-400 font-semibold">You're on the list!</p>
-                                    <p className="text-gray-400 text-sm">We'll notify you when spots open up.</p>
+                                    <p className="text-green-400 font-semibold">{t('landing.onTheList')}</p>
+                                    <p className="text-gray-400 text-sm">{t('landing.notifySpots')}</p>
                                 </div>
                             ) : (
                                 <form onSubmit={handleWaitlistSignup} className="space-y-4">
                                     <input
                                         type="email"
-                                        value={waitlistEmail}
-                                        onChange={(e) => setWaitlistEmail(e.target.value)}
-                                        placeholder="Enter your email"
+                                        value={waitlist{t('landing.emailLabel')}}
+                                        onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
+                                        placeholder={t('landing.emailPlaceholder')}
                                         className="w-full p-3 bg-black/40 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white placeholder-gray-500"
                                         required
                                     />
@@ -497,7 +494,7 @@ const LandingPage = () => {
                                                 onChange={(e) => setNotifyInvites(e.target.checked)}
                                                 className="accent-red-800"
                                             />
-                                            <span className="text-gray-300">Notify me when invite codes are available</span>
+                                            <span className="text-gray-300">{t('landing.notifyInvites')}</span>
                                         </label>
                                         <label className="flex items-center gap-2 cursor-pointer">
                                             <input
@@ -506,7 +503,7 @@ const LandingPage = () => {
                                                 onChange={(e) => setNotifyBeta(e.target.checked)}
                                                 className="accent-red-800"
                                             />
-                                            <span className="text-gray-300">Notify me when public beta launches</span>
+                                            <span className="text-gray-300">{t('landing.notifyBeta')}</span>
                                         </label>
                                     </div>
                                     {waitlistError && (
@@ -520,7 +517,7 @@ const LandingPage = () => {
                                         className="w-full p-3 btn-primary-red rounded-lg font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {waitlistLoading ? <Loader2 className="animate-spin" size={20} /> : <ArrowRight size={20} />}
-                                        {waitlistLoading ? 'Joining...' : 'Join Notification List'}
+                                        {waitlistLoading ? t('landing.joining') : '{t('landing.joinList')}'}
                                     </button>
                                 </form>
                             )}
@@ -530,9 +527,9 @@ const LandingPage = () => {
                     {/* Footer */}
                     <footer className="border-t border-gray-800/50 py-8">
                         <div className="max-w-6xl mx-auto px-4 text-center text-gray-600 text-sm">
-                            <p>&copy; 2026 Marxist.info &mdash; Advancing Revolutionary Theory</p>
+                            <p>&copy; 2026 Marxist.info &mdash; {t('landing.tagline')}</p>
                             <p className="mt-2">
-                                Made and owned by{' '}
+                                {t('landing.madeOwned')}{' '}
                                 <a
                                     href="https://JinbuJYG.com"
                                     target="_blank"
@@ -570,7 +567,7 @@ const LandingPage = () => {
                         }}
                     >
                         <CheckCircle size={18} />
-                        Thank you for your support! The revolution lives on. ✊
+                        {t('landing.donatedBanner')}
                         <button
                             onClick={() => setShowDonatedBanner(false)}
                             style={{ marginLeft: '0.5rem', opacity: 0.7, cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}
@@ -592,28 +589,28 @@ const LandingPage = () => {
                     <div className="modal-backdrop">
                         <div className="modal-panel">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-white">Log In</h2>
+                                <h2 className="text-2xl font-bold text-white">{t('landing.logIn')}</h2>
                                 <button onClick={() => setShowLoginModal(false)} className="text-gray-400 hover:text-white transition">
                                     <X size={24} />
                                 </button>
                             </div>
                             <form onSubmit={handleLogin} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                     <input
                                         type="email"
-                                        value={loginEmail}
-                                        onChange={(e) => setLoginEmail(e.target.value)}
+                                        value={login{t('landing.emailLabel')}}
+                                        onChange={(e) => setLogin{t('landing.emailLabel')}(e.target.value)}
                                         className="w-full p-3"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
+                                    <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.passwordLabel')}</label>
                                     <input
                                         type="password"
-                                        value={loginPassword}
-                                        onChange={(e) => setLoginPassword(e.target.value)}
+                                        value={login{t('landing.passwordLabel')}}
+                                        onChange={(e) => setLogin{t('landing.passwordLabel')}(e.target.value)}
                                         className="w-full p-3"
                                         required
                                     />
@@ -629,7 +626,7 @@ const LandingPage = () => {
                                             disabled={loginLoading}
                                             className="shrink-0 rounded border border-red-500/50 px-3 py-1 font-medium text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                                         >
-                                            Retry
+                                            {t('landing.retry')}
                                         </button>
                                     </div>
                                 )}
@@ -639,16 +636,16 @@ const LandingPage = () => {
                                     className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {loginLoading && <Loader2 className="animate-spin" size={20} />}
-                                    {loginLoading ? 'Logging in...' : 'Log In'}
+                                    {loginLoading ? t('landing.loggingIn') : '{t('landing.logIn')}'}
                                 </button>
                             </form>
                             <p className="text-center text-gray-500 mt-4 text-sm">
-                                Don't have an account?{' '}
+                                {t('landing.noAccountPrefix')}{' '}
                                 <button 
                                     onClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }}
                                     className="text-red-500 hover:underline"
                                 >
-                                    Register
+                                    {t('landing.register')}
                                 </button>
                             </p>
                         </div>
@@ -660,8 +657,8 @@ const LandingPage = () => {
                     <div className="modal-backdrop">
                         <div className="modal-panel">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-white">Create Account</h2>
-                                <button onClick={() => { setShowRegisterModal(false); setRegisterSuccess(false); setWaitlistError(''); setRegisterError(''); }} className="text-gray-400 hover:text-white transition">
+                                <h2 className="text-2xl font-bold text-white">{t('landing.createAccount')}</h2>
+                                <button onClick={() => { setShowRegisterModal(false); setregisterSuccess(false); setWaitlistError(''); setregisterError(''); }} className="text-gray-400 hover:text-white transition">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -671,20 +668,20 @@ const LandingPage = () => {
                                     <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
                                     {hasInviteCode ? (
                                         <>
-                                            <h3 className="text-xl font-semibold mb-2 text-white">Check Your Email</h3>
+                                            <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.check{t('landing.emailLabel')}Title')}</h3>
                                             <p className="text-gray-300 mb-4">
-                                                We've sent a confirmation link to <span className="text-red-500">{registerData.email}</span>
+                                                {t('landing.sentLinkTo')} <span className="text-red-500">{registerData.email}</span>
                                             </p>
                                             <p className="text-green-400 text-sm">
                                                 <Sparkles size={16} className="inline mr-1" />
-                                                Your invite code will be applied after email confirmation.
+                                                {t('landing.inviteApplied')}
                                             </p>
                                         </>
                                     ) : (
                                         <>
-                                            <h3 className="text-xl font-semibold mb-2 text-white">You're on the list</h3>
+                                            <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.onTheList')}</h3>
                                             <p className="text-gray-300">
-                                                We'll notify <span className="text-red-500">{registerData.email}</span> when access opens up.
+                                                We'll notify <span className="text-red-500">{registerData.email}</span> {t('landing.notifySpots')}
                                             </p>
                                         </>
                                     )}
@@ -696,13 +693,13 @@ const LandingPage = () => {
                                             <input
                                                 type="checkbox"
                                                 checked={hasInviteCode}
-                                                onChange={(e) => { setHasInviteCode(e.target.checked); setRegisterError(''); }}
+                                                onChange={(e) => { setHasInviteCode(e.target.checked); setregisterError(''); }}
                                                 className="accent-red-800"
                                             />
-                                            <span className="font-medium text-white">I have an invite code</span>
+                                            <span className="font-medium text-white">{t('landing.haveInviteCode')}</span>
                                         </label>
                                         <p className="text-gray-500 text-xs mt-1">
-                                            Invite codes grant immediate full access
+                                            {t('landing.inviteGrant')}
                                         </p>
                                     </div>
 
@@ -710,58 +707,58 @@ const LandingPage = () => {
                                         <>
                                             <div>
                                                 <label className="block text-sm font-medium mb-2 text-gray-300 flex items-center gap-1">
-                                                    <Sparkles size={14} className="text-yellow-500" /> Invite Code
+                                                    <Sparkles size={14} className="text-yellow-500" /> {t('landing.inviteCodeLabel')}
                                                 </label>
                                                 <input
                                                     type="text"
                                                     value={registerData.inviteCode}
-                                                    onChange={(e) => setRegisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
+                                                    onChange={(e) => setregisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
                                                     className="w-full p-3 uppercase tracking-wider"
                                                     style={{ borderColor: 'rgba(202,138,4,0.5)' }}
-                                                    placeholder="XXXX-XXXX"
+                                                    placeholder={t("landing.inviteCodeLabel").slice(0,4) + "-XXXX"}
                                                     required
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.usernameLabel')}</label>
                                                 <input
                                                     type="text"
                                                     value={registerData.username}
-                                                    onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
+                                                    onChange={(e) => setregisterData({...registerData, username: e.target.value})}
                                                     className="w-full p-3"
-                                                    placeholder="Min. 3 characters"
+                                                    placeholder={t('landing.usernamePlaceholder')}
                                                     minLength={3}
                                                     required
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                                 <input
                                                     type="email"
                                                     value={registerData.email}
-                                                    onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                                                    onChange={(e) => setregisterData({...registerData, email: e.target.value})}
                                                     className="w-full p-3"
                                                     required
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.passwordLabel')}</label>
                                                 <input
                                                     type="password"
                                                     value={registerData.password}
-                                                    onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                                                    onChange={(e) => setregisterData({...registerData, password: e.target.value})}
                                                     className="w-full p-3"
-                                                    placeholder="Min. 6 characters"
+                                                    placeholder={t('landing.passwordPlaceholder')}
                                                     minLength={6}
                                                     required
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-2 text-gray-300">Confirm Password</label>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.confirmPassword')}</label>
                                                 <input
                                                     type="password"
-                                                    value={registerData.confirmPassword}
-                                                    onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                                                    value={registerData.confirm{t('landing.passwordLabel')}}
+                                                    onChange={(e) => setregisterData({...registerData, confirm{t('landing.passwordLabel')}: e.target.value})}
                                                     className="w-full p-3"
                                                     required
                                                 />
@@ -770,18 +767,18 @@ const LandingPage = () => {
                                     ) : (
                                         <>
                                             <div>
-                                                <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                                 <input
                                                     type="email"
-                                                    value={waitlistEmail}
-                                                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                                                    value={waitlist{t('landing.emailLabel')}}
+                                                    onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
                                                     className="w-full p-3"
-                                                    placeholder="your@email.com"
+                                                    placeholder={t('landing.yourEmail')}
                                                     required
                                                 />
                                             </div>
                                             <p className="text-gray-500 text-xs">
-                                                You'll be notified when access opens up. No account is created.
+                                                {t('landing.notifyNoAccount')}
                                             </p>
                                         </>
                                     )}
@@ -798,18 +795,18 @@ const LandingPage = () => {
                                         className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                     >
                                         {(registerLoading || waitlistLoading) && <Loader2 className="animate-spin" size={20} />}
-                                        {registerLoading ? 'Creating Account...' : waitlistLoading ? 'Joining...' : hasInviteCode ? 'Register' : 'Join Waitlist'}
+                                        {registerLoading ? t('landing.creatingAccount') : waitlistLoading ? t('landing.joining') : hasInviteCode ? t('landing.register') : t('landing.joinWaitlist')}
                                     </button>
                                 </form>
                             )}
                             
                             <p className="text-center text-gray-500 mt-4 text-sm">
-                                Already have an account?{' '}
+                                {t('landing.hasAccountPrefix')}{' '}
                                 <button 
                                     onClick={() => { setShowRegisterModal(false); setShowLoginModal(true); }}
                                     className="text-red-500 hover:underline"
                                 >
-                                    Log In
+                                    {t('landing.logIn')}
                                 </button>
                             </p>
                         </div>
@@ -821,7 +818,7 @@ const LandingPage = () => {
                     <div className="modal-backdrop">
                         <div className="modal-panel modal-panel-wide">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-bold text-white">About Marxist.info</h2>
+                                <h2 className="text-2xl font-bold text-white">{t('landing.aboutTitle')}</h2>
                                 <button onClick={() => setShowAboutModal(false)} className="text-gray-400 hover:text-white transition">
                                     <X size={24} />
                                 </button>
@@ -829,31 +826,26 @@ const LandingPage = () => {
                             
                             <div className="max-w-none">
                                 <p className="text-gray-300 mb-5 leading-relaxed">
-                                    Marxist.info is a digital platform dedicated to advancing Marxist theory and research in the 21st century. 
-                                    Our mission is to provide a comprehensive resource for scholars, students, and activists interested in 
-                                    understanding and applying Marxist analysis to contemporary issues.
+                                    {t('landing.aboutP1')}
                                 </p>
                                 
-                                <h3 className="text-xl font-semibold text-white mt-6 mb-3">What We Offer</h3>
+                                <h3 className="text-xl font-semibold text-white mt-6 mb-3">{t('landing.whatWeOffer')}</h3>
                                 <ul className="text-gray-300 space-y-2 list-disc list-inside mb-4">
-                                    <li>A curated digital library of classic and contemporary Marxist texts</li>
-                                    <li>Interactive timelines of historical events and theoretical developments</li>
-                                    <li>A glossary of key concepts and terminology</li>
-                                    <li>Discussion forums for theoretical debate and collaboration</li>
-                                    <li>Study tools and resources for individual and group learning</li>
+                                    <li>{t('landing.offer1')}</li>
+                                    <li>{t('landing.offer2')}</li>
+                                    <li>{t('landing.offer3')}</li>
+                                    <li>{t('landing.offer4')}</li>
+                                    <li>{t('landing.offer5')}</li>
                                 </ul>
                                 
-                                <h3 className="text-xl font-semibold text-white mt-6 mb-3">Early Access</h3>
+                                <h3 className="text-xl font-semibold text-white mt-6 mb-3">{t('landing.earlyAccessTitle')}</h3>
                                 <p className="text-gray-300 mb-4 leading-relaxed">
-                                    We're currently in early access with limited spots available. Users with invite codes get 
-                                    immediate full access, while others can join our waitlist to be notified when more spots 
-                                    open up or when we launch public beta.
+                                    {t('landing.earlyAccessP')}
                                 </p>
                                 
-                                <h3 className="text-xl font-semibold text-white mt-6 mb-3">Guest Access</h3>
+                                <h3 className="text-xl font-semibold text-white mt-6 mb-3">{t('landing.guestAccessTitle')}</h3>
                                 <p className="text-gray-300 leading-relaxed">
-                                    You can browse the Home page and Digital Library as a guest without an account.
-                                    Full features like Theory, Study tools, Forum, and Profile require registration with an invite code.
+                                    {t('landing.guestAccessP')}
                                 </p>
                             </div>
                             
@@ -862,13 +854,13 @@ const LandingPage = () => {
                                     onClick={() => { setShowAboutModal(false); setShowRegisterModal(true); }}
                                     className="modal-btn-primary flex-1 p-3"
                                 >
-                                    Register Now
+                                    {t('landing.registerNow')}
                                 </button>
                                 <button
                                     onClick={() => setShowAboutModal(false)}
                                     className="modal-btn-ghost px-6 py-3"
                                 >
-                                    Close
+                                    {t('landing.closeBtn')}
                                 </button>
                             </div>
                         </div>
@@ -893,7 +885,7 @@ const LandingPage = () => {
                             <span className="text-red-600">Marxist</span>.info
                         </h1>
                         <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8">
-                            A platform for the new generation of Marxist theorists and researchers
+                            {t('landing.heroNew')}
                         </p>
                         
                         {/* Main Action Buttons */}
@@ -903,27 +895,27 @@ const LandingPage = () => {
                                 className="modal-btn-ghost flex items-center gap-2 px-6 py-3"
                             >
                                 <Eye size={20} />
-                                Browse as Guest
+                                {t('landing.browseGuest')}
                             </button>
                             <button
                                 onClick={() => setShowLoginModal(true)}
                                 className="modal-btn-primary flex items-center gap-2 px-6 py-3"
                             >
                                 <LogIn size={20} />
-                                Log In
+                                {t('landing.logIn')}
                             </button>
                             <button
                                 onClick={() => setShowRegisterModal(true)}
                                 className="flex items-center gap-2 px-6 py-3 rounded-none font-semibold transition" style={{ border: '1px solid rgba(179, 18, 46,0.28)', background: 'transparent', color: '#fff' }}
                             >
                                 <UserPlus size={20} />
-                                Register
+                                {t('landing.register')}
                             </button>
                             <button
                                 onClick={() => setShowAboutModal(true)}
                                 className="flex items-center gap-2 px-6 py-3 text-gray-400 hover:text-white transition"
                             >
-                                About the Project
+                                {t('landing.aboutProject')}
                             </button>
                         </div>
                     </div>
@@ -931,20 +923,15 @@ const LandingPage = () => {
                     {/* Introduction */}
                     <div className="max-w-4xl mx-auto mb-16">
                         <div className="p-8 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
-                            <h2 className="text-2xl font-bold mb-4">The Vision</h2>
+                            <h2 className="text-2xl font-bold mb-4">{t('landing.visionTitle')}</h2>
                             <p className="text-gray-300 mb-4">
-                                I am Leninistwarrior, as many know me across various platforms. Since November, I have been 
-                                dedicated to creating this platform with a singular vision: to revitalize authentic Marxist 
-                                analysis and provide a hub for writers with revolutionary potential.
+                                {t('landing.visionP1')}
                             </p>
                             <p className="text-gray-300 mb-4">
-                                In the latter part of the century, Marxism has been neglected and perverted beyond recognition. This site 
-                                aims to correct this trajectory by returning to scientific principles while addressing 
-                                contemporary conditions.
+                                {t('landing.visionP2')}
                             </p>
                             <p className="text-gray-300 mb-6">
-                                This site will primarily function as a writers' collective and community hub. As time progresses
-                                and our means increase, the digital library will be filled with essential texts and analysis.
+                                {t('landing.visionP3')}
                             </p>
                             <div className="flex flex-wrap items-center gap-4">
                                 <a 
@@ -954,7 +941,7 @@ const LandingPage = () => {
                                     className="flex items-center gap-2 text-red-400 hover:text-red-300 transition font-medium"
                                 >
                                     <ExternalLink size={16} />
-                                    @Leninistwarrior on Twitter
+                                    {t('landing.twitter')}
                                 </a>
                                 <a
                                     href="https://JinbuJYG.com"
@@ -970,7 +957,7 @@ const LandingPage = () => {
                                     className="btn-donate flex items-center gap-2 px-5 py-2.5 rounded-none font-semibold transition"
                                 >
                                     <Heart size={18} />
-                                    Support the Project
+                                    {t('landing.supportProject')}
                                 </button>
                             </div>
                         </div>
@@ -978,64 +965,64 @@ const LandingPage = () => {
 
                     {/* Site Features */}
                     <div className="mb-16">
-                        <h2 className="text-3xl font-bold text-center mb-8">Platform Features</h2>
+                        <h2 className="text-3xl font-bold text-center mb-8">{t('landing.featuresTitle')}</h2>
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <GraduationCap className="text-red-600 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Study Page</h3>
-                                <p className="text-gray-400">A structured learning environment featuring curated reading lists, study guides, and theoretical discussions to develop Marxist understanding systematically.</p>
+                                <h3 className="text-xl font-bold mb-2">{t('landing.featStudyTitle')}</h3>
+                                <p className="text-gray-400">{t('landing.featStudyDesc')}</p>
                             </div>
                             <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <FlaskConical className="text-red-600 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Science & Technology</h3>
-                                <p className="text-gray-400">As Lenin emphasized, communists should know everything mankind has to offer. Dedicated to ensuring Marxists are thoroughly educated in natural sciences and all fields of human knowledge.</p>
+                                <h3 className="text-xl font-bold mb-2">{t('nav.scienceTech')}</h3>
+                                <p className="text-gray-400">{t('landing.featScienceDesc')}</p>
                             </div>
                             <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <BookOpen className="text-red-600 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Digital Library</h3>
-                                <p className="text-gray-400">An expanding collection of essential Marxist texts, articles, and analyses, organized and annotated for accessibility and theoretical development.</p>
+                                <h3 className="text-xl font-bold mb-2">{t('nav.library')}</h3>
+                                <p className="text-gray-400">{t('landing.featLibraryDesc')}</p>
                             </div>
                             <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <BarChart3 className="text-red-600 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Data & Visualizations</h3>
-                                <p className="text-gray-400">Tools for tracking global economic developments and staying updated on the evolving conditions of capitalist production and class struggle.</p>
+                                <h3 className="text-xl font-bold mb-2">{t('landing.featDataTitle')}</h3>
+                                <p className="text-gray-400">{t('landing.featDataDesc')}</p>
                             </div>
                             <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <PenTool className="text-red-600 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Writers' Collective</h3>
-                                <p className="text-gray-400">A collaborative space for developing revolutionary thinkers and writers, emphasizing quality theoretical work that contributes to the Marxist tradition.</p>
+                                <h3 className="text-xl font-bold mb-2">{t('landing.featWritersTitle')}</h3>
+                                <p className="text-gray-400">{t('landing.featWritersDesc')}</p>
                             </div>
                             <div className="p-6 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <MessageSquare className="text-red-600 mb-4" size={32} />
-                                <h3 className="text-xl font-bold mb-2">Discussion Forum</h3>
-                                <p className="text-gray-400">Engage in theoretical discussions with fellow researchers, theorists, and activists building revolutionary understanding.</p>
+                                <h3 className="text-xl font-bold mb-2">{t('landing.featForumTitle')}</h3>
+                                <p className="text-gray-400">{t('landing.featForumDesc')}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Email Signup Section */}
+                    {/* {t('landing.emailLabel')} Signup Section */}
                     <div className="max-w-xl mx-auto p-8 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
                         <div className="flex items-center gap-2 mb-4">
                             <Mail className="text-red-600" size={24} />
-                            <h2 className="text-2xl font-bold">Stay Updated</h2>
+                            <h2 className="text-2xl font-bold">{t('landing.stayUpdatedTitle')}</h2>
                         </div>
                         <p className="text-gray-400 mb-6">
-                            Join our notification list to be informed when new invite codes are available or when we launch public beta.
+                            {t('landing.stayUpdatedDesc')}
                         </p>
                         
                         {waitlistSuccess ? (
                             <div className="text-center py-4">
                                 <CheckCircle size={48} className="mx-auto text-green-500 mb-3" />
-                                <p className="text-green-400 font-semibold">You're on the list!</p>
-                                <p className="text-gray-400 text-sm">We'll notify you when spots open up.</p>
+                                <p className="text-green-400 font-semibold">{t('landing.onTheList')}</p>
+                                <p className="text-gray-400 text-sm">{t('landing.notifySpots')}</p>
                             </div>
                         ) : (
                             <form onSubmit={handleWaitlistSignup} className="space-y-4">
                                 <input
                                     type="email"
-                                    value={waitlistEmail}
-                                    onChange={(e) => setWaitlistEmail(e.target.value)}
-                                    placeholder="Enter your email"
+                                    value={waitlist{t('landing.emailLabel')}}
+                                    onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
+                                    placeholder={t('landing.emailPlaceholder')}
                                     className="w-full p-3 rounded-none focus:outline-none"
                                     style={{ background: '#1a1f2b', border: '1px solid rgba(255,255,255,0.06)', color: '#fff' }}
                                     required
@@ -1048,7 +1035,7 @@ const LandingPage = () => {
                                             onChange={(e) => setNotifyInvites(e.target.checked)}
                                             className="accent-red-800"
                                         />
-                                        <span className="text-gray-300">Notify me when invite codes are available</span>
+                                        <span className="text-gray-300">{t('landing.notifyInvites')}</span>
                                     </label>
                                     <label className="flex items-center gap-2 cursor-pointer">
                                         <input
@@ -1057,7 +1044,7 @@ const LandingPage = () => {
                                             onChange={(e) => setNotifyBeta(e.target.checked)}
                                             className="accent-red-800"
                                         />
-                                        <span className="text-gray-300">Notify me when public beta launches</span>
+                                        <span className="text-gray-300">{t('landing.notifyBeta')}</span>
                                     </label>
                                 </div>
                                 {waitlistError && (
@@ -1071,7 +1058,7 @@ const LandingPage = () => {
                                     className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {waitlistLoading ? <Loader2 className="animate-spin" size={20} /> : <ArrowRight size={20} />}
-                                    {waitlistLoading ? 'Joining...' : 'Join Notification List'}
+                                    {waitlistLoading ? t('landing.joining') : '{t('landing.joinList')}'}
                                 </button>
                             </form>
                         )}
@@ -1103,7 +1090,7 @@ const LandingPage = () => {
                     }}
                 >
                     <CheckCircle size={18} />
-                    Thank you for your support! The revolution lives on. ✊
+                    {t('landing.donatedBanner')}
                     <button
                         onClick={() => setShowDonatedBanner(false)}
                         style={{ marginLeft: '0.5rem', opacity: 0.7, cursor: 'pointer', background: 'none', border: 'none', color: 'inherit' }}
@@ -1123,28 +1110,28 @@ const LandingPage = () => {
                 <div className="modal-backdrop">
                     <div className="modal-panel">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-white">Log In</h2>
+                            <h2 className="text-2xl font-bold text-white">{t('landing.logIn')}</h2>
                             <button onClick={() => setShowLoginModal(false)} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
                         </div>
                         <form onSubmit={handleLogin} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                 <input
                                     type="email"
-                                    value={loginEmail}
-                                    onChange={(e) => setLoginEmail(e.target.value)}
+                                    value={login{t('landing.emailLabel')}}
+                                    onChange={(e) => setLogin{t('landing.emailLabel')}(e.target.value)}
                                     className="w-full p-3"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
+                                <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.passwordLabel')}</label>
                                 <input
                                     type="password"
-                                    value={loginPassword}
-                                    onChange={(e) => setLoginPassword(e.target.value)}
+                                    value={login{t('landing.passwordLabel')}}
+                                    onChange={(e) => setLogin{t('landing.passwordLabel')}(e.target.value)}
                                     className="w-full p-3"
                                     required
                                 />
@@ -1160,7 +1147,7 @@ const LandingPage = () => {
                                         disabled={loginLoading}
                                         className="shrink-0 rounded border border-red-500/50 px-3 py-1 font-medium text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                                     >
-                                        Retry
+                                        {t('landing.retry')}
                                     </button>
                                 </div>
                             )}
@@ -1170,16 +1157,16 @@ const LandingPage = () => {
                                 className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                             >
                                 {loginLoading && <Loader2 className="animate-spin" size={20} />}
-                                {loginLoading ? 'Logging in...' : 'Log In'}
+                                {loginLoading ? t('landing.loggingIn') : '{t('landing.logIn')}'}
                             </button>
                         </form>
                         <p className="text-center text-gray-500 mt-4 text-sm">
-                            Don't have an account?{' '}
+                            {t('landing.noAccountPrefix')}{' '}
                             <button 
                                 onClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }}
                                 className="text-red-500 hover:underline"
                             >
-                                Register
+                                {t('landing.register')}
                             </button>
                         </p>
                     </div>
@@ -1191,8 +1178,8 @@ const LandingPage = () => {
                 <div className="modal-backdrop">
                     <div className="modal-panel">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-white">Create Account</h2>
-                            <button onClick={() => { setShowRegisterModal(false); setRegisterSuccess(false); setWaitlistError(''); setRegisterError(''); }} className="text-gray-400 hover:text-white transition">
+                            <h2 className="text-2xl font-bold text-white">{t('landing.createAccount')}</h2>
+                            <button onClick={() => { setShowRegisterModal(false); setregisterSuccess(false); setWaitlistError(''); setregisterError(''); }} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
                         </div>
@@ -1202,20 +1189,20 @@ const LandingPage = () => {
                                 <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
                                 {hasInviteCode ? (
                                     <>
-                                        <h3 className="text-xl font-semibold mb-2 text-white">Check Your Email</h3>
+                                        <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.check{t('landing.emailLabel')}Title')}</h3>
                                         <p className="text-gray-300 mb-4">
-                                            We've sent a confirmation link to <span className="text-red-500">{registerData.email}</span>
+                                            {t('landing.sentLinkTo')} <span className="text-red-500">{registerData.email}</span>
                                         </p>
                                         <p className="text-green-400 text-sm">
                                             <Sparkles size={16} className="inline mr-1" />
-                                            Your invite code will be applied after email confirmation.
+                                            {t('landing.inviteApplied')}
                                         </p>
                                     </>
                                 ) : (
                                     <>
-                                        <h3 className="text-xl font-semibold mb-2 text-white">You're on the list</h3>
+                                        <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.onTheList')}</h3>
                                         <p className="text-gray-300">
-                                            We'll notify <span className="text-red-500">{waitlistEmail}</span> when access opens up.
+                                            We'll notify <span className="text-red-500">{waitlist{t('landing.emailLabel')}}</span> {t('landing.notifySpots')}
                                         </p>
                                     </>
                                 )}
@@ -1227,13 +1214,13 @@ const LandingPage = () => {
                                         <input
                                             type="checkbox"
                                             checked={hasInviteCode}
-                                            onChange={(e) => { setHasInviteCode(e.target.checked); setRegisterError(''); }}
+                                            onChange={(e) => { setHasInviteCode(e.target.checked); setregisterError(''); }}
                                             className="accent-red-800"
                                         />
-                                        <span className="font-medium text-white">I have an invite code</span>
+                                        <span className="font-medium text-white">{t('landing.haveInviteCode')}</span>
                                     </label>
                                     <p className="text-gray-500 text-xs mt-1">
-                                        Invite codes grant immediate full access
+                                        {t('landing.inviteGrant')}
                                     </p>
                                 </div>
 
@@ -1241,58 +1228,58 @@ const LandingPage = () => {
                                     <>
                                         <div>
                                             <label className="block text-sm font-medium mb-2 text-gray-300 flex items-center gap-1">
-                                                <Sparkles size={14} className="text-yellow-500" /> Invite Code
+                                                <Sparkles size={14} className="text-yellow-500" /> {t('landing.inviteCodeLabel')}
                                             </label>
                                             <input
                                                 type="text"
                                                 value={registerData.inviteCode}
-                                                onChange={(e) => setRegisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
+                                                onChange={(e) => setregisterData({...registerData, inviteCode: e.target.value.toUpperCase()})}
                                                 className="w-full p-3 uppercase tracking-wider"
                                                 style={{ borderColor: 'rgba(202,138,4,0.5)' }}
-                                                placeholder="XXXX-XXXX"
+                                                placeholder={t("landing.inviteCodeLabel").slice(0,4) + "-XXXX"}
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">Username</label>
+                                            <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.usernameLabel')}</label>
                                             <input
                                                 type="text"
                                                 value={registerData.username}
-                                                onChange={(e) => setRegisterData({...registerData, username: e.target.value})}
+                                                onChange={(e) => setregisterData({...registerData, username: e.target.value})}
                                                 className="w-full p-3"
-                                                placeholder="Min. 3 characters"
+                                                placeholder={t('landing.usernamePlaceholder')}
                                                 minLength={3}
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                            <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                             <input
                                                 type="email"
                                                 value={registerData.email}
-                                                onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                                                onChange={(e) => setregisterData({...registerData, email: e.target.value})}
                                                 className="w-full p-3"
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">Password</label>
+                                            <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.passwordLabel')}</label>
                                             <input
                                                 type="password"
                                                 value={registerData.password}
-                                                onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                                                onChange={(e) => setregisterData({...registerData, password: e.target.value})}
                                                 className="w-full p-3"
-                                                placeholder="Min. 6 characters"
+                                                placeholder={t('landing.passwordPlaceholder')}
                                                 minLength={6}
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">Confirm Password</label>
+                                            <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.confirmPassword')}</label>
                                             <input
                                                 type="password"
-                                                value={registerData.confirmPassword}
-                                                onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                                                value={registerData.confirm{t('landing.passwordLabel')}}
+                                                onChange={(e) => setregisterData({...registerData, confirm{t('landing.passwordLabel')}: e.target.value})}
                                                 className="w-full p-3"
                                                 required
                                             />
@@ -1301,18 +1288,18 @@ const LandingPage = () => {
                                 ) : (
                                     <>
                                         <div>
-                                            <label className="block text-sm font-medium mb-2 text-gray-300">Email</label>
+                                            <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                             <input
                                                 type="email"
-                                                value={waitlistEmail}
-                                                onChange={(e) => setWaitlistEmail(e.target.value)}
+                                                value={waitlist{t('landing.emailLabel')}}
+                                                onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
                                                 className="w-full p-3"
-                                                placeholder="your@email.com"
+                                                placeholder={t('landing.yourEmail')}
                                                 required
                                             />
                                         </div>
                                         <p className="text-gray-500 text-xs">
-                                            You'll be notified when access opens up. No account is created.
+                                            {t('landing.notifyNoAccount')}
                                         </p>
                                     </>
                                 )}
@@ -1329,18 +1316,18 @@ const LandingPage = () => {
                                     className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {(registerLoading || waitlistLoading) && <Loader2 className="animate-spin" size={20} />}
-                                    {registerLoading ? 'Creating Account...' : waitlistLoading ? 'Joining...' : hasInviteCode ? 'Register' : 'Join Waitlist'}
+                                    {registerLoading ? t('landing.creatingAccount') : waitlistLoading ? t('landing.joining') : hasInviteCode ? t('landing.register') : t('landing.joinWaitlist')}
                                 </button>
                             </form>
                         )}
                         
                         <p className="text-center text-gray-500 mt-4 text-sm">
-                            Already have an account?{' '}
+                            {t('landing.hasAccountPrefix')}{' '}
                             <button 
                                 onClick={() => { setShowRegisterModal(false); setShowLoginModal(true); }}
                                 className="text-red-500 hover:underline"
                             >
-                                Log In
+                                {t('landing.logIn')}
                             </button>
                         </p>
                     </div>
@@ -1352,7 +1339,7 @@ const LandingPage = () => {
                 <div className="modal-backdrop">
                     <div className="modal-panel modal-panel-wide">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-white">About Marxist.info</h2>
+                            <h2 className="text-2xl font-bold text-white">{t('landing.aboutTitle')}</h2>
                             <button onClick={() => setShowAboutModal(false)} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
@@ -1360,31 +1347,26 @@ const LandingPage = () => {
                         
                         <div className="max-w-none">
                             <p className="text-gray-300 mb-5 leading-relaxed">
-                                Marxist.info is a digital platform dedicated to advancing Marxist theory and research in the 21st century. 
-                                Our mission is to provide a comprehensive resource for scholars, students, and activists interested in 
-                                understanding and applying Marxist analysis to contemporary issues.
+                                {t('landing.aboutP1')}
                             </p>
                             
-                            <h3 className="text-xl font-semibold text-white mt-6 mb-3">What We Offer</h3>
+                            <h3 className="text-xl font-semibold text-white mt-6 mb-3">{t('landing.whatWeOffer')}</h3>
                             <ul className="text-gray-300 space-y-2 list-disc list-inside mb-4">
-                                <li>A curated digital library of classic and contemporary Marxist texts</li>
-                                <li>Interactive timelines of historical events and theoretical developments</li>
-                                <li>A glossary of key concepts and terminology</li>
-                                <li>Discussion forums for theoretical debate and collaboration</li>
-                                <li>Study tools and resources for individual and group learning</li>
+                                <li>{t('landing.offer1')}</li>
+                                <li>{t('landing.offer2')}</li>
+                                <li>{t('landing.offer3')}</li>
+                                <li>{t('landing.offer4')}</li>
+                                <li>{t('landing.offer5')}</li>
                             </ul>
                             
-                            <h3 className="text-xl font-semibold text-white mt-6 mb-3">Early Access</h3>
+                            <h3 className="text-xl font-semibold text-white mt-6 mb-3">{t('landing.earlyAccessTitle')}</h3>
                             <p className="text-gray-300 mb-4 leading-relaxed">
-                                We're currently in early access with limited spots available. Users with invite codes get 
-                                immediate full access, while others can join our waitlist to be notified when more spots 
-                                open up or when we launch public beta.
+                                {t('landing.earlyAccessP')}
                             </p>
                             
-                            <h3 className="text-xl font-semibold text-white mt-6 mb-3">Guest Access</h3>
+                            <h3 className="text-xl font-semibold text-white mt-6 mb-3">{t('landing.guestAccessTitle')}</h3>
                             <p className="text-gray-300 leading-relaxed">
-                                You can browse the Home page and Digital Library as a guest without an account.
-                                Full features like Theory, Study tools, Forum, and Profile require registration with an invite code.
+                                {t('landing.guestAccessP')}
                             </p>
                         </div>
                         
@@ -1393,13 +1375,13 @@ const LandingPage = () => {
                                 onClick={() => { setShowAboutModal(false); setShowRegisterModal(true); }}
                                 className="modal-btn-primary flex-1 p-3"
                             >
-                                Register Now
+                                {t('landing.registerNow')}
                             </button>
                             <button
                                 onClick={() => setShowAboutModal(false)}
                                 className="modal-btn-ghost px-6 py-3"
                             >
-                                Close
+                                {t('landing.closeBtn')}
                             </button>
                         </div>
                     </div>
@@ -1411,7 +1393,7 @@ const LandingPage = () => {
                 <div className="max-w-6xl mx-auto px-4 text-center text-sm" style={{ color: 'rgba(255,255,255,0.28)' }}>
                     <p>© 2026 Marxist.info — Advancing Revolutionary Theory</p>
                     <p className="mt-2">
-                        Made and owned by{' '}
+                        {t('landing.madeOwned')}{' '}
                         <a
                             href="https://JinbuJYG.com"
                             target="_blank"
