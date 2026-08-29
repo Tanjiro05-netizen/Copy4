@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { fetchScienceHub, getCurrentUser, getScienceErrorMessage } from '../services/scienceApi';
 import {
@@ -30,21 +31,22 @@ const subjectIcons = {
 };
 
 const levelLabel = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
+  beginner: 'science.levelBeginner',
+  intermediate: 'science.levelIntermediate',
+  advanced: 'science.levelAdvanced',
 };
 
-const minutesToLabel = (minutes) => {
-  if (!minutes) return 'TBD';
-  if (minutes < 60) return `${minutes} min`;
-  return `${Math.round(minutes / 60)} hrs`;
+const minutesToLabel = (t, minutes) => {
+  if (!minutes) return t('science.tbd');
+  if (minutes < 60) return t('science.minuteCount', { count: minutes });
+  return t('science.hourCount', { count: Math.round(minutes / 60) });
 };
 
 const getSubjectCourseCount = (courses, subjectId) =>
   courses.filter((course) => course.subject_id === subjectId).length;
 
 const ScienceTechPage = () => {
+  const { t } = useTranslation();
   const [subjects, setSubjects] = useState([]);
   const [tracks, setTracks] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -72,14 +74,14 @@ const ScienceTechPage = () => {
         setUser(currentUser);
       } catch (loadError) {
         console.error('Error loading Science v2 hub:', loadError);
-        setError(getScienceErrorMessage(loadError, 'Could not load Science & Technology.'));
+        setError(getScienceErrorMessage(loadError, t('science.loadCatalogError')));
         setDemoMode(false);
       } finally {
         setIsLoading(false);
       }
     };
     load();
-  }, []);
+  }, [t]);
 
   const enrolledCourses = useMemo(() => {
     if (!user) return [];
@@ -103,12 +105,12 @@ const ScienceTechPage = () => {
   const groupedCourses = useMemo(() => {
     const groups = {};
     filteredCourses.forEach((course) => {
-      const key = course.science_subjects?.name || 'Unassigned';
+      const key = course.science_subjects?.name || t('science.unassigned');
       if (!groups[key]) groups[key] = [];
       groups[key].push(course);
     });
     return groups;
-  }, [filteredCourses]);
+  }, [filteredCourses, t]);
 
   const stats = useMemo(() => ({
     courses: courses.length,
@@ -123,18 +125,18 @@ const ScienceTechPage = () => {
         <section className="border-b border-[#1c202b]">
           <div className="container mx-auto max-w-7xl px-4 py-14">
             <div className="flex flex-col items-center text-center gap-3">
-              <p className="text-red-500 text-[11px] font-medium uppercase tracking-[0.32em]">Science &amp; Technology</p>
-              <h1 className="font-display text-4xl md:text-5xl font-medium text-white tracking-[0.01em]">Course and Research Catalog</h1>
+              <p className="text-red-500 text-[11px] font-medium uppercase tracking-[0.32em]">{t('science.title')}</p>
+              <h1 className="font-display text-4xl md:text-5xl font-medium text-white tracking-[0.01em]">{t('science.catalogTitle')}</h1>
               <div className="h-[2px] w-11 bg-[#b3122e]" aria-hidden="true" />
               <p className="text-gray-400 mt-2 max-w-2xl text-base">
-                Structured courses, technical readings, practice sets, simulations, and reference materials for systematic study.
+                {t('science.catalogDescription')}
               </p>
             </div>
             <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-px bg-[#262a35] border border-[#1c202b]">
-              <Stat label="Courses" value={stats.courses} />
-              <Stat label="Subjects" value={stats.subjects} />
-              <Stat label="Modules" value={stats.modules} />
-              <Stat label="Active" value={stats.active} />
+              <Stat label={t('science.courses')} value={stats.courses} />
+              <Stat label={t('science.subjects')} value={stats.subjects} />
+              <Stat label={t('science.modules')} value={stats.modules} />
+              <Stat label={t('science.active')} value={stats.active} />
             </div>
           </div>
         </section>
@@ -143,7 +145,7 @@ const ScienceTechPage = () => {
           {error && <div className="mb-6 border border-red-900/50 bg-red-950/30 px-4 py-3 text-red-200">{error}</div>}
           {demoMode && (
             <div className="mb-6 border border-yellow-900/50 bg-yellow-950/20 px-4 py-3 text-yellow-100">
-              Local demo mode: Supabase Science v2 tables are still missing, so the Physics demo course is being rendered from the app bundle.
+              {t('science.localDemoNotice')}
             </div>
           )}
 
@@ -154,7 +156,7 @@ const ScienceTechPage = () => {
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search courses, subjects, methods, or resources"
+                  placeholder={t('science.searchPlaceholder')}
                   className="w-full bg-black/50 border border-gray-700 text-white pl-9 pr-3 py-2.5 focus:border-red-500 focus:outline-none"
                 />
               </div>
@@ -163,7 +165,7 @@ const ScienceTechPage = () => {
                 onChange={(event) => setSelectedSubject(event.target.value)}
                 className="bg-black/50 border border-gray-700 text-white px-3 py-2.5 focus:border-red-500 focus:outline-none"
               >
-                <option value="all">All subjects</option>
+                <option value="all">{t('science.allSubjects')}</option>
                 {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
               </select>
               <select
@@ -171,17 +173,17 @@ const ScienceTechPage = () => {
                 onChange={(event) => setSelectedLevel(event.target.value)}
                 className="bg-black/50 border border-gray-700 text-white px-3 py-2.5 focus:border-red-500 focus:outline-none"
               >
-                <option value="all">All levels</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
+                <option value="all">{t('science.allLevels')}</option>
+                <option value="beginner">{t('science.levelBeginner')}</option>
+                <option value="intermediate">{t('science.levelIntermediate')}</option>
+                <option value="advanced">{t('science.levelAdvanced')}</option>
               </select>
               <div className="flex border border-gray-700 bg-black/50">
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
                   className={`p-2.5 ${viewMode === 'list' ? 'text-white bg-red-950/30' : 'text-gray-500 hover:text-white'}`}
-                  title="List view"
+                  title={t('science.listView')}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -189,7 +191,7 @@ const ScienceTechPage = () => {
                   type="button"
                   onClick={() => setViewMode('grid')}
                   className={`p-2.5 border-l border-gray-700 ${viewMode === 'grid' ? 'text-white bg-red-950/30' : 'text-gray-500 hover:text-white'}`}
-                  title="Grid view"
+                  title={t('science.gridView')}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
@@ -199,13 +201,13 @@ const ScienceTechPage = () => {
 
           <section className="grid gap-6 xl:grid-cols-[260px_1fr_300px]">
             <aside className="space-y-4">
-              <Panel title="Subjects" icon={BookOpen}>
+              <Panel title={t('science.subjects')} icon={BookOpen}>
                 <button
                   type="button"
                   onClick={() => setSelectedSubject('all')}
                   className={`w-full flex items-center justify-between py-2 text-sm ${selectedSubject === 'all' ? 'text-white' : 'text-gray-500 hover:text-white'}`}
                 >
-                  <span>All subjects</span>
+                  <span>{t('science.allSubjects')}</span>
                   <span>{courses.length}</span>
                 </button>
                 {subjects.map((subject) => {
@@ -228,9 +230,9 @@ const ScienceTechPage = () => {
                 })}
               </Panel>
 
-              <Panel title="Tracks" icon={Trophy}>
+              <Panel title={t('science.tracks')} icon={Trophy}>
                 {tracks.length === 0 ? (
-                  <p className="text-gray-600 text-sm">No published tracks yet.</p>
+                  <p className="text-gray-600 text-sm">{t('science.noTracks')}</p>
                 ) : tracks.slice(0, 6).map((track) => (
                   <div key={track.id} className="border-b border-gray-800 pb-3 last:border-b-0 last:pb-0">
                     <p className="text-gray-200 text-sm font-medium">{track.title}</p>
@@ -243,8 +245,8 @@ const ScienceTechPage = () => {
             <section className="min-w-0">
               <div className="flex items-end justify-between gap-4 mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Published Courses</h2>
-                  <p className="text-gray-600 text-sm">{filteredCourses.length} records visible</p>
+                  <h2 className="text-2xl font-bold text-white">{t('science.publishedCourses')}</h2>
+                  <p className="text-gray-600 text-sm">{t('science.visibleRecordCount', { count: filteredCourses.length })}</p>
                 </div>
                 <Link href="/admin/science" className="inline-flex items-center gap-2 text-sm text-red-400 hover:text-red-300">
                   <Settings className="w-4 h-4" />
@@ -253,10 +255,10 @@ const ScienceTechPage = () => {
               </div>
 
               {isLoading ? (
-                <div className="border border-gray-800 bg-black/30 p-8 text-center text-gray-400">Loading catalog...</div>
+                <div className="border border-gray-800 bg-black/30 p-8 text-center text-gray-400">{t('science.loadingCatalog')}</div>
               ) : filteredCourses.length === 0 ? (
                 <div className="border border-gray-800 bg-black/30 p-8 text-center">
-                  <p className="text-gray-300 font-medium">No published v2 courses match these filters.</p>
+                  <p className="text-gray-300 font-medium">{t('science.noMatchingCourses')}</p>
                   <p className="text-gray-600 text-sm mt-2">Use Creator Studio to draft and publish a course.</p>
                 </div>
               ) : viewMode === 'list' ? (
@@ -265,15 +267,15 @@ const ScienceTechPage = () => {
                     <div key={subjectName}>
                       <div className="flex items-center justify-between border-b border-gray-800 pb-2 mb-2">
                         <h3 className="text-white font-semibold">{subjectName}</h3>
-                        <span className="text-xs text-gray-600">{group.length} courses</span>
+                        <span className="text-xs text-gray-600">{t('science.courseCount', { count: group.length })}</span>
                       </div>
                       <div className="border border-gray-800 bg-black/30 overflow-hidden">
                         <div className="hidden md:grid grid-cols-[1fr_90px_90px_100px_120px_36px] gap-3 px-4 py-2 bg-black/45 border-b border-gray-800 text-xs uppercase tracking-wide text-gray-600">
-                          <span>Course</span>
-                          <span>Level</span>
-                          <span>Time</span>
-                          <span>Modules</span>
-                          <span>Status</span>
+                          <span>{t('science.course')}</span>
+                          <span>{t('science.level')}</span>
+                          <span>{t('science.time')}</span>
+                          <span>{t('science.modules')}</span>
+                          <span>{t('science.status')}</span>
                           <span />
                         </div>
                         {group.map((course) => <CourseRow key={course.id} course={course} user={user} />)}
@@ -289,9 +291,9 @@ const ScienceTechPage = () => {
             </section>
 
             <aside className="space-y-4">
-              <Panel title="Continue Learning" icon={Target}>
+              <Panel title={t('science.continueLearning')} icon={Target}>
                 {enrolledCourses.length === 0 ? (
-                  <p className="text-gray-600 text-sm">No active enrollments yet.</p>
+                  <p className="text-gray-600 text-sm">{t('science.noActiveEnrollments')}</p>
                 ) : enrolledCourses.slice(0, 5).map((course) => {
                   const enrollment = (course.science_enrollments || []).find((item) => item.user_id === user?.id);
                   return (
@@ -305,9 +307,9 @@ const ScienceTechPage = () => {
                 })}
               </Panel>
 
-              <Panel title="Reference Library" icon={FileText}>
+              <Panel title={t('science.referenceLibrary')} icon={FileText}>
                 {textbooks.length === 0 ? (
-                  <p className="text-gray-600 text-sm">No published references yet.</p>
+                  <p className="text-gray-600 text-sm">{t('science.noReferences')}</p>
                 ) : textbooks.slice(0, 5).map((book) => (
                   <Link key={book.id} href={`/science-tech/textbooks/${book.id}`} className="block border-b border-gray-800 pb-3 last:border-b-0 last:pb-0">
                     <p className="text-gray-200 text-sm font-medium">{book.title}</p>
@@ -341,24 +343,25 @@ const StatusChip = ({ children, tone = 'neutral' }) => {
 };
 
 const CourseRow = ({ course, user }) => {
+  const { t } = useTranslation();
   const enrollment = (course.science_enrollments || []).find((item) => item.user_id === user?.id);
   const moduleCount = course.science_modules?.length || 0;
   return (
     <Link href={`/science-tech/courses/${course.slug}`} className="grid md:grid-cols-[1fr_90px_90px_100px_120px_36px] gap-3 px-4 py-4 border-b border-gray-800 last:border-b-0 hover:bg-red-950/10 transition-colors">
       <div className="min-w-0">
         <p className="text-white font-semibold truncate">{course.title}</p>
-        <p className="text-gray-500 text-sm line-clamp-1">{course.subtitle || course.description || 'No overview yet'}</p>
+        <p className="text-gray-500 text-sm line-clamp-1">{course.subtitle || course.description || t('science.noOverview')}</p>
         <div className="flex flex-wrap gap-2 mt-2 md:hidden">
-          <StatusChip>{levelLabel[course.level] || course.level}</StatusChip>
-          <StatusChip>{minutesToLabel(course.estimated_minutes)}</StatusChip>
-          <StatusChip>{moduleCount} modules</StatusChip>
+          <StatusChip>{levelLabel[course.level] ? t(levelLabel[course.level]) : course.level}</StatusChip>
+          <StatusChip>{minutesToLabel(t, course.estimated_minutes)}</StatusChip>
+          <StatusChip>{t('science.moduleCount', { count: moduleCount })}</StatusChip>
         </div>
       </div>
-      <span className="hidden md:block text-sm text-gray-400">{levelLabel[course.level] || course.level}</span>
-      <span className="hidden md:block text-sm text-gray-400">{minutesToLabel(course.estimated_minutes)}</span>
+      <span className="hidden md:block text-sm text-gray-400">{levelLabel[course.level] ? t(levelLabel[course.level]) : course.level}</span>
+      <span className="hidden md:block text-sm text-gray-400">{minutesToLabel(t, course.estimated_minutes)}</span>
       <span className="hidden md:block text-sm text-gray-400">{moduleCount}</span>
       <div className="hidden md:flex flex-wrap gap-1">
-        {course.certificate_available && <StatusChip tone="yellow">Cert</StatusChip>}
+        {course.certificate_available && <StatusChip tone="yellow">{t('science.certificateShort')}</StatusChip>}
         {enrollment && <StatusChip tone="green">{enrollment.progress_percent || 0}%</StatusChip>}
       </div>
       <ChevronRight className="hidden md:block w-4 h-4 text-gray-600" />
@@ -367,22 +370,23 @@ const CourseRow = ({ course, user }) => {
 };
 
 const CourseCompactCard = ({ course, user }) => {
+  const { t } = useTranslation();
   const enrollment = (course.science_enrollments || []).find((item) => item.user_id === user?.id);
   return (
     <Link href={`/science-tech/courses/${course.slug}`} className="border border-gray-800 bg-black/30 p-4 hover:border-red-900/60">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs text-gray-600">{course.science_subjects?.name || 'Science'}</p>
+          <p className="text-xs text-gray-600">{course.science_subjects?.name || t('science.science')}</p>
           <h3 className="text-white font-semibold mt-1">{course.title}</h3>
         </div>
         <ChevronRight className="w-4 h-4 text-gray-600" />
       </div>
-      <p className="text-gray-500 text-sm mt-2 line-clamp-2">{course.subtitle || course.description || 'No overview yet'}</p>
+      <p className="text-gray-500 text-sm mt-2 line-clamp-2">{course.subtitle || course.description || t('science.noOverview')}</p>
       <div className="flex flex-wrap gap-2 mt-4">
-        <StatusChip>{levelLabel[course.level] || course.level}</StatusChip>
-        <StatusChip>{course.science_modules?.length || 0} modules</StatusChip>
-        <StatusChip>{minutesToLabel(course.estimated_minutes)}</StatusChip>
-        {course.certificate_available && <StatusChip tone="yellow">Certificate</StatusChip>}
+        <StatusChip>{levelLabel[course.level] ? t(levelLabel[course.level]) : course.level}</StatusChip>
+        <StatusChip>{t('science.moduleCount', { count: course.science_modules?.length || 0 })}</StatusChip>
+        <StatusChip>{minutesToLabel(t, course.estimated_minutes)}</StatusChip>
+        {course.certificate_available && <StatusChip tone="yellow">{t('science.certificate')}</StatusChip>}
       </div>
       {enrollment && (
         <div className="mt-4 h-1.5 bg-gray-800">
