@@ -30,11 +30,11 @@ const LandingPage = () => {
         () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('donated') === 'true'
     );
 
-    // Login modal is now only opened by explicit user click on "{t('landing.logIn')}" buttons
+    // Login modal is now only opened by explicit user click on "Log In" buttons
     
     // Login form
-    const [login{t('landing.emailLabel')}, setLogin{t('landing.emailLabel')}] = useState('');
-    const [login{t('landing.passwordLabel')}, setLogin{t('landing.passwordLabel')}] = useState('');
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
     const [loginError, setLoginError] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
     
@@ -43,17 +43,17 @@ const LandingPage = () => {
         username: '',
         email: '',
         password: '',
-        confirm{t('landing.passwordLabel')}: '',
+        confirmPassword: '',
         inviteCode: '',
         betaReason: ''
     });
-    const [registerError, setregisterError] = useState('');
+    const [registerError, setRegisterError] = useState('');
     const [registerLoading, setregisterLoading] = useState(false);
     const [registerSuccess, setregisterSuccess] = useState(false);
     const [hasInviteCode, setHasInviteCode] = useState(false);
     
-    // {t('landing.emailLabel')} signup (waitlist)
-    const [waitlist{t('landing.emailLabel')}, setWaitlist{t('landing.emailLabel')}] = useState('');
+    // Email signup (waitlist)
+    const [waitlistEmail, setWaitlistEmail] = useState('');
     const [waitlistLoading, setWaitlistLoading] = useState(false);
     const [waitlistSuccess, setWaitlistSuccess] = useState(false);
     const [waitlistError, setWaitlistError] = useState('');
@@ -208,7 +208,7 @@ const LandingPage = () => {
         setLoginLoading(true);
 
         try {
-            const result = await login({ email: login{t('landing.emailLabel')}, password: login{t('landing.passwordLabel')} });
+            const result = await login({ email: loginEmail, password: loginPassword });
 
             if (result.error) {
                 setLoginError(result.error.message);
@@ -225,15 +225,15 @@ const LandingPage = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        setregisterError('');
+        setRegisterError('');
         
-        if (registerData.password !== registerData.confirm{t('landing.passwordLabel')}) {
-            setregisterError('{t('landing.passwordLabel')}s do not match');
+        if (registerData.password !== registerData.confirmPassword) {
+            setRegisterError(t('landing.errPasswords'));
             return;
         }
         
         if (registerData.username.length < 3) {
-            setregisterError('{t('landing.usernameLabel')} must be at least 3 characters');
+            setRegisterError(t('landing.errUsernameMin'));
             return;
         }
 
@@ -245,7 +245,7 @@ const LandingPage = () => {
                 p_code: registerData.inviteCode
             });
             if (valError || !validation?.valid) {
-                setregisterError(t('landing.errInvalidInvite'));
+                setRegisterError(t('landing.errInvalidInvite'));
                 setregisterLoading(false);
                 return;
             }
@@ -260,7 +260,7 @@ const LandingPage = () => {
         });
         
         if (result.error) {
-            setregisterError(result.error.message);
+            setRegisterError(result.error.message);
         } else {
             setregisterSuccess(true);
         }
@@ -275,7 +275,7 @@ const LandingPage = () => {
         try {
             const { data, error } = await supabase.functions.invoke('waitlist-signup', {
                 body: {
-                    email: waitlist{t('landing.emailLabel')}.trim().toLowerCase(),
+                    email: waitlistEmail.trim().toLowerCase(),
                     notify_invite_codes: notifyInvites,
                     notify_public_beta: notifyBeta,
                 },
@@ -480,8 +480,8 @@ const LandingPage = () => {
                                 <form onSubmit={handleWaitlistSignup} className="space-y-4">
                                     <input
                                         type="email"
-                                        value={waitlist{t('landing.emailLabel')}}
-                                        onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
+                                        value={waitlistEmail}
+                                        onChange={(e) => setWaitlistEmail(e.target.value)}
                                         placeholder={t('landing.emailPlaceholder')}
                                         className="w-full p-3 bg-black/40 border border-gray-700 rounded-lg focus:border-red-800 focus:outline-none text-white placeholder-gray-500"
                                         required
@@ -517,7 +517,7 @@ const LandingPage = () => {
                                         className="w-full p-3 btn-primary-red rounded-lg font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {waitlistLoading ? <Loader2 className="animate-spin" size={20} /> : <ArrowRight size={20} />}
-                                        {waitlistLoading ? t('landing.joining') : '{t('landing.joinList')}'}
+                                        {waitlistLoading ? t('landing.joining') : t('landing.joinList')}
                                     </button>
                                 </form>
                             )}
@@ -599,8 +599,8 @@ const LandingPage = () => {
                                     <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                     <input
                                         type="email"
-                                        value={login{t('landing.emailLabel')}}
-                                        onChange={(e) => setLogin{t('landing.emailLabel')}(e.target.value)}
+                                        value={loginEmail}
+                                        onChange={(e) => setLoginEmail(e.target.value)}
                                         className="w-full p-3"
                                         required
                                     />
@@ -609,8 +609,8 @@ const LandingPage = () => {
                                     <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.passwordLabel')}</label>
                                     <input
                                         type="password"
-                                        value={login{t('landing.passwordLabel')}}
-                                        onChange={(e) => setLogin{t('landing.passwordLabel')}(e.target.value)}
+                                        value={loginPassword}
+                                        onChange={(e) => setLoginPassword(e.target.value)}
                                         className="w-full p-3"
                                         required
                                     />
@@ -636,7 +636,7 @@ const LandingPage = () => {
                                     className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {loginLoading && <Loader2 className="animate-spin" size={20} />}
-                                    {loginLoading ? t('landing.loggingIn') : '{t('landing.logIn')}'}
+                                    {loginLoading ? t('landing.loggingIn') : t('landing.logIn')}
                                 </button>
                             </form>
                             <p className="text-center text-gray-500 mt-4 text-sm">
@@ -658,7 +658,7 @@ const LandingPage = () => {
                         <div className="modal-panel">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-2xl font-bold text-white">{t('landing.createAccount')}</h2>
-                                <button onClick={() => { setShowRegisterModal(false); setregisterSuccess(false); setWaitlistError(''); setregisterError(''); }} className="text-gray-400 hover:text-white transition">
+                                <button onClick={() => { setShowRegisterModal(false); setregisterSuccess(false); setWaitlistError(''); setRegisterError(''); }} className="text-gray-400 hover:text-white transition">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -668,7 +668,7 @@ const LandingPage = () => {
                                     <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
                                     {hasInviteCode ? (
                                         <>
-                                            <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.check{t('landing.emailLabel')}Title')}</h3>
+                                            <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.checkEmailTitle')}</h3>
                                             <p className="text-gray-300 mb-4">
                                                 {t('landing.sentLinkTo')} <span className="text-red-500">{registerData.email}</span>
                                             </p>
@@ -693,7 +693,7 @@ const LandingPage = () => {
                                             <input
                                                 type="checkbox"
                                                 checked={hasInviteCode}
-                                                onChange={(e) => { setHasInviteCode(e.target.checked); setregisterError(''); }}
+                                                onChange={(e) => { setHasInviteCode(e.target.checked); setRegisterError(''); }}
                                                 className="accent-red-800"
                                             />
                                             <span className="font-medium text-white">{t('landing.haveInviteCode')}</span>
@@ -757,8 +757,8 @@ const LandingPage = () => {
                                                 <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.confirmPassword')}</label>
                                                 <input
                                                     type="password"
-                                                    value={registerData.confirm{t('landing.passwordLabel')}}
-                                                    onChange={(e) => setregisterData({...registerData, confirm{t('landing.passwordLabel')}: e.target.value})}
+                                                    value={registerData.confirmPassword}
+                                                    onChange={(e) => setregisterData({...registerData, confirmPassword: e.target.value})}
                                                     className="w-full p-3"
                                                     required
                                                 />
@@ -770,8 +770,8 @@ const LandingPage = () => {
                                                 <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                                 <input
                                                     type="email"
-                                                    value={waitlist{t('landing.emailLabel')}}
-                                                    onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
+                                                    value={waitlistEmail}
+                                                    onChange={(e) => setWaitlistEmail(e.target.value)}
                                                     className="w-full p-3"
                                                     placeholder={t('landing.yourEmail')}
                                                     required
@@ -1000,7 +1000,7 @@ const LandingPage = () => {
                         </div>
                     </div>
 
-                    {/* {t('landing.emailLabel')} Signup Section */}
+                    {/* Email Signup Section */}
                     <div className="max-w-xl mx-auto p-8 rounded-none" style={{ background: '#10131b', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 18px 40px rgba(0,0,0,0.42)' }}>
                         <div className="flex items-center gap-2 mb-4">
                             <Mail className="text-red-600" size={24} />
@@ -1020,8 +1020,8 @@ const LandingPage = () => {
                             <form onSubmit={handleWaitlistSignup} className="space-y-4">
                                 <input
                                     type="email"
-                                    value={waitlist{t('landing.emailLabel')}}
-                                    onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
+                                    value={waitlistEmail}
+                                    onChange={(e) => setWaitlistEmail(e.target.value)}
                                     placeholder={t('landing.emailPlaceholder')}
                                     className="w-full p-3 rounded-none focus:outline-none"
                                     style={{ background: '#1a1f2b', border: '1px solid rgba(255,255,255,0.06)', color: '#fff' }}
@@ -1058,7 +1058,7 @@ const LandingPage = () => {
                                     className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                                 >
                                     {waitlistLoading ? <Loader2 className="animate-spin" size={20} /> : <ArrowRight size={20} />}
-                                    {waitlistLoading ? t('landing.joining') : '{t('landing.joinList')}'}
+                                    {waitlistLoading ? t('landing.joining') : t('landing.joinList')}
                                 </button>
                             </form>
                         )}
@@ -1120,8 +1120,8 @@ const LandingPage = () => {
                                 <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                 <input
                                     type="email"
-                                    value={login{t('landing.emailLabel')}}
-                                    onChange={(e) => setLogin{t('landing.emailLabel')}(e.target.value)}
+                                    value={loginEmail}
+                                    onChange={(e) => setLoginEmail(e.target.value)}
                                     className="w-full p-3"
                                     required
                                 />
@@ -1130,8 +1130,8 @@ const LandingPage = () => {
                                 <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.passwordLabel')}</label>
                                 <input
                                     type="password"
-                                    value={login{t('landing.passwordLabel')}}
-                                    onChange={(e) => setLogin{t('landing.passwordLabel')}(e.target.value)}
+                                    value={loginPassword}
+                                    onChange={(e) => setLoginPassword(e.target.value)}
                                     className="w-full p-3"
                                     required
                                 />
@@ -1157,7 +1157,7 @@ const LandingPage = () => {
                                 className="modal-btn-primary w-full p-3 flex items-center justify-center gap-2"
                             >
                                 {loginLoading && <Loader2 className="animate-spin" size={20} />}
-                                {loginLoading ? t('landing.loggingIn') : '{t('landing.logIn')}'}
+                                {loginLoading ? t('landing.loggingIn') : t('landing.logIn')}
                             </button>
                         </form>
                         <p className="text-center text-gray-500 mt-4 text-sm">
@@ -1179,7 +1179,7 @@ const LandingPage = () => {
                     <div className="modal-panel">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-bold text-white">{t('landing.createAccount')}</h2>
-                            <button onClick={() => { setShowRegisterModal(false); setregisterSuccess(false); setWaitlistError(''); setregisterError(''); }} className="text-gray-400 hover:text-white transition">
+                            <button onClick={() => { setShowRegisterModal(false); setregisterSuccess(false); setWaitlistError(''); setRegisterError(''); }} className="text-gray-400 hover:text-white transition">
                                 <X size={24} />
                             </button>
                         </div>
@@ -1189,7 +1189,7 @@ const LandingPage = () => {
                                 <CheckCircle size={48} className="mx-auto text-green-500 mb-4" />
                                 {hasInviteCode ? (
                                     <>
-                                        <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.check{t('landing.emailLabel')}Title')}</h3>
+                                        <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.checkEmailTitle')}</h3>
                                         <p className="text-gray-300 mb-4">
                                             {t('landing.sentLinkTo')} <span className="text-red-500">{registerData.email}</span>
                                         </p>
@@ -1202,7 +1202,7 @@ const LandingPage = () => {
                                     <>
                                         <h3 className="text-xl font-semibold mb-2 text-white">{t('landing.onTheList')}</h3>
                                         <p className="text-gray-300">
-                                            We'll notify <span className="text-red-500">{waitlist{t('landing.emailLabel')}}</span> {t('landing.notifySpots')}
+                                            We'll notify <span className="text-red-500">{waitlistEmail}</span> {t('landing.notifySpots')}
                                         </p>
                                     </>
                                 )}
@@ -1214,7 +1214,7 @@ const LandingPage = () => {
                                         <input
                                             type="checkbox"
                                             checked={hasInviteCode}
-                                            onChange={(e) => { setHasInviteCode(e.target.checked); setregisterError(''); }}
+                                            onChange={(e) => { setHasInviteCode(e.target.checked); setRegisterError(''); }}
                                             className="accent-red-800"
                                         />
                                         <span className="font-medium text-white">{t('landing.haveInviteCode')}</span>
@@ -1278,8 +1278,8 @@ const LandingPage = () => {
                                             <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.confirmPassword')}</label>
                                             <input
                                                 type="password"
-                                                value={registerData.confirm{t('landing.passwordLabel')}}
-                                                onChange={(e) => setregisterData({...registerData, confirm{t('landing.passwordLabel')}: e.target.value})}
+                                                value={registerData.confirmPassword}
+                                                onChange={(e) => setregisterData({...registerData, confirmPassword: e.target.value})}
                                                 className="w-full p-3"
                                                 required
                                             />
@@ -1291,8 +1291,8 @@ const LandingPage = () => {
                                             <label className="block text-sm font-medium mb-2 text-gray-300">{t('landing.emailLabel')}</label>
                                             <input
                                                 type="email"
-                                                value={waitlist{t('landing.emailLabel')}}
-                                                onChange={(e) => setWaitlist{t('landing.emailLabel')}(e.target.value)}
+                                                value={waitlistEmail}
+                                                onChange={(e) => setWaitlistEmail(e.target.value)}
                                                 className="w-full p-3"
                                                 placeholder={t('landing.yourEmail')}
                                                 required
