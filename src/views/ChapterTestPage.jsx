@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
@@ -26,7 +27,15 @@ const normalizeOptions = (question) => {
   return question?.options || [];
 };
 
+const getAnswerLabel = (t, question, answer) => {
+  if (question?.question_type !== 'true_false') return answer;
+  if (`${answer || ''}`.toLowerCase() === 'true') return t('science.true');
+  if (`${answer || ''}`.toLowerCase() === 'false') return t('science.false');
+  return answer;
+};
+
 const ChapterTestPage = () => {
+  const { t } = useTranslation();
   const { courseSlug, chapterSlug } = useParams();
   const router = useRouter();
   const [data, setData] = useState(null);
@@ -54,13 +63,13 @@ const ChapterTestPage = () => {
         setSelectedQuizId(checkpoint.quizzes[0]?.id || '');
       } catch (loadError) {
         console.error('Error loading Science checkpoint:', loadError);
-        setError(getScienceErrorMessage(loadError, 'Could not load this checkpoint.'));
+        setError(getScienceErrorMessage(loadError, t('science.loadCheckpointError')));
       } finally {
         setIsLoading(false);
       }
     };
     load();
-  }, [chapterSlug, courseSlug]);
+  }, [chapterSlug, courseSlug, t]);
 
   const selectedQuiz = useMemo(
     () => data?.quizzes?.find((quiz) => quiz.id === selectedQuizId) || data?.quizzes?.[0],
@@ -135,7 +144,7 @@ const ChapterTestPage = () => {
       setPhase('results');
     } catch (submitError) {
       console.error('Error submitting Science checkpoint:', submitError);
-      setError(getScienceErrorMessage(submitError, 'Could not save your quiz attempt.'));
+      setError(getScienceErrorMessage(submitError, t('science.saveQuizError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,7 +153,7 @@ const ChapterTestPage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0b0d12]">
-        <div className="py-24 text-center text-gray-400">Loading checkpoint...</div>
+        <div className="py-24 text-center text-gray-400">{t('science.loadingCheckpoint')}</div>
       </div>
     );
   }
@@ -153,9 +162,9 @@ const ChapterTestPage = () => {
     return (
       <div className="min-h-screen bg-[#0b0d12]">
         <div className="py-24 px-4 text-center">
-          <p className="text-red-300">{error || 'Checkpoint not found.'}</p>
+          <p className="text-red-300">{error || t('science.checkpointNotFound')}</p>
           <Link href={`/science-tech/courses/${courseSlug}`} className="mt-4 inline-flex text-red-400 hover:text-red-300">
-            Back to course
+            {t('science.backToCourse')}
           </Link>
         </div>
       </div>
@@ -168,13 +177,13 @@ const ChapterTestPage = () => {
         <div className="py-24 px-4">
           <div className="mx-auto max-w-3xl border border-gray-800 bg-black/35 p-8 text-center">
             <HelpCircle className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white">No checkpoint yet</h1>
+            <h1 className="text-2xl font-bold text-white">{t('science.noCheckpoint')}</h1>
             <p className="text-gray-500 mt-3">
-              This module has no published quiz questions. Add a checkpoint in Creator Studio when the lessons are ready.
+              {t('science.noCheckpointQuestions')} <span>Add a checkpoint in Creator Studio when the lessons are ready.</span>
             </p>
             <Link href={`/science-tech/courses/${courseSlug}`} className="mt-6 inline-flex items-center gap-2 text-red-400 hover:text-red-300">
               <ArrowLeft className="w-4 h-4" />
-              Back to {data.course.title}
+              {t('science.backToTitle', { title: data.course.title })}
             </Link>
           </div>
         </div>
@@ -214,17 +223,16 @@ const ChapterTestPage = () => {
           {phase === 'intro' && (
             <section className="grid gap-6 lg:grid-cols-[1fr_280px]">
               <div className="border border-gray-800 bg-black/35 p-6">
-                <h2 className="text-xl font-semibold text-white mb-3">Checkpoint Overview</h2>
+                <h2 className="text-xl font-semibold text-white mb-3">{t('science.checkpointOverview')}</h2>
                 <p className="text-gray-400 leading-relaxed">
-                  This checkpoint assembles reusable question-bank items for the module. It is meant to test understanding,
-                  not memorization: review the lesson blocks, simulations, and worked examples before you begin.
+                  {t('science.checkpointDescription')}
                 </p>
                 <button
                   type="button"
                   onClick={startQuiz}
                   className="mt-6 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-5 py-3 text-white font-semibold"
                 >
-                  Start Checkpoint
+                  {t('science.startCheckpoint')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -232,11 +240,11 @@ const ChapterTestPage = () => {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="border border-gray-800 bg-black/30 p-3">
                     <p className="text-2xl text-white font-bold">{questions.length}</p>
-                    <p className="text-xs uppercase tracking-wide text-gray-600">Questions</p>
+                    <p className="text-xs uppercase tracking-wide text-gray-600">{t('profile.questions')}</p>
                   </div>
                   <div className="border border-gray-800 bg-black/30 p-3">
                     <p className="text-2xl text-white font-bold">{selectedQuiz.passing_score || 70}%</p>
-                    <p className="text-xs uppercase tracking-wide text-gray-600">Pass</p>
+                    <p className="text-xs uppercase tracking-wide text-gray-600">{t('science.passingScore')}</p>
                   </div>
                 </div>
               </aside>
@@ -248,8 +256,8 @@ const ChapterTestPage = () => {
               {questions.map((question, index) => (
                 <div key={question.id} className="border border-gray-800 bg-black/35 p-5">
                   <div className="flex items-center justify-between gap-4 mb-4">
-                    <p className="text-sm text-gray-600">Question {index + 1} of {questions.length}</p>
-                    <p className="text-sm text-yellow-500">{question.points || 1} pt</p>
+                    <p className="text-sm text-gray-600">{t('science.questionProgress', { current: index + 1, total: questions.length })}</p>
+                    <p className="text-sm text-yellow-500">{t('science.pointCount', { count: question.points || 1 })}</p>
                   </div>
                   <p className="text-white font-medium mb-4">{question.prompt}</p>
 
@@ -262,7 +270,7 @@ const ChapterTestPage = () => {
                           onClick={() => setAnswer(question.id, option)}
                           className={`w-full text-left border px-4 py-3 transition-colors ${answers[question.id] === option ? 'border-red-500 bg-red-950/20 text-white' : 'border-gray-800 bg-black/30 text-gray-300 hover:border-gray-600'}`}
                         >
-                          {option}
+                          {question.question_type === 'true_false' ? t(option === 'True' ? 'science.true' : 'science.false') : option}
                         </button>
                       ))}
                     </div>
@@ -272,7 +280,7 @@ const ChapterTestPage = () => {
                       value={answers[question.id] || ''}
                       onChange={(event) => setAnswer(question.id, event.target.value)}
                       className="w-full bg-black/50 border border-gray-700 px-4 py-3 text-white focus:outline-none focus:border-red-500"
-                      placeholder="Enter your answer"
+                      placeholder={t('science.enterAnswer')}
                     />
                   )}
                 </div>
@@ -288,7 +296,7 @@ const ChapterTestPage = () => {
                   className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-5 py-3 text-white font-semibold disabled:opacity-50"
                 >
                   <Target className="w-4 h-4" />
-                  {isSubmitting ? 'Saving...' : 'Submit checkpoint'}
+                  {isSubmitting ? t('science.saving') : t('science.submitCheckpoint')}
                 </button>
               </div>
             </section>
@@ -299,10 +307,10 @@ const ChapterTestPage = () => {
               <div className={`border p-6 ${results.passed ? 'border-green-900/40 bg-green-950/20' : 'border-yellow-900/40 bg-yellow-950/10'}`}>
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <p className="text-gray-400">Checkpoint score</p>
+                    <p className="text-gray-400">{t('science.checkpointScore')}</p>
                     <h2 className="text-4xl font-bold text-white mt-1">{results.score}%</h2>
                     <p className={results.passed ? 'text-green-300 mt-2' : 'text-yellow-300 mt-2'}>
-                      {results.passed ? 'Passed' : `Review and try again. Passing score is ${selectedQuiz.passing_score || 70}%.`}
+                      {results.passed ? t('science.passed') : t('science.reviewTryAgain', { score: selectedQuiz.passing_score || 70 })}
                     </p>
                   </div>
                   <Award className={`w-14 h-14 ${results.passed ? 'text-green-400' : 'text-yellow-500'}`} />
@@ -313,11 +321,11 @@ const ChapterTestPage = () => {
                 <div key={result.question_id} className="border border-gray-800 bg-black/35 p-5">
                   <div className="flex items-center gap-2 mb-3">
                     {result.is_correct ? <Check className="w-5 h-5 text-green-400" /> : <X className="w-5 h-5 text-red-400" />}
-                    <p className="text-white font-medium">Question {index + 1}</p>
+                    <p className="text-white font-medium">{t('science.questionNumber', { number: index + 1 })}</p>
                   </div>
                   <p className="text-gray-300 mb-2">{result.prompt}</p>
-                  <p className="text-sm text-gray-500">Your answer: <span className="text-gray-300">{result.user_answer || 'No answer'}</span></p>
-                  {!result.is_correct && <p className="text-sm text-gray-500">Correct answer: <span className="text-green-300">{result.correct_answer}</span></p>}
+                  <p className="text-sm text-gray-500">{t('science.yourAnswer')} <span className="text-gray-300">{getAnswerLabel(t, questions[index], result.user_answer) || t('science.noAnswer')}</span></p>
+                  {!result.is_correct && <p className="text-sm text-gray-500">{t('science.correctAnswer')} <span className="text-green-300">{getAnswerLabel(t, questions[index], result.correct_answer)}</span></p>}
                   {result.explanation && <p className="mt-3 border border-blue-900/40 bg-blue-950/20 p-3 text-blue-100 text-sm">{result.explanation}</p>}
                 </div>
               ))}
@@ -329,14 +337,14 @@ const ChapterTestPage = () => {
                   className="inline-flex items-center gap-2 border border-gray-800 px-4 py-2 text-gray-300 hover:text-white hover:border-gray-600"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Try again
+                  {t('science.tryAgain')}
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push(`/science-tech/courses/${courseSlug}`)}
                   className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 px-5 py-2 text-white font-semibold"
                 >
-                  Back to course
+                  {t('science.backToCourse')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

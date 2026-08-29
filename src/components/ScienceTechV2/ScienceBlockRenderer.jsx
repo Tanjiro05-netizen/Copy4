@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -43,7 +44,15 @@ export const gradeScienceQuestion = (question, answer) => {
   return normalizeAnswer(answer) === normalizeAnswer(question.correct_answer);
 };
 
-const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
+const getAnswerLabel = (t, question, answer) => {
+  if (question?.question_type !== 'true_false') return answer;
+  if (`${answer || ''}`.toLowerCase() === 'true') return t('science.true');
+  if (`${answer || ''}`.toLowerCase() === 'false') return t('science.false');
+  return answer;
+};
+
+const ScienceQuestion = ({ question, label }) => {
+  const { t } = useTranslation();
   const [answer, setAnswer] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -59,7 +68,7 @@ const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
     <div className="border border-gray-800 bg-black/30 p-4">
       <div className="flex items-center gap-2 text-gray-300 text-sm font-medium mb-3">
         <HelpCircle className="w-4 h-4" />
-        {label}
+        {label || t('science.checkUnderstanding')}
       </div>
       <p className="text-white mb-4">{question?.prompt}</p>
 
@@ -81,7 +90,7 @@ const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
                 onClick={() => setAnswer(option)}
                 className={`w-full text-left px-3 py-2 border text-gray-200 transition-colors ${stateClass}`}
               >
-                {option}
+                {getAnswerLabel(t, question, option)}
               </button>
             );
           })}
@@ -93,7 +102,7 @@ const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
           disabled={submitted}
           onChange={(event) => setAnswer(event.target.value)}
           className="w-full px-3 py-2 bg-black/50 border border-gray-700 text-white focus:border-red-500 focus:outline-none"
-          placeholder="Enter your answer"
+          placeholder={t('science.enterAnswer')}
         />
       )}
 
@@ -104,7 +113,7 @@ const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
           className="mt-3 inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm"
         >
           <Lightbulb className="w-4 h-4" />
-          {showHint ? 'Hide hint' : 'Show hint'}
+          {showHint ? t('science.hideHint') : t('science.showHint')}
         </button>
       )}
       {showHint && <p className="mt-2 text-gray-300 text-sm bg-black/40 border border-gray-800 p-3">{question.hint}</p>}
@@ -117,17 +126,17 @@ const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
             disabled={!answer}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm disabled:opacity-50"
           >
-            Check Answer
+            {t('science.checkAnswer')}
           </button>
         ) : (
           <div className={`inline-flex items-center gap-2 text-sm font-medium ${correct ? 'text-green-400' : 'text-red-400'}`}>
             {correct ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-            {correct ? 'Correct' : `Answer: ${question.correct_answer}`}
+            {correct ? t('science.correct') : t('science.answerValue', { answer: getAnswerLabel(t, question, question.correct_answer) })}
           </div>
         )}
         {submitted && (
           <button type="button" onClick={() => { setAnswer(''); setSubmitted(false); }} className="text-sm text-gray-400 hover:text-white">
-            Try again
+            {t('science.tryAgain')}
           </button>
         )}
       </div>
@@ -142,12 +151,13 @@ const ScienceQuestion = ({ question, label = 'Check understanding' }) => {
 };
 
 const WorkedExample = ({ block }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const content = block.content_json || {};
 
   return (
     <div className="border border-gray-800 bg-black/30 p-5">
-      <div className="text-gray-500 text-xs uppercase tracking-wide mb-2">Worked example</div>
+      <div className="text-gray-500 text-xs uppercase tracking-wide mb-2">{t('science.workedExample')}</div>
       <p className="text-white font-medium mb-4">{content.problem || block.title}</p>
       <button
         type="button"
@@ -155,7 +165,7 @@ const WorkedExample = ({ block }) => {
         className="inline-flex items-center gap-2 text-red-400 hover:text-red-300 text-sm"
       >
         {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        {open ? 'Hide solution' : 'Reveal solution'}
+        {open ? t('science.hideSolution') : t('science.revealSolution')}
       </button>
       {open && (
         <div className="mt-4 space-y-3">
@@ -167,7 +177,7 @@ const WorkedExample = ({ block }) => {
           ))}
           {content.answer && (
             <div className="border-t border-gray-800 pt-3 text-white">
-              <span className="text-gray-400 font-medium">Answer: </span>{content.answer}
+              <span className="text-gray-400 font-medium">{t('science.answer')} </span>{content.answer}
             </div>
           )}
         </div>
@@ -193,6 +203,7 @@ const LabList = ({ title, items }) => (
 );
 
 const SimulationLab = ({ block }) => {
+  const { t } = useTranslation();
   const content = block?.content_json || {};
   const variables = content.variables || [];
   const tasks = content.tasks || [];
@@ -213,7 +224,7 @@ const SimulationLab = ({ block }) => {
     <section className="border border-gray-800 bg-black/30 overflow-hidden">
       <div className="p-4 border-b border-gray-800 flex items-center justify-between gap-3">
         <div>
-          <p className="text-white font-medium">{block.title || 'Simulation lab'}</p>
+          <p className="text-white font-medium">{block.title || t('science.simulationLab')}</p>
           {content.caption && <p className="text-gray-500 text-sm">{content.caption}</p>}
         </div>
         {content.url && (
@@ -227,43 +238,43 @@ const SimulationLab = ({ block }) => {
         <div className="border-b border-gray-800 bg-black/25 p-4">
           {content.prompt && (
             <div className="mb-4">
-              <p className="text-xs uppercase tracking-wide text-gray-600">Investigation</p>
+              <p className="text-xs uppercase tracking-wide text-gray-600">{t('science.investigation')}</p>
               <p className="mt-1 text-sm leading-relaxed text-gray-300">{content.prompt}</p>
             </div>
           )}
           {content.setup && (
             <div className="mb-4">
-              <p className="text-xs uppercase tracking-wide text-gray-600">Setup</p>
+              <p className="text-xs uppercase tracking-wide text-gray-600">{t('science.setup')}</p>
               <p className="mt-1 text-sm leading-relaxed text-gray-300">{content.setup}</p>
             </div>
           )}
-          {variables.length > 0 && <LabList title="Variables / Controls" items={variables} />}
+          {variables.length > 0 && <LabList title={t('science.variablesControls')} items={variables} />}
         </div>
       )}
 
       {content.url ? (
-        <iframe src={content.url} title={block.title || 'Simulation'} className="w-full h-[420px] bg-black" allowFullScreen />
+        <iframe src={content.url} title={block.title || t('science.simulation')} className="w-full h-[420px] bg-black" allowFullScreen />
       ) : (
-        <div className="p-6 text-gray-500">Missing simulation URL</div>
+        <div className="p-6 text-gray-500">{t('science.missingSimulationUrl')}</div>
       )}
 
       {(tasks.length > 0 || observations.length > 0) && (
         <div className="border-t border-gray-800 bg-black/35 p-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-white font-medium">Lab notebook</p>
-              <p className="text-sm text-gray-600">Use this while running the simulation.</p>
+              <p className="text-white font-medium">{t('science.labNotebook')}</p>
+              <p className="text-sm text-gray-600">{t('science.labNotebookDescription')}</p>
             </div>
             {tasks.length > 0 && (
               <span className="border border-gray-800 bg-black/40 px-2 py-1 text-xs text-gray-400">
-                {completedCount}/{tasks.length} tasks checked
+                {t('science.tasksChecked', { count: tasks.length, completed: completedCount, total: tasks.length })}
               </span>
             )}
           </div>
 
           {tasks.length > 0 && (
             <div className="mb-5">
-              <p className="mb-2 text-xs uppercase tracking-wide text-gray-600">Task checklist</p>
+              <p className="mb-2 text-xs uppercase tracking-wide text-gray-600">{t('science.taskChecklist')}</p>
               <div className="space-y-2">
                 {tasks.map((task, index) => (
                   <label key={`${task}-${index}`} className="flex items-start gap-3 border border-gray-800 bg-black/25 p-3 text-sm text-gray-300">
@@ -282,7 +293,7 @@ const SimulationLab = ({ block }) => {
 
           {observations.length > 0 && (
             <div>
-              <p className="mb-2 text-xs uppercase tracking-wide text-gray-600">Observation responses</p>
+              <p className="mb-2 text-xs uppercase tracking-wide text-gray-600">{t('science.observationResponses')}</p>
               <div className="space-y-3">
                 {observations.map((prompt, index) => (
                   <label key={`${prompt}-${index}`} className="block border border-gray-800 bg-black/25 p-3">
@@ -292,7 +303,7 @@ const SimulationLab = ({ block }) => {
                       onChange={(event) => updateNote(index, event.target.value)}
                       rows={3}
                       className="mt-2 w-full border border-gray-800 bg-black/45 p-2 text-sm text-white outline-none focus:border-red-700"
-                      placeholder="Write your observation here..."
+                      placeholder={t('science.observationPlaceholder')}
                     />
                   </label>
                 ))}
@@ -306,6 +317,7 @@ const SimulationLab = ({ block }) => {
 };
 
 export const ScienceBlockRenderer = ({ block, questionsById = {} }) => {
+  const { t } = useTranslation();
   const content = block?.content_json || {};
   const type = block?.block_type;
 
@@ -316,7 +328,7 @@ export const ScienceBlockRenderer = ({ block, questionsById = {} }) => {
   if (type === 'math') {
     return (
       <section className="border border-gray-800 bg-black/30 p-5">
-        <div className="text-gray-500 text-xs uppercase tracking-wide mb-3">Math note</div>
+        <div className="text-gray-500 text-xs uppercase tracking-wide mb-3">{t('science.mathNote')}</div>
         {renderMarkdown(content.body)}
       </section>
     );
@@ -332,10 +344,10 @@ export const ScienceBlockRenderer = ({ block, questionsById = {} }) => {
       <section className="border border-gray-800 bg-black/35 overflow-hidden">
         <div className="p-4 border-b border-gray-800 flex items-center gap-2 text-white font-medium">
           <Play className="w-4 h-4 text-red-400" />
-          {block.title || 'Video'}
+          {block.title || t('science.video')}
         </div>
         {embed ? (
-          <iframe src={embed} title={block.title || 'Video'} allowFullScreen className="w-full aspect-video bg-black" />
+          <iframe src={embed} title={block.title || t('science.video')} allowFullScreen className="w-full aspect-video bg-black" />
         ) : (
           <video src={content.url} controls className="w-full aspect-video bg-black" />
         )}
@@ -350,16 +362,16 @@ export const ScienceBlockRenderer = ({ block, questionsById = {} }) => {
 
   if (type === 'exercise') {
     const question = content.inline_question || questionsById[content.question_id];
-    return question ? <ScienceQuestion question={question} label={block.title || 'Check understanding'} /> : (
-      <section className="border border-gray-800 bg-black/30 p-5 text-gray-400">Exercise question is not connected yet.</section>
+    return question ? <ScienceQuestion question={question} label={block.title || t('science.checkUnderstanding')} /> : (
+      <section className="border border-gray-800 bg-black/30 p-5 text-gray-400">{t('science.exerciseNotConnected')}</section>
     );
   }
 
   if (type === 'quiz') {
     return (
       <section className="border border-gray-800 bg-black/30 p-5">
-        <p className="text-white font-medium">{block.title || 'Checkpoint quiz'}</p>
-        <p className="text-gray-500 text-sm mt-1">Open the course checkpoint to complete this quiz.</p>
+        <p className="text-white font-medium">{block.title || t('science.checkpointQuiz')}</p>
+        <p className="text-gray-500 text-sm mt-1">{t('science.openCheckpoint')}</p>
       </section>
     );
   }
@@ -375,7 +387,7 @@ export const ScienceBlockRenderer = ({ block, questionsById = {} }) => {
     const variant = content.variant || 'intuition';
     return (
       <section className={`border p-5 ${variants[variant] || variants.intuition}`}>
-        <p className="uppercase tracking-wide text-xs opacity-70 mb-2">{variant}</p>
+        <p className="uppercase tracking-wide text-xs opacity-70 mb-2">{t(`science.callout.${variant}`, { defaultValue: variant })}</p>
         {renderMarkdown(content.body)}
       </section>
     );
@@ -390,7 +402,7 @@ export const ScienceBlockRenderer = ({ block, questionsById = {} }) => {
     );
   }
 
-  return <section className="border border-gray-800 bg-black/35 p-5 text-gray-500">Unsupported block type: {type}</section>;
+  return <section className="border border-gray-800 bg-black/35 p-5 text-gray-500">{t('science.unsupportedBlock', { type })}</section>;
 };
 
 export default ScienceBlockRenderer;
