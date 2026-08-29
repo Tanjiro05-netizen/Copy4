@@ -4,10 +4,10 @@ import { Globe } from 'lucide-react';
 
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: 'EN' },
-  { code: 'es', label: 'Espanol', flag: 'ES' },
+  { code: 'es', label: 'Español', flag: 'ES' },
   { code: 'de', label: 'Deutsch', flag: 'DE' },
   { code: 'zh', label: '中文', flag: '中' },
-  { code: 'fr', label: 'Francais', flag: 'FR' },
+  { code: 'fr', label: 'Français', flag: 'FR' },
   { code: 'it', label: 'Italiano', flag: 'IT' },
 ];
 
@@ -16,7 +16,7 @@ const bandHairline = 'rgba(20, 22, 29, 0.2)';
 const bandAccent = '#b3122e';
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -60,7 +60,7 @@ const LanguageSwitcher = () => {
             e.currentTarget.style.color = bandInk;
           }
         }}
-        title="Change language"
+        title={t('nav.changeLanguage')}
       >
         <Globe size={12} />
         <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '10px', letterSpacing: '0.05em' }}>

@@ -20,7 +20,12 @@
     "profile": "个人资料",
     "login": "登录",
     "logout": "退出",
-    "membersOnly": "仅限会员"
+    "membersOnly": "仅限会员",
+    "searchLibrary": "搜索图书馆",
+    "changeLanguage": "切换语言",
+    "editorial": "编辑",
+    "myProfile": "我的资料",
+    "adminTools": "管理工具"
   },
   "common": {
     "loading": "加载中...",
@@ -99,7 +104,35 @@
     "deleteList": "删除列表",
     "noLists": "还没有阅读列表。创建一个吧！",
     "epubFormat": "EPUB",
-    "pdfFormat": "PDF"
+    "pdfFormat": "PDF",
+    "archive": "档案库",
+    "era19": "19世纪",
+    "era20": "20世纪",
+    "era21": "21世纪",
+    "titles_one": "部",
+    "titles_other": "部",
+    "read": "阅读",
+    "open": "打开",
+    "listen": "收听",
+    "listenNow": "立即收听",
+    "openPdf": "打开 PDF",
+    "openExternal": "在外部查看器中打开",
+    "unknownAuthor": "佚名",
+    "pagesWord": "页",
+    "gridView": "网格视图",
+    "listView": "列表视图",
+    "categories": {
+      "politicalEconomy": "政治经济学",
+      "philosophy": "哲学",
+      "history": "历史",
+      "sociology": "社会学",
+      "strategyTactics": "战略与战术",
+      "downloads": "下载",
+      "audiobooks": "有声书",
+      "uncategorized": "未分类"
+    },
+    "localListsNote": "仅存储在此浏览器中。",
+    "noReviews": "暂无评论。"
   },
   "book": {
     "downloadPDF": "下载PDF",
@@ -122,7 +155,9 @@
     "typography": "排版",
     "noToc": "没有可用的目录。",
     "reading": "阅读中",
-    "noFile": "未找到此书的可读文件。"
+    "noFile": "未找到此书的可读文件。",
+    "epubRenderTimeout": "此 EPUB 未能完成渲染。如有备用文件，请使用下方文件。",
+    "openFallback": "打开 PDF 备用文件"
   },
   "theory": {
     "title": "革命理论",
@@ -272,5 +307,53 @@
   "pwa": {
     "installPrompt": "安装应用",
     "installDesc": "将Marxist.info添加到主屏幕以便快速访问。"
+  },
+  "footer": {
+    "mission": "一个开放的平台，用于研究马克思主义理论——文本、分析、讨论与数据。",
+    "sections": "栏目",
+    "epigraph": "“哲学家们只是用不同的方式解释世界，而问题在于改变世界。”",
+    "attribution": "马克思——《关于费尔巴哈的提纲》第十一条",
+    "meta": "学习 · 分析 · 讨论 · 数据",
+    "home": "主页",
+    "theory": "理论",
+    "analysis": "分析",
+    "library": "图书馆",
+    "study": "学习",
+    "politics": "政治",
+    "bulletin": "通讯",
+    "feed": "社区",
+    "epigraphLabel": "题词"
+  },
+  "maintenance": {
+    "title": "我们即将归来",
+    "message": "平台正在进行维护与升级。我们正在努力为您带来更好的体验。",
+    "quote": "“哲学家们只是用不同的方式解释世界，而问题在于改变世界。”",
+    "quoteAuthor": "—— 卡尔·马克思《关于费尔巴哈的提纲》",
+    "apk": "下载 Marxist Forum APK",
+    "tagline": "推进革命理论"
+  },
+  "comingSoon": {
+    "kicker": "筹备中",
+    "defaultDesc": "本板块正在积极开发中，即将上线。",
+    "whatToExpect": "敬请期待",
+    "cardText1": "本板块正在开发中。我们为会员规划了阅读、研究与社区等一系列功能。",
+    "cardText2": "请稍后再来，或注册以在本功能上线时收到通知。",
+    "registerToUnlock": "注册解锁",
+    "returnHome": "返回主页",
+    "theoryTitle": "理论",
+    "theoryDesc": "深度文章与文本，配备高级阅读工具。面向会员开放。",
+    "studyTitle": "学习中心",
+    "studyDesc": "结构化学习路径、精选书单与进度追踪。面向会员开放。",
+    "scienceTechTitle": "科学与技术",
+    "scienceTechDesc": "涵盖自然科学、数学与技术的课程与参考资料。面向会员开放。",
+    "vizTitle": "数据与可视化",
+    "vizDesc": "涵盖经济与社会指标的交互式图表与仪表盘。面向会员开放。",
+    "directoryTitle": "名录",
+    "forumTitle": "论坛",
+    "forumDesc": "一个讨论、辩论与协作阅读的空间。面向会员开放。",
+    "knowledgeTitle": "知识库",
+    "knowledgeDesc": "社区问答与参考资源。面向会员开放。",
+    "politicsTitle": "政治",
+    "politicsDesc": "时事新闻、分析与评论。面向会员开放。"
   }
 }

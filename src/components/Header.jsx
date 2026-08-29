@@ -78,7 +78,7 @@ const Header = () => {
             <div className={s.navband}>
                 <div className={s.navbandInner}>
                     <div className={s.bandSlot}>
-                        <Link href="/digital-library" className={s.bandIconLink} title="Search the library">
+                        <Link href="/digital-library" className={s.bandIconLink} title={t('nav.searchLibrary')}>
                             <Search size={15} strokeWidth={1.8} />
                         </Link>
                         <LanguageSwitcher />
@@ -137,7 +137,7 @@ const Header = () => {
                                 <div className={s.dropdownWrap}>
                                     <div className={s.dropdownTrigger}>
                                         <FileText size={16} style={{ marginRight: 8 }} />
-                                        <span>Editorial</span>
+                                        <span>{t('nav.editorial')}</span>
                                     </div>
                                     <div className={s.dropdownMenu}>
                                             <Link href="/admin/politics/upload"
@@ -153,7 +153,7 @@ const Header = () => {
                                 <div className={s.dropdownWrap}>
                                     <div className={s.dropdownTrigger}>
                                         <Shield size={16} style={{ marginRight: 8 }} />
-                                        <span>Admin</span>
+                                        <span>{t('nav.admin')}</span>
                                     </div>
                                     <div className={s.dropdownMenu}>
                                             {[
@@ -199,7 +199,7 @@ const Header = () => {
                             <button
                                 onClick={handleLogout}
                                 className={s.iconButton}
-                                title='Logout'
+                                title={t('nav.logout')}
                             >
                                 <LogOut size={18} />
                             </button>
@@ -276,7 +276,7 @@ const Header = () => {
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
                                         <Shield size={20} style={{ marginRight: 8 }} />
-                                        <span>Admin Tools</span>
+                                        <span>{t('nav.adminTools')}</span>
                                     </Link>
                                     <Link href="/admin/roles"
                                         className={`${s.mobileSubLink} ${isActive('/admin/roles') ? s.mobileLinkActive : ''}`}
@@ -306,7 +306,7 @@ const Header = () => {
                                     className={s.mobileLink}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
-                                    <span>My Profile</span>
+                                    <span>{t('nav.myProfile')}</span>
                                 </Link>
                             )}
                         </nav>

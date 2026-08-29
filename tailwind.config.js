@@ -238,9 +238,11 @@ module.exports = {
         sand: '#d8c79f',
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        body: ['Newsreader', 'Georgia', 'serif'],
-        label: ['Outfit', 'system-ui', 'sans-serif'],
+        // 'Noto Serif/Sans SC' append: per-glyph CJK fallback for zh —
+        // Latin text keeps the display/body faces untouched.
+        display: ['"Cormorant Garamond"', 'Georgia', '"Noto Serif SC"', 'serif'],
+        body: ['Newsreader', 'Georgia', '"Noto Serif SC"', 'serif'],
+        label: ['Outfit', 'system-ui', '"Noto Sans SC"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'Fira Code', 'monospace'],
       },
       animation: {

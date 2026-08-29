@@ -20,7 +20,12 @@
     "profile": "Profil",
     "login": "Connexion",
     "logout": "Deconnexion",
-    "membersOnly": "Membres uniquement"
+    "membersOnly": "Membres uniquement",
+    "searchLibrary": "Rechercher dans la bibliothèque",
+    "changeLanguage": "Changer de langue",
+    "editorial": "Rédaction",
+    "myProfile": "Mon profil",
+    "adminTools": "Outils d'administration"
   },
   "common": {
     "loading": "Chargement...",
@@ -49,7 +54,7 @@
     "all": "Tous",
     "filter": "Filtrer",
     "sort": "Trier",
-    "recent": "Recent",
+    "recent": "Récent",
     "popular": "Populaire",
     "exportCSV": "Exporter CSV",
     "exportPNG": "Exporter PNG"
@@ -99,7 +104,35 @@
     "deleteList": "Supprimer la liste",
     "noLists": "Pas encore de listes de lecture. Creez-en une!",
     "epubFormat": "EPUB",
-    "pdfFormat": "PDF"
+    "pdfFormat": "PDF",
+    "archive": "Les Archives",
+    "era19": "XIXe siècle",
+    "era20": "XXe siècle",
+    "era21": "XXIe siècle",
+    "titles_one": "titre",
+    "titles_other": "titres",
+    "read": "Lire",
+    "open": "Ouvrir",
+    "listen": "Écouter",
+    "listenNow": "Écouter maintenant",
+    "openPdf": "Ouvrir le PDF",
+    "openExternal": "Ouvrir dans une visionneuse externe",
+    "unknownAuthor": "Inconnu",
+    "pagesWord": "pages",
+    "gridView": "Vue grille",
+    "listView": "Vue liste",
+    "categories": {
+      "politicalEconomy": "Économie politique",
+      "philosophy": "Philosophie",
+      "history": "Histoire",
+      "sociology": "Sociologie",
+      "strategyTactics": "Stratégie et tactique",
+      "downloads": "Téléchargements",
+      "audiobooks": "Livres audio",
+      "uncategorized": "Non classé"
+    },
+    "localListsNote": "Stockées dans ce navigateur uniquement.",
+    "noReviews": "Pas encore d'avis."
   },
   "book": {
     "downloadPDF": "Telecharger le PDF",
@@ -122,7 +155,9 @@
     "typography": "Typographie",
     "noToc": "Aucune table des matieres disponible.",
     "reading": "Lecture",
-    "noFile": "Aucun fichier lisible trouvé pour ce livre."
+    "noFile": "Aucun fichier lisible trouvé pour ce livre.",
+    "epubRenderTimeout": "Cet EPUB n'a pas fini de s'afficher. Utilisez le fichier de secours ci-dessous s'il est disponible.",
+    "openFallback": "Ouvrir le PDF de secours"
   },
   "theory": {
     "title": "Theorie Revolutionnaire",
@@ -272,5 +307,53 @@
   "pwa": {
     "installPrompt": "Installer l'Application",
     "installDesc": "Ajoutez Marxist.info a votre ecran d'accueil pour un acces rapide."
+  },
+  "footer": {
+    "mission": "Une plateforme ouverte pour l'étude de la théorie marxiste — textes, analyse, discussion et données.",
+    "sections": "Sections",
+    "epigraph": "« Les philosophes n'ont fait qu'interpréter le monde de diverses manières ; ce qui compte, c'est de le transformer. »",
+    "attribution": "Marx — Thèses sur Feuerbach, XI",
+    "meta": "étude · analyse · discussion · données",
+    "home": "Accueil",
+    "theory": "Théorie",
+    "analysis": "Analyse",
+    "library": "Bibliothèque",
+    "study": "Étude",
+    "politics": "Politique",
+    "bulletin": "Bulletin",
+    "feed": "Communauté",
+    "epigraphLabel": "Épigraphe"
+  },
+  "maintenance": {
+    "title": "Nous revenons sous peu",
+    "message": "La plateforme est actuellement en maintenance et en cours d'amélioration. Nous travaillons à vous offrir une meilleure expérience.",
+    "quote": "« Les philosophes n'ont fait qu'interpréter le monde de diverses manières ; il s'agit cependant de le transformer. »",
+    "quoteAuthor": "— Karl Marx, Thèses sur Feuerbach",
+    "apk": "Télécharger l'APK de Marxist Forum",
+    "tagline": "Faire avancer la théorie révolutionnaire"
+  },
+  "comingSoon": {
+    "kicker": "En préparation",
+    "defaultDesc": "Cette section est en cours de développement actif et sera bientôt disponible.",
+    "whatToExpect": "À quoi s'attendre",
+    "cardText1": "Cette section est actuellement en développement. Toute une série de fonctions de lecture, de recherche et de communauté est prévue pour les membres.",
+    "cardText2": "Revenez bientôt ou inscrivez-vous pour être averti lorsque cette fonctionnalité sera disponible.",
+    "registerToUnlock": "S'inscrire pour débloquer",
+    "returnHome": "Retour à la page d'accueil",
+    "theoryTitle": "Théorie",
+    "theoryDesc": "Articles et textes approfondis avec des outils de lecture avancés. Réservé aux membres.",
+    "studyTitle": "Centre d'études",
+    "studyDesc": "Parcours d'apprentissage structurés, listes de lecture sélectionnées et suivi des progrès. Réservé aux membres.",
+    "scienceTechTitle": "Science et technologie",
+    "scienceTechDesc": "Cours et documents de référence couvrant les sciences naturelles, les mathématiques et la technologie. Réservé aux membres.",
+    "vizTitle": "Données et visualisations",
+    "vizDesc": "Graphiques interactifs et tableaux de bord couvrant les indicateurs économiques et sociaux. Réservé aux membres.",
+    "directoryTitle": "Annuaire",
+    "forumTitle": "Forum",
+    "forumDesc": "Un espace de discussion, de débat et de lecture collaborative. Réservé aux membres.",
+    "knowledgeTitle": "Base de connaissances",
+    "knowledgeDesc": "Une ressource de questions-réponses communautaire et de référence. Réservé aux membres.",
+    "politicsTitle": "Politique",
+    "politicsDesc": "Actualités, analyses et commentaires sur l'actualité. Réservé aux membres."
   }
 }

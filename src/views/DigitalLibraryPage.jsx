@@ -33,6 +33,25 @@ const PDF_UPLOAD_URL = '/admin/library/upload?format=pdf';
 
 const isPurePdfBook = (book) => !!book?.pdf_filename && !book?.epub_filename && !book?.isAudiobook;
 
+/* DB categories and synthetic sections get translated display names;
+   the raw string stays the section id and React key. */
+const CATEGORY_KEYS = {
+    'Political Economy': 'politicalEconomy',
+    'Philosophy': 'philosophy',
+    'History': 'history',
+    'Sociology': 'sociology',
+    'Strategy & Tactics': 'strategyTactics',
+    [PDF_DOWNLOADS_SECTION]: 'downloads',
+    [AUDIOBOOKS_SECTION]: 'audiobooks',
+    'Uncategorized': 'uncategorized',
+};
+
+const translateCategory = (name, t) => {
+    if (name === 'All Categories') return t('library.allCategories');
+    const key = CATEGORY_KEYS[name];
+    return key ? t(`library.categories.${key}`) : name;
+};
+
 const getBookSectionName = (book) => {
     if (book?.isAudiobook) return AUDIOBOOKS_SECTION;
     if (isPurePdfBook(book)) return PDF_DOWNLOADS_SECTION;
@@ -74,15 +93,16 @@ const getCoverImageSrc = (coverUrl) => {
 
 const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
     const router = useRouter();
+    const { t } = useTranslation();
     const isAudiobook = book.isAudiobook;
     const isPdfBook = isPurePdfBook(book);
-    
+
     // Get the public URL for the book's PDF file (if not audiobook)
     const externalViewerUrl = !isAudiobook && book.pdf_filename ? supabase
         .storage
         .from('library')
         .getPublicUrl(book.pdf_filename)?.data?.publicUrl : null;
-    const pdfFileActionLabel = isPdfBook ? 'Download PDF' : 'Open in external viewer';
+    const pdfFileActionLabel = isPdfBook ? t('book.downloadPDF') : t('library.openExternal');
     
     // Get a proper public URL for cover image from Supabase storage
     const initialCover = getCoverImageSrc(isAudiobook ? book.cover_url : book.cover_image_url);
@@ -215,7 +235,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                                 onClick={() => onPlay(book)}
                                 className="flex items-center gap-1.5 border border-[#262a35] px-3 py-1.5 font-[Outfit,sans-serif] text-[9px] font-medium uppercase tracking-[0.18em] text-[#a5a194] transition-colors hover:border-[#d41f3d] hover:text-[#d41f3d] cursor-pointer bg-transparent"
                             >
-                                <Headphones size={12} /> Listen
+                                <Headphones size={12} /> {t('library.listen')}
                             </button>
                         ) : (
                             <Link
@@ -223,7 +243,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                                 data-testid="ebook-read-link"
                                 className="flex items-center gap-1.5 bg-[#b3122e] px-3 py-1.5 font-[Outfit,sans-serif] text-[9px] font-medium uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#d41f3d]"
                             >
-                                <BookOpen size={12} /> {isPdfBook ? 'Open' : 'Read'}
+                                <BookOpen size={12} /> {isPdfBook ? t('library.open') : t('library.read')}
                             </Link>
                         )}
                         {!isAudiobook && externalViewerUrl && (
@@ -248,7 +268,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                     {book.pages ? (
                         <>
                             <span className="font-display text-2xl leading-none text-[#ece9e0]">{book.pages}</span>
-                            <span className="font-[Outfit,sans-serif] text-[8.5px] uppercase tracking-[0.22em] text-[#6f6c61]">pages</span>
+                            <span className="font-[Outfit,sans-serif] text-[8.5px] uppercase tracking-[0.22em] text-[#6f6c61]">{t('library.pagesWord')}</span>
                         </>
                     ) : (
                         <ArrowUpRight size={15} className="text-[#6f6c61] transition-colors group-hover:text-[#d41f3d]" />
@@ -318,7 +338,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                             <Link href={`/book/${book.id}`}>{book.title}</Link>
                         )}
                     </h3>
-                    <p className="text-gray-400 text-sm mb-2">{book.author || 'Unknown'} {book.year ? `• ${book.year}` : ''}</p>
+                    <p className="text-gray-400 text-sm mb-2">{book.author || t('library.unknownAuthor')} {book.year ? `• ${book.year}` : ''}</p>
                     
                     {viewMode === 'list' && book.description && (
                         <p className="text-gray-300 text-sm mb-4">{book.description}</p>
@@ -331,7 +351,7 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                     {!isAudiobook && book.pages && (
                         <span className="flex items-center">
                             <FileText size={16} className="mr-1" />
-                            {book.pages} pages
+                            {book.pages} {t('library.pagesWord')}
                         </span>
                     )}
                 </div>
@@ -342,14 +362,14 @@ const BookCard = ({ book, viewMode, isAdminUser, onDelete, onPlay }) => {
                              onClick={() => onPlay(book)}
                              className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors text-sm font-bold flex items-center justify-center gap-2 cursor-pointer border-none"
                          >
-                             <Headphones size={16} /> Listen Now
+                             <Headphones size={16} /> {t('library.listenNow')}
                          </button>
                      ) : (
                          <Link href={`/book/${book.id}`}
                             data-testid="ebook-read-link"
                             className="flex-1 text-center bg-red-600 text-white py-2 rounded hover:bg-red-700 transition-colors text-sm font-bold"
                         >
-                            {isPdfBook ? (book.text_edition?.sections?.length ? 'Read Now' : 'Open PDF') : 'Read Now'}
+                            {isPdfBook ? (book.text_edition?.sections?.length ? t('library.readNow') : t('library.openPdf')) : t('library.readNow')}
                         </Link>
                      )}
                     {!isAudiobook && externalViewerUrl && (
@@ -441,7 +461,7 @@ const DigitalLibraryPage = () => {
                     .filter(category => category && ![PDF_DOWNLOADS_SECTION, LEGACY_PDF_DOWNLOADS_SECTION, AUDIOBOOKS_SECTION].includes(category)))];
                 const dynamicCategories = distinctCategories.map(name => ({
                     id: name,
-                    name: name,
+                    name,
                     icon: categoryIcons[name] || categoryIcons.default
                 }));
                 setCategories([
@@ -534,7 +554,7 @@ const DigitalLibraryPage = () => {
             <div className="relative border-b border-[#1c202b] py-16">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-col items-center text-center">
-                        <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.32em] text-red-500">The Archive</p>
+                        <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.32em] text-red-500">{t('library.archive')}</p>
                         <h1 className="font-display text-5xl font-medium tracking-[0.01em] text-white">{t('library.title')}</h1>
                         <div className="mt-4 mb-4 h-[2px] w-11 bg-[#b3122e]" aria-hidden="true" />
                         <p className="max-w-2xl text-lg text-gray-300">
@@ -586,9 +606,9 @@ const DigitalLibraryPage = () => {
                             onChange={(e) => setActiveEra(e.target.value)}
                         >
                             <option value="all">{t('library.allEras')}</option>
-                            <option value="19th Century">19th Century</option>
-                            <option value="20th Century">20th Century</option>
-                            <option value="21st Century">21st Century</option>
+                            <option value="19th Century">{t('library.era19')}</option>
+                            <option value="20th Century">{t('library.era20')}</option>
+                            <option value="21st Century">{t('library.era21')}</option>
                         </select>
                         
                         <select 
@@ -605,12 +625,14 @@ const DigitalLibraryPage = () => {
                         <div className="flex space-x-2">
                             <button
                                 onClick={() => setViewMode('grid')}
+                                aria-label={t('library.gridView')}
                                 className={`p-2 rounded ${viewMode === 'grid' ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400'}`}
                             >
                                 <Grid size={20} />
                             </button>
                             <button
                                 onClick={() => setViewMode('list')}
+                                aria-label={t('library.listView')}
                                 className={`p-2 rounded ${viewMode === 'list' ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400'}`}
                             >
                                 <List size={20} />
@@ -627,7 +649,7 @@ const DigitalLibraryPage = () => {
                                 onClick={() => setActiveCategory(category.id)}
                                 className={`px-4 py-2 ${activeCategory === category.id ? 'bg-red-600 text-white' : 'bg-black/30 text-gray-400 hover:bg-black/50'} rounded-none transition-colors whitespace-nowrap flex items-center gap-2`}
                             >
-                                <span>{category.name}</span>
+                                <span>{translateCategory(category.name, t)}</span>
                             </button>
                         ))}
                     </div>
@@ -655,10 +677,10 @@ const DigitalLibraryPage = () => {
                                 <div className="mb-2 flex flex-col gap-3">
                                     <div className="flex items-baseline justify-center gap-3">
                                         <h2 className="m-0 font-display text-[26px] font-medium tracking-[0.01em] text-[#ece9e0]">
-                                            {categoryName}
+                                            {translateCategory(categoryName, t)}
                                         </h2>
                                         <span className="font-[Outfit,sans-serif] text-[9px] font-medium uppercase tracking-[0.22em] text-[#6f6c61]">
-                                            {String(booksInCategory.length).padStart(2, '0')} titles
+                                            {String(booksInCategory.length).padStart(2, '0')} {t('library.titles', { count: booksInCategory.length })}
                                         </span>
                                     </div>
                                     {isAdminUser && categoryName === PDF_DOWNLOADS_SECTION && <PdfUploadAction />}

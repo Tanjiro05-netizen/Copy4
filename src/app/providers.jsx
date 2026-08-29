@@ -9,9 +9,23 @@ import { ThemeProvider } from '@/src/context/ThemeContext.jsx';
 import ErrorBoundary from '@/src/components/ErrorBoundary.jsx';
 import FloatingMiniPlayer from '@/src/components/Library/FloatingMiniPlayer.jsx';
 import MaintenancePage from '@/src/views/MaintenancePage.jsx';
+import i18n from '@/src/i18n';
 
 const DEVELOPMENT_CACHE_NAMES = ['api-cache', 'google-fonts', 'images', 'images-v2'];
 const SERVICE_WORKER_RELOAD_KEY = 'marxist-platform-sw-reload-at';
+
+/* Keep <html lang> in step with the selected language for a11y/SEO. */
+const HtmlLangSync = () => {
+  useEffect(() => {
+    const set = (lng) => {
+      document.documentElement.lang = (lng || 'en').split('-')[0];
+    };
+    set(i18n.language);
+    i18n.on('languageChanged', set);
+    return () => i18n.off('languageChanged', set);
+  }, []);
+  return null;
+};
 
 const isDevelopmentAppCache = (cacheName) =>
   DEVELOPMENT_CACHE_NAMES.includes(cacheName) ||
@@ -132,6 +146,7 @@ export default function Providers({ children, initialAuth }) {
 
   return (
     <ErrorBoundary>
+      <HtmlLangSync />
       <AuthProvider
         initialUser={initialAuth?.user ?? null}
         initialProfile={initialAuth?.profile ?? null}

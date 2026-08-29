@@ -20,7 +20,12 @@
     "profile": "Perfil",
     "login": "Iniciar Sesion",
     "logout": "Cerrar Sesion",
-    "membersOnly": "Solo Miembros"
+    "membersOnly": "Solo Miembros",
+    "searchLibrary": "Buscar en la biblioteca",
+    "changeLanguage": "Cambiar idioma",
+    "editorial": "Editorial",
+    "myProfile": "Mi perfil",
+    "adminTools": "Herramientas de administración"
   },
   "common": {
     "loading": "Cargando...",
@@ -99,7 +104,35 @@
     "deleteList": "Eliminar lista",
     "noLists": "Aun no hay listas de lectura. Crea una!",
     "epubFormat": "EPUB",
-    "pdfFormat": "PDF"
+    "pdfFormat": "PDF",
+    "archive": "El Archivo",
+    "era19": "Siglo XIX",
+    "era20": "Siglo XX",
+    "era21": "Siglo XXI",
+    "titles_one": "título",
+    "titles_other": "títulos",
+    "read": "Leer",
+    "open": "Abrir",
+    "listen": "Escuchar",
+    "listenNow": "Escuchar ahora",
+    "openPdf": "Abrir PDF",
+    "openExternal": "Abrir en visor externo",
+    "unknownAuthor": "Desconocido",
+    "pagesWord": "páginas",
+    "gridView": "Vista de cuadrícula",
+    "listView": "Vista de lista",
+    "categories": {
+      "politicalEconomy": "Economía Política",
+      "philosophy": "Filosofía",
+      "history": "Historia",
+      "sociology": "Sociología",
+      "strategyTactics": "Estrategia y Táctica",
+      "downloads": "Descargas",
+      "audiobooks": "Audiolibros",
+      "uncategorized": "Sin categoría"
+    },
+    "localListsNote": "Guardadas solo en este navegador.",
+    "noReviews": "Aún no hay reseñas."
   },
   "book": {
     "downloadPDF": "Descargar PDF",
@@ -122,7 +155,9 @@
     "typography": "Tipografia",
     "noToc": "No hay tabla de contenidos disponible.",
     "reading": "Leyendo",
-    "noFile": "No se encontró un archivo legible para este libro."
+    "noFile": "No se encontró un archivo legible para este libro.",
+    "epubRenderTimeout": "Este EPUB no terminó de renderizarse. Use el archivo alternativo de abajo si hay uno disponible.",
+    "openFallback": "Abrir PDF alternativo"
   },
   "theory": {
     "title": "Teoria Revolucionaria",
@@ -272,5 +307,53 @@
   "pwa": {
     "installPrompt": "Instalar App",
     "installDesc": "Agrega Marxist.info a tu pantalla de inicio para acceso rapido."
+  },
+  "footer": {
+    "mission": "Una plataforma abierta para el estudio de la teoría marxista: textos, análisis, debate y datos.",
+    "sections": "Secciones",
+    "epigraph": "«Los filósofos no han hecho más que interpretar de diversos modos el mundo, pero de lo que se trata es de transformarlo.»",
+    "attribution": "Marx — Tesis sobre Feuerbach, XI",
+    "meta": "estudio · análisis · debate · datos",
+    "home": "Inicio",
+    "theory": "Teoría",
+    "analysis": "Análisis",
+    "library": "Biblioteca",
+    "study": "Estudio",
+    "politics": "Política",
+    "bulletin": "Boletín",
+    "feed": "Comunidad",
+    "epigraphLabel": "Epígrafe"
+  },
+  "maintenance": {
+    "title": "Volvemos en breve",
+    "message": "La plataforma se encuentra en mantenimiento y mejoras. Estamos trabajando para ofrecerle una mejor experiencia.",
+    "quote": "«Los filósofos no han hecho más que interpretar el mundo de diversos modos; se trata, sin embargo, de transformarlo.»",
+    "quoteAuthor": "— Karl Marx, Tesis sobre Feuerbach",
+    "apk": "Descargar el APK de Marxist Forum",
+    "tagline": "Avanzando en la teoría revolucionaria"
+  },
+  "comingSoon": {
+    "kicker": "En preparación",
+    "defaultDesc": "Esta sección está en desarrollo activo y estará disponible pronto.",
+    "whatToExpect": "Qué esperar",
+    "cardText1": "Esta sección está actualmente en desarrollo. Está prevista una serie de funciones de lectura, investigación y comunidad para los miembros.",
+    "cardText2": "Vuelva pronto o regístrese para recibir una notificación cuando esta función esté disponible.",
+    "registerToUnlock": "Regístrese para desbloquear",
+    "returnHome": "Volver a la página de inicio",
+    "theoryTitle": "Teoría",
+    "theoryDesc": "Artículos y textos en profundidad con herramientas de lectura avanzadas. Disponible para miembros.",
+    "studyTitle": "Centro de Estudios",
+    "studyDesc": "Rutas de aprendizaje estructuradas, listas de lectura curadas y seguimiento del progreso. Disponible para miembros.",
+    "scienceTechTitle": "Ciencia y Tecnología",
+    "scienceTechDesc": "Cursos y material de referencia que abarcan las ciencias naturales, las matemáticas y la tecnología. Disponible para miembros.",
+    "vizTitle": "Datos y Visualizaciones",
+    "vizDesc": "Gráficos interactivos y paneles que cubren indicadores económicos y sociales. Disponible para miembros.",
+    "directoryTitle": "Directorio",
+    "forumTitle": "Foro",
+    "forumDesc": "Un espacio de discusión, debate y lectura colaborativa. Disponible para miembros.",
+    "knowledgeTitle": "Base de Conocimiento",
+    "knowledgeDesc": "Un recurso de preguntas y respuestas de la comunidad y de referencia. Disponible para miembros.",
+    "politicsTitle": "Política",
+    "politicsDesc": "Noticias, análisis y comentarios sobre la actualidad. Disponible para miembros."
   }
 }

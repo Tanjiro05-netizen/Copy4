@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Lock, BookMarked, GraduationCap, FlaskConical, LineChart, Users, MessageSquare, HelpCircle, Newspaper } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -12,51 +13,21 @@ const VisualizationTeaser = dynamic(() => import('../components/ComingSoonTeaser
 });
 import * as s from './ComingSoonPage.css.ts';
 
+/* Titles/descriptions resolve through i18n at render time. */
 const FEATURE_CONFIG = {
-    theory: {
-        icon: BookMarked,
-        title: 'Theory',
-        desc: 'In-depth articles and texts with advanced reading tools. Available to members.',
-    },
-    study: {
-        icon: GraduationCap,
-        title: 'Study Center',
-        desc: 'Structured learning paths, curated reading lists, and progress tracking. Available to members.',
-    },
-    'science-tech': {
-        icon: FlaskConical,
-        title: 'Science & Technology',
-        desc: 'Courses and reference material spanning the natural sciences, mathematics, and technology. Available to members.',
-    },
-    visualizations: {
-        icon: LineChart,
-        title: 'Data & Visualizations',
-        desc: 'Interactive charts and dashboards covering economic and social indicators. Available to members.',
-    },
-    directory: {
-        icon: Users,
-        title: 'Directory',
-        desc: '',
-    },
-    forum: {
-        icon: MessageSquare,
-        title: 'Forum',
-        desc: 'A space for discussion, debate, and collaborative reading. Available to members.',
-    },
-    knowledge: {
-        icon: HelpCircle,
-        title: 'Knowledge Base',
-        desc: 'A community Q&A and reference resource. Available to members.',
-    },
-    politics: {
-        icon: Newspaper,
-        title: 'Politics',
-        desc: 'News, analysis, and commentary on current events. Available to members.',
-    },
+    theory: { icon: BookMarked, titleKey: 'comingSoon.theoryTitle', descKey: 'comingSoon.theoryDesc' },
+    study: { icon: GraduationCap, titleKey: 'comingSoon.studyTitle', descKey: 'comingSoon.studyDesc' },
+    'science-tech': { icon: FlaskConical, titleKey: 'comingSoon.scienceTechTitle', descKey: 'comingSoon.scienceTechDesc' },
+    visualizations: { icon: LineChart, titleKey: 'comingSoon.vizTitle', descKey: 'comingSoon.vizDesc' },
+    directory: { icon: Users, titleKey: 'comingSoon.directoryTitle', descKey: null },
+    forum: { icon: MessageSquare, titleKey: 'comingSoon.forumTitle', descKey: 'comingSoon.forumDesc' },
+    knowledge: { icon: HelpCircle, titleKey: 'comingSoon.knowledgeTitle', descKey: 'comingSoon.knowledgeDesc' },
+    politics: { icon: Newspaper, titleKey: 'comingSoon.politicsTitle', descKey: 'comingSoon.politicsDesc' },
 };
 
 const ComingSoonPage = () => {
     const router = useRouter();
+    const { t } = useTranslation();
     const searchParams = useSearchParams();
     const featureKey = searchParams.get('feature');
     const feature = FEATURE_CONFIG[featureKey];
@@ -71,39 +42,34 @@ const ComingSoonPage = () => {
                     </div>
                 )}
 
-                <p className={s.kicker}>In Preparation</p>
-                <h1 className={s.title}>{feature ? feature.title : 'Coming Soon'}</h1>
+                <p className={s.kicker}>{t('comingSoon.kicker')}</p>
+                <h1 className={s.title}>{feature ? t(feature.titleKey) : t('common.comingSoon')}</h1>
                 <div className={s.rule} />
 
                 <p className={s.subtitle}>
-                    {feature ? feature.desc : 'This section is under active development and will be available soon.'}
+                    {feature && feature.descKey ? t(feature.descKey) : t('comingSoon.defaultDesc')}
                 </p>
 
                 {featureKey === 'visualizations' && <VisualizationTeaser />}
 
                 {!feature && (
                     <div className={s.card}>
-                        <h2 className={s.cardTitle}>What to expect</h2>
-                        <p className={s.cardText}>
-                            This section is currently in development. A range of reading, research, 
-                            and community features are planned for members.
-                        </p>
-                        <p className={s.cardText}>
-                            Check back soon or register to be notified when this feature becomes available.
-                        </p>
+                        <h2 className={s.cardTitle}>{t('comingSoon.whatToExpect')}</h2>
+                        <p className={s.cardText}>{t('comingSoon.cardText1')}</p>
+                        <p className={s.cardText}>{t('comingSoon.cardText2')}</p>
                     </div>
                 )}
 
                 {feature && (
                     <Link href="/login" className={s.registerCta}>
                         <Lock size={16} />
-                        Register to Unlock
+                        {t('comingSoon.registerToUnlock')}
                     </Link>
                 )}
 
                 <button onClick={() => router.push('/')} className={s.backButton}>
                     <ArrowLeft size={16} />
-                    Return to Homepage
+                    {t('comingSoon.returnHome')}
                 </button>
             </div>
         </div>

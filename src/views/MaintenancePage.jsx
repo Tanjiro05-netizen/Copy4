@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import './MaintenancePage.css';
 
 const PARTICLE_COUNT = 25;
 
 const MaintenancePage = () => {
+    const { t } = useTranslation();
     const rootRef = useRef(null);
     const revealRef = useRef(null);
     const bgRef = useRef(null);
@@ -172,21 +174,19 @@ const MaintenancePage = () => {
                     {/* Subtitle */}
                     <div className="maintenance-subtitle">
                         <h2 className="text-xl md:text-2xl font-semibold text-gray-200 mb-4 tracking-wide">
-                            We Will Be Back Shortly
+                            {t('maintenance.title')}
                         </h2>
                     </div>
 
                     {/* Message */}
                     <div className="maintenance-message">
                         <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-6 max-w-md mx-auto">
-                            The platform is currently undergoing maintenance and improvements.
-                            We are working to bring you a better experience.
+                            {t('maintenance.message')}
                         </p>
                         <p className="text-gray-500 text-xs md:text-sm italic">
-                            "The philosophers have only interpreted the world, in various ways.
-                            The point, however, is to change it."
+                            {t('maintenance.quote')}
                         </p>
-                        <p className="text-gray-600 text-xs mt-1">— Karl Marx, Theses on Feuerbach</p>
+                        <p className="text-gray-600 text-xs mt-1">{t('maintenance.quoteAuthor')}</p>
                     </div>
 
                     {/* APK Download Button */}
@@ -218,7 +218,7 @@ const MaintenancePage = () => {
                                     <line x1="12" x2="12" y1="15" y2="3" />
                                 </svg>
                                 <span className="maintenance-download-text">
-                                    Download Marxist Forum APK
+                                    {t('maintenance.apk')}
                                 </span>
                             </div>
                         </a>
@@ -228,7 +228,7 @@ const MaintenancePage = () => {
                 {/* Footer */}
                 <div className="maintenance-footer mt-12 text-center">
                     <p className="text-gray-700 text-xs tracking-widest uppercase">
-                        &copy; 2026 Marxist.info &mdash; Advancing Revolutionary Theory
+                        &copy; 2026 Marxist.info &mdash; {t('maintenance.tagline')}
                     </p>
                 </div>
             </div>

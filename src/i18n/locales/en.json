@@ -20,7 +20,12 @@
     "profile": "Profile",
     "login": "Login",
     "logout": "Logout",
-    "membersOnly": "Members Only"
+    "membersOnly": "Members Only",
+    "searchLibrary": "Search the library",
+    "changeLanguage": "Change language",
+    "editorial": "Editorial",
+    "myProfile": "My Profile",
+    "adminTools": "Admin Tools"
   },
   "common": {
     "loading": "Loading...",
@@ -101,7 +106,33 @@
     "deleteList": "Delete list",
     "noLists": "No reading lists yet. Create one!",
     "epubFormat": "EPUB",
-    "pdfFormat": "PDF"
+    "pdfFormat": "PDF",
+    "archive": "The Archive",
+    "era19": "19th Century",
+    "era20": "20th Century",
+    "era21": "21st Century",
+    "titles_one": "title",
+    "titles_other": "titles",
+    "read": "Read",
+    "open": "Open",
+    "listen": "Listen",
+    "listenNow": "Listen Now",
+    "openPdf": "Open PDF",
+    "openExternal": "Open in external viewer",
+    "unknownAuthor": "Unknown",
+    "pagesWord": "pages",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "categories": {
+      "politicalEconomy": "Political Economy",
+      "philosophy": "Philosophy",
+      "history": "History",
+      "sociology": "Sociology",
+      "strategyTactics": "Strategy & Tactics",
+      "downloads": "Downloads",
+      "audiobooks": "Audiobooks",
+      "uncategorized": "Uncategorized"
+    }
   },
   "book": {
     "downloadPDF": "Download PDF",
@@ -276,5 +307,53 @@
   "pwa": {
     "installPrompt": "Install App",
     "installDesc": "Add Marxist.info to your home screen for quick access."
+  },
+  "footer": {
+    "mission": "An open platform for the study of Marxist theory — texts, analysis, discussion, and data.",
+    "sections": "Sections",
+    "epigraph": "“The philosophers have only interpreted the world, in various ways; the point is to change it.”",
+    "attribution": "Marx — Theses on Feuerbach, XI",
+    "meta": "study · analysis · discussion · data",
+    "home": "Home",
+    "theory": "Theory",
+    "analysis": "Analysis",
+    "library": "Library",
+    "study": "Study",
+    "politics": "Politics",
+    "bulletin": "Bulletin",
+    "feed": "Community",
+    "epigraphLabel": "Epigraph"
+  },
+  "maintenance": {
+    "title": "We Will Be Back Shortly",
+    "message": "The platform is currently undergoing maintenance and improvements. We are working to bring you a better experience.",
+    "quote": "“The philosophers have only interpreted the world, in various ways. The point, however, is to change it.”",
+    "quoteAuthor": "— Karl Marx, Theses on Feuerbach",
+    "apk": "Download Marxist Forum APK",
+    "tagline": "Advancing Revolutionary Theory"
+  },
+  "comingSoon": {
+    "kicker": "In Preparation",
+    "defaultDesc": "This section is under active development and will be available soon.",
+    "whatToExpect": "What to expect",
+    "cardText1": "This section is currently in development. A range of reading, research, and community features are planned for members.",
+    "cardText2": "Check back soon or register to be notified when this feature becomes available.",
+    "registerToUnlock": "Register to Unlock",
+    "returnHome": "Return to Homepage",
+    "theoryTitle": "Theory",
+    "theoryDesc": "In-depth articles and texts with advanced reading tools. Available to members.",
+    "studyTitle": "Study Center",
+    "studyDesc": "Structured learning paths, curated reading lists, and progress tracking. Available to members.",
+    "scienceTechTitle": "Science & Technology",
+    "scienceTechDesc": "Courses and reference material spanning the natural sciences, mathematics, and technology. Available to members.",
+    "vizTitle": "Data & Visualizations",
+    "vizDesc": "Interactive charts and dashboards covering economic and social indicators. Available to members.",
+    "directoryTitle": "Directory",
+    "forumTitle": "Forum",
+    "forumDesc": "A space for discussion, debate, and collaborative reading. Available to members.",
+    "knowledgeTitle": "Knowledge Base",
+    "knowledgeDesc": "A community Q&A and reference resource. Available to members.",
+    "politicsTitle": "Politics",
+    "politicsDesc": "News, analysis, and commentary on current events. Available to members."
   }
 }
