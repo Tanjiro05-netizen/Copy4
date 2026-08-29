@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import DigitalLibraryPage from './DigitalLibraryPage';
 import { supabase } from '../supabaseClient';
 
@@ -38,6 +38,12 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('../components/Library/AddToListButton', () => () => <button>Add to list</button>);
 jest.mock('../components/Library/ReadingListPanel', () => () => <div>Reading lists</div>);
+
+// The page fetches through a module-level query cache; bypass it so every
+// test sees its own mocked Supabase responses instead of the first test's.
+jest.mock('../lib/queryCache', () => ({
+    prefetchQuery: (_key, fetcher) => fetcher(),
+}));
 
 jest.mock('../supabaseClient', () => ({
     supabase: {
@@ -98,8 +104,10 @@ describe('DigitalLibraryPage', () => {
         render(<DigitalLibraryPage />);
 
         expect(await screen.findByRole('link', { name: 'Book Without PDF' })).toBeInTheDocument();
-        expect(screen.getByText('Read Now')).toBeInTheDocument();
-        expect(screen.queryByTitle('Open in external viewer')).not.toBeInTheDocument();
+        const readLink = screen.getByTestId('ebook-read-link');
+        expect(readLink).toHaveAttribute('href', '/book/book-1');
+        expect(readLink).toHaveTextContent(/^Read$/);
+        expect(screen.queryByTestId('ebook-external-pdf-link')).not.toBeInTheDocument();
 
         await waitFor(() => {
             expect(supabase.storage.from).not.toHaveBeenCalledWith('library');
@@ -138,9 +146,13 @@ describe('DigitalLibraryPage', () => {
             }),
         }));
 
-        render(<DigitalLibraryPage />);
+        const { container } = render(<DigitalLibraryPage />);
 
-        expect(await screen.findByRole('img', { name: 'Covered Book' })).toHaveAttribute(
+        expect(await screen.findByRole('link', { name: 'Covered Book' })).toBeInTheDocument();
+        // The default list view renders the cover as a small decorative plate
+        // (alt=""), so query the img element directly.
+        const coverImg = container.querySelector('img');
+        expect(coverImg).toHaveAttribute(
             'src',
             `/api/cover-image?url=${encodeURIComponent(coverUrl)}`
         );
@@ -200,15 +212,13 @@ describe('DigitalLibraryPage', () => {
         expect(await screen.findByRole('heading', { name: 'History' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Downloads' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'PDF Pamphlet' })).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Open PDF' })).toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'Download PDF' })).toHaveAttribute(
-            'href',
-            'https://library.test/pamphlet.pdf'
-        );
-        expect(screen.getByRole('link', { name: 'Download PDF' })).toHaveAttribute(
-            'download',
-            'PDF Pamphlet.pdf'
-        );
+        // The list-view card links to the reader with "Open" and offers the
+        // PDF itself through the "PDF" anchor (Download icon + label).
+        const pdfCard = screen.getAllByTestId('pdf-book-card')[0];
+        expect(within(pdfCard).getByTestId('ebook-read-link')).toHaveTextContent(/^Open$/);
+        const pdfDownload = within(pdfCard).getByRole('link', { name: 'PDF' });
+        expect(pdfDownload).toHaveAttribute('href', 'https://library.test/pamphlet.pdf');
+        expect(pdfDownload).toHaveAttribute('download', 'PDF Pamphlet.pdf');
         expect(screen.getByRole('link', { name: 'Upload PDF' })).toHaveAttribute(
             'href',
             '/admin/library/upload?format=pdf'
