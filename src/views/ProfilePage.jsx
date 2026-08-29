@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
@@ -6,20 +7,21 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Award, Cpu, Eye, Heart, Users, MessageSquare, TrendingUp, Star, Loader2, GraduationCap, Zap, BarChart2, User, Image as ImageIcon, Shield, CheckCircle, FileText, Repeat2, Bookmark, Camera, Pencil, X } from 'lucide-react';
 import { knowledgeApiService } from '../components/Knowledge/api';
 import { forumApiService } from '../components/Forum/api';
+import { formatDate } from '../components/Forum/utils/formatters';
 import * as s from './ProfilePage.css.ts';
 
 // Level thresholds (same as Widgets.jsx)
 const LEVEL_THRESHOLDS = [
-  { level: 1, min: 0, title: 'Newcomer' },
-  { level: 2, min: 50, title: 'Contributor' },
-  { level: 3, min: 200, title: 'Active' },
-  { level: 4, min: 500, title: 'Established' },
-  { level: 5, min: 1000, title: 'Influencer' },
-  { level: 6, min: 2500, title: 'Expert' },
-  { level: 7, min: 5000, title: 'Authority' },
-  { level: 8, min: 10000, title: 'Master' },
-  { level: 9, min: 25000, title: 'Legend' },
-  { level: 10, min: 50000, title: 'Icon' },
+  { level: 1, min: 0, titleKey: 'profile.levelNewcomer' },
+  { level: 2, min: 50, titleKey: 'profile.levelContributor' },
+  { level: 3, min: 200, titleKey: 'profile.levelActive' },
+  { level: 4, min: 500, titleKey: 'profile.levelEstablished' },
+  { level: 5, min: 1000, titleKey: 'profile.levelInfluencer' },
+  { level: 6, min: 2500, titleKey: 'profile.levelExpert' },
+  { level: 7, min: 5000, titleKey: 'profile.levelAuthority' },
+  { level: 8, min: 10000, titleKey: 'profile.levelMaster' },
+  { level: 9, min: 25000, titleKey: 'profile.levelLegend' },
+  { level: 10, min: 50000, titleKey: 'profile.levelIcon' },
 ];
 
 const calculateLevel = (stats) => {
@@ -42,14 +44,13 @@ const calculateLevel = (stats) => {
   return { ...currentLevel, engagement, progress, nextLevel };
 };
 
-const formatCount = (num) => {
-  if (!num) return '0';
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return num.toString();
-};
+const formatCount = (num, language) => new Intl.NumberFormat(language || 'en', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+}).format(num || 0);
 
 const ProfilePage = () => {
+    const { t, i18n } = useTranslation();
     const { user, refreshProfile } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
@@ -172,7 +173,7 @@ const ProfilePage = () => {
     const handleSaveProfile = async () => {
         if (!user) return;
         if (editForm.username.trim().length < 3) {
-            alert('Username must be at least 3 characters.');
+            alert(t('profile.usernameMin'));
             return;
         }
         setSaving(true);
@@ -189,7 +190,7 @@ const ProfilePage = () => {
             setIsEditing(false);
         } catch (error) {
             console.error('Error saving profile:', error);
-            alert('Failed to save profile: ' + (error.message || 'unknown error'));
+            alert(t('profile.saveFailed', { message: error.message || t('profile.unknownError') }));
         } finally {
             setSaving(false);
         }
@@ -212,7 +213,10 @@ const ProfilePage = () => {
             refreshProfile?.();
         } catch (error) {
             console.error(`Error uploading ${kind}:`, error);
-            alert(`Failed to upload ${kind === 'avatar' ? 'profile picture' : 'banner'}: ` + (error.message || 'unknown error'));
+            alert(t('profile.uploadFailed', {
+                kind: kind === 'avatar' ? t('profile.profilePicture') : t('profile.banner'),
+                message: error.message || t('profile.unknownError'),
+            }));
         } finally {
             setUploading(false);
         }
@@ -342,21 +346,21 @@ const ProfilePage = () => {
                         <div className="bg-gray-800/50 rounded-none p-5 border border-yellow-600/30">
                             <div className="flex items-center gap-2 text-yellow-500 mb-2">
                                 <Zap className="w-5 h-5" />
-                                <span className="text-sm font-medium">Total XP</span>
+                                <span className="text-sm font-medium">{t('profile.totalXp')}</span>
                             </div>
                             <p className="text-3xl font-bold text-white">{stemXP?.total_xp || 0}</p>
                         </div>
                         <div className="bg-gray-800/50 rounded-none p-5 border border-orange-600/30">
                             <div className="flex items-center gap-2 text-orange-400 mb-2">
                                 <BarChart2 className="w-5 h-5" />
-                                <span className="text-sm font-medium">Current Streak</span>
+                                <span className="text-sm font-medium">{t('profile.currentStreak')}</span>
                             </div>
-                            <p className="text-3xl font-bold text-white">{stemXP?.current_streak || 0} <span className="text-lg text-gray-500">days</span></p>
+                            <p className="text-3xl font-bold text-white">{t('profile.dayCount', { count: stemXP?.current_streak || 0 })}</p>
                         </div>
                         <div className="bg-gray-800/50 rounded-none p-5 border border-green-600/30">
                             <div className="flex items-center gap-2 text-green-400 mb-2">
                                 <Award className="w-5 h-5" />
-                                <span className="text-sm font-medium">Certificates</span>
+                                <span className="text-sm font-medium">{t('profile.certificates')}</span>
                             </div>
                             <p className="text-3xl font-bold text-white">{certificates.length}</p>
                         </div>
@@ -366,9 +370,9 @@ const ProfilePage = () => {
                     <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
                             <h3 className="font-semibold text-white flex items-center gap-2">
-                                <GraduationCap className="w-4 h-4 text-red-400" /> My Courses
+                                <GraduationCap className="w-4 h-4 text-red-400" /> {t('profile.myCourses')}
                             </h3>
-                            <Link href="/science-tech" className="text-sm text-red-400 hover:text-red-300">Browse Courses →</Link>
+                            <Link href="/science-tech" className="text-sm text-red-400 hover:text-red-300">{t('profile.browseCourses')} →</Link>
                         </div>
                         <div className="divide-y divide-gray-700">
                             {enrollments.length > 0 ? enrollments.map(e => {
@@ -389,14 +393,14 @@ const ProfilePage = () => {
                                             </div>
                                         </div>
                                         {progress === 100 && (
-                                            <span className="text-green-400 text-xs bg-green-900/30 px-2 py-1 rounded">Completed</span>
+                                            <span className="text-green-400 text-xs bg-green-900/30 px-2 py-1 rounded">{t('profile.completed')}</span>
                                         )}
                                     </Link>
                                 );
                             }) : (
                                 <div className="p-8 text-center text-gray-500">
-                                    <p>No courses enrolled yet.</p>
-                                    <Link href="/science-tech" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">Browse courses →</Link>
+                                    <p>{t('profile.noCourses')}</p>
+                                    <Link href="/science-tech" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">{t('profile.browseCourses')} →</Link>
                                 </div>
                             )}
                         </div>
@@ -407,7 +411,7 @@ const ProfilePage = () => {
                         <div className="bg-gray-800/50 rounded-none border border-gray-700">
                             <div className="p-4 border-b border-gray-700">
                                 <h3 className="font-semibold text-white flex items-center gap-2">
-                                    <Award className="w-4 h-4 text-yellow-500" /> My Certificates
+                                    <Award className="w-4 h-4 text-yellow-500" /> {t('profile.myCertificates')}
                                 </h3>
                             </div>
                             <div className="divide-y divide-gray-700">
@@ -419,12 +423,12 @@ const ProfilePage = () => {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-gray-500 text-xs">
-                                                {new Date(cert.issued_at).toLocaleDateString()}
+                                                {formatDate(cert.issued_at, false)}
                                             </span>
                                             <Link href={`/verify/${cert.certificate_number}`}
                                                 className="text-xs text-blue-400 hover:text-blue-300"
                                             >
-                                                Verify
+                                                {t('profile.verify')}
                                             </Link>
                                         </div>
                                     </div>
@@ -454,8 +458,8 @@ const ProfilePage = () => {
                                     <Cpu className="w-6 h-6 text-red-500" />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-bold text-white">Creator Lvl {levelInfo.level}</h2>
-                                    <p className="text-gray-400">{levelInfo.title}</p>
+                                    <h2 className="text-2xl font-bold text-white">{t('profile.creatorLevel', { level: levelInfo.level })}</h2>
+                                    <p className="text-gray-400">{t(levelInfo.titleKey)}</p>
                                 </div>
                             </div>
                             {creatorStats.growth !== 0 && (
@@ -465,7 +469,7 @@ const ProfilePage = () => {
                                         : 'bg-red-900/30 text-red-400'
                                 }`}>
                                     <TrendingUp className="w-4 h-4 inline mr-1" />
-                                    {creatorStats.growth > 0 ? '+' : ''}{creatorStats.growth}% this week
+                                    {t('profile.growthThisWeek', { growth: `${creatorStats.growth > 0 ? '+' : ''}${creatorStats.growth}` })}
                                 </div>
                             )}
                         </div>
@@ -474,8 +478,8 @@ const ProfilePage = () => {
                         {levelInfo.nextLevel && (
                             <div>
                                 <div className="flex justify-between text-sm text-gray-400 mb-2">
-                                    <span>{formatCount(levelInfo.engagement)} XP</span>
-                                    <span>{levelInfo.progress}% to Level {levelInfo.nextLevel.level} ({levelInfo.nextLevel.title})</span>
+                                    <span>{t('profile.xpCount', { count: formatCount(levelInfo.engagement, i18n.resolvedLanguage || i18n.language) })}</span>
+                                    <span>{t('profile.levelProgress', { progress: levelInfo.progress, level: levelInfo.nextLevel.level, title: t(levelInfo.nextLevel.titleKey) })}</span>
                                 </div>
                                 <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                                     <div 
@@ -484,7 +488,7 @@ const ProfilePage = () => {
                                     />
                                 </div>
                                 <p className="text-xs text-gray-500 mt-2">
-                                    {formatCount(levelInfo.nextLevel.min - levelInfo.engagement)} XP needed for next level
+                                    {t('profile.xpNeeded', { count: formatCount(levelInfo.nextLevel.min - levelInfo.engagement, i18n.resolvedLanguage || i18n.language) })}
                                 </p>
                             </div>
                         )}
@@ -495,39 +499,39 @@ const ProfilePage = () => {
                         <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <Eye className="w-4 h-4" />
-                                <span className="text-sm">Views</span>
+                                <span className="text-sm">{t('profile.views')}</span>
                             </div>
-                            <p className="text-2xl font-bold text-white">{formatCount(creatorStats.views)}</p>
+                            <p className="text-2xl font-bold text-white">{formatCount(creatorStats.views, i18n.resolvedLanguage || i18n.language)}</p>
                         </div>
                         <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <Heart className="w-4 h-4" />
-                                <span className="text-sm">Likes</span>
+                                <span className="text-sm">{t('profile.likes')}</span>
                             </div>
-                            <p className="text-2xl font-bold text-white">{formatCount(creatorStats.likes)}</p>
+                            <p className="text-2xl font-bold text-white">{formatCount(creatorStats.likes, i18n.resolvedLanguage || i18n.language)}</p>
                         </div>
                         <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <Users className="w-4 h-4" />
-                                <span className="text-sm">Follows</span>
+                                <span className="text-sm">{t('profile.follows')}</span>
                             </div>
-                            <p className="text-2xl font-bold text-white">{formatCount(creatorStats.follows)}</p>
+                            <p className="text-2xl font-bold text-white">{formatCount(creatorStats.follows, i18n.resolvedLanguage || i18n.language)}</p>
                         </div>
                         <div className="bg-gray-800/50 rounded-none p-4 border border-gray-700">
                             <div className="flex items-center gap-2 text-gray-400 mb-2">
                                 <MessageSquare className="w-4 h-4" />
-                                <span className="text-sm">Content</span>
+                                <span className="text-sm">{t('profile.content')}</span>
                             </div>
                             <p className="text-2xl font-bold text-white">{contentCounts.questions + contentCounts.answers}</p>
-                            <p className="text-xs text-gray-500">{contentCounts.questions} Q / {contentCounts.answers} A</p>
+                            <p className="text-xs text-gray-500">{t('profile.questionAnswerCount', { questions: contentCounts.questions, answers: contentCounts.answers })}</p>
                         </div>
                     </div>
                     
                     {/* My Questions */}
                     <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-                            <h3 className="font-semibold text-white">My Questions</h3>
-                            <Link href="/knowledge" className="text-sm text-red-400 hover:text-red-300">View All →</Link>
+                            <h3 className="font-semibold text-white">{t('profile.myQuestions')}</h3>
+                            <Link href="/knowledge" className="text-sm text-red-400 hover:text-red-300">{t('common.viewAll')} →</Link>
                         </div>
                         <div className="divide-y divide-gray-700">
                             {userQuestions.length > 0 ? userQuestions.map(q => (
@@ -536,7 +540,7 @@ const ProfilePage = () => {
                                         <p className="text-white truncate">{q.title}</p>
                                         <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
                                             {q.topic?.name && <span className="bg-gray-700 px-2 py-0.5 rounded">{q.topic.name}</span>}
-                                            <span>{new Date(q.created_at).toLocaleDateString()}</span>
+                                            <span>{formatDate(q.created_at, false)}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4 text-sm text-gray-400 ml-4">
@@ -547,8 +551,8 @@ const ProfilePage = () => {
                                 </Link>
                             )) : (
                                 <div className="p-8 text-center text-gray-500">
-                                    <p>No questions yet.</p>
-                                    <Link href="/knowledge/ask" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">Ask your first question →</Link>
+                                    <p>{t('profile.noQuestions')}</p>
+                                    <Link href="/knowledge/ask" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">{t('profile.askFirstQuestion')} →</Link>
                                 </div>
                             )}
                         </div>
@@ -557,24 +561,24 @@ const ProfilePage = () => {
                     {/* My Answers */}
                     <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-                            <h3 className="font-semibold text-white">My Answers</h3>
+                            <h3 className="font-semibold text-white">{t('profile.myAnswers')}</h3>
                         </div>
                         <div className="divide-y divide-gray-700">
                             {userAnswers.length > 0 ? userAnswers.map(a => (
                                 <Link key={a.id} href={`/knowledge/question/${a.question?.id}`} className="flex items-center justify-between p-4 hover:bg-gray-700/30 transition-colors">
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-gray-400 text-sm truncate">Answer to: <span className="text-white">{a.question?.title}</span></p>
+                                        <p className="text-gray-400 text-sm truncate">{t('profile.answerTo')} <span className="text-white">{a.question?.title}</span></p>
                                         <p className="text-gray-500 text-xs mt-1 line-clamp-1">{a.content?.substring(0, 100)}...</p>
                                     </div>
                                     <div className="flex items-center gap-2 ml-4">
-                                        {a.is_accepted && <span className="text-green-400 text-xs bg-green-900/30 px-2 py-0.5 rounded">Accepted</span>}
+                                        {a.is_accepted && <span className="text-green-400 text-xs bg-green-900/30 px-2 py-0.5 rounded">{t('profile.accepted')}</span>}
                                         <span className="flex items-center gap-1 text-sm text-gray-400"><Heart className="w-3 h-3" />{a.upvote_count || 0}</span>
                                     </div>
                                 </Link>
                             )) : (
                                 <div className="p-8 text-center text-gray-500">
-                                    <p>No answers yet.</p>
-                                    <Link href="/knowledge" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">Browse questions to answer →</Link>
+                                    <p>{t('profile.noAnswers')}</p>
+                                    <Link href="/knowledge" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">{t('profile.browseQuestionsToAnswer')} →</Link>
                                 </div>
                             )}
                         </div>
@@ -584,7 +588,7 @@ const ProfilePage = () => {
                     <div className="bg-gray-800/50 rounded-none border border-gray-700">
                         <div className="flex items-center justify-between p-4 border-b border-gray-700">
                             <h3 className="font-semibold text-white flex items-center gap-2">
-                                <Star className="w-4 h-4 text-yellow-500" /> My Favorites
+                                <Star className="w-4 h-4 text-yellow-500" /> {t('profile.myFavorites')}
                             </h3>
                         </div>
                         <div className="divide-y divide-gray-700">
@@ -599,8 +603,8 @@ const ProfilePage = () => {
                                 </Link>
                             )) : (
                                 <div className="p-8 text-center text-gray-500">
-                                    <p>No favorites yet.</p>
-                                    <Link href="/knowledge" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">Browse questions to save →</Link>
+                                    <p>{t('profile.noFavorites')}</p>
+                                    <Link href="/knowledge" className="text-red-400 hover:text-red-300 text-sm mt-2 inline-block">{t('profile.browseQuestionsToSave')} →</Link>
                                 </div>
                             )}
                         </div>
@@ -615,13 +619,13 @@ const ProfilePage = () => {
         <div>
             <div className={s.subTabRow}>
                 <button onClick={() => setActivitySubTab('posts')} className={`${s.tabBtn} ${activitySubTab === 'posts' ? s.tabBtnActive : ''}`}>
-                    <FileText size={14} style={{marginRight:6}} />Posts ({forumPosts.length})
+                    <FileText size={14} style={{marginRight:6}} />{t('profile.postsCount', { count: forumPosts.length })}
                 </button>
                 <button onClick={() => setActivitySubTab('replies')} className={`${s.tabBtn} ${activitySubTab === 'replies' ? s.tabBtnActive : ''}`}>
-                    <MessageSquare size={14} style={{marginRight:6}} />Replies ({forumReplies.length})
+                    <MessageSquare size={14} style={{marginRight:6}} />{t('profile.repliesCount', { count: forumReplies.length })}
                 </button>
                 <button onClick={() => setActivitySubTab('reposts')} className={`${s.tabBtn} ${activitySubTab === 'reposts' ? s.tabBtnActive : ''}`}>
-                    <Repeat2 size={14} style={{marginRight:6}} />Reposts ({forumReposts.length})
+                    <Repeat2 size={14} style={{marginRight:6}} />{t('profile.repostsCount', { count: forumReposts.length })}
                 </button>
             </div>
 
@@ -638,12 +642,12 @@ const ProfilePage = () => {
                                         <p className={s.cardExcerpt}>{post.content}</p>
                                         <div className={s.cardMeta}>
                                             <span>/{post.category_slug}/</span>
-                                            <span>{post.comment_count} replies</span>
+                                            <span>{t('forum.replyCount', { count: post.comment_count || 0 })}</span>
                                         </div>
                                     </Link>
                                 ))}
                             </div>
-                        ) : <div className={s.emptyCard}>No posts yet.</div>
+                        ) : <div className={s.emptyCard}>{t('profile.noPosts')}</div>
                     )}
 
                     {activitySubTab === 'replies' && (
@@ -651,16 +655,16 @@ const ProfilePage = () => {
                             <div className={s.cardGrid}>
                                 {forumReplies.map((reply) => (
                                     <Link key={reply.id} href="/feed?section=boards" className={s.card}>
-                                        <h3 className={s.cardTitle}>{reply.thread?.title || 'Unknown thread'}</h3>
+                                        <h3 className={s.cardTitle}>{reply.thread?.title || t('profile.unknownThread')}</h3>
                                         <p className={s.cardExcerpt}>{reply.content}</p>
                                         <div className={s.cardMeta}>
                                             <span>♥ {reply.like_count || 0}</span>
-                                            <span>{new Date(reply.created_at).toLocaleDateString()}</span>
+                                            <span>{formatDate(reply.created_at, false)}</span>
                                         </div>
                                     </Link>
                                 ))}
                             </div>
-                        ) : <div className={s.emptyCard}>No replies yet.</div>
+                        ) : <div className={s.emptyCard}>{t('profile.noReplies')}</div>
                     )}
 
                     {activitySubTab === 'reposts' && (
@@ -672,13 +676,13 @@ const ProfilePage = () => {
                                             <p className={s.quoteText}>&ldquo;{repost.quote_content}&rdquo;</p>
                                         )}
                                         <div className={s.quoteFooter}>
-                                            <span>Reposted: {repost.thread?.title}</span>
-                                            <span>{new Date(repost.created_at).toLocaleDateString()}</span>
+                                            <span>{t('profile.repostedTitle', { title: repost.thread?.title || t('profile.unknownThread') })}</span>
+                                            <span>{formatDate(repost.created_at, false)}</span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        ) : <div className={s.emptyCard}>No reposts yet.</div>
+                        ) : <div className={s.emptyCard}>{t('profile.noReposts')}</div>
                     )}
                 </>
             )}
@@ -701,7 +705,7 @@ const ProfilePage = () => {
                                 <button
                                     className={s.cardRemoveBtn}
                                     onClick={() => handleRemoveBookmark(bookmark.thread?.id)}
-                                    title="Remove bookmark"
+                                    title={t('profile.removeBookmark')}
                                 >
                                     <X size={14} />
                                 </button>
@@ -709,13 +713,13 @@ const ProfilePage = () => {
                             <p className={s.cardExcerpt}>{bookmark.thread?.content}</p>
                             <div className={s.cardMeta}>
                                 <span>/{bookmark.thread?.category_slug}/</span>
-                                <span>{bookmark.thread?.comment_count || 0} replies</span>
+                                <span>{t('forum.replyCount', { count: bookmark.thread?.comment_count || 0 })}</span>
                             </div>
                         </div>
                     ))}
                 </div>
             ) : (
-                <div className={s.emptyCard}>No bookmarks yet. Save threads from the forum to see them here.</div>
+                <div className={s.emptyCard}>{t('profile.noBookmarks')}</div>
             )}
         </div>
     );
@@ -730,7 +734,7 @@ const ProfilePage = () => {
                         {/* Banner */}
                         <div className={s.banner}>
                             {profileData.banner_url ? (
-                                <img src={profileData.banner_url} alt="Profile banner" className={s.bannerImg} />
+                                <img src={profileData.banner_url} alt={t('profile.profileBanner')} className={s.bannerImg} />
                             ) : (
                                 <div className={s.bannerPlaceholder}><ImageIcon size={40} /></div>
                             )}
@@ -741,7 +745,7 @@ const ProfilePage = () => {
                                     onClick={() => bannerInputRef.current?.click()}
                                     disabled={bannerUploading}
                                 >
-                                    <Camera size={14} />{bannerUploading ? 'Uploading…' : 'Change banner'}
+                                    <Camera size={14} />{bannerUploading ? t('profile.uploading') : t('profile.changeBanner')}
                                 </button>
                             )}
                             <input
@@ -777,7 +781,7 @@ const ProfilePage = () => {
                             <div className={s.editRow}>
                                 {!isEditing && (
                                     <button type="button" className={s.editBtn} onClick={startEditing}>
-                                        <Pencil size={14} style={{marginRight:6}} />Edit Profile
+                                        <Pencil size={14} style={{marginRight:6}} />{t('profile.editProfile')}
                                     </button>
                                 )}
                             </div>
@@ -786,17 +790,17 @@ const ProfilePage = () => {
                                 {!isEditing ? (
                                     <>
                                         <h1 className={s.profileName}>
-                                            {profileData.username || 'Unnamed'}
+                                            {profileData.username || t('profile.unnamed')}
                                             {profileData.is_certified && (
-                                                <span className={s.certBadge}><CheckCircle size={12} />Certified</span>
+                                                <span className={s.certBadge}><CheckCircle size={12} />{t('profile.certified')}</span>
                                             )}
                                             {profileData.role === 'admin' && (
                                                 <span className={s.certBadge}><Shield size={12} />Admin</span>
                                             )}
                                         </h1>
                                         <div className={s.statsRow}>
-                                            <span><span className={s.statsCount}>{profileData.follower_count || 0}</span> followers</span>
-                                            <span><span className={s.statsCount}>{profileData.following_count || 0}</span> following</span>
+                                            <span>{t('profile.followersCount', { count: profileData.follower_count || 0 })}</span>
+                                            <span>{t('profile.followingCount', { count: profileData.following_count || 0 })}</span>
                                         </div>
                                         {profileData.ideology && (
                                             <p className={s.ideologyText}>{profileData.ideology}</p>
@@ -804,13 +808,13 @@ const ProfilePage = () => {
                                         {profileData.bio ? (
                                             <p className={s.bioText}>{profileData.bio}</p>
                                         ) : (
-                                            <p className={s.emptyBioText}>Add a bio to tell others about yourself.</p>
+                                            <p className={s.emptyBioText}>{t('profile.addBio')}</p>
                                         )}
                                     </>
                                 ) : (
                                     <>
                                         <div className={s.fieldBlock}>
-                                            <label className={s.fieldLabel}>Username</label>
+                                            <label className={s.fieldLabel}>{t('profile.username')}</label>
                                             <input
                                                 className={s.textInput}
                                                 value={editForm.username}
@@ -819,30 +823,30 @@ const ProfilePage = () => {
                                             />
                                         </div>
                                         <div className={s.fieldBlock}>
-                                            <label className={s.fieldLabel}>Ideology</label>
+                                            <label className={s.fieldLabel}>{t('profile.ideology')}</label>
                                             <input
                                                 className={s.textInput}
                                                 value={editForm.ideology}
                                                 onChange={(e) => setEditForm((f) => ({ ...f, ideology: e.target.value }))}
-                                                placeholder="e.g. Marxist-Leninist"
+                                                placeholder={t('profile.ideologyShortPlaceholder')}
                                             />
                                         </div>
                                         <div className={s.fieldBlock}>
-                                            <label className={s.fieldLabel}>Bio</label>
+                                            <label className={s.fieldLabel}>{t('profile.bio')}</label>
                                             <textarea
                                                 className={s.textArea}
                                                 rows={4}
                                                 value={editForm.bio}
                                                 onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
-                                                placeholder="Tell others about yourself…"
+                                                placeholder={t('profile.bioEditPlaceholder')}
                                             />
                                         </div>
                                         <div className={s.saveRow}>
                                             <button type="button" className={s.cancelBtn} onClick={() => setIsEditing(false)} disabled={saving}>
-                                                Cancel
+                                                {t('common.cancel')}
                                             </button>
                                             <button type="button" className={s.saveBtn} onClick={handleSaveProfile} disabled={saving}>
-                                                {saving ? 'Saving…' : 'Save Changes'}
+                                                {saving ? t('profile.saving') : t('profile.saveChanges')}
                                             </button>
                                         </div>
                                     </>
@@ -853,16 +857,16 @@ const ProfilePage = () => {
                         {/* Tab Navigation */}
                         <div className={`${s.tabRow} ${s.sectionBlock}`}>
                             <button onClick={() => setActiveTab('overview')} className={`${s.tabBtn} ${activeTab === 'overview' ? s.tabBtnActive : ''}`}>
-                                <User size={16} style={{marginRight:8}} />Overview
+                                <User size={16} style={{marginRight:8}} />{t('profile.overview')}
                             </button>
                             <button onClick={() => setActiveTab('bookmarks')} className={`${s.tabBtn} ${activeTab === 'bookmarks' ? s.tabBtnActive : ''}`}>
-                                <Bookmark size={16} style={{marginRight:8}} />Bookmarks
+                                <Bookmark size={16} style={{marginRight:8}} />{t('profile.bookmarks')}
                             </button>
                             <button onClick={() => setActiveTab('learning')} className={`${s.tabBtn} ${activeTab === 'learning' ? s.tabBtnActive : ''}`}>
-                                <GraduationCap size={16} style={{marginRight:8}} />Learning
+                                <GraduationCap size={16} style={{marginRight:8}} />{t('profile.learning')}
                             </button>
                             <button onClick={() => setActiveTab('dashboard')} className={`${s.tabBtn} ${activeTab === 'dashboard' ? s.tabBtnActive : ''}`}>
-                                <Cpu size={16} style={{marginRight:8}} />Creator Dashboard
+                                <Cpu size={16} style={{marginRight:8}} />{t('profile.dashboard')}
                             </button>
                         </div>
 
