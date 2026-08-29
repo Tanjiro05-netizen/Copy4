@@ -44,6 +44,11 @@ const nextConfig = {
     ];
   },
   webpack: (config, { dev, webpack }) => {
+    // pdfjs-dist (Node entry) requires the native 'canvas' package, which is
+    // not installed and is only used for server-side canvas rendering we never
+    // do — resolve it to an empty module so both bundles compile.
+    config.resolve.alias = { ...config.resolve.alias, canvas: false };
+
     if (!dev) {
       config.cache = false;
 
