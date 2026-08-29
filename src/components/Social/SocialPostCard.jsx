@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import {
   Heart,
@@ -11,8 +12,9 @@ import SocialAvatar, { getSocialIdentity } from './SocialAvatar'
 import * as s from './Social.css.ts'
 
 function EmbeddedPost({ post }) {
+  const { t } = useTranslation()
   if (!post) return null
-  const identity = getSocialIdentity(post)
+  const identity = getSocialIdentity(post, t)
 
   return (
     <div className={s.embeddedPost}>
@@ -51,12 +53,13 @@ function SocialPostCard({
   onQuote,
   onBoardSelect,
 }) {
+  const { t } = useTranslation()
   if (!post) return null
 
   const isBoard = variant === 'board'
   const displayedPost = post.reposted_post || post
-  const identity = getSocialIdentity(displayedPost)
-  const repostIdentity = post.reposted_post ? getSocialIdentity(post) : null
+  const identity = getSocialIdentity(displayedPost, t)
+  const repostIdentity = post.reposted_post ? getSocialIdentity(post, t) : null
   const profileHref = identity.profile?.username ? `/profile/${identity.profile.username}` : null
 
   return (
@@ -64,7 +67,7 @@ function SocialPostCard({
       {post.reposted_post && (
         <div className={s.repostBanner}>
           <Repeat2 size={14} />
-          <span>{repostIdentity?.name || 'Someone'} reposted</span>
+          <span>{t('social.repostedBy', { name: repostIdentity?.name || t('social.someone') })}</span>
         </div>
       )}
 
@@ -104,7 +107,7 @@ function SocialPostCard({
             icon={MessageCircle}
             count={displayedPost.reply_count || 0}
             active={false}
-            label="Reply"
+            label={t('social.reply')}
             onClick={() => onReply?.(displayedPost)}
           />
           {!isBoard && (
@@ -112,7 +115,7 @@ function SocialPostCard({
               icon={Repeat2}
               count={displayedPost.repost_count || 0}
               active={reposted}
-              label="Repost"
+              label={t('social.repost')}
               onClick={() => onRepost?.(displayedPost.id)}
             />
           )}
@@ -120,14 +123,14 @@ function SocialPostCard({
             icon={Heart}
             count={displayedPost.like_count || 0}
             active={liked}
-            label="Like"
+            label={t('social.like')}
             onClick={() => onLike?.(displayedPost.id)}
           />
           {!isBoard && (
             <ActionButton
               icon={Quote}
               count={displayedPost.quote_count || 0}
-              label="Quote"
+              label={t('social.quote')}
               onClick={() => onQuote?.(displayedPost)}
             />
           )}

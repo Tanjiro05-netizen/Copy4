@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -10,6 +11,7 @@ import { useSocialInteractions } from '../components/Social/hooks/useSocialInter
 import * as s from '../components/Social/Social.css.ts'
 
 function FeedPostPage() {
+  const { t } = useTranslation()
   const { postId } = useParams()
   const router = useRouter()
   const { user, profile } = useAuth()
@@ -35,13 +37,13 @@ function FeedPostPage() {
       setPosts(threadPosts.length ? threadPosts : [post])
     } catch (err) {
       console.error('Failed to fetch social thread:', err)
-      setError(err.message || 'Thread unavailable.')
+      setError(err.message || t('feed.threadUnavailable'))
       setPosts([])
       setRootPost(null)
     } finally {
       setLoading(false)
     }
-  }, [postId, user?.id])
+  }, [postId, t, user?.id])
 
   useEffect(() => {
     fetchThread()
@@ -65,23 +67,23 @@ function FeedPostPage() {
             <div className={s.headerTop}>
               <button className={s.actionButton} onClick={() => router.back()}>
                 <ArrowLeft size={18} />
-                <span>Back</span>
+                <span>{t('common.back')}</span>
               </button>
               <div className={s.titleBlock}>
-                <h1>{isBoardThread ? 'Thread' : 'Post'}</h1>
-                <p>{posts.length > 1 ? `${posts.length - 1} replies` : 'Thread'}</p>
+                <h1>{isBoardThread ? t('social.thread') : t('social.post')}</h1>
+                <p>{posts.length > 1 ? t('feed.repliesCount', { count: posts.length - 1 }) : t('social.thread')}</p>
               </div>
             </div>
           </header>
 
           {loading ? (
-            <div className={s.stateBlock}>Loading...</div>
+            <div className={s.stateBlock}>{t('common.loading')}</div>
           ) : error ? (
             <div className={s.stateBlock}>
               <div>
                 <p>{error}</p>
                 <button className={s.retryButton} onClick={fetchThread}>
-                  <RefreshCw size={14} /> Retry
+                  <RefreshCw size={14} /> {t('data.retry')}
                 </button>
               </div>
             </div>
@@ -125,7 +127,7 @@ function FeedPostPage() {
               />
             </>
           ) : (
-            <div className={s.stateBlock}>Post not found.</div>
+            <div className={s.stateBlock}>{t('feed.postNotFound')}</div>
           )}
         </main>
 

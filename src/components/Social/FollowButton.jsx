@@ -1,8 +1,10 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useFollow } from './hooks/useFollow'
 import * as s from './Social.css.ts'
 
 function FollowButton({ targetUserId, currentUserId, compact = false, onChange }) {
+  const { t } = useTranslation()
   const { following, loading, toggleFollow } = useFollow(targetUserId, currentUserId)
   const isSelf = targetUserId && currentUserId && targetUserId === currentUserId
 
@@ -18,9 +20,9 @@ function FollowButton({ targetUserId, currentUserId, compact = false, onChange }
       className={`${s.followButton} ${following ? s.followButtonFollowing : ''}`}
       onClick={handleClick}
       disabled={loading}
-      title={following ? 'Unfollow' : 'Follow'}
+      title={following ? t('social.unfollow') : t('social.follow')}
     >
-      {following ? (compact ? 'On' : 'Following') : 'Follow'}
+      {following ? (compact ? t('social.on') : t('social.following')) : t('social.follow')}
     </button>
   )
 }

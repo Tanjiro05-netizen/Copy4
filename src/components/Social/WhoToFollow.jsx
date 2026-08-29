@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { Users } from 'lucide-react'
 import { socialApiService } from './api'
@@ -7,6 +8,7 @@ import SocialAvatar from './SocialAvatar'
 import * as s from './Social.css.ts'
 
 function WhoToFollow({ userId, limit = 5 }) {
+  const { t } = useTranslation()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
 
@@ -29,12 +31,12 @@ function WhoToFollow({ userId, limit = 5 }) {
   return (
     <section className={s.railSection}>
       <div className={s.railHeader}>
-        <span>Who to follow</span>
+        <span>{t('social.whoToFollow')}</span>
         <Users size={16} />
       </div>
       <div className={s.suggestionList}>
         {loading ? (
-          <div className={s.stateBlock}>Loading...</div>
+          <div className={s.stateBlock}>{t('common.loading')}</div>
         ) : users.length > 0 ? users.map((profile) => (
           <div key={profile.id} className={s.suggestionItem}>
             <Link href={`/profile/${profile.username}`}>
@@ -42,7 +44,7 @@ function WhoToFollow({ userId, limit = 5 }) {
             </Link>
             <Link href={`/profile/${profile.username}`} className={s.suggestionText}>
               <strong>{profile.username}</strong>
-              <span>{profile.follower_count || 0} followers</span>
+              <span>{t('social.followersCount', { count: profile.follower_count || 0 })}</span>
             </Link>
             <FollowButton
               targetUserId={profile.id}
@@ -52,7 +54,7 @@ function WhoToFollow({ userId, limit = 5 }) {
             />
           </div>
         )) : (
-          <div className={s.stateBlock}>No suggestions yet.</div>
+          <div className={s.stateBlock}>{t('social.noSuggestions')}</div>
         )}
       </div>
     </section>

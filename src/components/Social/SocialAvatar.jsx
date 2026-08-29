@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import * as s from './Social.css.ts'
 
 const cleanAnonymousName = (name) => {
@@ -7,12 +8,14 @@ const cleanAnonymousName = (name) => {
   return trimmed
 }
 
-export function getSocialIdentity(postOrProfile) {
+export function getSocialIdentity(postOrProfile, t = (key, options) => options?.defaultValue || key) {
   const anonymousName = cleanAnonymousName(postOrProfile?.anonymous_name)
   if (postOrProfile?.is_anonymous || anonymousName) {
     return {
-      name: anonymousName || 'Anonymous',
-      handle: 'anonymous',
+      name: !anonymousName || anonymousName === 'Anonymous'
+        ? t('social.anonymous', { defaultValue: 'Anonymous' })
+        : anonymousName,
+      handle: t('social.anonymousHandle', { defaultValue: 'anonymous' }),
       avatarUrl: null,
       anonymous: true,
       profile: null,
@@ -20,7 +23,7 @@ export function getSocialIdentity(postOrProfile) {
   }
 
   const profile = postOrProfile?.author || postOrProfile
-  const username = profile?.username || 'Someone'
+  const username = profile?.username || t('social.someone', { defaultValue: 'Someone' })
   return {
     name: username,
     handle: username ? `@${username}` : '@someone',
@@ -31,7 +34,8 @@ export function getSocialIdentity(postOrProfile) {
 }
 
 function SocialAvatar({ item, size = 'md' }) {
-  const identity = getSocialIdentity(item)
+  const { t } = useTranslation()
+  const identity = getSocialIdentity(item, t)
   const initials = identity.name
     .split(/[\s_-]/)
     .filter(Boolean)

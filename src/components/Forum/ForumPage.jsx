@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   ArrowLeft,
@@ -22,7 +23,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { forumApiService } from './api'
-import { BOARDS, getBoardBySlug } from './constants'
+import { BOARDS, getBoardBySlug, getLocalizedBoardName } from './constants'
 import { formatPostNumber, formatRelativeTime, truncateText } from './utils/formatters'
 import { parseContent } from './utils/helpers'
 import { sanitizeInput } from './utils/sanitize'
@@ -43,9 +44,9 @@ import {
 } from '../../styles/obsidianTheme.css.ts'
 
 const FEED_TABS = [
-  { key: 'latest', label: 'Latest', icon: Clock3, sortBy: 'created_at' },
-  { key: 'hot', label: 'Hot', icon: Flame, sortBy: 'like_count' },
-  { key: 'discussed', label: 'Discussed', icon: TrendingUp, sortBy: 'comment_count' },
+  { key: 'latest', labelKey: 'forum.latest', icon: Clock3, sortBy: 'created_at' },
+  { key: 'hot', labelKey: 'forum.hot', icon: Flame, sortBy: 'like_count' },
+  { key: 'discussed', labelKey: 'forum.discussed', icon: TrendingUp, sortBy: 'comment_count' },
 ]
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -67,27 +68,28 @@ function cleanAnonymousName(name) {
   return trimmed
 }
 
-function getDisplayIdentity(item) {
+function getDisplayIdentity(item, t = (key, options) => options?.defaultValue || key) {
   const anonymousName = cleanAnonymousName(item?.anonymous_name)
   if (anonymousName) {
     return {
-      name: anonymousName,
-      handle: 'anonymous',
+      name: anonymousName === 'Anonymous' ? t('social.anonymous', { defaultValue: 'Anonymous' }) : anonymousName,
+      handle: t('social.anonymousHandle', { defaultValue: 'anonymous' }),
       avatarUrl: null,
       anonymous: true,
     }
   }
 
   return {
-    name: item?.author?.username || 'Anonymous',
-    handle: item?.author?.username ? `@${item.author.username}` : 'anonymous',
+    name: item?.author?.username || t('social.anonymous', { defaultValue: 'Anonymous' }),
+    handle: item?.author?.username ? `@${item.author.username}` : t('social.anonymousHandle', { defaultValue: 'anonymous' }),
     avatarUrl: item?.author?.avatar_url || null,
     anonymous: !item?.author?.username,
   }
 }
 
 function InitialAvatar({ item, large = false }) {
-  const identity = getDisplayIdentity(item)
+  const { t } = useTranslation()
+  const identity = getDisplayIdentity(item, t)
   const initials = identity.name
     .split(/[\s_-]/)
     .filter(Boolean)
@@ -140,27 +142,28 @@ function ContentSegments({ content, preview = false }) {
 }
 
 function BoardRail({ currentBoard, stats, onlineCounts, totalOnline, onAllBoards, onSelectBoard }) {
+  const { t } = useTranslation()
   return (
     <aside className={s.leftRail} id="boards">
       <div className={s.railHeader}>
         <button className={s.brandButton} onClick={onAllBoards}>
           <span className={s.brandMark}><Hash size={17} /></span>
           <span>
-            <span className={s.brandTitle}>Forum</span>
-            <span className={s.brandMeta}>{totalOnline} online</span>
+            <span className={s.brandTitle}>{t('forum.title')}</span>
+            <span className={s.brandMeta}>{t('forum.onlineCount', { count: totalOnline })}</span>
           </span>
         </button>
       </div>
 
-      <nav className={s.boardNav} aria-label="Forum boards">
+      <nav className={s.boardNav} aria-label={t('forum.forumBoards')}>
         <button
           className={`${s.boardNavItem} ${!currentBoard ? s.boardNavItemActive : ''}`}
           onClick={onAllBoards}
         >
           <span className={s.boardNavIcon}><Home size={16} /></span>
           <span className={s.boardNavText}>
-            <span>Home Feed</span>
-            <span>all boards</span>
+            <span>{t('forum.homeFeed')}</span>
+            <span>{t('forum.allBoards')}</span>
           </span>
           <ChevronRight size={15} />
         </button>
@@ -176,8 +179,8 @@ function BoardRail({ currentBoard, stats, onlineCounts, totalOnline, onAllBoards
             >
               <span className={s.boardSlug}>/{board.slug}/</span>
               <span className={s.boardNavText}>
-                <span>{board.name}</span>
-                <span>{boardStats.threadCount} threads · {online} online</span>
+                <span>{getLocalizedBoardName(t, board)}</span>
+                <span>{t('forum.threadCount', { count: boardStats.threadCount })} · {t('forum.onlineCount', { count: online })}</span>
               </span>
               <ChevronRight size={15} />
             </button>
@@ -189,13 +192,14 @@ function BoardRail({ currentBoard, stats, onlineCounts, totalOnline, onAllBoards
 }
 
 function MobileBoardStrip({ currentBoard, onAllBoards, onSelectBoard }) {
+  const { t } = useTranslation()
   return (
     <div className={s.mobileBoardStrip}>
       <button
         className={`${s.mobileBoardChip} ${!currentBoard ? s.mobileBoardChipActive : ''}`}
         onClick={onAllBoards}
       >
-        Home
+        {t('forum.home')}
       </button>
       {BOARDS.map((board) => (
         <button
@@ -211,6 +215,7 @@ function MobileBoardStrip({ currentBoard, onAllBoards, onSelectBoard }) {
 }
 
 function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
@@ -244,20 +249,20 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
     event.preventDefault()
     if (!userId || honeypot) return
     if (Date.now() - mountTime.current < 1200) {
-      setError('Give the post one more second.')
+      setError(t('forum.waitOneSecond'))
       return
     }
     const rate = checkLimit('thread')
     if (!rate.ok) {
-      setError(`Too many posts. Try again in ${Math.ceil(rate.retryAfterMs / 1000)}s.`)
+      setError(t('forum.tooManyPosts', { seconds: Math.ceil(rate.retryAfterMs / 1000) }))
       return
     }
     if (title.trim().length < 3) {
-      setError('Title must be at least 3 characters.')
+      setError(t('forum.titleMin'))
       return
     }
     if (content.trim().length < 10) {
-      setError('Post must be at least 10 characters.')
+      setError(t('forum.postMin'))
       return
     }
 
@@ -276,7 +281,7 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
       reset()
       onCreated?.(thread)
     } catch (err) {
-      setError(err.message || 'Failed to post thread.')
+      setError(err.message || t('forum.postFailed'))
     } finally {
       setLoading(false)
     }
@@ -285,8 +290,8 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
   if (!expanded) {
     return (
       <button className={s.composerCollapsed} onClick={() => setExpanded(true)}>
-        <InitialAvatar item={{ author: { username: user?.email || 'You' } }} />
-        <span>Start a thread...</span>
+        <InitialAvatar item={{ author: { username: user?.email || t('social.you') } }} />
+        <span>{t('forum.startThread')}</span>
         <MessageSquarePlus size={18} />
       </button>
     )
@@ -295,13 +300,13 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
   return (
     <form className={s.composer} onSubmit={handleSubmit}>
       <div className={s.composerTop}>
-        <InitialAvatar item={{ anonymous_name: useAnonymousName ? anonymousName : '', author: { username: user?.email || 'You' } }} />
+        <InitialAvatar item={{ anonymous_name: useAnonymousName ? anonymousName : '', author: { username: user?.email || t('social.you') } }} />
         <div className={s.composerFields}>
           <input
             className={s.composerTitleInput}
             value={title}
             onChange={(event) => { setTitle(event.target.value); setError('') }}
-            placeholder="Thread title"
+            placeholder={t('social.threadTitle')}
             maxLength={200}
             disabled={loading}
           />
@@ -309,14 +314,14 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
             className={s.composerTextarea}
             value={content}
             onChange={(event) => { setContent(event.target.value); setError('') }}
-            placeholder="Post body"
+            placeholder={t('social.boardPostBody')}
             disabled={loading}
           />
         </div>
       </div>
 
       <div className={s.honeypot} aria-hidden="true">
-        <label htmlFor="forum_website">Website</label>
+        <label htmlFor="forum_website">{t('forum.website')}</label>
         <input
           id="forum_website"
           type="text"
@@ -329,10 +334,10 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
 
       <div className={s.composerMeta}>
         <label className={s.selectWrap}>
-          <span>Board</span>
+          <span>{t('forum.board')}</span>
           <select value={selectedBoard} onChange={(event) => setSelectedBoard(event.target.value)} disabled={loading}>
             {BOARDS.map((board) => (
-              <option key={board.slug} value={board.slug}>/{board.slug}/ {board.name}</option>
+              <option key={board.slug} value={board.slug}>/{board.slug}/ {getLocalizedBoardName(t, board)}</option>
             ))}
           </select>
         </label>
@@ -344,7 +349,7 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
             onChange={(event) => setUseAnonymousName(event.target.checked)}
             disabled={loading}
           />
-          <span>Anonymous display</span>
+          <span>{t('forum.anonymousDisplay')}</span>
         </label>
 
         {useAnonymousName && (
@@ -352,7 +357,7 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
             className={s.anonInput}
             value={anonymousName}
             onChange={(event) => setAnonymousName(event.target.value)}
-            placeholder="Anonymous"
+            placeholder={t('social.anonymous')}
             maxLength={50}
             disabled={loading}
           />
@@ -362,13 +367,13 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
       {error && <div className={s.formError}>{error}</div>}
 
       <div className={s.composerActions}>
-        <span className={monoMeta}>{content.length} chars</span>
+        <span className={monoMeta}>{t('forum.characterCount', { count: content.length })}</span>
         <div className={s.composerActionButtons}>
           <button type="button" className={actionButton({ tone: 'ghost', size: 'sm' })} onClick={reset} disabled={loading}>
-            Cancel
+            {t('common.cancel')}
           </button>
           <button type="submit" className={actionButton({ tone: 'accent', size: 'sm' })} disabled={loading || !title.trim() || !content.trim()}>
-            <Send size={14} /> {loading ? 'Posting...' : 'Post'}
+            <Send size={14} /> {loading ? t('social.posting') : t('social.post')}
           </button>
         </div>
       </div>
@@ -377,11 +382,12 @@ function ThreadComposer({ user, userId, initialBoardSlug, onCreated }) {
 }
 
 function FeedTabButton({ tab, active, onClick }) {
+  const { t } = useTranslation()
   const Icon = tab.icon
   return (
     <button className={`${s.feedTab} ${active ? s.feedTabActive : ''}`} onClick={onClick}>
       <Icon size={15} />
-      <span>{tab.label}</span>
+      <span>{t(tab.labelKey)}</span>
     </button>
   )
 }
@@ -411,7 +417,8 @@ function ThreadFeedCard({
   reposted,
   bookmarked,
 }) {
-  const identity = getDisplayIdentity(thread)
+  const { t } = useTranslation()
+  const identity = getDisplayIdentity(thread, t)
 
   return (
     <article className={s.feedCard}>
@@ -431,8 +438,8 @@ function ThreadFeedCard({
             </button>
           </div>
           <div className={s.stateBadges}>
-            {thread.is_pinned && <span className={s.stateBadge}><Pin size={12} /> pinned</span>}
-            {thread.is_locked && <span className={s.stateBadge}><Lock size={12} /> locked</span>}
+            {thread.is_pinned && <span className={s.stateBadge}><Pin size={12} /> {t('forum.pinned')}</span>}
+            {thread.is_locked && <span className={s.stateBadge}><Lock size={12} /> {t('forum.locked')}</span>}
           </div>
         </div>
 
@@ -445,10 +452,10 @@ function ThreadFeedCard({
         </div>
 
         <div className={s.feedActions}>
-          <FeedAction icon={MessageCircle} count={thread.comment_count || 0} label="Replies" onClick={() => onOpen?.(thread)} />
-          <FeedAction icon={Heart} count={thread.like_count || 0} label="Likes" active={liked} onClick={() => onLike?.(thread.id)} />
-          <FeedAction icon={Repeat2} count={thread.repost_count || 0} label="Reposts" active={reposted} onClick={() => onRepost?.(thread.id)} />
-          <FeedAction icon={Bookmark} label={bookmarked ? 'Saved' : 'Save'} active={bookmarked} onClick={() => onBookmark?.(thread.id)} />
+          <FeedAction icon={MessageCircle} count={thread.comment_count || 0} label={t('forum.replies')} onClick={() => onOpen?.(thread)} />
+          <FeedAction icon={Heart} count={thread.like_count || 0} label={t('forum.likes')} active={liked} onClick={() => onLike?.(thread.id)} />
+          <FeedAction icon={Repeat2} count={thread.repost_count || 0} label={t('forum.reposts')} active={reposted} onClick={() => onRepost?.(thread.id)} />
+          <FeedAction icon={Bookmark} label={bookmarked ? t('forum.saved') : t('common.save')} active={bookmarked} onClick={() => onBookmark?.(thread.id)} />
         </div>
       </div>
     </article>
@@ -456,6 +463,7 @@ function ThreadFeedCard({
 }
 
 function ActivityRail({ threads, boardStats, totalOnline, unreadCount, bookmarkCount, onOpenThread }) {
+  const { t } = useTranslation()
   const trending = useMemo(() => {
     return [...(threads || [])]
       .sort((a, b) => ((b.like_count || 0) * 2 + (b.comment_count || 0)) - ((a.like_count || 0) * 2 + (a.comment_count || 0)))
@@ -470,42 +478,42 @@ function ActivityRail({ threads, boardStats, totalOnline, unreadCount, bookmarkC
     <aside className={s.rightRail}>
       <section className={s.sidePanel}>
         <div className={s.sidePanelHeader}>
-          <span>Live</span>
+          <span>{t('forum.live')}</span>
           <Wifi size={15} />
         </div>
         <div className={s.statGrid}>
           <div>
             <strong>{totalOnline}</strong>
-            <span>online</span>
+            <span>{t('forum.online')}</span>
           </div>
           <div>
             <strong>{totalThreads}</strong>
-            <span>threads</span>
+            <span>{t('forum.threads')}</span>
           </div>
           <div>
             <strong>{unreadCount}</strong>
-            <span>alerts</span>
+            <span>{t('forum.alerts')}</span>
           </div>
           <div>
             <strong>{bookmarkCount}</strong>
-            <span>saved</span>
+            <span>{t('forum.saved')}</span>
           </div>
         </div>
       </section>
 
       <section className={s.sidePanel}>
         <div className={s.sidePanelHeader}>
-          <span>Trending</span>
+          <span>{t('forum.trending')}</span>
           <Flame size={15} />
         </div>
         <div className={s.trendingList}>
           {trending.length > 0 ? trending.map((thread) => (
             <button key={thread.id} className={s.trendingItem} onClick={() => onOpenThread?.(thread)}>
               <span className={s.trendingTitle}>{thread.title}</span>
-              <span>{thread.comment_count || 0} replies · {thread.like_count || 0} likes</span>
+              <span>{t('forum.replyCount', { count: thread.comment_count || 0 })} · {t('forum.likeCount', { count: thread.like_count || 0 })}</span>
             </button>
           )) : (
-            <p className={s.mutedText}>No trending threads yet.</p>
+            <p className={s.mutedText}>{t('forum.noTrending')}</p>
           )}
         </div>
       </section>
@@ -524,6 +532,7 @@ function FeedSurface({
   onSelectBoard,
   onOpenThread,
 }) {
+  const { t } = useTranslation()
   const board = boardSlug ? getBoardBySlug(boardSlug) : null
   const [activeTab, setActiveTab] = useState('latest')
   const [page, setPage] = useState(1)
@@ -556,8 +565,8 @@ function FeedSurface({
     if (thread?.id) onOpenThread(thread)
   }, [onOpenThread, refetch])
 
-  const title = board ? board.name : 'Home Feed'
-  const subtitle = board ? board.fullName : 'Latest threads from every board'
+  const title = board ? getLocalizedBoardName(t, board) : t('forum.homeFeed')
+  const subtitle = board ? getLocalizedBoardName(t, board, true) : t('forum.latestEveryBoard')
 
   return (
     <>
@@ -575,13 +584,13 @@ function FeedSurface({
 
         <header className={s.feedHeader}>
           <div>
-            <p className={s.kicker}>Community</p>
+            <p className={s.kicker}>{t('forum.community')}</p>
             <h1>{title}</h1>
             <p>{subtitle}</p>
           </div>
           <div className={s.feedHeaderMeta}>
-            <span><Users size={14} /> {boardStats[boardSlug]?.uniquePostersWeek || 0} this week</span>
-            <span><Wifi size={14} /> {boardSlug ? (onlineCounts[boardSlug] || 0) : totalOnline} online</span>
+            <span><Users size={14} /> {t('forum.thisWeekCount', { count: boardStats[boardSlug]?.uniquePostersWeek || 0 })}</span>
+            <span><Wifi size={14} /> {t('forum.onlineCount', { count: boardSlug ? (onlineCounts[boardSlug] || 0) : totalOnline })}</span>
           </div>
         </header>
 
@@ -602,14 +611,14 @@ function FeedSurface({
           <div className={loadingState}><div className={loadingSpinner} /></div>
         ) : error ? (
           <div className={emptyState}>
-            Feed unavailable right now.
+            {t('forum.feedUnavailable')}
             <br />
             <button className={actionButton({ tone: 'ghost', size: 'sm' })} onClick={refetch} style={{ marginTop: 12 }}>
-              Retry
+              {t('data.retry')}
             </button>
           </div>
         ) : threads.length === 0 ? (
-          <div className={emptyState}>No threads yet.</div>
+          <div className={emptyState}>{t('forum.noThreads')}</div>
         ) : (
           <div className={s.feedList}>
             {threads.map((thread) => (
@@ -634,11 +643,11 @@ function FeedSurface({
         {pagination.totalPages > 1 && (
           <div className={s.paginationRow}>
             <button className={actionButton({ tone: 'ghost', size: 'sm' })} disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
-              Previous
+              {t('common.previous')}
             </button>
             <span className={monoMeta}>{page} / {pagination.totalPages}</span>
             <button className={actionButton({ tone: 'ghost', size: 'sm' })} disabled={page >= pagination.totalPages} onClick={() => setPage((current) => current + 1)}>
-              Next
+              {t('common.next')}
             </button>
           </div>
         )}
@@ -657,6 +666,7 @@ function FeedSurface({
 }
 
 function ReplyComposer({ user, loading, error, onSubmit }) {
+  const { t } = useTranslation()
   const [content, setContent] = useState('')
   const [useAnonymousName, setUseAnonymousName] = useState(false)
   const [anonymousName, setAnonymousName] = useState('')
@@ -674,13 +684,13 @@ function ReplyComposer({ user, loading, error, onSubmit }) {
 
   return (
     <form className={s.replyComposer} onSubmit={handleSubmit}>
-      <InitialAvatar item={{ anonymous_name: useAnonymousName ? anonymousName : '', author: { username: user?.email || 'You' } }} />
+      <InitialAvatar item={{ anonymous_name: useAnonymousName ? anonymousName : '', author: { username: user?.email || t('social.you') } }} />
       <div className={s.replyComposerBody}>
         <textarea
           className={s.replyTextarea}
           value={content}
           onChange={(event) => setContent(event.target.value)}
-          placeholder="Write a reply..."
+          placeholder={t('forum.writeReply')}
           disabled={loading}
         />
         <div className={s.replyComposerMeta}>
@@ -691,20 +701,20 @@ function ReplyComposer({ user, loading, error, onSubmit }) {
               onChange={(event) => setUseAnonymousName(event.target.checked)}
               disabled={loading}
             />
-            <span>Anonymous display</span>
+            <span>{t('forum.anonymousDisplay')}</span>
           </label>
           {useAnonymousName && (
             <input
               className={s.anonInput}
               value={anonymousName}
               onChange={(event) => setAnonymousName(event.target.value)}
-              placeholder="Anonymous"
+              placeholder={t('social.anonymous')}
               maxLength={50}
               disabled={loading}
             />
           )}
           <button type="submit" className={actionButton({ tone: 'accent', size: 'sm' })} disabled={loading || !content.trim()}>
-            <Send size={14} /> {loading ? 'Posting...' : 'Reply'}
+            <Send size={14} /> {loading ? t('social.posting') : t('social.reply')}
           </button>
         </div>
         {error && <div className={s.formError}>{error}</div>}
@@ -714,7 +724,8 @@ function ReplyComposer({ user, loading, error, onSubmit }) {
 }
 
 function CommentCard({ comment, liked, onLike }) {
-  const identity = getDisplayIdentity(comment)
+  const { t } = useTranslation()
+  const identity = getDisplayIdentity(comment, t)
   const postNumber = formatPostNumber(comment.id)
 
   return (
@@ -726,13 +737,13 @@ function CommentCard({ comment, liked, onLike }) {
           <span className={s.handle}>{identity.handle}</span>
           <span className={s.dot}>·</span>
           <span>{formatRelativeTime(comment.created_at)}</span>
-          <span>No.{postNumber}</span>
+          <span>{t('forum.postNumber', { number: postNumber })}</span>
         </div>
         <div className={s.commentText}>
-          {comment.is_deleted ? '[deleted]' : <ContentSegments content={comment.content} />}
+          {comment.is_deleted ? t('forum.deleted') : <ContentSegments content={comment.content} />}
         </div>
         <div className={s.feedActions}>
-          <FeedAction icon={Heart} count={comment.like_count || 0} label="Likes" active={liked} onClick={() => onLike?.(comment.id)} />
+          <FeedAction icon={Heart} count={comment.like_count || 0} label={t('forum.likes')} active={liked} onClick={() => onLike?.(comment.id)} />
         </div>
       </div>
     </article>
@@ -749,6 +760,7 @@ function ThreadDetailSurface({
   onAllBoards,
   onSelectBoard,
 }) {
+  const { t } = useTranslation()
   const [thread, setThread] = useState(null)
   const [threadLoading, setThreadLoading] = useState(true)
   const [threadError, setThreadError] = useState('')
@@ -770,14 +782,14 @@ function ThreadDetailSurface({
         const data = await forumApiService.getThread(threadId)
         if (!cancelled) setThread(data)
       } catch (err) {
-        if (!cancelled) setThreadError(err.message || 'Thread not found.')
+        if (!cancelled) setThreadError(err.message || t('forum.threadNotFound'))
       } finally {
         if (!cancelled) setThreadLoading(false)
       }
     }
     loadThread()
     return () => { cancelled = true }
-  }, [threadId])
+  }, [t, threadId])
 
   useEffect(() => {
     if (userId) fetchUserLikes()
@@ -786,7 +798,7 @@ function ThreadDetailSurface({
   const handleReply = async (content, anonymousName) => {
     const rate = checkLimit('comment')
     if (!rate.ok) {
-      setReplyError(`Too many replies. Try again in ${Math.ceil(rate.retryAfterMs / 1000)}s.`)
+      setReplyError(t('forum.tooManyReplies', { seconds: Math.ceil(rate.retryAfterMs / 1000) }))
       return false
     }
     setReplyLoading(true)
@@ -794,14 +806,14 @@ function ThreadDetailSurface({
     const result = await createComment(sanitizeInput(content.trim()), null, anonymousName ? sanitizeInput(anonymousName) : null)
     setReplyLoading(false)
     if (!result.success) {
-      setReplyError(result.error?.message || 'Failed to post reply.')
+      setReplyError(result.error?.message || t('forum.replyFailed'))
       return false
     }
     return true
   }
 
   const currentBoard = thread?.category_slug || null
-  const identity = getDisplayIdentity(thread)
+  const identity = getDisplayIdentity(thread, t)
 
   return (
     <>
@@ -820,7 +832,7 @@ function ThreadDetailSurface({
         {threadLoading ? (
           <div className={loadingState}><div className={loadingSpinner} /></div>
         ) : threadError || !thread ? (
-          <div className={emptyState}>{threadError || 'Thread not found.'}</div>
+          <div className={emptyState}>{threadError || t('forum.threadNotFound')}</div>
         ) : (
           <>
             <button className={s.backButton} onClick={() => onSelectBoard(thread.category_slug)}>
@@ -847,10 +859,10 @@ function ThreadDetailSurface({
               </div>
 
               <div className={s.threadDetailActions}>
-                <FeedAction icon={MessageCircle} count={flatComments?.length || 0} label="Replies" />
-                <FeedAction icon={Heart} count={thread.like_count || 0} label="Likes" active={isLiked('thread', thread.id)} onClick={() => toggleLike('thread', thread.id)} />
-                <FeedAction icon={Repeat2} count={thread.repost_count || 0} label="Reposts" active={isReposted(thread.id)} onClick={() => toggleRepost(thread.id)} />
-                <FeedAction icon={Bookmark} label={isBookmarked(thread.id) ? 'Saved' : 'Save'} active={isBookmarked(thread.id)} onClick={() => toggleBookmark(thread.id)} />
+                <FeedAction icon={MessageCircle} count={flatComments?.length || 0} label={t('forum.replies')} />
+                <FeedAction icon={Heart} count={thread.like_count || 0} label={t('forum.likes')} active={isLiked('thread', thread.id)} onClick={() => toggleLike('thread', thread.id)} />
+                <FeedAction icon={Repeat2} count={thread.repost_count || 0} label={t('forum.reposts')} active={isReposted(thread.id)} onClick={() => toggleRepost(thread.id)} />
+                <FeedAction icon={Bookmark} label={isBookmarked(thread.id) ? t('forum.saved') : t('common.save')} active={isBookmarked(thread.id)} onClick={() => toggleBookmark(thread.id)} />
               </div>
             </article>
 
@@ -859,12 +871,12 @@ function ThreadDetailSurface({
             )}
 
             {thread.is_locked && (
-              <div className={s.lockedNotice}><Lock size={15} /> This thread is locked.</div>
+              <div className={s.lockedNotice}><Lock size={15} /> {t('forum.threadLocked')}</div>
             )}
 
             <section className={s.commentsSection}>
               <div className={s.commentsHeader}>
-                <h2>Replies</h2>
+                <h2>{t('forum.replies')}</h2>
                 <span>{flatComments?.length || 0}</span>
               </div>
 
@@ -882,7 +894,7 @@ function ThreadDetailSurface({
                   ))}
                 </div>
               ) : (
-                <div className={emptyState}>No replies yet.</div>
+                <div className={emptyState}>{t('forum.noReplies')}</div>
               )}
             </section>
           </>
@@ -902,12 +914,13 @@ function ThreadDetailSurface({
 }
 
 function BottomNav({ onHome }) {
+  const { t } = useTranslation()
   return (
-    <nav className={s.bottomNav} aria-label="Forum navigation">
-      <button onClick={onHome}><Home size={18} /><span>Home</span></button>
-      <a href="#boards"><Hash size={18} /><span>Boards</span></a>
-      <button type="button"><Bell size={18} /><span>Alerts</span></button>
-      <a href="/profile"><Bookmark size={18} /><span>Saved</span></a>
+    <nav className={s.bottomNav} aria-label={t('forum.navigation')}>
+      <button onClick={onHome}><Home size={18} /><span>{t('forum.home')}</span></button>
+      <a href="#boards"><Hash size={18} /><span>{t('forum.boardsLabel')}</span></a>
+      <button type="button"><Bell size={18} /><span>{t('forum.alerts')}</span></button>
+      <a href="/profile"><Bookmark size={18} /><span>{t('forum.saved')}</span></a>
     </nav>
   )
 }

@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { Send } from 'lucide-react'
-import { BOARDS } from '../Forum/constants'
+import { BOARDS, getLocalizedBoardName } from '../Forum/constants'
 import { sanitizeInput } from '../Forum/utils/sanitize'
 import { truncateText } from '../Forum/utils/formatters'
 import { socialApiService } from './api'
 import SocialAvatar, { getSocialIdentity } from './SocialAvatar'
 import * as s from './Social.css.ts'
 
-const SOCIAL_TOPIC_CHIPS = ['#Theory', '#Reading', '#Organizing', '#History']
+const SOCIAL_TOPIC_CHIPS = [
+  { value: '#Theory', labelKey: 'feed.theory' },
+  { value: '#Reading', labelKey: 'feed.reading' },
+  { value: '#Organizing', labelKey: 'feed.organizing' },
+  { value: '#History', labelKey: 'feed.history' },
+]
 
 function SocialComposer({
   composerId,
@@ -22,6 +28,7 @@ function SocialComposer({
   onCancelQuote,
   onCreated,
 }) {
+  const { t } = useTranslation()
   const isBoardComposer = mode === 'board' || Boolean(defaultBoardSlug)
   const initialDestination = isBoardComposer ? `board:${defaultBoardSlug || BOARDS[0].slug}` : 'timeline'
   const [content, setContent] = useState('')
@@ -38,7 +45,9 @@ function SocialComposer({
   const isLoggedIn = Boolean(user?.id)
   const canPost = isLoggedIn || boardMode
   const effectiveAnonymous = boardMode && (!isLoggedIn || anonymous)
-  const topicChips = Array.from(new Set([...(suggestedTopics || []), ...SOCIAL_TOPIC_CHIPS]))
+  const topicChips = [...(suggestedTopics || []).map((topic) => typeof topic === 'string' ? { value: topic } : topic), ...SOCIAL_TOPIC_CHIPS]
+    .filter((topic, index, items) => items.findIndex((item) => item.value === topic.value) === index)
+  const quotedIdentity = quotedPost ? getSocialIdentity(quotedPost, t) : null
 
   useEffect(() => {
     setDestination(isBoardComposer ? `board:${defaultBoardSlug || BOARDS[0].slug}` : 'timeline')
@@ -72,11 +81,11 @@ function SocialComposer({
     const cleanedTitle = sanitizeInput(title.trim())
 
     if (cleanedContent.length < 1) {
-      setError('Post body is required.')
+      setError(t('social.postRequired'))
       return
     }
     if (boardMode && cleanedTitle && cleanedTitle.length < 3) {
-      setError('Board titles need at least 3 characters.')
+      setError(t('social.boardTitleMin'))
       return
     }
 
@@ -96,7 +105,7 @@ function SocialComposer({
       reset()
       onCreated?.(post)
     } catch (err) {
-      setError(err.message || 'Could not post.')
+      setError(err.message || t('social.couldNotPost'))
     } finally {
       setLoading(false)
     }
@@ -106,14 +115,14 @@ function SocialComposer({
     return (
       <div id={composerId} className={`${s.composer} ${s.socialComposer}`}>
         <div className={s.composerGrid}>
-          <SocialAvatar item={{ username: 'Guest' }} />
+          <SocialAvatar item={{ username: t('social.guest') }} />
           <div className={s.composerBody}>
             <div className={s.guestComposerPrompt}>
               <div className={s.guestComposerText}>
-                <strong>Log in to use Social</strong>
-                <span>The social timeline is account-only. The Imageboard section supports anonymous posting.</span>
+                <strong>{t('social.loginToUse')}</strong>
+                <span>{t('social.loginToUseDesc')}</span>
               </div>
-              <Link href="/login" className={s.submitButton}>Log in</Link>
+              <Link href="/login" className={s.submitButton}>{t('nav.login')}</Link>
             </div>
           </div>
         </div>
@@ -128,7 +137,7 @@ function SocialComposer({
         <div className={s.composerBody}>
           {boardMode && !parentId && (
             <div className={s.boardComposerHeader}>
-              <strong>New thread</strong>
+              <strong>{t('social.newThread')}</strong>
               <span>/{selectedBoardSlug || defaultBoardSlug || BOARDS[0].slug}/</span>
             </div>
           )}
@@ -142,7 +151,7 @@ function SocialComposer({
                 setError('')
               }}
               maxLength={200}
-              placeholder="Thread title"
+              placeholder={t('social.threadTitle')}
               disabled={loading}
             />
           )}
@@ -153,24 +162,24 @@ function SocialComposer({
               setContent(event.target.value)
               setError('')
             }}
-            placeholder={parentId ? 'Post your reply' : boardMode ? 'Start a thread' : 'What is happening?'}
-            aria-label={boardMode ? 'Board post body' : 'Social post body'}
+            placeholder={parentId ? t('social.replyPlaceholder') : boardMode ? t('social.startThread') : t('social.whatsHappening')}
+            aria-label={boardMode ? t('social.boardPostBody') : t('social.socialPostBody')}
             disabled={loading}
           />
 
           {!boardMode && !parentId && (
             <div className={s.socialComposerToolbar}>
-              <div className={s.topicChipGroup} aria-label="Topic shortcuts">
-                <span className={s.composerToolLabel}>Signal tags</span>
+              <div className={s.topicChipGroup} aria-label={t('social.topicShortcuts')}>
+                <span className={s.composerToolLabel}>{t('social.signalTags')}</span>
                 {topicChips.map((topic) => (
                   <button
-                    key={topic}
+                    key={topic.value}
                     type="button"
                     className={s.topicChip}
-                    onClick={() => appendTopic(topic)}
+                    onClick={() => appendTopic(topic.value)}
                     disabled={loading}
                   >
-                    {topic}
+                    {topic.labelKey ? `#${t(topic.labelKey)}` : topic.value}
                   </button>
                 ))}
               </div>
@@ -181,9 +190,9 @@ function SocialComposer({
           {quotedPost && (
             <div className={s.embeddedPost}>
               <div className={s.identityLine}>
-                <span className={s.displayName}>{getSocialIdentity(quotedPost).name}</span>
-                <span className={s.handle}>{getSocialIdentity(quotedPost).handle}</span>
-                <button type="button" className={s.boardBadge} onClick={onCancelQuote}>clear</button>
+                <span className={s.displayName}>{quotedIdentity.name}</span>
+                <span className={s.handle}>{quotedIdentity.handle}</span>
+                <button type="button" className={s.boardBadge} onClick={onCancelQuote}>{t('common.clear')}</button>
               </div>
               {quotedPost.title && <h4 className={s.postTitle}>{quotedPost.title}</h4>}
               <p className={s.postContent}>{truncateText(quotedPost.content, 180)}</p>
@@ -194,7 +203,7 @@ function SocialComposer({
             <div className={s.controlGroup}>
               {boardMode && !parentId && (
                 <label className={s.selectLabel}>
-                  <span>Board</span>
+                  <span>{t('forum.boardsLabel')}</span>
                   <select
                     className={s.select}
                     value={destination}
@@ -203,7 +212,7 @@ function SocialComposer({
                   >
                     {BOARDS.map((board) => (
                       <option key={board.slug} value={`board:${board.slug}`}>
-                        /{board.slug}/ {board.name}
+                        /{board.slug}/ {getLocalizedBoardName(t, board)}
                       </option>
                     ))}
                   </select>
@@ -217,9 +226,9 @@ function SocialComposer({
                   onChange={(event) => setVisibility(event.target.value)}
                   disabled={loading}
                 >
-                  <option value="public">Public</option>
-                  <option value="followers">Followers</option>
-                  <option value="unlisted">Unlisted</option>
+                  <option value="public">{t('social.public')}</option>
+                  <option value="followers">{t('social.followers')}</option>
+                  <option value="unlisted">{t('social.unlisted')}</option>
                 </select>
               )}
 
@@ -231,7 +240,7 @@ function SocialComposer({
                     onChange={(event) => setAnonymous(event.target.checked)}
                     disabled={!isLoggedIn || loading}
                   />
-                  <span>{isLoggedIn ? 'Post anonymously' : 'Anonymous'}</span>
+                  <span>{isLoggedIn ? t('social.postAnonymously') : t('social.anonymous')}</span>
                 </label>
               )}
 
@@ -241,7 +250,7 @@ function SocialComposer({
                   value={anonymousName}
                   onChange={(event) => setAnonymousName(event.target.value)}
                   maxLength={50}
-                  placeholder="Name"
+                  placeholder={t('social.name')}
                   disabled={loading}
                 />
               )}
@@ -249,7 +258,7 @@ function SocialComposer({
 
             <button className={s.submitButton} type="submit" disabled={loading || !content.trim()}>
               <Send size={15} />
-              <span>{loading ? 'Posting' : parentId ? 'Reply' : boardMode ? 'Thread' : 'Post'}</span>
+              <span>{loading ? t('social.posting') : parentId ? t('social.reply') : boardMode ? t('social.thread') : t('social.post')}</span>
             </button>
           </div>
 

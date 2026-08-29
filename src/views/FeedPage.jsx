@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -18,7 +19,7 @@ import {
   UserRoundCheck,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { BOARDS, getBoardBySlug } from '../components/Forum/constants'
+import { BOARDS, getBoardBySlug, getLocalizedBoardName } from '../components/Forum/constants'
 import { formatRelativeTime, truncateText } from '../components/Forum/utils/formatters'
 import SocialComposer from '../components/Social/SocialComposer'
 import SocialPostCard from '../components/Social/SocialPostCard'
@@ -29,67 +30,88 @@ import { useSocialInteractions } from '../components/Social/hooks/useSocialInter
 import * as s from '../components/Social/Social.css.ts'
 
 const SOCIAL_TABS = [
-  { key: 'home', label: 'For You' },
-  { key: 'following', label: 'Following', icon: UserRoundCheck },
-  { key: 'hot', label: 'Hot', icon: Flame },
+  { key: 'home', labelKey: 'feed.forYou' },
+  { key: 'following', labelKey: 'feed.following', icon: UserRoundCheck },
+  { key: 'hot', labelKey: 'feed.hot', icon: Flame },
 ]
 
 const DISCOVERY_CATEGORIES = [
-  { key: 'hot', label: 'Rising', meta: 'Now' },
-  { key: 'theory', label: 'Theory', meta: 'Concepts' },
-  { key: 'reading', label: 'Reading', meta: 'Notes' },
-  { key: 'praxis', label: 'Organizing', meta: 'Praxis' },
-  { key: 'history', label: 'History', meta: 'Archive' },
-  { key: 'meta', label: 'Meta', meta: 'Platform' },
+  { key: 'hot', label: 'Rising', labelKey: 'feed.rising', metaKey: 'feed.now' },
+  { key: 'theory', label: 'Theory', labelKey: 'feed.theory', metaKey: 'feed.concepts' },
+  { key: 'reading', label: 'Reading', labelKey: 'feed.reading', metaKey: 'feed.notes' },
+  { key: 'praxis', label: 'Organizing', labelKey: 'feed.organizing', metaKey: 'feed.praxis' },
+  { key: 'history', label: 'History', labelKey: 'feed.history', metaKey: 'feed.archive' },
+  { key: 'meta', label: 'Meta', labelKey: 'feed.meta', metaKey: 'feed.platform' },
 ]
 
 const TOPIC_DETAILS = {
   t: {
     category: 'Theory',
+    categoryKey: 'feed.theory',
     description: 'Political economy, ideology, and long-form theoretical arguments.',
+    descriptionKey: 'feed.topicTheoryDesc',
     host: 'Study Center',
+    hostKey: 'feed.studyCenter',
     reads: '1.1M',
     index: '98.6',
   },
   r: {
     category: 'Reading',
+    categoryKey: 'feed.reading',
     description: 'Reading groups, notes, passages, and shared study plans.',
+    descriptionKey: 'feed.topicReadingDesc',
     host: 'Digital Library',
+    hostKey: 'feed.digitalLibrary',
     reads: '577K',
     index: '87.4',
   },
   o: {
     category: 'Organizing',
+    categoryKey: 'feed.organizing',
     description: 'Organizing reports, strategy notes, local work, and campaign debriefs.',
+    descriptionKey: 'feed.topicOrganizingDesc',
     host: 'Community Desk',
+    hostKey: 'feed.communityDesk',
     reads: '491K',
     index: '81.2',
   },
   h: {
     category: 'History',
+    categoryKey: 'feed.history',
     description: 'Historical debates, anniversaries, archives, and materialist analysis.',
+    descriptionKey: 'feed.topicHistoryDesc',
     host: 'History Circle',
+    hostKey: 'feed.historyCircle',
     reads: '433K',
     index: '76.8',
   },
   c: {
     category: 'Rising',
+    categoryKey: 'feed.rising',
     description: 'Current events, fast-moving news analysis, and public controversy.',
+    descriptionKey: 'feed.topicCurrentDesc',
     host: 'News Watch',
+    hostKey: 'feed.newsWatch',
     reads: '386K',
     index: '72.5',
   },
   m: {
     category: 'Meta',
+    categoryKey: 'feed.meta',
     description: 'Site feedback, moderation notes, feature requests, and release discussion.',
+    descriptionKey: 'feed.topicMetaDesc',
     host: 'Marxist.info',
+    hostKey: 'feed.marxistInfo',
     reads: '214K',
     index: '65.1',
   },
   x: {
     category: 'Rising',
+    categoryKey: 'feed.rising',
     description: 'Loose discussion, miscellany, and unexpected public chatter.',
+    descriptionKey: 'feed.topicRandomDesc',
     host: 'Open Floor',
+    hostKey: 'feed.openFloor',
     reads: '188K',
     index: '58.9',
   },
@@ -106,8 +128,11 @@ const SOCIAL_HOT_TOPICS = BOARDS.map((board, index) => {
     boardSlug: board.slug,
     meta: board.fullName,
     category: details.category,
+    categoryKey: details.categoryKey,
     description: details.description,
+    descriptionKey: details.descriptionKey,
     host: details.host,
+    hostKey: details.hostKey,
     reads: details.reads,
     index: details.index,
     href: `/feed/social?topic=${encodeURIComponent(key)}`,
@@ -118,13 +143,14 @@ const SOCIAL_HOT_TOPICS = BOARDS.map((board, index) => {
 
 
 const WEIBO_LEFT_ITEMS = [
-  { key: 'rank', label: 'Momentum', icon: TrendingUp },
-  { key: 'search', label: 'Topic scan', icon: Search },
+  { key: 'rank', labelKey: 'feed.momentum', icon: TrendingUp },
+  { key: 'search', labelKey: 'feed.topicScan', icon: Search },
 ]
 
 const normalizeTopic = (value) => `${value || ''}`.trim().replace(/^#/, '').replace(/\s+/g, '')
 const getInitialTopic = (searchParams) => normalizeTopic(searchParams.get('topic'))
 const getTopicByKey = (key) => SOCIAL_HOT_TOPICS.find((topic) => topic.key.toLowerCase() === normalizeTopic(key).toLowerCase()) || null
+const getTopicLabel = (t, topic) => `#${getLocalizedBoardName(t, topic.boardSlug).replace(/\s+/g, '')}`
 const getTopicsForDiscoveryCategory = (category) => {
   const activeCategory = DISCOVERY_CATEGORIES.find((item) => item.key === category)?.label
   if (!activeCategory || category === 'hot') return SOCIAL_HOT_TOPICS
@@ -150,37 +176,39 @@ const getInitialSocialTab = (searchParams) => {
   return SOCIAL_TABS.some((item) => item.key === tab) ? tab : 'home'
 }
 
-const getPageTitle = (section, tab, boardSlug) => {
+const getPageTitle = (t, section, tab, boardSlug) => {
   if (section === 'boards') {
-    return boardSlug ? `/${boardSlug}/ ${getBoardBySlug(boardSlug)?.name || 'Board'}` : 'Imageboard'
+    return boardSlug ? `/${boardSlug}/ ${getLocalizedBoardName(t, boardSlug)}` : t('feed.imageboard')
   }
-  if (tab === 'following') return 'Following'
-  if (tab === 'hot') return 'Hot'
-  return 'Home'
+  if (tab === 'following') return t('feed.following')
+  if (tab === 'hot') return t('feed.hot')
+  return t('feed.home')
 }
 
-const getPageSubtitle = (section, tab, boardSlug) => {
+const getPageSubtitle = (t, section, tab, boardSlug) => {
   if (section === 'boards') {
-    return boardSlug ? getBoardBySlug(boardSlug)?.fullName || 'Board feed' : 'Anonymous board threads'
+    return boardSlug ? getLocalizedBoardName(t, boardSlug, true) : t('feed.anonymousBoardThreads')
   }
   return ''
 }
 
 function FeedTab({ tab, active, onClick }) {
+  const { t } = useTranslation()
   const Icon = tab.icon
   return (
     <button className={`${s.tab} ${active ? s.tabActive : ''}`} onClick={onClick}>
       {Icon && <Icon size={16} />}
-      <span>{tab.label}</span>
+      <span>{t(tab.labelKey)}</span>
     </button>
   )
 }
 
 function SocialTopicDock({ selectedTopic }) {
+  const { t } = useTranslation()
   return (
-    <div className={s.socialTopicDock} aria-label="Super topics">
+    <div className={s.socialTopicDock} aria-label={t('feed.superTopics')}>
       <Link href="/feed/social" className={`${s.socialTopicPill} ${!selectedTopic ? s.socialTopicPillActive : ''}`}>
-        All
+        {t('common.all')}
       </Link>
       {SOCIAL_HOT_TOPICS.slice(0, 6).map((topic) => (
         <Link
@@ -188,7 +216,7 @@ function SocialTopicDock({ selectedTopic }) {
           href={topic.href}
           className={`${s.socialTopicPill} ${selectedTopic === topic.key ? s.socialTopicPillActive : ''}`}
         >
-          {topic.label}
+          {getTopicLabel(t, topic)}
         </Link>
       ))}
     </div>
@@ -196,23 +224,24 @@ function SocialTopicDock({ selectedTopic }) {
 }
 
 function TopicSpotlight({ topic }) {
+  const { t } = useTranslation()
   if (!topic) return null
 
   return (
     <section className={s.topicSpotlight}>
       <div>
-        <span>Topic circle · {topic.category}</span>
-        <h2>{topic.label}</h2>
-        <p>{topic.description}</p>
+        <span>{t('feed.topicCircle')} · {t(topic.categoryKey)}</span>
+        <h2>{getTopicLabel(t, topic)}</h2>
+        <p>{t(topic.descriptionKey)}</p>
         <div className={s.topicStats}>
-          <strong>{topic.reads} reads</strong>
-          <strong>steward {topic.host}</strong>
-          <strong>signal {topic.index}</strong>
+          <strong>{t('feed.readsLabel', { count: topic.reads })}</strong>
+          <strong>{t('feed.stewardLabel')} {t(topic.hostKey)}</strong>
+          <strong>{t('feed.signalLabel')} {topic.index}</strong>
         </div>
       </div>
       <div className={s.topicSpotlightActions}>
-        <Link href={topic.boardHref}>Board</Link>
-        <Link href="/feed/social">Clear</Link>
+        <Link href={topic.boardHref}>{t('forum.boardsLabel')}</Link>
+        <Link href="/feed/social">{t('common.clear')}</Link>
       </div>
     </section>
   )
@@ -220,6 +249,7 @@ function TopicSpotlight({ topic }) {
 
 
 function WeiboLeftRail({ activeItem, category, onCategoryChange, onPrimarySelect }) {
+  const { t } = useTranslation()
   const categoryItems = DISCOVERY_CATEGORIES.filter((item) => item.key !== 'hot')
 
   return (
@@ -234,7 +264,7 @@ function WeiboLeftRail({ activeItem, category, onCategoryChange, onPrimarySelect
               onClick={() => onPrimarySelect(item.key)}
             >
               <Icon size={20} />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </button>
           )
         })}
@@ -247,7 +277,7 @@ function WeiboLeftRail({ activeItem, category, onCategoryChange, onPrimarySelect
             onClick={() => onCategoryChange(item.key)}
           >
             <span>•</span>
-            {item.label}
+            {t(item.labelKey)}
           </button>
         ))}
       </div>
@@ -256,6 +286,7 @@ function WeiboLeftRail({ activeItem, category, onCategoryChange, onPrimarySelect
 }
 
 function WeiboHotSearchPanel({ selectedTopic, category, refreshSeed, onRefresh }) {
+  const { t } = useTranslation()
   const filteredTopics = getTopicsForDiscoveryCategory(category)
   const rotatedTopics = filteredTopics.length
     ? filteredTopics.map((_, index) => filteredTopics[(index + refreshSeed) % filteredTopics.length])
@@ -266,12 +297,12 @@ function WeiboHotSearchPanel({ selectedTopic, category, refreshSeed, onRefresh }
       <div className={s.weiboHotHeader}>
         <button type="button" onClick={onRefresh}>
           <RotateCw size={15} />
-          <span>Refresh</span>
+          <span>{t('data.refresh')}</span>
         </button>
       </div>
       <div className={s.weiboHotTabs}>
-        <button type="button">Mine</button>
-        <button type="button" className={s.weiboHotTabActive}>Network</button>
+        <button type="button">{t('feed.mine')}</button>
+        <button type="button" className={s.weiboHotTabActive}>{t('feed.network')}</button>
       </div>
       <div className={s.weiboHotRankList}>
         {rotatedTopics.slice(0, 10).map((topic, index) => (
@@ -281,16 +312,16 @@ function WeiboHotSearchPanel({ selectedTopic, category, refreshSeed, onRefresh }
             className={`${s.weiboHotRankItem} ${selectedTopic === topic.key ? s.weiboHotRankItemActive : ''}`}
           >
             <span>{index + 1}</span>
-            <strong>{topic.label.replace(/#/g, '')}</strong>
+            <strong>{getTopicLabel(t, topic).replace(/#/g, '')}</strong>
             <em>{topic.reads.replace(/[^\d.]/g, '') || topic.heat}</em>
-            {index === 3 && <b>new</b>}
-            {index === 5 && <b>up</b>}
-            {index === 6 && <b>hot</b>}
+            {index === 3 && <b>{t('feed.new')}</b>}
+            {index === 5 && <b>{t('feed.up')}</b>}
+            {index === 6 && <b>{t('feed.hot')}</b>}
           </Link>
         ))}
       </div>
       <Link href="/feed/social?tab=hot" className={s.weiboFullHotLink}>
-        Open signal map
+        {t('feed.openSignalMap')}
         <ArrowUpRight size={14} />
       </Link>
     </section>
@@ -298,22 +329,24 @@ function WeiboHotSearchPanel({ selectedTopic, category, refreshSeed, onRefresh }
 }
 
 function WeiboUtilityLinks() {
+  const { t } = useTranslation()
   return (
     <div className={s.weiboUtilityLinks}>
-      <span>Help</span>
-      <span>Moderation</span>
-      <span>Community notes</span>
-      <span>About Commons</span>
+      <span>{t('feed.help')}</span>
+      <span>{t('feed.moderation')}</span>
+      <span>{t('feed.communityNotes')}</span>
+      <span>{t('feed.aboutCommons')}</span>
     </div>
   )
 }
 
 function SocialDiscoveryRail({ selectedTopic }) {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('hot')
   const normalizedQuery = query.trim().toLowerCase()
   const topics = normalizedQuery
-    ? SOCIAL_HOT_TOPICS.filter((topic) => `${topic.label} ${topic.meta} ${topic.category} ${topic.description} ${topic.host}`.toLowerCase().includes(normalizedQuery))
+    ? SOCIAL_HOT_TOPICS.filter((topic) => `${topic.label} ${getLocalizedBoardName(t, topic.boardSlug, true)} ${t(topic.categoryKey)} ${t(topic.descriptionKey)} ${t(topic.hostKey)}`.toLowerCase().includes(normalizedQuery))
     : SOCIAL_HOT_TOPICS
   const visibleTopics = category === 'hot'
     ? topics
@@ -326,24 +359,24 @@ function SocialDiscoveryRail({ selectedTopic }) {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search topics"
-          aria-label="Search topics"
+          placeholder={t('feed.searchTopics')}
+          aria-label={t('feed.searchTopics')}
         />
       </form>
-      <div className={s.discoveryCategoryGrid} aria-label="Discovery categories">
+      <div className={s.discoveryCategoryGrid} aria-label={t('feed.discoveryCategories')}>
         {DISCOVERY_CATEGORIES.map((item) => (
           <button
             key={item.key}
             className={`${s.discoveryCategoryButton} ${category === item.key ? s.discoveryCategoryButtonActive : ''}`}
             onClick={() => setCategory(item.key)}
           >
-            <strong>{item.label}</strong>
-            <span>{item.meta}</span>
+            <strong>{t(item.labelKey)}</strong>
+            <span>{t(item.metaKey)}</span>
           </button>
         ))}
       </div>
       <div className={s.railHeader}>
-        <span>Hot Search</span>
+        <span>{t('feed.hotSearch')}</span>
         <TrendingUp size={16} />
       </div>
       <div className={s.hotSearchList}>
@@ -354,13 +387,13 @@ function SocialDiscoveryRail({ selectedTopic }) {
             className={`${s.hotSearchItem} ${selectedTopic === topic.key ? s.hotSearchItemActive : ''}`}
           >
             <span>{topic.topLabel}</span>
-            <strong>{topic.label}</strong>
-            <small>{topic.category} · {topic.description}</small>
+            <strong>{getTopicLabel(t, topic)}</strong>
+            <small>{t(topic.categoryKey)} · {t(topic.descriptionKey)}</small>
             <em>{topic.reads}</em>
-            <b>steward: {topic.host}</b>
+            <b>{t('feed.stewardLabel')}{': '}{t(topic.hostKey)}</b>
           </Link>
         )) : (
-          <div className={s.hotSearchEmpty}>No matching topics.</div>
+          <div className={s.hotSearchEmpty}>{t('feed.noMatchingTopics')}</div>
         )}
       </div>
     </section>
@@ -368,21 +401,22 @@ function SocialDiscoveryRail({ selectedTopic }) {
 }
 
 function SuperTopicRail({ selectedTopic }) {
+  const { t } = useTranslation()
   return (
     <section className={s.railSection}>
       <div className={s.railHeader}>
-        <span>Topic Circles</span>
+        <span>{t('feed.topicCircles')}</span>
         <BadgeCheck size={16} />
       </div>
       <div className={s.superTopicList}>
         {SOCIAL_HOT_TOPICS.slice(0, 5).map((topic) => (
           <div key={topic.key} className={`${s.superTopicItem} ${selectedTopic === topic.key ? s.superTopicItemActive : ''}`}>
             <Link href={topic.href}>
-              <strong>{topic.label}</strong>
-              <span>{topic.category} · {topic.reads} reads · steward {topic.host}</span>
+              <strong>{getTopicLabel(t, topic)}</strong>
+              <span>{t(topic.categoryKey)} · {t('feed.readsLabel', { count: topic.reads })} · {t('feed.stewardLabel')} {t(topic.hostKey)}</span>
             </Link>
             <Link href={topic.boardHref} className={s.superTopicBoardLink}>
-              board
+              {t('forum.board')}
             </Link>
           </div>
         ))}
@@ -392,16 +426,17 @@ function SuperTopicRail({ selectedTopic }) {
 }
 
 function WeiboPulseRail({ selectedTopic }) {
+  const { t } = useTranslation()
   const topic = getTopicByKey(selectedTopic) || SOCIAL_HOT_TOPICS[0]
 
   return (
     <section className={s.railSection}>
       <div className={s.pulsePanel}>
-        <strong>{topic.label}</strong>
-        <p>{topic.description}</p>
+        <strong>{getTopicLabel(t, topic)}</strong>
+        <p>{t(topic.descriptionKey)}</p>
         <div>
-          <span>signal {topic.index}</span>
-          <span>{topic.heat} heat</span>
+          <span>{t('feed.signalLabel')} {topic.index}</span>
+          <span>{topic.heat} {t('feed.heat')}</span>
         </div>
       </div>
     </section>
@@ -409,13 +444,14 @@ function WeiboPulseRail({ selectedTopic }) {
 }
 
 function BoardStrip({ activeBoardSlug, onAllBoards, onSelectBoard }) {
+  const { t } = useTranslation()
   return (
-    <div className={s.boardStrip} aria-label="Boards">
+    <div className={s.boardStrip} aria-label={t('forum.boardsLabel')}>
       <button
         className={`${s.boardStripChip} ${!activeBoardSlug ? s.boardStripChipActive : ''}`}
         onClick={onAllBoards}
       >
-        All
+        {t('common.all')}
       </button>
       {BOARDS.map((board) => (
         <button
@@ -424,7 +460,7 @@ function BoardStrip({ activeBoardSlug, onAllBoards, onSelectBoard }) {
           onClick={() => onSelectBoard(board.slug)}
         >
           /{board.slug}/
-          <span>{board.name}</span>
+          <span>{getLocalizedBoardName(t, board)}</span>
         </button>
       ))}
     </div>
@@ -432,13 +468,14 @@ function BoardStrip({ activeBoardSlug, onAllBoards, onSelectBoard }) {
 }
 
 function BoardThreadCard({ post, liked, onLike, onOpen, onBoardSelect }) {
+  const { t } = useTranslation()
   if (!post) return null
 
   const displayedPost = post.reposted_post || post
-  const identity = getSocialIdentity(displayedPost)
+  const identity = getSocialIdentity(displayedPost, t)
   const board = getBoardBySlug(displayedPost.board_slug)
   const shortId = `${displayedPost.id || ''}`.replace(/-/g, '').slice(0, 8) || 'thread'
-  const title = displayedPost.title || truncateText(displayedPost.content || 'Untitled thread', 64)
+  const title = displayedPost.title || truncateText(displayedPost.content || t('feed.untitledThread'), 64)
   const excerpt = truncateText(displayedPost.content || '', 190)
 
   return (
@@ -461,9 +498,9 @@ function BoardThreadCard({ post, liked, onLike, onOpen, onBoardSelect }) {
       {excerpt && <p className={s.threadExcerpt}>{excerpt}</p>}
 
       <div className={s.threadMetaGrid}>
-        <span>{identity.anonymous ? identity.name : 'Registered user'}</span>
-        <span>bump {formatRelativeTime(displayedPost.bump_at || displayedPost.created_at)}</span>
-        <span>{board?.name || 'Board'}</span>
+        <span>{identity.anonymous ? identity.name : t('feed.registeredUser')}</span>
+        <span>{t('feed.bump')} {formatRelativeTime(displayedPost.bump_at || displayedPost.created_at)}</span>
+        <span>{board ? getLocalizedBoardName(t, board) : t('forum.board')}</span>
       </div>
 
       <div className={s.threadFooter}>
@@ -481,9 +518,10 @@ function BoardThreadCard({ post, liked, onLike, onOpen, onBoardSelect }) {
 }
 
 function SurfaceReference({ activeSection }) {
+  const { t } = useTranslation()
   const target = activeSection === 'social'
-    ? { label: 'Imageboard', meta: 'Open the anonymous board catalog', href: '/feed/boards', icon: Hash }
-    : { label: 'Social', meta: 'Open the account timeline', href: '/feed/social', icon: AtSign }
+    ? { label: t('feed.imageboard'), meta: t('feed.openBoardCatalog'), href: '/feed/boards', icon: Hash }
+    : { label: t('feed.social'), meta: t('feed.openAccountTimeline'), href: '/feed/social', icon: AtSign }
   const Icon = target.icon
 
   return (
@@ -500,10 +538,11 @@ function SurfaceReference({ activeSection }) {
 }
 
 function BoardRail({ activeBoardSlug, onAllBoards, onSelectBoard }) {
+  const { t } = useTranslation()
   return (
     <section className={s.railSection}>
       <div className={s.railHeader}>
-        <span>Boards</span>
+        <span>{t('forum.boardsLabel')}</span>
         <Hash size={16} />
       </div>
       <div className={s.boardList}>
@@ -511,8 +550,8 @@ function BoardRail({ activeBoardSlug, onAllBoards, onSelectBoard }) {
           className={`${s.boardChip} ${!activeBoardSlug ? s.boardChipActive : ''}`}
           onClick={onAllBoards}
         >
-          <span>All</span>
-          <span>boards</span>
+          <span>{t('common.all')}</span>
+          <span>{t('forum.boardsLabel').toLowerCase()}</span>
         </button>
         {BOARDS.map((board) => (
           <button
@@ -521,7 +560,7 @@ function BoardRail({ activeBoardSlug, onAllBoards, onSelectBoard }) {
             onClick={() => onSelectBoard(board.slug)}
           >
             <span>/{board.slug}/</span>
-            <span>{board.name}</span>
+            <span>{getLocalizedBoardName(t, board)}</span>
           </button>
         ))}
       </div>
@@ -530,6 +569,7 @@ function BoardRail({ activeBoardSlug, onAllBoards, onSelectBoard }) {
 }
 
 function FeedPage({ initialSurface = null }) {
+  const { t } = useTranslation()
   const { user, profile, loading: authLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -554,8 +594,8 @@ function FeedPage({ initialSurface = null }) {
   const defaultComposerBoard = isBoards ? (boardSlug || BOARDS[0].slug) : ''
   const selectedBoard = useMemo(() => getBoardBySlug(boardSlug), [boardSlug])
   const selectedTopicInfo = useMemo(() => getTopicByKey(selectedTopic), [selectedTopic])
-  const pageTitle = selectedTopicInfo && !isBoards ? selectedTopicInfo.label : getPageTitle(section, socialTab, boardSlug)
-  const pageSubtitle = selectedTopicInfo && !isBoards ? selectedTopicInfo.meta : getPageSubtitle(section, socialTab, boardSlug)
+  const pageTitle = selectedTopicInfo && !isBoards ? getTopicLabel(t, selectedTopicInfo) : getPageTitle(t, section, socialTab, boardSlug)
+  const pageSubtitle = selectedTopicInfo && !isBoards ? getLocalizedBoardName(t, selectedTopicInfo.boardSlug, true) : getPageSubtitle(t, section, socialTab, boardSlug)
 
   const { posts, pagination, loading, error, refetch } = useSocialFeed({
     mode,
@@ -647,7 +687,7 @@ function FeedPage({ initialSurface = null }) {
 
   const renderContent = () => {
     if (loading) {
-      return <div className={s.stateBlock}>Loading...</div>
+      return <div className={s.stateBlock}>{t('common.loading')}</div>
     }
 
     if (error) {
@@ -656,7 +696,7 @@ function FeedPage({ initialSurface = null }) {
           <div>
             <p>{error}</p>
             <button className={s.retryButton} onClick={refetch}>
-              <RefreshCw size={14} /> Retry
+              <RefreshCw size={14} /> {t('data.retry')}
             </button>
           </div>
         </div>
@@ -666,7 +706,15 @@ function FeedPage({ initialSurface = null }) {
     if (posts.length === 0) {
       return (
         <div className={s.stateBlock}>
-          {socialLocked ? 'Log in to use the social timeline.' : selectedTopicInfo && !isBoards ? `No posts for ${selectedTopicInfo.label} yet.` : socialTab === 'following' ? 'Follow people to build this feed.' : isBoards ? 'No board threads yet.' : 'No posts yet.'}
+          {socialLocked
+            ? t('feed.loginForTimeline')
+            : selectedTopicInfo && !isBoards
+              ? t('feed.noPostsForTopic', { topic: getTopicLabel(t, selectedTopicInfo) })
+              : socialTab === 'following'
+                ? t('feed.followPeoplePrompt')
+                : isBoards
+                  ? t('feed.noBoardThreads')
+                  : t('feed.noPosts')}
         </div>
       )
     }
@@ -740,7 +788,7 @@ function FeedPage({ initialSurface = null }) {
               ))}
             </div>
             <SocialTopicDock selectedTopic={selectedTopic} />
-            <Link href="/feed/boards" className={s.mobileSurfaceLink}>Open Imageboard</Link>
+            <Link href="/feed/boards" className={s.mobileSurfaceLink}>{t('feed.openImageboard')}</Link>
 
             <SocialComposer
               composerId="social-composer"
@@ -759,11 +807,11 @@ function FeedPage({ initialSurface = null }) {
             {pagination.totalPages > 1 && (
               <div className={s.pagination}>
                 <button className={s.pageButton} disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
-                  Previous
+                  {t('common.previous')}
                 </button>
                 <span className={s.monoMeta}>{page} / {pagination.totalPages}</span>
                 <button className={s.pageButton} disabled={page >= pagination.totalPages} onClick={() => setPage((value) => value + 1)}>
-                  Next
+                  {t('common.next')}
                 </button>
               </div>
             )}
@@ -799,7 +847,7 @@ function FeedPage({ initialSurface = null }) {
               </div>
               <div className={s.boardPicker}>
                 {socialLocked ? <Lock size={15} /> : <Radio size={15} />}
-                <span>{isBoards ? (selectedBoard ? `/${selectedBoard.slug}/` : 'all boards') : 'account social'}</span>
+                <span>{isBoards ? (selectedBoard ? `/${selectedBoard.slug}/` : t('feed.allBoards')) : t('feed.accountSocial')}</span>
               </div>
             </div>
 
@@ -809,7 +857,7 @@ function FeedPage({ initialSurface = null }) {
               onSelectBoard={handleBoardSelect}
             />
 
-            <Link href="/feed/social" className={s.mobileSurfaceLink}>Open Social</Link>
+            <Link href="/feed/social" className={s.mobileSurfaceLink}>{t('feed.openSocial')}</Link>
           </header>
 
           <SocialComposer
@@ -828,11 +876,11 @@ function FeedPage({ initialSurface = null }) {
           {pagination.totalPages > 1 && (
             <div className={s.pagination}>
               <button className={s.pageButton} disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
-                Previous
+                {t('common.previous')}
               </button>
               <span className={s.monoMeta}>{page} / {pagination.totalPages}</span>
               <button className={s.pageButton} disabled={page >= pagination.totalPages} onClick={() => setPage((value) => value + 1)}>
-                Next
+                {t('common.next')}
               </button>
             </div>
           )}
