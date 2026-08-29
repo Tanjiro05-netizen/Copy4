@@ -532,5 +532,29 @@
     "eContrib": "作者贡献：",
     "eContribVal": "须提供一份说明，详述每位作者对稿件的具体贡献。",
     "citChicagoVal": "注释与参考文献制或作者-年份制"
+  },
+  "submit": {
+    "kicker": "作者集体",
+    "title": "提交你的作品",
+    "quote": "“每一个社会阶级都会创造出自己的有机知识分子。”",
+    "viewGuidelines": "查看投稿指南",
+    "category": "类别",
+    "selectCategory": "请选择类别...",
+    "workTitle": "标题",
+    "titlePlaceholder": "请输入作品标题",
+    "abstract": "摘要",
+    "abstractPlaceholder": "请简要概述你的作品",
+    "tags": "标签",
+    "selectTags": "请选择标签...",
+    "uploadManuscript": "上传稿件",
+    "chooseFile": "选择文件...",
+    "fileHint": "PDF、DOC、DOCX，最大 5 MB。",
+    "success": "投稿成功！感谢你的贡献。",
+    "submitting": "正在提交...",
+    "submitWork": "提交作品",
+    "invalidFileType": "文件类型无效。请上传 PDF 或 Word 文档。",
+    "fileTooLarge": "文件过大，最大为 5 MB。",
+    "loginRequired": "你必须登录后才能提交文章。",
+    "missingFields": "请填写所有字段，选择一个类别和至少一个标签，并上传稿件。"
   }
 }

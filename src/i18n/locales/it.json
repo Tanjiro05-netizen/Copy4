@@ -532,5 +532,29 @@
     "eContrib": "Contributi degli autori:",
     "eContribVal": "È richiesta una dichiarazione che dettagli i contributi specifici di ciascun autore al manoscritto.",
     "citChicagoVal": "Note e bibliografia o autore-data"
+  },
+  "submit": {
+    "kicker": "Collettivo degli autori",
+    "title": "Invia il tuo lavoro",
+    "quote": "«Ogni classe sociale crea i propri intellettuali organici.»",
+    "viewGuidelines": "Vedi le linee guida per l'invio",
+    "category": "Categoria",
+    "selectCategory": "Seleziona una categoria...",
+    "workTitle": "Titolo",
+    "titlePlaceholder": "Inserisci il titolo del tuo lavoro",
+    "abstract": "Abstract",
+    "abstractPlaceholder": "Fornisci un breve abstract del tuo lavoro",
+    "tags": "Parole chiave",
+    "selectTags": "Seleziona le parole chiave...",
+    "uploadManuscript": "Carica il manoscritto",
+    "chooseFile": "Scegli un file...",
+    "fileHint": "PDF, DOC, DOCX. Max 5 MB.",
+    "success": "Invio completato! Grazie per il tuo contributo.",
+    "submitting": "Invio in corso...",
+    "submitWork": "Invia il lavoro",
+    "invalidFileType": "Tipo di file non valido. Carica un documento PDF o Word.",
+    "fileTooLarge": "Il file è troppo grande. La dimensione massima è di 5 MB.",
+    "loginRequired": "Devi accedere per inviare un articolo.",
+    "missingFields": "Compila tutti i campi, seleziona una categoria e almeno una parola chiave, quindi carica un manoscritto."
   }
 }

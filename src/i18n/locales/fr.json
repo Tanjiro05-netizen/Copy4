@@ -532,5 +532,29 @@
     "eContrib": "Contributions des auteurs :",
     "eContribVal": "Une déclaration détaillant les contributions spécifiques de chaque auteur au manuscrit est requise.",
     "citChicagoVal": "Notes et bibliographie ou auteur-date"
+  },
+  "submit": {
+    "kicker": "Collectif d'auteurs",
+    "title": "Soumettre votre travail",
+    "quote": "« Chaque classe sociale crée ses propres intellectuels organiques. »",
+    "viewGuidelines": "Voir les directives de soumission",
+    "category": "Catégorie",
+    "selectCategory": "Sélectionnez une catégorie...",
+    "workTitle": "Titre",
+    "titlePlaceholder": "Saisissez le titre de votre travail",
+    "abstract": "Résumé",
+    "abstractPlaceholder": "Présentez un bref résumé de votre travail",
+    "tags": "Mots-clés",
+    "selectTags": "Sélectionnez des mots-clés...",
+    "uploadManuscript": "Téléverser le manuscrit",
+    "chooseFile": "Choisir un fichier...",
+    "fileHint": "PDF, DOC, DOCX. 5 Mo max.",
+    "success": "Soumission réussie ! Merci pour votre contribution.",
+    "submitting": "Envoi en cours...",
+    "submitWork": "Soumettre le travail",
+    "invalidFileType": "Type de fichier non valide. Veuillez téléverser un document PDF ou Word.",
+    "fileTooLarge": "Le fichier est trop volumineux. La taille maximale est de 5 Mo.",
+    "loginRequired": "Vous devez être connecté pour soumettre un article.",
+    "missingFields": "Veuillez remplir tous les champs, sélectionner une catégorie et au moins un mot-clé, puis téléverser un manuscrit."
   }
 }

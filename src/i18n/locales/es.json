@@ -532,5 +532,29 @@
     "eContrib": "Contribuciones de los autores:",
     "eContribVal": "Se requiere una declaración que detalle las contribuciones específicas de cada autor al manuscrito.",
     "citChicagoVal": "Notas y bibliografía o autor-fecha"
+  },
+  "submit": {
+    "kicker": "Colectivo de escritores",
+    "title": "Envía tu trabajo",
+    "quote": "«Cada clase social crea sus propios intelectuales orgánicos.»",
+    "viewGuidelines": "Ver las directrices de envío",
+    "category": "Categoría",
+    "selectCategory": "Selecciona una categoría...",
+    "workTitle": "Título",
+    "titlePlaceholder": "Introduce el título de tu trabajo",
+    "abstract": "Resumen",
+    "abstractPlaceholder": "Proporciona un breve resumen de tu trabajo",
+    "tags": "Etiquetas",
+    "selectTags": "Selecciona etiquetas...",
+    "uploadManuscript": "Subir manuscrito",
+    "chooseFile": "Elegir un archivo...",
+    "fileHint": "PDF, DOC, DOCX. Máx. 5 MB.",
+    "success": "¡Envío completado! Gracias por tu contribución.",
+    "submitting": "Enviando...",
+    "submitWork": "Enviar trabajo",
+    "invalidFileType": "Tipo de archivo no válido. Sube un documento PDF o Word.",
+    "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es de 5 MB.",
+    "loginRequired": "Debes iniciar sesión para enviar un artículo.",
+    "missingFields": "Completa todos los campos, selecciona una categoría, elige al menos una etiqueta y sube un manuscrito."
   }
 }

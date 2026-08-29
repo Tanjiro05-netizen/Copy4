@@ -532,5 +532,29 @@
     "eContrib": "Author Contributions:",
     "eContribVal": "A statement detailing the specific contributions of each author to the manuscript is required.",
     "citChicagoVal": "Notes & Bibliography or Author-Date"
+  },
+  "submit": {
+    "kicker": "Writers' Collective",
+    "title": "Submit Your Work",
+    "quote": "“Every social class creates its own organic intellectuals.”",
+    "viewGuidelines": "View Submission Guidelines",
+    "category": "Category",
+    "selectCategory": "Select a category...",
+    "workTitle": "Title",
+    "titlePlaceholder": "Enter your work's title",
+    "abstract": "Abstract",
+    "abstractPlaceholder": "Provide a brief abstract of your work",
+    "tags": "Tags",
+    "selectTags": "Select tags...",
+    "uploadManuscript": "Upload Manuscript",
+    "chooseFile": "Choose a file...",
+    "fileHint": "PDF, DOC, DOCX. Max 5MB.",
+    "success": "Submission successful! Thank you for your contribution.",
+    "submitting": "Submitting...",
+    "submitWork": "Submit Work",
+    "invalidFileType": "Invalid file type. Please upload a PDF or Word document.",
+    "fileTooLarge": "File is too large. Maximum size is 5MB.",
+    "loginRequired": "You must be logged in to submit an article.",
+    "missingFields": "Please fill out all fields, select a category, choose at least one tag, and upload a manuscript."
   }
 }

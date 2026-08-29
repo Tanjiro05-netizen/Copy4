@@ -532,5 +532,29 @@
     "eContrib": "Autorenbeiträge:",
     "eContribVal": "Eine Erklärung mit den konkreten Beiträgen jeder Autorin und jedes Autors zum Manuskript ist erforderlich.",
     "citChicagoVal": "Anmerkungen & Bibliographie oder Autor-Datum"
+  },
+  "submit": {
+    "kicker": "Autor:innenkollektiv",
+    "title": "Beitrag einreichen",
+    "quote": "„Jede soziale Klasse schafft sich ihre eigenen organischen Intellektuellen.“",
+    "viewGuidelines": "Einreichungsrichtlinien anzeigen",
+    "category": "Kategorie",
+    "selectCategory": "Kategorie auswählen...",
+    "workTitle": "Titel",
+    "titlePlaceholder": "Geben Sie den Titel Ihres Beitrags ein",
+    "abstract": "Zusammenfassung",
+    "abstractPlaceholder": "Geben Sie eine kurze Zusammenfassung Ihres Beitrags an",
+    "tags": "Schlagwörter",
+    "selectTags": "Schlagwörter auswählen...",
+    "uploadManuscript": "Manuskript hochladen",
+    "chooseFile": "Datei auswählen...",
+    "fileHint": "PDF, DOC, DOCX. Max. 5 MB.",
+    "success": "Einreichung erfolgreich! Vielen Dank für Ihren Beitrag.",
+    "submitting": "Wird eingereicht...",
+    "submitWork": "Beitrag einreichen",
+    "invalidFileType": "Ungültiger Dateityp. Bitte laden Sie ein PDF- oder Word-Dokument hoch.",
+    "fileTooLarge": "Die Datei ist zu groß. Die maximale Größe beträgt 5 MB.",
+    "loginRequired": "Sie müssen angemeldet sein, um einen Artikel einzureichen.",
+    "missingFields": "Bitte füllen Sie alle Felder aus, wählen Sie eine Kategorie und mindestens ein Schlagwort und laden Sie ein Manuskript hoch."
   }
 }

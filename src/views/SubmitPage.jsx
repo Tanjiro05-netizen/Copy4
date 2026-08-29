@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +10,7 @@ import * as s from './SubmitPage.css.ts';
 
 const SubmitPage = () => {
 
+    const { t } = useTranslation();
     const { user } = useAuth();
     const [showGuidelinesModal, setShowGuidelinesModal] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -169,13 +171,13 @@ const SubmitPage = () => {
         if (selectedFile) {
             const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
             if (!allowedTypes.includes(selectedFile.type)) {
-                setError('Invalid file type. Please upload a PDF or Word document.');
+                setError(t('submit.invalidFileType'));
                 setFile(null);
                 setFileName('');
                 return;
             }
             if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-                setError('File is too large. Maximum size is 5MB.');
+                setError(t('submit.fileTooLarge'));
                 setFile(null);
                 setFileName('');
                 return;
@@ -192,12 +194,12 @@ const SubmitPage = () => {
         setSuccess(false);
 
         if (!user) {
-            setError('You must be logged in to submit an article.');
+            setError(t('submit.loginRequired'));
             return;
         }
 
         if (!file || !title || !abstract || !category || selectedTags.length === 0) {
-            setError('Please fill out all fields, select a category, choose at least one tag, and upload a manuscript.');
+            setError(t('submit.missingFields'));
             return;
         }
 
@@ -262,11 +264,11 @@ const SubmitPage = () => {
                 <div className={s.heroGrid} />
                 <div className={s.heroContent}>
                     <div className={s.heroCopy}>
-                        <p className={s.heroKicker}>Writers' Collective</p>
-                        <h1 className={s.heroTitle}>Submit Your Work</h1>
+                        <p className={s.heroKicker}>{t('submit.kicker')}</p>
+                        <h1 className={s.heroTitle}>{t('submit.title')}</h1>
                         <div className={s.heroRule} aria-hidden="true" />
                         <p className={s.heroQuote}>
-                            "Every social class creates its own organic intellectuals."
+                            {t('submit.quote')}
                         </p>
                     </div>
                 </div>
@@ -278,7 +280,7 @@ const SubmitPage = () => {
                         <div className={s.topActions}>
                             <button type="button" onClick={() => setShowGuidelinesModal(true)} className={s.guidelineBtn}>
                                 <Info size={18} />
-                                <span>View Submission Guidelines</span>
+                                <span>{t('submit.viewGuidelines')}</span>
                             </button>
                             {isAdmin && (
                                 <button type="button" onClick={initializeTags} disabled={initializingTags} className={s.adminBtn}>
@@ -288,25 +290,25 @@ const SubmitPage = () => {
                         </div>
 
                         <div className={s.fieldBlock}>
-                            <label htmlFor="category" className={s.fieldLabel}>Category</label>
+                            <label htmlFor="category" className={s.fieldLabel}>{t('submit.category')}</label>
                             <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className={s.selectInput} required>
-                                <option value="" disabled>Select a category...</option>
+                                <option value="" disabled>{t('submit.selectCategory')}</option>
                                 {categories.map(cat => (<option key={cat.id} value={cat.id}>{cat.name}</option>))}
                             </select>
                         </div>
 
                         <div className={s.fieldBlock}>
-                            <label htmlFor="title" className={s.fieldLabel}>Title</label>
-                            <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className={s.textInput} placeholder="Enter your work's title" required />
+                            <label htmlFor="title" className={s.fieldLabel}>{t('submit.workTitle')}</label>
+                            <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className={s.textInput} placeholder={t('submit.titlePlaceholder')} required />
                         </div>
 
                         <div className={s.fieldBlock}>
-                            <label htmlFor="abstract" className={s.fieldLabel}>Abstract</label>
-                            <textarea id="abstract" rows="4" value={abstract} onChange={(e) => setAbstract(e.target.value)} className={s.textArea} placeholder="Provide a brief abstract of your work" required />
+                            <label htmlFor="abstract" className={s.fieldLabel}>{t('submit.abstract')}</label>
+                            <textarea id="abstract" rows="4" value={abstract} onChange={(e) => setAbstract(e.target.value)} className={s.textArea} placeholder={t('submit.abstractPlaceholder')} required />
                         </div>
 
                         <div className={s.fieldBlock}>
-                            <label htmlFor="tags" className={s.fieldLabel}>Tags</label>
+                            <label htmlFor="tags" className={s.fieldLabel}>{t('submit.tags')}</label>
                             <Select
                                 id="tags"
                                 isMulti
@@ -314,7 +316,7 @@ const SubmitPage = () => {
                                 value={selectedTags}
                                 onChange={setSelectedTags}
                                 classNamePrefix="select"
-                                placeholder="Select tags..."
+                                placeholder={t('submit.selectTags')}
                                 styles={{
                                     control: (base) => ({ ...base, backgroundColor: '#1a1f2b', borderColor: 'rgba(255,255,255,0.06)', color: 'white' }),
                                     multiValue: (base) => ({ ...base, backgroundColor: '#b3122e' }),
@@ -328,13 +330,13 @@ const SubmitPage = () => {
                         </div>
 
                         <div className={s.fieldBlock}>
-                            <label className={s.fieldLabel}>Upload Manuscript</label>
+                            <label className={s.fieldLabel}>{t('submit.uploadManuscript')}</label>
                             <label htmlFor="manuscript-upload" className={s.uploadLabel}>
                                 <UploadIcon size={18} style={{ marginRight: 12 }} />
-                                <span>{fileName || 'Choose a file...'}</span>
+                                <span>{fileName || t('submit.chooseFile')}</span>
                             </label>
                             <input id="manuscript-upload" type="file" style={{ display: 'none' }} onChange={handleFileChange} accept=".pdf,.doc,.docx" />
-                            <p className={s.uploadHint}>PDF, DOC, DOCX. Max 5MB.</p>
+                            <p className={s.uploadHint}>{t('submit.fileHint')}</p>
                         </div>
 
                         {error && (
@@ -346,13 +348,13 @@ const SubmitPage = () => {
                         {success && (
                             <div className={s.successBox}>
                                 <CheckCircle size={18} style={{ flexShrink: 0 }} />
-                                <span>Submission successful! Thank you for your contribution.</span>
+                                <span>{t('submit.success')}</span>
                             </div>
                         )}
 
                         <div className={s.submitRow}>
                             <button type="submit" disabled={submitting} className={s.submitBtn}>
-                                {submitting ? (<><Loader2 size={18} /> Submitting...</>) : (<><UploadIcon size={18} /> Submit Work</>)}
+                                {submitting ? (<><Loader2 size={18} /> {t('submit.submitting')}</>) : (<><UploadIcon size={18} /> {t('submit.submitWork')}</>)}
                             </button>
                         </div>
                     </form>
