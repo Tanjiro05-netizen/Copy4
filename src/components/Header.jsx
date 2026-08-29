@@ -59,7 +59,11 @@ const Header = () => {
     const navItems = allNavItems;
     
     return (
-        <header className={s.header}>
+        /* Fragment on purpose: the navband must be a direct child of the page
+           shell (min-height 100vh) for position:sticky to hold for the whole
+           document — wrapping it in a <header> confines the stick to that
+           short box and the band scrolls away. */
+        <>
             {/* Masthead — centered, scrolls away */}
             <div className={s.masthead}>
                 <Link href="/home" className={s.mastheadLink}>
@@ -216,8 +220,7 @@ const Header = () => {
             </div>
 
             {/* Mobile Menu */}
-            {mobileMenuOpen && (
-                <div className={s.mobileOverlay}>
+            {mobileMenuOpen && (                <div className={s.mobileOverlay}>
                     <div className={s.mobileInner}>
                         <div className={s.mobileCloseRow}>
                             <button className={s.mobileCloseButton} onClick={() => setMobileMenuOpen(false)}>
@@ -325,7 +328,7 @@ const Header = () => {
                     </div>
                 </div>
             )}
-        </header>
+        </>
     );
 };
 

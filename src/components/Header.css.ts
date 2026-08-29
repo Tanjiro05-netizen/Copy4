@@ -9,13 +9,6 @@ const bandAccent = '#b3122e';
 /* Parchment gold — the warm tan plate that marks hovered/active selectors */
 const bandHighlight = '#e0ccaa';
 
-export const header = style({
-  position: 'relative',
-  width: '100%',
-  zIndex: 40,
-  background: vars.color.background,
-});
-
 /* ── Masthead — centered, scrolls away ── */
 
 export const masthead = style({
